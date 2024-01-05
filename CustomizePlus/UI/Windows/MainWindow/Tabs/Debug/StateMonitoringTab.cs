@@ -1,0 +1,195 @@
+﻿using ImGuiNET;
+using System.Linq;
+using System;
+using CustomizePlus.Armatures.Data;
+using CustomizePlus.Profiles;
+using CustomizePlus.Armatures.Services;
+using CustomizePlus.Templates;
+using CustomizePlus.Profiles.Data;
+using CustomizePlus.Templates.Data;
+using CustomizePlus.GameData.Extensions;
+using CustomizePlus.GameData.Services;
+
+namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
+
+public class StateMonitoringTab
+{
+    private readonly ProfileManager _profileManager;
+    private readonly TemplateManager _templateManager;
+    private readonly ArmatureManager _armatureManager;
+    private readonly ObjectManager _objectManager;
+
+    public StateMonitoringTab(
+        ProfileManager profileManager,
+        TemplateManager templateManager,
+        ArmatureManager armatureManager,
+        ObjectManager objectManager)
+    {
+        _profileManager = profileManager;
+        _templateManager = templateManager;
+        _armatureManager = armatureManager;
+        _objectManager = objectManager;
+    }
+
+    public void Draw()
+    {
+        var showProfiles = ImGui.CollapsingHeader($"Profiles ({_profileManager.Profiles.Count})###profiles_header");
+
+        if (showProfiles)
+            DrawProfiles();
+
+        var showTemplates = ImGui.CollapsingHeader($"Templates ({_templateManager.Templates.Count})###templates_header");
+
+        if (showTemplates)
+            DrawTemplates();
+
+        var showArmatures = ImGui.CollapsingHeader($"Armatures ({_armatureManager.Armatures.Count})###armatures_header");
+
+        if (showArmatures)
+            DrawArmatures();
+
+        var showObjectManager = ImGui.CollapsingHeader($"Object manager ({_objectManager.Count})###objectmanager_header");
+
+        if (showObjectManager)
+            DrawObjectManager();
+    }
+
+    private void DrawProfiles()
+    {
+        foreach (var profile in _profileManager.Profiles.OrderByDescending(x => x.Enabled))
+        {
+            DrawSingleProfile("root", profile);
+            ImGui.Spacing();
+            ImGui.Spacing();
+        }
+    }
+
+    private void DrawTemplates()
+    {
+        foreach (var template in _templateManager.Templates)
+        {
+            DrawSingleTemplate($"root", template);
+            ImGui.Spacing();
+            ImGui.Spacing();
+        }
+    }
+
+    private void DrawArmatures()
+    {
+        foreach (var armature in _armatureManager.Armatures)
+        {
+            DrawSingleArmature($"root", armature.Value);
+            ImGui.Spacing();
+            ImGui.Spacing();
+        }
+    }
+
+    private void DrawObjectManager()
+    {
+        foreach (var kvPair in _objectManager)
+        {
+            var show = ImGui.CollapsingHeader($"{kvPair.Key} ({kvPair.Value.Objects.Count} objects)###object-{kvPair.Key}");
+
+            if (!show)
+                continue;
+
+            ImGui.Text($"ActorIdentifier");
+            ImGui.Text($"PlayerName: {kvPair.Key.PlayerName}");
+            ImGui.Text($"HomeWorld: {kvPair.Key.HomeWorld}");
+            ImGui.Text($"Retainer: {kvPair.Key.Retainer}");
+            ImGui.Text($"Kind: {kvPair.Key.Kind}");
+            ImGui.Text($"Data id: {kvPair.Key.DataId}");
+            ImGui.Text($"Index: {kvPair.Key.Index.Index}");
+            ImGui.Text($"Type: {kvPair.Key.Type}");
+            ImGui.Text($"Special: {kvPair.Key.Special.ToString()}");
+            ImGui.Text($"ToName: {kvPair.Key.ToName()}");
+            ImGui.Text($"ToNameWithoutOwnerName: {kvPair.Key.ToNameWithoutOwnerName()}");
+
+            ImGui.Spacing();
+            ImGui.Spacing();
+
+            ImGui.Text($"Objects");
+            ImGui.Text($"Valid: {kvPair.Value.Valid}");
+            ImGui.Text($"Label: {kvPair.Value.Label}");
+            ImGui.Text($"Count: {kvPair.Value.Objects.Count}");
+            foreach (var item in kvPair.Value.Objects)
+            {
+                ImGui.Text($"{item}, valid: {item.Valid}");
+            }
+
+            ImGui.Spacing();
+            ImGui.Spacing();
+        }
+    }
+
+    private void DrawSingleProfile(string prefix, Profile profile)
+    {
+        var show = ImGui.CollapsingHeader($"[{(profile.Enabled ? "E" : "D")}] {profile.Name} on {profile.CharacterName} [{(profile.IsTemporary ? "Temporary" : "Permanent")}]###{prefix}-profile-{profile.UniqueId}");
+
+        if (!show)
+            return;
+
+        ImGui.Text($"ID: {profile.UniqueId}");
+        ImGui.Text($"Enabled: {(profile.Enabled ? "Enabled" : "Disabled")}");
+        ImGui.Text($"State : {(profile.IsTemporary ? "Temporary" : "Permanent")}");
+        ImGui.Text($"Lookup: {(profile.LimitLookupToOwnedObjects ? "Limited lookup" : "Global lookup")}");
+        var showTemplates = ImGui.CollapsingHeader($"Templates###{prefix}-profile-{profile.UniqueId}-templates");
+
+        if (showTemplates)
+        {
+            foreach (var template in profile.Templates)
+            {
+                DrawSingleTemplate($"profile-{profile.UniqueId}", template);
+            }
+        }
+
+        if (profile.Armatures.Count > 0)
+            foreach (var armature in profile.Armatures)
+                DrawSingleArmature($"profile-{profile.UniqueId}", armature);
+        else
+            ImGui.Text("No armatures");
+    }
+
+    private void DrawSingleTemplate(string prefix, Template template)
+    {
+        var show = ImGui.CollapsingHeader($"{template.Name}###{prefix}-template-{template.UniqueId}");
+
+        if (!show)
+            return;
+
+        ImGui.Text($"ID: {template.UniqueId}");
+
+        ImGui.Text($"Bones:");
+        foreach (var kvPair in template.Bones)
+        {
+            ImGui.Text($"{kvPair.Key}: p:{kvPair.Value.Translation} | r: {kvPair.Value.Rotation} | s: {kvPair.Value.Scaling}");
+        }
+    }
+
+    private void DrawSingleArmature(string prefix, Armature armature)
+    {
+        var show = ImGui.CollapsingHeader($"{armature} [{(armature.IsBuilt ? "Built" : "Not built")}, {(armature.IsVisible ? "Visible" : "Not visible")}]###{prefix}-armature-{armature.GetHashCode()}");
+
+        if (!show)
+            return;
+
+        if (armature.IsBuilt)
+        {
+            ImGui.Text($"Total bones: {armature.TotalBoneCount}");
+            ImGui.Text($"Partial skeletons: {armature.PartialSkeletonCount}");
+            ImGui.Text($"Root bone: {armature.MainRootBone}");
+        }
+
+        ImGui.Text($"Profile: {armature.Profile.Name} ({armature.Profile.UniqueId})");
+        ImGui.Text($"Actor: {armature.ActorIdentifier}");
+        ImGui.Text($"Protection: {(armature.ProtectedUntil >= DateTime.UtcNow ? "Active" : "NOT active")} [{armature.ProtectedUntil} (UTC)]");
+        //ImGui.Text("Profile:");
+        //DrawSingleProfile($"armature-{armature.GetHashCode()}", armature.Profile);
+
+        ImGui.Text($"Bone template bindings:");
+        foreach (var kvPair in armature.BoneTemplateBinding)
+        {
+            ImGui.Text($"{kvPair.Key} -> {kvPair.Value.Name} ({kvPair.Value.UniqueId})");
+        }
+    }
+}

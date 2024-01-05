@@ -1,0 +1,15 @@
+{
+    "Author": "Risa",
+    "Name": "Customize+",
+    "Punchline": "Customize your character beyond FFXIV's limitations.",
+    "Description": "A plugin that allows you to customize your character beyond FFXIV limitations by directly editing bone parameters.",
+    "InternalName": "CustomizePlus",
+    "ApplicableVersion": "any",
+    "DalamudApiLevel": 9,
+    "Tags": [
+        "anamnesis",
+        "customize",
+        "Risa",
+        "Aether Tools"
+    ]
+}

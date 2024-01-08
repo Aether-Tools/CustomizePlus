@@ -13,10 +13,10 @@ public static class ActorIdentifierExtensions
     /// <exception cref="Exception"></exception>
     public static string ToNameWithoutOwnerName(this ActorIdentifier identifier)
     {
-        if (identifier == ActorIdentifier.Invalid)
+        if (!identifier.IsValid)
             return "Invalid";
 
-        if (!identifier.IsValid || identifier.Type != IdentifierType.Owned)
+        if (identifier.Type != IdentifierType.Owned)
             return identifier.ToName();
 
         if (ActorIdentifier.Manager == null)
@@ -32,12 +32,12 @@ public static class ActorIdentifierExtensions
     /// <returns></returns>
     public static string IncognitoDebug(this ActorIdentifier identifier)
     {
-        if (identifier == ActorIdentifier.Invalid)
+        if (!identifier.IsValid)
             return "Invalid";
 
         try
         {
-#if DEBUG
+#if !INCOGNIFY_STRINGS
             return identifier.ToString();
 #else
             return identifier.Incognito(null);
@@ -60,7 +60,7 @@ public static class ActorIdentifierExtensions
     /// <returns></returns>
     public static bool IsAllowedForProfiles(this ActorIdentifier identifier)
     {
-        if (identifier == ActorIdentifier.Invalid)
+        if (!identifier.IsValid)
             return false;
 
         switch (identifier.Type)

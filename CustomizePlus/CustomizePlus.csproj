@@ -88,4 +88,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+<!--  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DefineConstants>INCOGNIFY_STRINGS</DefineConstants>
+  </PropertyGroup>-->
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DefineConstants>INCOGNIFY_STRINGS</DefineConstants>
+  </PropertyGroup>
 </Project>

@@ -12,7 +12,7 @@ namespace CustomizePlus.Core.Extensions
             if (str.IsNullOrWhitespace())
                 return str;
 
-#if DEBUG
+#if !INCOGNIFY_STRINGS
             return str;
 #endif
 
@@ -21,12 +21,12 @@ namespace CustomizePlus.Core.Extensions
                 var split = str.Split(' ');
 
                 if (split.Length > 2)
-                    return $"{str[..2]}...";
+                    return $"{str[..5]}...";
 
                 return $"{split[0][0]}.{split[1][0]}";
             }
 
-            return $"{str[..2]}...";
+            return $"{str[..5]}...";
         }
     }
 }

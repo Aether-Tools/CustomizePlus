@@ -9,6 +9,8 @@ using CustomizePlus.Profiles.Data;
 using CustomizePlus.Templates.Data;
 using CustomizePlus.GameData.Extensions;
 using CustomizePlus.GameData.Services;
+using CustomizePlus.Core.Extensions;
+using System.Numerics;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 
@@ -124,7 +126,15 @@ public class StateMonitoringTab
 
     private void DrawSingleProfile(string prefix, Profile profile)
     {
-        var show = ImGui.CollapsingHeader($"[{(profile.Enabled ? "E" : "D")}] {profile.Name} on {profile.CharacterName} [{(profile.IsTemporary ? "Temporary" : "Permanent")}]###{prefix}-profile-{profile.UniqueId}");
+        string name = profile.Name;
+        string characterName = profile.CharacterName;
+
+#if INCOGNIFY_STRINGS
+        name = name.Incognify();
+        characterName = characterName.Incognify();
+#endif
+
+        var show = ImGui.CollapsingHeader($"[{(profile.Enabled ? "E" : "D")}] {name} on {characterName} [{(profile.IsTemporary ? "Temporary" : "Permanent")}] [{profile.UniqueId}]###{prefix}-profile-{profile.UniqueId}");
 
         if (!show)
             return;
@@ -152,7 +162,13 @@ public class StateMonitoringTab
 
     private void DrawSingleTemplate(string prefix, Template template)
     {
-        var show = ImGui.CollapsingHeader($"{template.Name}###{prefix}-template-{template.UniqueId}");
+        string name = template.Name;
+
+#if INCOGNIFY_STRINGS
+        name = name.Incognify();
+#endif
+
+        var show = ImGui.CollapsingHeader($"{name} [{template.UniqueId}]###{prefix}-template-{template.UniqueId}");
 
         if (!show)
             return;
@@ -162,7 +178,11 @@ public class StateMonitoringTab
         ImGui.Text($"Bones:");
         foreach (var kvPair in template.Bones)
         {
-            ImGui.Text($"{kvPair.Key}: p:{kvPair.Value.Translation} | r: {kvPair.Value.Rotation} | s: {kvPair.Value.Scaling}");
+#if !INCOGNIFY_STRINGS
+            ImGui.Text($"{kvPair.Key}: p: {kvPair.Value.Translation} | r: {kvPair.Value.Rotation} | s: {kvPair.Value.Scaling}");
+#else
+            ImGui.Text($"{kvPair.Key}: p: {(kvPair.Value.Translation.IsApproximately(Vector3.Zero) ? "Approx. not changed" : "Changed")} | r: {(kvPair.Value.Rotation.IsApproximately(Vector3.Zero) ? "Approx. not changed" : "Changed")} | s: {(kvPair.Value.Scaling.IsApproximately(Vector3.One) ? "Not changed" : "Changed")}");
+#endif
         }
     }
 
@@ -180,8 +200,8 @@ public class StateMonitoringTab
             ImGui.Text($"Root bone: {armature.MainRootBone}");
         }
 
-        ImGui.Text($"Profile: {armature.Profile.Name} ({armature.Profile.UniqueId})");
-        ImGui.Text($"Actor: {armature.ActorIdentifier}");
+        ImGui.Text($"Profile: {armature.Profile.Name.Text.Incognify()} ({armature.Profile.UniqueId})");
+        ImGui.Text($"Actor: {armature.ActorIdentifier.IncognitoDebug()}");
         ImGui.Text($"Protection: {(armature.ProtectedUntil >= DateTime.UtcNow ? "Active" : "NOT active")} [{armature.ProtectedUntil} (UTC)]");
         //ImGui.Text("Profile:");
         //DrawSingleProfile($"armature-{armature.GetHashCode()}", armature.Profile);
@@ -189,7 +209,7 @@ public class StateMonitoringTab
         ImGui.Text($"Bone template bindings:");
         foreach (var kvPair in armature.BoneTemplateBinding)
         {
-            ImGui.Text($"{kvPair.Key} -> {kvPair.Value.Name} ({kvPair.Value.UniqueId})");
+            ImGui.Text($"{kvPair.Key} -> {kvPair.Value.Name.Text.Incognify()} ({kvPair.Value.UniqueId})");
         }
     }
 }

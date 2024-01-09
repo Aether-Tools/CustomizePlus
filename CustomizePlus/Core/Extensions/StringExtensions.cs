@@ -1,4 +1,5 @@
 ﻿using Dalamud.Utility;
+using System;
 
 namespace CustomizePlus.Core.Extensions;
 
@@ -15,17 +16,22 @@ internal static class StringExtensions
 #if !INCOGNIFY_STRINGS
         return str;
 #endif
-
         if (str.Contains(" "))
         {
             var split = str.Split(' ');
 
-            if (split.Length > 2)
-                return $"{str[..5]}...";
-
-            return $"{split[0][0]}.{split[1][0]}";
+            if (split.Length == 2)
+                return $"{split[0][0]}.{split[1][0]}";
         }
 
-        return $"{str[..5]}...";
+        return str.GetCutString();
+    }
+
+    private static string GetCutString(this string str, int maxLength = 5)
+    {
+        if(str.Length > maxLength)
+            return $"{str[..maxLength]}...";
+        else
+            return str[0..Math.Min(str.Length, maxLength)];
     }
 }

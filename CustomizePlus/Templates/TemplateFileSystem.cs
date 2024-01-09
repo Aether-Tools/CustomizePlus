@@ -95,23 +95,15 @@ public sealed class TemplateFileSystem : FileSystem<Template>, IDisposable, ISav
 
     private void Reload()
     {
-        if (Load(new FileInfo(_saveService.FileNames.TemplateFileSystem), _templateManager.Templates, TemplateToIdentifier, TemplateToName))
+        //this is a workaround for FileSystem's weird behavior where it doesn't load objects into itself if its file does not exist
+        if (!File.Exists(_saveService.FileNames.TemplateFileSystem))
         {
-            var shouldReloadAgain = false;
-
-            if (!File.Exists(_saveService.FileNames.TemplateFileSystem))
-                shouldReloadAgain = true;
-
-            _saveService.ImmediateSave(this);
-
-            //this is a workaround for FileSystem's weird behavior where it doesn't load objects into itself if its file does not exist
-            if (shouldReloadAgain)
-            {
-                _logger.Debug("BUG WORKAROUND: reloading template filesystem again");
-                Reload();
-                return;
-            }
+            _logger.Debug("WORKAROUND: saving filesystem file");
+            _saveService.ImmediateSaveSync(this);
         }
+
+        if (Load(new FileInfo(_saveService.FileNames.TemplateFileSystem), _templateManager.Templates, TemplateToIdentifier, TemplateToName))
+            _saveService.ImmediateSave(this);
 
         _logger.Debug("Reloaded template filesystem.");
     }

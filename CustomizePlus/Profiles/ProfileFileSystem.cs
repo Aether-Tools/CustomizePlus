@@ -94,23 +94,14 @@ public class ProfileFileSystem : FileSystem<Profile>, IDisposable, ISavable
 
     private void Reload()
     {
-        if (Load(new FileInfo(_saveService.FileNames.ProfileFileSystem), _profileManager.Profiles, ProfileToIdentifier, ProfileToName))
+        if (!File.Exists(_saveService.FileNames.ProfileFileSystem))
         {
-            var shouldReloadAgain = false;
-
-            if (!File.Exists(_saveService.FileNames.ProfileFileSystem))
-                shouldReloadAgain = true;
-
-            _saveService.ImmediateSave(this);
-
-            //this is a workaround for FileSystem's weird behavior where it doesn't load objects into itself if its file does not exist
-            if (shouldReloadAgain)
-            {
-                _logger.Debug("BUG WORKAROUND: reloading profile filesystem again");
-                Reload();
-                return;
-            }
+            _logger.Debug("WORKAROUND: saving filesystem file");
+            _saveService.ImmediateSaveSync(this);
         }
+
+        if (Load(new FileInfo(_saveService.FileNames.ProfileFileSystem), _profileManager.Profiles, ProfileToIdentifier, ProfileToName))
+            _saveService.ImmediateSave(this);
 
         _logger.Debug("Reloaded profile filesystem.");
     }

@@ -95,8 +95,8 @@ public class ConfigurationMigrator
             while (template.UniqueId == Guid.Empty || usedGuids.Contains(template.UniqueId));
             usedGuids.Add(template.UniqueId);
 
-            _saveService.ImmediateSave(template);
-            _saveService.ImmediateSave(profile);
+            _saveService.ImmediateSaveSync(template);
+            _saveService.ImmediateSaveSync(profile);
 
             _logger.Debug($"Migrated v3 profile {legacyProfile.ProfileName} to profile {profile.UniqueId} and template {template.UniqueId}");
             File.Delete(file);

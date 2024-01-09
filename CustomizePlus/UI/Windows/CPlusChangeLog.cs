@@ -29,17 +29,18 @@ public class CPlusChangeLog
     private static void Add2_0_0_0(Changelog log)
         => log.NextVersion("Version 2.0.0.0")
             .RegisterHighlight("Major rework of the entire plugin.")
-            .RegisterEntry("Migration of your Customize+ settings and profiles should be performed without any issues.", 1)
-            .RegisterImportant("Old version configuration is backed up in case something goes wrong, please report any issues with configuration migration as soon as possible.", 1)
+            .RegisterEntry("Settings and profiles from previous version will be automatically converted to new format on the first load.", 1)
+            .RegisterImportant("Old version configuration is backed up in case something goes wrong, please report any issues with configuration migration as soon as possible.", 2)
+            .RegisterImportant("Clipboard copies from previous versions are not currently supported.", 2)
+            .RegisterImportant("Profiles from previous versions will only be loaded during first load.", 2)
 
             .RegisterHighlight("Major changes:")
 
             .RegisterEntry("Plugin has been almost completely rewritten from scratch.", 1)
-            .RegisterImportant("Clipboard copies and profiles from previous versions are not currently supported.", 2)
 
             .RegisterEntry("User interface has been moved to the framework used by Glamourer and Penumbra, so the interface should feel familiar to the users of those plugins.", 1)
             .RegisterEntry("User interface issues related to different resolutions and font sizes should *mostly* not occur anymore.", 2)
-            .RegisterImportant("There are several issues with text not fitting in some places depending on your resolution and font size. This will be fixed later.", 3)
+            .RegisterImportant("There are several issues with text not fitting in some places depending on your screen resolution and font size. This will be fixed later.", 3)
 
             .RegisterEntry("Template system has been added", 1)
             .RegisterEntry("All bone edits are now stored in templates which can be used by multiple profiles and single profile can reference unlimited number of templates.", 2)

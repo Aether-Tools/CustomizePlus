@@ -1,9 +1,12 @@
 ﻿using CustomizePlus.Core.Data;
 using CustomizePlus.Game.Events;
 using CustomizePlus.Game.Services;
+using CustomizePlus.Profiles;
 using CustomizePlus.Profiles.Data;
+using CustomizePlus.Profiles.Enums;
 using CustomizePlus.Templates.Data;
 using CustomizePlus.Templates.Events;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using OtterGui.Log;
 using System;
 using System.Collections.Generic;
@@ -69,7 +72,7 @@ public class TemplateEditorManager : IDisposable
 
         _gposeStateChanged.Subscribe(OnGPoseStateChanged, GPoseStateChanged.Priority.TemplateEditorManager);
 
-        EditorProfile = new Profile() { Templates = new List<Template>(), Enabled = false, Name = "Template editor profile" };
+        EditorProfile = new Profile() { Templates = new List<Template>(), Enabled = false, Name = "Template editor profile", ProfileType = ProfileType.Editor };
     }
 
     public void Dispose()
@@ -159,6 +162,18 @@ public class TemplateEditorManager : IDisposable
 
         EditorProfile.CharacterName = characterName;
         _event.Invoke(TemplateChanged.Type.EditorCharacterChanged, CurrentlyEditedTemplate, (characterName, EditorProfile));
+
+        return true;
+    }
+
+    public bool SetLimitLookupToOwned(bool value)
+    {
+        if (!IsEditorActive || IsEditorPaused || value == EditorProfile.LimitLookupToOwnedObjects)
+            return false;
+
+        //_profileManager.SetLimitLookupToOwned(EditorProfile, value);
+        EditorProfile.LimitLookupToOwnedObjects = value;
+        _event.Invoke(TemplateChanged.Type.EditorLimitLookupToOwnedChanged, CurrentlyEditedTemplate, EditorProfile);
 
         return true;
     }

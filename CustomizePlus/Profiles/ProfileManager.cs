@@ -21,6 +21,7 @@ using CustomizePlus.Templates.Data;
 using CustomizePlus.GameData.Data;
 using CustomizePlus.GameData.Services;
 using CustomizePlus.GameData.Extensions;
+using CustomizePlus.Profiles.Enums;
 
 namespace CustomizePlus.Profiles;
 
@@ -378,7 +379,7 @@ public class ProfileManager : IDisposable
             return;
 
         profile.Enabled = true;
-        profile.IsTemporary = true;
+        profile.ProfileType = ProfileType.Temporary;
         profile.TemporaryActor = identifier;
         profile.CharacterName = identifier.ToNameWithoutOwnerName();
         profile.LimitLookupToOwnedObjects = false;
@@ -500,6 +501,10 @@ public class ProfileManager : IDisposable
 
     private void SaveProfile(Profile profile)
     {
+        //disallow saving special profiles
+        if (profile.ProfileType != ProfileType.Normal)
+            return;
+
         profile.ModifiedDate = DateTimeOffset.UtcNow;
         _saveService.QueueSave(profile);
     }

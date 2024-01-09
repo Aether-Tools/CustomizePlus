@@ -134,7 +134,7 @@ public class StateMonitoringTab
         characterName = characterName.Incognify();
 #endif
 
-        var show = ImGui.CollapsingHeader($"[{(profile.Enabled ? "E" : "D")}] {name} on {characterName} [{(profile.IsTemporary ? "Temporary" : "Permanent")}] [{profile.UniqueId}]###{prefix}-profile-{profile.UniqueId}");
+        var show = ImGui.CollapsingHeader($"[{(profile.Enabled ? "E" : "D")}] {name} on {characterName} [{profile.ProfileType}] [{profile.UniqueId}]###{prefix}-profile-{profile.UniqueId}");
 
         if (!show)
             return;

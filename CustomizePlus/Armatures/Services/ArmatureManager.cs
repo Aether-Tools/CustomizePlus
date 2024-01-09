@@ -18,6 +18,7 @@ using CustomizePlus.Core.Extensions;
 using CustomizePlus.GameData.Data;
 using CustomizePlus.GameData.Services;
 using CustomizePlus.GameData.Extensions;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 
 namespace CustomizePlus.Armatures.Services;
 
@@ -345,6 +346,7 @@ public unsafe sealed class ArmatureManager : IDisposable
         if (type is not TemplateChanged.Type.NewBone &&
             type is not TemplateChanged.Type.DeletedBone &&
             type is not TemplateChanged.Type.EditorCharacterChanged &&
+            type is not TemplateChanged.Type.EditorLimitLookupToOwnedChanged &&
             type is not TemplateChanged.Type.EditorEnabled &&
             type is not TemplateChanged.Type.EditorDisabled)
             return;
@@ -386,6 +388,21 @@ public unsafe sealed class ArmatureManager : IDisposable
                 armature.IsPendingProfileRebind = true;
 
             _logger.Debug($"ArmatureManager.OnTemplateChange Editor profile character name changed, armature rebind scheduled: {type}, profile: {profile.Name.Text.Incognify()}->{profile.Enabled}, new name: {characterName.Incognify()}");
+
+            return;
+        }
+
+        if(type == TemplateChanged.Type.EditorLimitLookupToOwnedChanged)
+        {
+            var profile = (Profile)arg3!;
+
+            if (profile.Armatures.Count == 0)
+                return;
+
+            foreach (var armature in profile.Armatures)
+                armature.IsPendingProfileRebind = true;
+
+            _logger.Debug($"ArmatureManager.OnTemplateChange Editor profile limit lookup setting changed, armature rebind scheduled: {type}, profile: {profile.Name.Text.Incognify()}->{profile.Enabled}");
 
             return;
         }

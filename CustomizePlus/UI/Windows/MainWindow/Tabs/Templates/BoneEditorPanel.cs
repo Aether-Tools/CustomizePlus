@@ -31,6 +31,14 @@ public class BoneEditorPanel
     private bool _isShowLiveBones;
     private bool _isMirrorModeEnabled;
 
+    private string? _newCharacterName;
+
+    private Dictionary<BoneData.BoneFamily, bool> _groupExpandedState = new();
+
+    private bool _openSavePopup;
+
+    private bool _isUnlocked = false;
+
     public bool HasChanges => _editorManager.HasChanges;
     public bool IsEditorActive => _editorManager.IsEditorActive;
     public bool IsEditorPaused => _editorManager.IsEditorPaused;
@@ -40,18 +48,6 @@ public class BoneEditorPanel
     /// </summary>
     public bool IsCharacterFound { get; private set; }
     public string CharacterName { get; private set; }
-
-    private ModelBone? _changedBone;
-    private string? _changedBoneName;
-    private BoneTransform? _changedBoneTransform;
-
-    private string? _newCharacterName;
-
-    private Dictionary<BoneData.BoneFamily, bool> _groupExpandedState = new();
-
-    private bool _openSavePopup;
-
-    private bool _isUnlocked = false;
 
     public BoneEditorPanel(
         TemplateFileSystemSelector templateFileSystemSelector,
@@ -75,7 +71,7 @@ public class BoneEditorPanel
     {
         if (_editorManager.EnableEditor(template, CharacterName))
         {
-            _editorManager.EditorProfile.LimitLookupToOwnedObjects = _configuration.EditorConfiguration.LimitLookupToOwnedObjects;
+            _editorManager.SetLimitLookupToOwned(_configuration.EditorConfiguration.LimitLookupToOwnedObjects);
 
             return true;
         }
@@ -157,7 +153,7 @@ public class BoneEditorPanel
                     var enabled = _editorManager.EditorProfile.LimitLookupToOwnedObjects;
                     if (ImGui.Checkbox("##LimitLookupToOwnedObjects", ref enabled))
                     {
-                        _editorManager.EditorProfile.LimitLookupToOwnedObjects = enabled;
+                        _editorManager.SetLimitLookupToOwned(enabled);
 
                         _configuration.EditorConfiguration.LimitLookupToOwnedObjects = enabled;
                         _configuration.Save();
@@ -376,26 +372,34 @@ public class BoneEditorPanel
 
     #region ImGui helper functions
 
-    public bool ResetBoneButton(string codename)
+    private bool ResetBoneButton(EditRowParams bone)
     {
-        var output = ImGuiComponents.IconButton(codename, FontAwesomeIcon.Recycle);
+        var output = ImGuiComponents.IconButton(bone.BoneCodeName, FontAwesomeIcon.Recycle);
         CtrlHelper.AddHoverText(
-            $"Reset '{BoneData.GetBoneDisplayName(codename)}' to default {_editingAttribute} values");
+            $"Reset '{BoneData.GetBoneDisplayName(bone.BoneCodeName)}' to default {_editingAttribute} values");
 
         if (output)
-            _editorManager.ResetBoneAttributeChanges(codename, _editingAttribute);
+        {
+            _editorManager.ResetBoneAttributeChanges(bone.BoneCodeName, _editingAttribute);
+            if (_isMirrorModeEnabled && bone.Basis?.TwinBone != null) //todo: put it inside manager
+                _editorManager.ResetBoneAttributeChanges(bone.Basis.TwinBone.BoneName, _editingAttribute);
+        }
 
         return output;
     }
 
-    private bool RevertBoneButton(string codename)
+    private bool RevertBoneButton(EditRowParams bone)
     {
-        var output = ImGuiComponents.IconButton(codename, FontAwesomeIcon.ArrowCircleLeft);
+        var output = ImGuiComponents.IconButton(bone.BoneCodeName, FontAwesomeIcon.ArrowCircleLeft);
         CtrlHelper.AddHoverText(
-            $"Revert '{BoneData.GetBoneDisplayName(codename)}' to last saved {_editingAttribute} values");
+            $"Revert '{BoneData.GetBoneDisplayName(bone.BoneCodeName)}' to last saved {_editingAttribute} values");
 
         if (output)
-            _editorManager.RevertBoneAttributeChanges(codename, _editingAttribute);
+        {
+            _editorManager.RevertBoneAttributeChanges(bone.BoneCodeName, _editingAttribute);
+            if (_isMirrorModeEnabled && bone.Basis?.TwinBone != null) //todo: put it inside manager
+                _editorManager.RevertBoneAttributeChanges(bone.Basis.TwinBone.BoneName, _editingAttribute);
+        }
 
         return output;
     }
@@ -464,9 +468,9 @@ public class BoneEditorPanel
             //----------------------------------
             ImGui.Dummy(new Vector2(CtrlHelper.IconButtonWidth * 0.75f, 0));
             ImGui.SameLine();
-            ResetBoneButton(codename);
+            ResetBoneButton(bone);
             ImGui.SameLine();
-            RevertBoneButton(codename);
+            RevertBoneButton(bone);
 
             //----------------------------------
             ImGui.TableNextColumn();

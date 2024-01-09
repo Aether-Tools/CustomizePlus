@@ -5,6 +5,7 @@ using CustomizePlus.Armatures.Data;
 using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Extensions;
 using CustomizePlus.Core.Services;
+using CustomizePlus.Profiles.Enums;
 using CustomizePlus.Templates;
 using CustomizePlus.Templates.Data;
 using Newtonsoft.Json;
@@ -46,11 +47,13 @@ public sealed class Profile : ISavable
 
     public bool IsWriteProtected { get; internal set; }
 
+    public ProfileType ProfileType { get; set; }
+
     /// <summary>
-    /// Specifies if this profile is not persistent (ex. was made via IPC calls) and should not be displayed in UI.
+    /// Tells us if this profile is not persistent (ex. was made via IPC calls) and should have specific treatement like not being shown in UI, etc.
     /// WARNING, TEMPLATES FOR TEMPORARY PROFILES *ARE NOT* STORED IN TemplateManager
     /// </summary>
-    public bool IsTemporary { get; set; }
+    public bool IsTemporary => ProfileType == ProfileType.Temporary;
 
     /// <summary>
     /// Identificator specifying specific actor this profile applies to, only works for temporary profiles

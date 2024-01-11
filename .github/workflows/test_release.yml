@@ -25,22 +25,22 @@ jobs:
       - name: Build
         run: |
           $ver = '${{ github.ref_name }}' -replace 'testing_'
-          invoke-expression 'dotnet build --no-restore --configuration Debug --nologo -p:Version=$ver -p:FileVersion=$ver -p:AssemblyVersion=$ver'
+          invoke-expression 'dotnet build --no-restore --configuration Release --nologo -p:Version=$ver -p:FileVersion=$ver -p:AssemblyVersion=$ver'
       - name: write version into json
         run: |
           $ver = '${{ github.ref_name }}' -replace 'testing_'
-          $path = './CustomizePlus/bin/Debug/CustomizePlus.json'
+          $path = './CustomizePlus/bin/Release/CustomizePlus.json'
           $json = Get-Content -Raw $path | ConvertFrom-Json
           $json.AssemblyVersion = $ver
           $content = $json | ConvertTo-Json
           set-content -Path $path -Value $content
       - name: Archive
-        run: Compress-Archive -Path CustomizePlus/bin/Debug/* -DestinationPath CustomizePlus.zip
+        run: Compress-Archive -Path CustomizePlus/bin/Release/* -DestinationPath CustomizePlus.zip
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.2.1
         with:
           path: |
-            ./CustomizePlus/bin/Debug/*
+            ./CustomizePlus/bin/Release/*
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1

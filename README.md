@@ -33,6 +33,7 @@ We expect contributed code to adhere to the code style of already existing code 
 * User interface and general plugin architecture is heavily based on the code written as a part of [Glamourer](https://github.com/Ottermandias/Glamourer) and [OtterGui](https://github.com/Ottermandias/OtterGui/) projects. Original code is licensed under Apache License 2.0.
 * Bone manipulation code is based on the code contributed to Customize+ 1.x by [dendr01d](https://github.com/dendr01d/).
 * Some of the game object interaction code is copied from [Penumbra](https://github.com/xivdev/Penumbra) and [Glamourer](https://github.com/Ottermandias/Glamourer) projects in order to make Customize+ not rely on Penumbra being installed.
+* GitHub workflows have been taken from [Glamourer](https://github.com/Ottermandias/Glamourer) project.
 * Everyone who contributed code and features through pull requests.
 
 ## License

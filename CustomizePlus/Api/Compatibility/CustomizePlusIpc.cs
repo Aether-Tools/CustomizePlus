@@ -17,6 +17,10 @@ using CustomizePlus.Templates.Events;
 using CustomizePlus.Profiles.Events;
 using CustomizePlus.Templates.Data;
 using CustomizePlus.GameData.Data;
+using CustomizePlus.Core.Extensions;
+using CustomizePlus.Armatures.Events;
+using CustomizePlus.Armatures.Data;
+using CustomizePlus.GameData.Extensions;
 
 namespace CustomizePlus.Api.Compatibility;
 
@@ -28,8 +32,8 @@ public class CustomizePlusIpc : IDisposable
     private readonly ProfileManager _profileManager;
     private readonly GameObjectService _gameObjectService;
 
-    private readonly TemplateChanged _templateChangedEvent;
     private readonly ProfileChanged _profileChangedEvent;
+    private readonly ArmatureChanged _armatureChangedEvent;
 
     private const int _configurationVersion = 3;
 
@@ -37,10 +41,10 @@ public class CustomizePlusIpc : IDisposable
     public const string GetProfileFromCharacterLabel = $"CustomizePlus.{nameof(GetProfileFromCharacter)}";
     public const string SetProfileToCharacterLabel = $"CustomizePlus.{nameof(SetProfileToCharacter)}";
     public const string RevertCharacterLabel = $"CustomizePlus.{nameof(RevertCharacter)}";
-    //public const string OnProfileUpdateLabel = $"CustomizePlus.{nameof(OnProfileUpdate)}"; //I'm honestly not sure this is even used by mare
+    public const string OnProfileUpdateLabel = $"CustomizePlus.{nameof(OnProfileUpdate)}";
     public static readonly (int, int) ApiVersion = (3, 0);
 
-    //Sends local player's profile on hooks reload (plugin startup) as well as any updates to their profile.
+    //Sends local player's profile every time their active profile is changed
     //If no profile is applied sends null
     internal ICallGateProvider<string?, string?, object?>? ProviderOnProfileUpdate;
     internal ICallGateProvider<Character?, object>? ProviderRevertCharacter;
@@ -53,27 +57,70 @@ public class CustomizePlusIpc : IDisposable
         DalamudPluginInterface pluginInterface,
         Logger logger,
         ProfileManager profileManager,
-        GameObjectService gameObjectService//,
-        /*TemplateChanged templateChangedEvent,
-        ProfileChanged profileChangedEvent*/)
+        GameObjectService gameObjectService,
+        ArmatureChanged armatureChangedEvent,
+        ProfileChanged profileChangedEvent)
     {
         _objectTable = objectTable;
         _pluginInterface = pluginInterface;
         _logger = logger;
         _profileManager = profileManager;
         _gameObjectService = gameObjectService;
-        /*            _templateChangedEvent = templateChangedEvent;
-                _profileChangedEvent = profileChangedEvent;*/
+         _profileChangedEvent = profileChangedEvent;
+        _armatureChangedEvent = armatureChangedEvent;
 
         InitializeProviders();
 
-        /*_templateChangedEvent.Subscribe(OnTemplateChange, TemplateChanged.Priority.CustomizePlusIpc);
-        _profileChangedEvent.Subscribe(OnProfileChange, ProfileChanged.Priority.CustomizePlusIpc);*/
+        _profileChangedEvent.Subscribe(OnProfileChange, ProfileChanged.Priority.CustomizePlusIpc);
+        _armatureChangedEvent.Subscribe(OnArmatureChanged, ArmatureChanged.Priority.CustomizePlusIpc);
     }
 
     public void Dispose()
     {
+        _profileChangedEvent.Unsubscribe(OnProfileChange);
+        _armatureChangedEvent.Unsubscribe(OnArmatureChanged);
         DisposeProviders();
+    }
+
+    //warn: limitation - ignores default profiles but why you would use default profile on your own character
+    private void OnProfileChange(ProfileChanged.Type type, Profile? profile, object? arg3)
+    {
+        if (type != ProfileChanged.Type.AddedTemplate &&
+            type != ProfileChanged.Type.RemovedTemplate &&
+            type != ProfileChanged.Type.MovedTemplate &&
+            type != ProfileChanged.Type.ChangedTemplate)
+            return;
+
+        if (profile == null ||
+            !profile.Enabled ||
+            profile.CharacterName.Text != _gameObjectService.GetCurrentPlayerName())
+            return;
+
+        OnProfileUpdate(profile);
+    }
+
+    private void OnArmatureChanged(ArmatureChanged.Type type, Armature armature, object? arg3)
+    {
+        string currentPlayerName = _gameObjectService.GetCurrentPlayerName();
+
+        if (armature.ActorIdentifier.ToNameWithoutOwnerName() != currentPlayerName)
+            return;
+
+        if (type == ArmatureChanged.Type.Created ||
+            type == ArmatureChanged.Type.Rebound)
+        {
+            if(armature.Profile == null)
+                _logger.Warning("Armature created/rebound and profile is null");
+
+            OnProfileUpdate(armature.Profile);
+            return;
+        }
+
+        if(type == ArmatureChanged.Type.Deleted)
+        {
+            OnProfileUpdate(null);
+            return;
+        }
     }
 
     private void InitializeProviders()
@@ -121,7 +168,7 @@ public class CustomizePlusIpc : IDisposable
         {
             _logger.Error($"Error registering legacy Customize+ IPC provider for {RevertCharacterLabel}: {ex}");
         }
-        /*
+        
         try
         {
             ProviderOnProfileUpdate = _pluginInterface.GetIpcProvider<string?, string?, object?>(OnProfileUpdateLabel);
@@ -129,7 +176,7 @@ public class CustomizePlusIpc : IDisposable
         catch (Exception ex)
         {
             _logger.Error($"Error registering legacy Customize+ IPC provider for {OnProfileUpdateLabel}: {ex}");
-        }*/
+        }
     }
 
     private void DisposeProviders()
@@ -143,8 +190,7 @@ public class CustomizePlusIpc : IDisposable
 
     private void OnProfileUpdate(Profile? profile)
     {
-        //Get player's body profile string and send IPC message
-        _logger.Debug($"Sending local player update message: {profile?.Name ?? "no profile"} - {profile?.CharacterName ?? "no profile"}");
+        _logger.Debug($"Sending local player update message: {(profile != null ? profile.ToString() : "no profile")}");
 
         var convertedProfile = profile != null ? GetVersion3Profile(profile) : null;
 

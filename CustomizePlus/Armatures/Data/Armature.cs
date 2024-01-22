@@ -32,6 +32,12 @@ public unsafe class Armature
     public bool IsVisible { get; set; }
 
     /// <summary>
+    /// Represents date and time when actor associated with this armature was last seen.
+    /// Implemented mostly as a armature cleanup protection hack for mare and penumbra.
+    /// </summary>
+    public DateTime LastSeen { get; private set; }
+
+    /// <summary>
     /// Gets a value indicating whether or not this armature has successfully built itself with bone information.
     /// </summary>
     public bool IsBuilt => _partialSkeletons.Any();
@@ -40,12 +46,6 @@ public unsafe class Armature
     /// Internal flag telling ArmatureManager that it should attempt to rebind profile to (another) profile whenever possible.
     /// </summary>
     public bool IsPendingProfileRebind { get; set; }
-
-    /// <summary>
-    /// Represents date and time until which any kind of removal protections will not be applying to this armature.
-    /// Implemented mostly as a armature cleanup protection hack due to how mare works when downloading files for the first time
-    /// </summary>
-    public DateTime ProtectedUntil { get; private set; }
 
     /// <summary>
     /// For debugging purposes, each armature is assigned a globally-unique ID number upon creation.
@@ -147,7 +147,7 @@ public unsafe class Armature
         Profile = profile;
         IsVisible = false;
 
-        ProtectFromRemoval();
+        UpdateLastSeen();
 
         Profile.Armatures.Add(this);
 
@@ -257,11 +257,14 @@ public unsafe class Armature
     }
 
     /// <summary>
-    /// Apply removal protection for 30 seconds starting from current time. For the most part this is a hack for mare.
+    /// Update last time actor for this armature was last seen in the game
     /// </summary>
-    public void ProtectFromRemoval()
+    public void UpdateLastSeen(DateTime? dateTime = null)
     {
-        ProtectedUntil = DateTime.UtcNow.AddSeconds(30);
+        if(dateTime == null)
+            dateTime = DateTime.UtcNow;
+
+        LastSeen = (DateTime)dateTime;
     }
 
     private static unsafe List<List<ModelBone>> ParseBonesFromObject(Armature arm, CharacterBase* cBase)

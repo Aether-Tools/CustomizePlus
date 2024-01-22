@@ -62,9 +62,9 @@ public class GameObjectService
             {
                 if (kvPair.Value.Objects.Count > 1) //in gpose we can have more than a single object for one actor
                     foreach (var obj in kvPair.Value.Objects)
-                        yield return (kvPair.Key, obj);
+                        yield return (kvPair.Key.CreatePermanent(), obj);
                 else
-                    yield return (kvPair.Key, kvPair.Value.Objects[0]);
+                    yield return (kvPair.Key.CreatePermanent(), kvPair.Value.Objects[0]);
             }
         }
     }

@@ -202,7 +202,7 @@ public class StateMonitoringTab
 
         ImGui.Text($"Profile: {armature.Profile.Name.Text.Incognify()} ({armature.Profile.UniqueId})");
         ImGui.Text($"Actor: {armature.ActorIdentifier.IncognitoDebug()}");
-        ImGui.Text($"Protection: {(armature.ProtectedUntil >= DateTime.UtcNow ? "Active" : "NOT active")} [{armature.ProtectedUntil} (UTC)]");
+        ImGui.Text($"Last seen: {armature.LastSeen} (UTC)");
         //ImGui.Text("Profile:");
         //DrawSingleProfile($"armature-{armature.GetHashCode()}", armature.Profile);
 

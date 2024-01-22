@@ -19,6 +19,7 @@ using CustomizePlus.GameData.Data;
 using CustomizePlus.GameData.Services;
 using CustomizePlus.GameData.Extensions;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
+using System.Drawing;
 
 namespace CustomizePlus.Armatures.Services;
 
@@ -106,15 +107,21 @@ public unsafe sealed class ArmatureManager : IDisposable
         _objectManager.Update();
 
         var currentTime = DateTime.UtcNow;
+        var armatureExpirationDateTime = currentTime.AddSeconds(-30);
         foreach (var kvPair in Armatures.ToList())
         {
             var armature = kvPair.Value;
             if (!_objectManager.ContainsKey(kvPair.Value.ActorIdentifier) &&
-                currentTime > armature.ProtectedUntil) //Only remove armatures which are no longer protected
+                armature.LastSeen <= armatureExpirationDateTime) //Only remove armatures which haven't been seen for a while
             {
                 _logger.Debug($"Removing armature {armature} because {kvPair.Key.IncognitoDebug()} is gone");
                 RemoveArmature(armature, ArmatureChanged.DeletionReason.Gone);
+
+                continue;
             }
+
+            //armature is considered visible if 1 or less seconds passed since last time we've seen the actor
+            armature.IsVisible = armature.LastSeen.AddSeconds(1) >= currentTime;
         }
 
         Profile? GetProfileForActor(ActorIdentifier identifier)
@@ -134,28 +141,32 @@ public unsafe sealed class ArmatureManager : IDisposable
 
         foreach (var obj in _objectManager)
         {
-            if (!Armatures.ContainsKey(obj.Key))
+            var actorIdentifier = obj.Key.CreatePermanent();
+            if (!Armatures.ContainsKey(actorIdentifier))
             {
-                var activeProfile = GetProfileForActor(obj.Key);
+                var activeProfile = GetProfileForActor(actorIdentifier);
                 if (activeProfile == null)
                     continue;
 
-                var newArm = new Armature(obj.Key, activeProfile);
+                var newArm = new Armature(actorIdentifier, activeProfile);
                 TryLinkSkeleton(newArm);
-                Armatures.Add(obj.Key, newArm);
-                _logger.Debug($"Added '{newArm}' for {obj.Key.IncognitoDebug()} to cache");
+                Armatures.Add(actorIdentifier, newArm);
+                _logger.Debug($"Added '{newArm}' for {actorIdentifier.IncognitoDebug()} to cache");
+                _event.Invoke(ArmatureChanged.Type.Created, newArm, activeProfile);
 
                 continue;
             }
 
-            var armature = Armatures[obj.Key];
+            var armature = Armatures[actorIdentifier];
+
+            armature.UpdateLastSeen(currentTime);
 
             if (armature.IsPendingProfileRebind)
             {
                 _logger.Debug($"Armature {armature} is pending profile rebind, rebinding...");
                 armature.IsPendingProfileRebind = false;
 
-                var activeProfile = GetProfileForActor(obj.Key);
+                var activeProfile = GetProfileForActor(actorIdentifier);
                 if (activeProfile == armature.Profile)
                     continue;
 
@@ -166,14 +177,19 @@ public unsafe sealed class ArmatureManager : IDisposable
                     continue;
                 }
 
+                Profile oldProfile = armature.Profile;
+
                 armature.Profile.Armatures.Remove(armature);
                 armature.Profile = activeProfile;
                 activeProfile.Armatures.Add(armature);
                 armature.RebuildBoneTemplateBinding();
 
+                _event.Invoke(ArmatureChanged.Type.Rebound, armature, activeProfile);
             }
 
-            armature.IsVisible = armature.Profile.Enabled && TryLinkSkeleton(armature); //todo: remove armatures which are not visible?
+            //Needed because skeleton sometimes appears to be not ready when armature is created
+            //and also because we want to augment armature with new bones if they are available
+            TryLinkSkeleton(armature);
         }
     }
 
@@ -496,7 +512,7 @@ public unsafe sealed class ArmatureManager : IDisposable
             if (armature.Profile == profile)
                 return;
 
-            armature.ProtectFromRemoval();
+            armature.UpdateLastSeen();
 
             armature.IsPendingProfileRebind = true;
 
@@ -516,7 +532,7 @@ public unsafe sealed class ArmatureManager : IDisposable
             foreach (var armature in profile.Armatures)
             {
                 if (type == ProfileChanged.Type.TemporaryProfileDeleted)
-                    armature.ProtectFromRemoval(); //just to be safe
+                    armature.UpdateLastSeen(); //just to be safe
 
                 armature.IsPendingProfileRebind = true;
             }

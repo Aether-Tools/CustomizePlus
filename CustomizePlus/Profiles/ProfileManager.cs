@@ -545,7 +545,7 @@ public class ProfileManager : IDisposable
     }
 
 
-    private void OnArmatureChange(ArmatureChanged.Type type, Armature? armature, object? arg3)
+    private void OnArmatureChange(ArmatureChanged.Type type, Armature armature, object? arg3)
     {
         if (type == ArmatureChanged.Type.Deleted)
         {

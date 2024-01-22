@@ -7,17 +7,19 @@ namespace CustomizePlus.Armatures.Events;
 /// <summary>
 /// Triggered when armature is changed
 /// </summary>
-public sealed class ArmatureChanged() : EventWrapper<ArmatureChanged.Type, Armature?, object?, ArmatureChanged.Priority>(nameof(ArmatureChanged))
+public sealed class ArmatureChanged() : EventWrapper<ArmatureChanged.Type, Armature, object?, ArmatureChanged.Priority>(nameof(ArmatureChanged))
 {
     public enum Type
     {
-        //Created,
-        Deleted
+        Created,
+        Deleted,
+        Rebound
     }
 
     public enum Priority
     {
-        ProfileManager
+        ProfileManager,
+        CustomizePlusIpc
     }
 
     public enum DeletionReason

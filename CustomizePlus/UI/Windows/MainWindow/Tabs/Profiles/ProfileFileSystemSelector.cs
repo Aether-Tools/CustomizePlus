@@ -25,6 +25,7 @@ public class ProfileFileSystemSelector : FileSystemSelector<Profile, ProfileStat
     private readonly ProfileManager _profileManager;
     private readonly ProfileChanged _event;
     private readonly GameObjectService _gameObjectService;
+    private readonly IClientState _clientState;
 
     private Profile? _cloneProfile;
     private string _newName = string.Empty;
@@ -51,15 +52,20 @@ public class ProfileFileSystemSelector : FileSystemSelector<Profile, ProfileStat
         PluginConfiguration configuration,
         ProfileManager profileManager,
         ProfileChanged @event,
-        GameObjectService gameObjectService)
+        GameObjectService gameObjectService,
+        IClientState clientState)
         : base(fileSystem, keyState, logger, allowMultipleSelection: true)
     {
         _configuration = configuration;
         _profileManager = profileManager;
         _event = @event;
         _gameObjectService = gameObjectService;
+        _clientState = clientState;
 
         _event.Subscribe(OnProfileChange, ProfileChanged.Priority.ProfileFileSystemSelector);
+
+        _clientState.Login += OnLoginLogout;
+        _clientState.Logout += OnLoginLogout;
 
         AddButton(NewButton, 0);
         AddButton(CloneButton, 20);
@@ -71,6 +77,8 @@ public class ProfileFileSystemSelector : FileSystemSelector<Profile, ProfileStat
     {
         base.Dispose();
         _event.Unsubscribe(OnProfileChange);
+        _clientState.Login -= OnLoginLogout;
+        _clientState.Logout -= OnLoginLogout;
     }
 
     protected override uint ExpandedFolderColor
@@ -129,6 +137,11 @@ public class ProfileFileSystemSelector : FileSystemSelector<Profile, ProfileStat
                 SetFilterDirty();
                 break;
         }
+    }
+
+    private void OnLoginLogout()
+    {
+        SetFilterDirty();
     }
 
     private void NewButton(Vector2 size)

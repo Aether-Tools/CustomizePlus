@@ -18,9 +18,11 @@ Most of the things should be self-explanatory, if you do need help you can join 
 This plugin is being worked on when developers have free time and have a desire to do so, therefore update schedule does not exist. Real life and paid employment take priority over this project.
 
 ### IPC
-Current IPC is mostly designed around it being used by Mare Synchronos, it is not recommended to rely on it. In the future general purpose IPC will be introduced with functionality better designed for usage by other plugins.
+Current IPC is designed to be used by Mare Synchronos and can be changed without any warning. In the future general purpose IPC will be introduced with functionality better designed for usage by other plugins.
 
-### Contributing
+## Contributing
+**This is important, please read before contributing.**
+
 Before you contribute your code and features we would like to ask you to first discuss your ideas with us so you don't spend your time making something that possibly won't be accepted. It is possible that your idea might be either out of scope for this project or we have a specific vision for how it should be implemented.
 
 We expect contributed code to adhere to the code style of already existing code and be reasonably well tested. We kindly ask you to be ready to make changes to the code in your Pull Requests if we feel like it needs to be changed.

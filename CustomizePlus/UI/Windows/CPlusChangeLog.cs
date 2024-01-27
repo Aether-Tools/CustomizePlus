@@ -46,7 +46,6 @@ public class CPlusChangeLog
             .RegisterEntry("All bone edits are now stored in templates which can be used by multiple profiles and single profile can reference unlimited number of templates.", 2)
 
             .RegisterImportant("Chat commands have been changed, refer to \"/customize help\" for information about available commands.", 1)
-            .RegisterEntry("Added \"toggle\" chat command which can be used to toggle given profile on a given character.", 2)
 
             .RegisterEntry("Profiles can be applied to summons, mounts and pets without any limitations.", 1)
             .RegisterImportant("Root scaling of mounts is not available for now.", 2)

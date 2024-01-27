@@ -10,6 +10,8 @@ using CustomizePlus.Profiles;
 using CustomizePlus.Game.Services;
 using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 using CustomizePlus.UI.Windows.MainWindow;
+using static System.Windows.Forms.AxHost;
+using CustomizePlus.Profiles.Data;
 
 namespace CustomizePlus.Core.Services;
 
@@ -76,11 +78,8 @@ public class CommandService : IDisposable
         {
             switch (argumentList[0].ToLowerInvariant())
             {
-                case "apply":
-                    Apply(argument);
-                    return;
-                case "toggle":
-                    Apply(argument, true);
+                case "profile":
+                    ProfileCommand(argument);
                     return;
                 default:
                 case "help":
@@ -100,83 +99,136 @@ public class CommandService : IDisposable
         else
             _chatService.PrintInChat(new SeStringBuilder().AddText("Valid arguments for /customize are:").BuiltString);
 
-        _chatService.PrintInChat(new SeStringBuilder().AddCommand("apply", "Applies a given profile for a given character. Use without arguments for help.")
+        _chatService.PrintInChat(new SeStringBuilder().AddCommand("profile", "Change the state of profiles. Use without arguments for help.")
             .BuiltString);
-        _chatService.PrintInChat(new SeStringBuilder().AddCommand("toggle", "Toggles a given profile for a given character. Use without arguments for help.")
-    .BuiltString);
         return true;
     }
 
-    private void Apply(string argument, bool toggle = false)
+    private void ProfileCommand(string argument)
     {
-        var argumentList = argument.Split(',', 2, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        if (argumentList.Length != 2)
+        var argumentList = argument.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        string[]? subArgumentList = null;
+
+        if(argumentList.Length == 2)
+            subArgumentList = argumentList[1].Split(',', 2, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        bool isTurningOffAllProfiles = subArgumentList != null && subArgumentList.Length != 2 && argumentList[0] == "disable";
+
+        if (argumentList.Length != 2 || subArgumentList == null || (subArgumentList.Length != 2 && !isTurningOffAllProfiles))
         {
-            _chatService.PrintInChat(new SeStringBuilder().AddText($"Usage: /customize {(toggle ? "toggle" : "apply")} ").AddBlue("Character Name", true)
+            _chatService.PrintInChat(new SeStringBuilder().AddText($"Usage: /customize profile ")
+                .AddBlue("enable, disable or toggle", true)
+                .AddText(" ")
+                .AddRed("Character Name", true)
                 .AddText(",")
-                .AddRed("Profile Name", true)
+                .AddYellow("Profile Name", true)
                 .BuiltString);
+            _chatService.PrintInChat(new SeStringBuilder().AddText("    》 ").AddBlue("disable", true)
+                .AddText(" option can also be used without supplying profile name to turn off currently active profile for the character").BuiltString);
             _chatService.PrintInChat(new SeStringBuilder().AddText("    》 ")
-                .AddBlue("Character Name", true).AddText("can be either full character name or one of the following:").BuiltString);
+                .AddRed("Character Name", true).AddText(" can be either full character name or one of the following:").BuiltString);
             _chatService.PrintInChat(new SeStringBuilder().AddText("    》 To apply to yourself: ").AddBlue("<me>").AddText(", ").AddBlue("self").BuiltString);
             _chatService.PrintInChat(new SeStringBuilder().AddText("    》 To apply to target: ").AddBlue("<t>").AddText(", ").AddBlue("target").BuiltString);
             return;
         }
 
-        string charaName = "", profName = "";
+        string characterName = "", profileName = "";
 
         try
         {
-            (charaName, profName) = argumentList switch { var a => (a[0].Trim(), a[1].Trim()) };
+            if (!_profileManager.Profiles.Any())
+            {
+                _chatService.PrintInChat(new SeStringBuilder().AddText("This command cannot be executed because no profiles exist").BuiltString);
+                return;
+            }
 
-            charaName = charaName switch
+            bool? state = null;
+            switch (argumentList[0].ToLowerInvariant())
+            {
+                case "enabled":
+                case "enable":
+                case "on":
+                case "true":
+                    state = true;
+                    break;
+                case "disabled":
+                case "disable":
+                case "off":
+                case "false":
+                    state = false;
+                    break;
+                case "toggle":
+                case "switch":
+                    break;
+            }
+
+            Profile? targetProfile = null;
+
+            characterName = subArgumentList[0].Trim();
+            characterName = characterName switch
             {
                 "<me>" => _gameObjectService.GetCurrentPlayerName() ?? string.Empty,
                 "self" => _gameObjectService.GetCurrentPlayerName() ?? string.Empty,
                 "<t>" => _gameObjectService.GetCurrentPlayerTargetName() ?? string.Empty,
                 "target" => _gameObjectService.GetCurrentPlayerTargetName() ?? string.Empty,
-                _ => charaName,
+                _ => characterName,
             };
 
-            if (!_profileManager.Profiles.Any())
+            if (!isTurningOffAllProfiles)
             {
-                _chatService.PrintInChat(
-                    $"Can't {(toggle ? "toggle" : "apply")} profile \"{profName}\" for character \"{charaName}\" because no profiles exist", ChatService.ChatMessageColor.Error);
-                return;
+                profileName = subArgumentList[1].Trim();
+                targetProfile = _profileManager.Profiles.FirstOrDefault(x => x.Name == profileName && x.CharacterName == characterName);
             }
-
-            if (_profileManager.Profiles.Count(x => x.Name == profName && x.CharacterName == charaName) > 1)
-            {
-                _logger.Warning(
-                    $"Found more than one profile matching profile \"{profName}\" and character \"{charaName}\". Using first match.");
-            }
-
-            var outProf = _profileManager.Profiles.FirstOrDefault(x => x.Name == profName && x.CharacterName == charaName);
-
-            if (outProf == null)
-            {
-                _chatService.PrintInChat(
-                    $"Can't {(toggle ? "toggle" : "apply")} profile \"{(string.IsNullOrWhiteSpace(profName) ? "empty (none provided)" : profName)}\" " +
-                    $"for Character \"{(string.IsNullOrWhiteSpace(charaName) ? "empty (none provided)" : charaName)}\"\n" +
-                    "Check if the profile and character names were provided correctly and said profile exists for chosen character", ChatService.ChatMessageColor.Error);
-                return;
-            }
-
-            if (!toggle)
-                _profileManager.SetEnabled(outProf, true);
             else
-                _profileManager.SetEnabled(outProf, !outProf.Enabled);
+                targetProfile = _profileManager.Profiles.FirstOrDefault(x => x.CharacterName == characterName && x.Enabled);
 
-            _chatService.PrintInChat(
-                $"{outProf.Name} was successfully {(toggle ? "toggled" : "applied")} for {outProf.CharacterName}", ChatService.ChatMessageColor.Info);
+            if (targetProfile == null)
+            {
+                _chatService.PrintInChat(new SeStringBuilder()
+                    .AddText("Cannot execute command because profile ")
+                    .AddYellow(string.IsNullOrWhiteSpace(profileName) ? "[Any enabled profile]" : profileName)
+                    .AddText(" for ")
+                    .AddRed(characterName)
+                    .AddText(" was not found").BuiltString);
+                return;
+            }
+
+            if (state != null)
+            {
+                if(targetProfile.Enabled == state)
+                {
+                    _chatService.PrintInChat(new SeStringBuilder()
+                        .AddText("Profile ")
+                        .AddYellow(targetProfile.Name)
+                        .AddText(" for ")
+                        .AddBlue(characterName)
+                        .AddText(" is already ")
+                        .AddGreen((bool)state ? "enabled" : "disabled").BuiltString);
+                    return;
+                }
+
+                _profileManager.SetEnabled(targetProfile, (bool)state);
+            }
+            else
+                _profileManager.SetEnabled(targetProfile, !targetProfile.Enabled);
+
+            _chatService.PrintInChat(new SeStringBuilder()
+                .AddText("Profile ")
+                .AddYellow(targetProfile.Name)
+                .AddText(" was successfully ")
+                .AddBlue(state != null ? ((bool)state ? "enabled" : "disabled") : "toggled")
+                .AddText(" for ")
+                .AddRed(targetProfile.CharacterName).BuiltString);
         }
         catch (Exception e)
         {
-            _chatService.PrintInChat($"Error while {(toggle ? "toggling" : "applying")} profile, details are available in dalamud log", ChatService.ChatMessageColor.Error);
-            _logger.Error($"Error {(toggle ? "toggling" : "applying")} profile by command: \n" +
-                            $"Profile name \"{(string.IsNullOrWhiteSpace(profName) ? "empty (none provided)" : profName)}\"\n" +
-                            $"Character name \"{(string.IsNullOrWhiteSpace(charaName) ? "empty (none provided)" : charaName)}\"\n" +
-                            $"Error: {e}");
+            _chatService.PrintInChat(new SeStringBuilder()
+                .AddRed($"Error while changing state of profile, details are available in dalamud log").BuiltString);
+
+            _logger.Error($"Error while changing state of profile by command:\n" +
+                            $"Profile name \"{(string.IsNullOrWhiteSpace(profileName) ? "empty (none provided)" : profileName)}\"\n" +
+                            $"Character name \"{(string.IsNullOrWhiteSpace(characterName) ? "empty (none provided)" : characterName)}\"\n" +
+                            $"Arguments: {argument}\nError: {e}");
         }
     }
 }

@@ -33,6 +33,9 @@ public sealed class Plugin : IDalamudPlugin
             var configMover = _services.GetRequiredService<FantasiaPlusConfigMover>();
             configMover.MoveConfigsIfNeeded();
 
+            var v3ConfigFixer = _services.GetRequiredService<Version3ConfigFixer>();
+            v3ConfigFixer.FixV3ConfigIfNeeded();
+
             _services.GetRequiredService<CustomizePlusIpc>();
             _services.GetRequiredService<CPlusWindowSystem>();
             _services.GetRequiredService<CommandService>();

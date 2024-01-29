@@ -10,6 +10,7 @@ using CustomizePlus.Profiles;
 using CustomizePlus.Configuration.Helpers;
 using CustomizePlus.Game.Services;
 using CustomizePlus.GameData.Services;
+using System;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 
@@ -27,12 +28,16 @@ public class IPCTestTab //: IDisposable
     private readonly ICallGateSubscriber<Character?, string>? _getProfileFromCharacter;
     private readonly ICallGateSubscriber<Character?, object>? _revertCharacter;
     //private readonly ICallGateSubscriber<string?, string?, object?>? _onProfileUpdate;
+    private readonly ICallGateSubscriber<(string Name, string characterName, Guid ID)[]>? _getRegisteredProfileList;
+    private readonly ICallGateSubscriber<Guid, Character?, object>? _setProfileToCharacterByUniqueId;
 
     private string? _rememberedProfileJson;
 
     private (int, int) _apiVersion;
 
     private string? _targetCharacterName;
+
+    private string _targetProfileID = "";
 
     public IPCTestTab(
         DalamudPluginInterface pluginInterface,
@@ -63,6 +68,8 @@ public class IPCTestTab //: IDisposable
         _revertCharacter = pluginInterface.GetIpcSubscriber<Character?, object>("CustomizePlus.RevertCharacter");
         /*_onProfileUpdate = pluginInterface.GetIpcSubscriber<string?, string?, object?>("CustomizePlus.OnProfileUpdate");
         _onProfileUpdate.Subscribe(OnProfileUpdate);*/
+        _getRegisteredProfileList = pluginInterface.GetIpcSubscriber<(string Name, string characterName, Guid ID)[]>("CustomizePlus.GetRegisteredProfileList");
+        _setProfileToCharacterByUniqueId = pluginInterface.GetIpcSubscriber<Guid, Character?, object>("CustomizePlus.SetProfileToCharacterByUniqueId");
     }
     /* public void Dispose()
      {
@@ -130,7 +137,7 @@ public class IPCTestTab //: IDisposable
             }
         }
 
-        if (ImGui.Button("RevertCharacter") && _rememberedProfileJson != null)
+        if (ImGui.Button("RevertCharacter"))// && _rememberedProfileJson != null) //_rememberedProfileJson isn't used in call
         {
             var actors = _gameObjectService.FindActorsByName(_targetCharacterName).ToList();
             if (actors.Count == 0)
@@ -138,6 +145,24 @@ public class IPCTestTab //: IDisposable
 
             _revertCharacter!.InvokeAction(FindCharacterByAddress(actors[0].Item2.Address));
             _popupSystem.ShowPopup("ipc_revert_done");
+        }
+
+        if (ImGui.Button("Copy profile list to clipboard"))
+        {
+            ImGui.SetClipboardText(string.Join("\n", _getRegisteredProfileList!.InvokeFunc().Select(x => $"{x.Name}, {x.characterName}, {x.ID}")));
+        }
+
+        ImGui.Text("Profile GUID to set:");
+        ImGui.SameLine();
+        ImGui.InputText("##profileguid", ref _targetProfileID, 128);
+
+        if (ImGui.Button("Set profile to character by GUID"))
+        {
+            var actors = _gameObjectService.FindActorsByName(_targetCharacterName).ToList();
+            if (actors.Count == 0)
+                return;
+
+            _setProfileToCharacterByUniqueId!.InvokeAction(Guid.Parse(_targetProfileID), FindCharacterByAddress(actors[0].Item2.Address));
         }
     }
 

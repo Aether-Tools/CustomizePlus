@@ -21,6 +21,9 @@ using CustomizePlus.Core.Extensions;
 using CustomizePlus.Armatures.Events;
 using CustomizePlus.Armatures.Data;
 using CustomizePlus.GameData.Extensions;
+using CustomizePlus.Templates;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace CustomizePlus.Api.Compatibility;
 
@@ -42,6 +45,8 @@ public class CustomizePlusIpc : IDisposable
     public const string SetProfileToCharacterLabel = $"CustomizePlus.{nameof(SetProfileToCharacter)}";
     public const string RevertCharacterLabel = $"CustomizePlus.{nameof(RevertCharacter)}";
     public const string OnProfileUpdateLabel = $"CustomizePlus.{nameof(OnProfileUpdate)}";
+    public const string GetRegisteredProfileListLabel = $"CustomizePlus.{nameof(GetRegisteredProfileList)}";
+    public const string SetProfileToCharacterByUniqueIdLabel = $"CustomizePlus.{nameof(SetProfileToCharacterByUniqueId)}";
     public static readonly (int, int) ApiVersion = (3, 0);
 
     //Sends local player's profile every time their active profile is changed
@@ -51,6 +56,8 @@ public class CustomizePlusIpc : IDisposable
     internal ICallGateProvider<string, Character?, object>? ProviderSetProfileToCharacter;
     internal ICallGateProvider<Character?, string?>? ProviderGetProfileFromCharacter;
     internal ICallGateProvider<(int, int)>? ProviderGetApiVersion;
+    internal ICallGateProvider<(string Name, string characterName, Guid ID)[]>? ProviderGetRegisteredProfileList;
+    internal ICallGateProvider<Guid, Character?, object>? ProviderSetProfileToCharacterByUniqueId;
 
     public CustomizePlusIpc(
         IObjectTable objectTable,
@@ -168,7 +175,7 @@ public class CustomizePlusIpc : IDisposable
         {
             _logger.Error($"Error registering legacy Customize+ IPC provider for {RevertCharacterLabel}: {ex}");
         }
-        
+
         try
         {
             ProviderOnProfileUpdate = _pluginInterface.GetIpcProvider<string?, string?, object?>(OnProfileUpdateLabel);
@@ -176,6 +183,27 @@ public class CustomizePlusIpc : IDisposable
         catch (Exception ex)
         {
             _logger.Error($"Error registering legacy Customize+ IPC provider for {OnProfileUpdateLabel}: {ex}");
+        }
+
+        try
+        {
+            ProviderGetRegisteredProfileList = _pluginInterface.GetIpcProvider<(string Name, string characterName, Guid ID)[]>(GetRegisteredProfileListLabel);
+            ProviderGetRegisteredProfileList.RegisterFunc(GetRegisteredProfileList);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error($"Error registering legacy Customize+ IPC provider for {GetRegisteredProfileListLabel}: {ex}");
+        }
+
+        try
+        {
+            ProviderSetProfileToCharacterByUniqueId =
+                _pluginInterface.GetIpcProvider<Guid, Character?, object>(SetProfileToCharacterByUniqueIdLabel);
+            ProviderSetProfileToCharacterByUniqueId.RegisterAction(SetProfileToCharacterByUniqueId);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error($"Error registering legacy Customize+ IPC provider for {SetProfileToCharacterByUniqueIdLabel}: {ex}");
         }
     }
 
@@ -186,6 +214,8 @@ public class CustomizePlusIpc : IDisposable
         ProviderRevertCharacter?.UnregisterAction();
         ProviderGetApiVersion?.UnregisterFunc();
         ProviderOnProfileUpdate?.UnregisterFunc();
+        ProviderGetRegisteredProfileList?.UnregisterFunc();
+        ProviderSetProfileToCharacterByUniqueId?.UnregisterAction();
     }
 
     private void OnProfileUpdate(Profile? profile)
@@ -285,5 +315,33 @@ public class CustomizePlusIpc : IDisposable
     private (Profile, Template) GetProfileFromVersion3(Version3Profile profile)
     {
         return V3ProfileToV4Converter.Convert(profile);
+    }
+
+    private (string Name, string characterName, Guid ID)[] GetRegisteredProfileList()
+    {
+        return _profileManager.Profiles.Select(x => (x.Name.ToString(), x.CharacterName.ToString(), x.UniqueId)).ToArray();
+    }
+
+    private void SetProfileToCharacterByUniqueId(Guid UniqueID, Character? character)
+    {
+        if (character == null)
+            return;
+
+        var actor = (Actor)character.Address;
+        if (!actor.Valid)
+            return;
+
+        try
+        {
+            var profile = _profileManager.Profiles.FirstOrDefault(x => x.UniqueId == UniqueID);
+            if (profile != null)
+            {
+                _profileManager.AddTemporaryProfile(new(profile), actor); //copy to regenerate guid
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Warning($"Unable to set body profile. Character: {character?.Name}, exception: {ex}, debug data: {UniqueID}");
+        }
     }
 }

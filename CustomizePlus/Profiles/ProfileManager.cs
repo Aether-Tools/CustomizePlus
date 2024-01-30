@@ -287,6 +287,15 @@ public class ProfileManager : IDisposable
         }
     }
 
+    public void SetEnabled(Guid guid, bool value)
+    {
+        var profile = Profiles.FirstOrDefault(x => x.UniqueId == guid && x.ProfileType == ProfileType.Normal);
+        if(profile != null)
+        {
+            SetEnabled(profile, value);
+        }
+    }
+
     public void SetLimitLookupToOwned(Profile profile, bool value)
     {
         if (profile.LimitLookupToOwnedObjects != value)

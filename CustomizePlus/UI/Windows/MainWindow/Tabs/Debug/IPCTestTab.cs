@@ -11,6 +11,7 @@ using CustomizePlus.Configuration.Helpers;
 using CustomizePlus.Game.Services;
 using CustomizePlus.GameData.Services;
 using System;
+using IPCProfileDataTuple = (string Name, string characterName, bool IsEnabled, System.Guid ID);
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 
@@ -28,8 +29,9 @@ public class IPCTestTab //: IDisposable
     private readonly ICallGateSubscriber<Character?, string>? _getProfileFromCharacter;
     private readonly ICallGateSubscriber<Character?, object>? _revertCharacter;
     //private readonly ICallGateSubscriber<string?, string?, object?>? _onProfileUpdate;
-    private readonly ICallGateSubscriber<(string Name, string characterName, Guid ID)[]>? _getRegisteredProfileList;
-    private readonly ICallGateSubscriber<Guid, Character?, object>? _setProfileToCharacterByUniqueId;
+    private readonly ICallGateSubscriber<IPCProfileDataTuple[]>? _GetProfileList;
+    private readonly ICallGateSubscriber<Guid, object>? _EnableProfileByUniqueId;
+    private readonly ICallGateSubscriber<Guid, object>? _DisableProfileByUniqueId;
 
     private string? _rememberedProfileJson;
 
@@ -68,8 +70,9 @@ public class IPCTestTab //: IDisposable
         _revertCharacter = pluginInterface.GetIpcSubscriber<Character?, object>("CustomizePlus.RevertCharacter");
         /*_onProfileUpdate = pluginInterface.GetIpcSubscriber<string?, string?, object?>("CustomizePlus.OnProfileUpdate");
         _onProfileUpdate.Subscribe(OnProfileUpdate);*/
-        _getRegisteredProfileList = pluginInterface.GetIpcSubscriber<(string Name, string characterName, Guid ID)[]>("CustomizePlus.GetRegisteredProfileList");
-        _setProfileToCharacterByUniqueId = pluginInterface.GetIpcSubscriber<Guid, Character?, object>("CustomizePlus.SetProfileToCharacterByUniqueId");
+        _GetProfileList = pluginInterface.GetIpcSubscriber<IPCProfileDataTuple[]>("CustomizePlus.GetProfileList");
+        _EnableProfileByUniqueId = pluginInterface.GetIpcSubscriber<Guid, object>("CustomizePlus.EnableProfileByUniqueId");
+        _DisableProfileByUniqueId = pluginInterface.GetIpcSubscriber<Guid, object>("CustomizePlus.DisableProfileByUniqueId");
     }
     /* public void Dispose()
      {
@@ -137,7 +140,7 @@ public class IPCTestTab //: IDisposable
             }
         }
 
-        if (ImGui.Button("RevertCharacter"))// && _rememberedProfileJson != null) //_rememberedProfileJson isn't used in call
+        if (ImGui.Button("RevertCharacter") && _rememberedProfileJson != null)
         {
             var actors = _gameObjectService.FindActorsByName(_targetCharacterName).ToList();
             if (actors.Count == 0)
@@ -149,20 +152,21 @@ public class IPCTestTab //: IDisposable
 
         if (ImGui.Button("Copy profile list to clipboard"))
         {
-            ImGui.SetClipboardText(string.Join("\n", _getRegisteredProfileList!.InvokeFunc().Select(x => $"{x.Name}, {x.characterName}, {x.ID}")));
+            ImGui.SetClipboardText(string.Join("\n", _GetProfileList!.InvokeFunc().Select(x => $"{x.Name}, {x.characterName}, {x.IsEnabled}, {x.ID}")));
         }
 
         ImGui.Text("Profile GUID to set:");
         ImGui.SameLine();
         ImGui.InputText("##profileguid", ref _targetProfileID, 128);
 
-        if (ImGui.Button("Set profile to character by GUID"))
+        if (ImGui.Button("Enable profile by GUID"))
         {
-            var actors = _gameObjectService.FindActorsByName(_targetCharacterName).ToList();
-            if (actors.Count == 0)
-                return;
+            _EnableProfileByUniqueId!.InvokeAction(Guid.Parse(_targetProfileID));
+        }
 
-            _setProfileToCharacterByUniqueId!.InvokeAction(Guid.Parse(_targetProfileID), FindCharacterByAddress(actors[0].Item2.Address));
+        if (ImGui.Button("Disable profile by GUID"))
+        {
+            _DisableProfileByUniqueId!.InvokeAction(Guid.Parse(_targetProfileID));
         }
     }
 

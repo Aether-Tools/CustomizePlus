@@ -2,6 +2,8 @@
 Customize+ is a Dalamud plugin designed to give you better control over your Final Fantasy XIV character appearance. Namely it allows you to apply character bone manipulations during gameplay.
 
 ## Installing
+**Do not use repo.json from this repository**
+
 Add [Aether Tools](https://github.com/Aether-Tools/DalamudPlugins) or [Sea of Stars](https://github.com/Ottermandias/SeaOfStars) dalamud repository by following instructions on the respective pages. 
 
 Then search for Customize+ in the plugin manager.

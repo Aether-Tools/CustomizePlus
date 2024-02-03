@@ -20,6 +20,7 @@ using CustomizePlus.GameData.Services;
 using CustomizePlus.GameData.Extensions;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using System.Drawing;
+using Penumbra.GameData.Enums;
 
 namespace CustomizePlus.Armatures.Services;
 
@@ -33,7 +34,7 @@ public unsafe sealed class ArmatureManager : IDisposable
     private readonly Logger _logger;
     private readonly FrameworkManager _framework;
     private readonly ObjectManager _objectManager;
-    private readonly ActorService _actorService;
+    private readonly ActorManager _actorManager;
     private readonly ArmatureChanged _event;
 
     public Dictionary<ActorIdentifier, Armature> Armatures { get; private set; } = new();
@@ -47,7 +48,7 @@ public unsafe sealed class ArmatureManager : IDisposable
         Logger logger,
         FrameworkManager framework,
         ObjectManager objectManager,
-        ActorService actorService,
+        ActorManager actorManager,
         ArmatureChanged @event)
     {
         _profileManager = profileManager;
@@ -58,7 +59,7 @@ public unsafe sealed class ArmatureManager : IDisposable
         _logger = logger;
         _framework = framework;
         _objectManager = objectManager;
-        _actorService = actorService;
+        _actorManager = actorManager;
         _event = @event;
 
         _templateChangedEvent.Subscribe(OnTemplateChange, TemplateChanged.Priority.ArmatureManager);
@@ -92,7 +93,7 @@ public unsafe sealed class ArmatureManager : IDisposable
     /// </summary>
     public void OnGameObjectMove(Actor actor)
     {
-        if (!actor.Identifier(_actorService.AwaitedService, out var identifier))
+        if (!actor.Identifier(_actorManager, out var identifier))
             return;
 
         if (Armatures.TryGetValue(identifier, out var armature) && armature.IsBuilt && armature.IsVisible)

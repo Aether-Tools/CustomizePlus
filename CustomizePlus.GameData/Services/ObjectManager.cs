@@ -4,6 +4,7 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using Penumbra.GameData.Actors;
+using Penumbra.GameData.Enums;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,18 +19,18 @@ public class ObjectManager : IReadOnlyDictionary<ActorIdentifier, ActorData>
     private readonly IFramework _framework;
     private readonly IClientState _clientState;
     private readonly IObjectTable _objects;
-    private readonly ActorService _actors;
+    private readonly ActorManager _actorManager;
     private readonly ITargetManager _targets;
 
     public IObjectTable Objects
         => _objects;
 
-    public ObjectManager(IFramework framework, IClientState clientState, IObjectTable objects, ActorService actors, ITargetManager targets)
+    public ObjectManager(IFramework framework, IClientState clientState, IObjectTable objects, ActorManager actorManager, ITargetManager targets)
     {
         _framework = framework;
         _clientState = clientState;
         _objects = objects;
-        _actors = actors;
+        _actorManager = actorManager;
         _targets = targets;
     }
 
@@ -60,23 +61,26 @@ public class ObjectManager : IReadOnlyDictionary<ActorIdentifier, ActorData>
         for (var i = 0; i < (int)ScreenActor.CutsceneStart; ++i)
         {
             Actor character = _objects.GetObjectAddress(i);
-            if (character.Identifier(_actors.AwaitedService, out var identifier))
+            if (character.Identifier(_actorManager, out var identifier))
                 HandleIdentifier(identifier, character);
         }
 
         for (var i = (int)ScreenActor.CutsceneStart; i < (int)ScreenActor.CutsceneEnd; ++i)
         {
             Actor character = _objects.GetObjectAddress(i);
-            if (!character.Valid)
+            // Technically the game does not create holes in cutscenes or GPose.
+            // But for Brio compatibility, we allow holes in GPose.
+            // Since GPose always has the event actor in the first cutscene slot, we can still optimize in this case.
+            if (!character.Valid && i == (int)ScreenActor.CutsceneStart)
                 break;
 
-            HandleIdentifier(character.GetIdentifier(_actors.AwaitedService), character);
+            HandleIdentifier(character.GetIdentifier(_actorManager), character);
         }
 
         void AddSpecial(ScreenActor idx, string label)
         {
             Actor actor = _objects.GetObjectAddress((int)idx);
-            if (actor.Identifier(_actors.AwaitedService, out var ident))
+            if (actor.Identifier(_actorManager, out var ident))
             {
                 var data = new ActorData(actor, label);
                 _identifiers.Add(ident, data);
@@ -95,7 +99,7 @@ public class ObjectManager : IReadOnlyDictionary<ActorIdentifier, ActorData>
         for (var i = (int)ScreenActor.ScreenEnd; i < _objects.Length; ++i)
         {
             Actor character = _objects.GetObjectAddress(i);
-            if (character.Identifier(_actors.AwaitedService, out var identifier))
+            if (character.Identifier(_actorManager, out var identifier))
                 HandleIdentifier(identifier, character);
         }
 
@@ -120,7 +124,7 @@ public class ObjectManager : IReadOnlyDictionary<ActorIdentifier, ActorData>
 
         if (identifier.Type is IdentifierType.Player or IdentifierType.Owned)
         {
-            var allWorld = _actors.AwaitedService.CreateIndividualUnchecked(identifier.Type, identifier.PlayerName, ushort.MaxValue,
+            var allWorld = _actorManager.CreateIndividualUnchecked(identifier.Type, identifier.PlayerName, ushort.MaxValue,
             identifier.Kind,
                 identifier.DataId);
 
@@ -137,7 +141,7 @@ public class ObjectManager : IReadOnlyDictionary<ActorIdentifier, ActorData>
 
         if (identifier.Type is IdentifierType.Owned)
         {
-            var nonOwned = _actors.AwaitedService.CreateNpc(identifier.Kind, identifier.DataId);
+            var nonOwned = _actorManager.CreateNpc(identifier.Kind, identifier.DataId);
             if (!_nonOwnedIdentifiers.TryGetValue(nonOwned, out var nonOwnedData))
             {
                 nonOwnedData = new ActorData(character, nonOwned.ToString());
@@ -170,7 +174,7 @@ public class ObjectManager : IReadOnlyDictionary<ActorIdentifier, ActorData>
         get
         {
             Update();
-            return Player.Identifier(_actors.AwaitedService, out var ident) && _identifiers.TryGetValue(ident, out var data)
+            return Player.Identifier(_actorManager, out var ident) && _identifiers.TryGetValue(ident, out var data)
                 ? (ident, data)
                 : (ident, ActorData.Invalid);
         }
@@ -181,7 +185,7 @@ public class ObjectManager : IReadOnlyDictionary<ActorIdentifier, ActorData>
         get
         {
             Update();
-            return Target.Identifier(_actors.AwaitedService, out var ident) && _identifiers.TryGetValue(ident, out var data)
+            return Target.Identifier(_actorManager, out var ident) && _identifiers.TryGetValue(ident, out var data)
                 ? (ident, data)
                 : (ident, ActorData.Invalid);
         }

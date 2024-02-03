@@ -5,18 +5,19 @@ using CustomizePlus.Core.Data;
 using CustomizePlus.GameData.Data;
 using CustomizePlus.GameData.Services;
 using CustomizePlus.GameData.Extensions;
+using Penumbra.GameData.Enums;
 
 namespace CustomizePlus.Game.Services;
 
 public class GameObjectService
 {
-    private readonly ActorService _actorService;
+    private readonly ActorManager _actorManager;
     private readonly IObjectTable _objectTable;
     private readonly ObjectManager _objectManager;
 
-    public GameObjectService(ActorService actorService, IObjectTable objectTable, ObjectManager objectManager)
+    public GameObjectService(ActorManager actorManager, IObjectTable objectTable, ObjectManager objectManager)
     {
-        _actorService = actorService;
+        _actorManager = actorManager;
         _objectTable = objectTable;
         _objectManager = objectManager;
     }
@@ -33,7 +34,7 @@ public class GameObjectService
 
     public bool IsActorHasScalableRoot(Actor actor)
     {
-        if (!actor.Identifier(_actorService.AwaitedService, out var identifier))
+        if (!actor.Identifier(_actorManager, out var identifier))
             return false;
 
         return !Constants.IsInObjectTableBusyNPCRange(actor.Index.Index)

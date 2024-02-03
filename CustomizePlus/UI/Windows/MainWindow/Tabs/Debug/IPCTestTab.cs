@@ -10,6 +10,7 @@ using CustomizePlus.Profiles;
 using CustomizePlus.Configuration.Helpers;
 using CustomizePlus.Game.Services;
 using CustomizePlus.GameData.Services;
+using Penumbra.GameData.Actors;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 
@@ -20,7 +21,7 @@ public class IPCTestTab //: IDisposable
     private readonly PopupSystem _popupSystem;
     private readonly GameObjectService _gameObjectService;
     private readonly ObjectManager _objectManager;
-    private readonly ActorService _actorService;
+    private readonly ActorManager _actorManager;
 
     private readonly ICallGateSubscriber<(int, int)>? _getApiVersion;
     private readonly ICallGateSubscriber<string, Character?, object>? _setCharacterProfile;
@@ -41,14 +42,14 @@ public class IPCTestTab //: IDisposable
         PopupSystem popupSystem,
         ObjectManager objectManager,
         GameObjectService gameObjectService,
-        ActorService actorService)
+        ActorManager actorManager)
     {
         _objectTable = objectTable;
         _profileManager = profileManager;
         _popupSystem = popupSystem;
         _objectManager = objectManager;
         _gameObjectService = gameObjectService;
-        _actorService = actorService;
+        _actorManager = actorManager;
 
         _popupSystem.RegisterPopup("ipc_v4_profile_remembered", "Current profile has been copied into memory");
         _popupSystem.RegisterPopup("ipc_get_profile_from_character_remembered", "GetProfileFromCharacter result has been copied into memory");
@@ -96,7 +97,7 @@ public class IPCTestTab //: IDisposable
             if (actors.Count == 0)
                 return;
 
-            if (!actors[0].Item2.Identifier(_actorService.AwaitedService, out var identifier))
+            if (!actors[0].Item2.Identifier(_actorManager, out var identifier))
                 return;
 
             var profile = _profileManager.GetEnabledProfilesByActor(identifier).FirstOrDefault();

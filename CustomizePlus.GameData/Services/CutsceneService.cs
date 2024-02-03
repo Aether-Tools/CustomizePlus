@@ -1,23 +1,23 @@
-﻿using Dalamud.Plugin.Services;
+﻿using CustomizePlus.GameData.Hooks.Objects;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using Penumbra.GameData.Actors;
-using System;
-using System.Collections.Generic;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using OtterGui.Services;
+using Penumbra.GameData.Enums;
+using Penumbra.String;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CustomizePlus.GameData.Services;
 
-public class CutsceneService : IDisposable
+public class CutsceneService : IService, IDisposable
 {
     public const int CutsceneStartIdx = (int)ScreenActor.CutsceneStart;
     public const int CutsceneEndIdx = (int)ScreenActor.CutsceneEnd;
     public const int CutsceneSlots = CutsceneEndIdx - CutsceneStartIdx;
 
-    private readonly GameEventManager _events;
     private readonly IObjectTable _objects;
+    private readonly CopyCharacter _copyCharacter;
+    private readonly CharacterDestructor _characterDestructor;
     private readonly short[] _copiedCharacters = Enumerable.Repeat((short)-1, CutsceneSlots).ToArray();
 
     public IEnumerable<KeyValuePair<int, Dalamud.Game.ClientState.Objects.Types.GameObject>> Actors
@@ -25,13 +25,18 @@ public class CutsceneService : IDisposable
             .Where(i => _objects[i] != null)
             .Select(i => KeyValuePair.Create(i, this[i] ?? _objects[i]!));
 
-    public unsafe CutsceneService(IObjectTable objects, GameEventManager events)
+    public unsafe CutsceneService(IObjectTable objects, CopyCharacter copyCharacter, CharacterDestructor characterDestructor,
+        IClientState clientState)
     {
         _objects = objects;
-        _events = events;
-        _events.CopyCharacter += OnCharacterCopy;
-        _events.CharacterDestructor += OnCharacterDestructor;
+        _copyCharacter = copyCharacter;
+        _characterDestructor = characterDestructor;
+        _copyCharacter.Subscribe(OnCharacterCopy, CopyCharacter.Priority.CutsceneService);
+        _characterDestructor.Subscribe(OnCharacterDestructor, CharacterDestructor.Priority.CutsceneService);
+        if (clientState.IsGPosing)
+            RecoverGPoseActors();
     }
+
 
     /// <summary>
     /// Get the related actor to a cutscene actor.
@@ -50,6 +55,27 @@ public class CutsceneService : IDisposable
 
     /// <summary> Return the currently set index of a parent or -1 if none is set or the index is invalid. </summary>
     public int GetParentIndex(int idx)
+        => GetParentIndex((ushort)idx);
+
+    public bool SetParentIndex(int copyIdx, int parentIdx)
+    {
+        if (copyIdx is < CutsceneStartIdx or >= CutsceneEndIdx)
+            return false;
+
+        if (parentIdx is < -1 or >= CutsceneEndIdx)
+            return false;
+
+        if (_objects.GetObjectAddress(copyIdx) == nint.Zero)
+            return false;
+
+        if (parentIdx != -1 && _objects.GetObjectAddress(parentIdx) == nint.Zero)
+            return false;
+
+        _copiedCharacters[copyIdx - CutsceneStartIdx] = (short)parentIdx;
+        return true;
+    }
+
+    public short GetParentIndex(ushort idx)
     {
         if (idx is >= CutsceneStartIdx and < CutsceneEndIdx)
             return _copiedCharacters[idx - CutsceneStartIdx];
@@ -59,17 +85,34 @@ public class CutsceneService : IDisposable
 
     public unsafe void Dispose()
     {
-        _events.CopyCharacter -= OnCharacterCopy;
-        _events.CharacterDestructor -= OnCharacterDestructor;
+        _copyCharacter.Unsubscribe(OnCharacterCopy);
+        _characterDestructor.Unsubscribe(OnCharacterDestructor);
     }
 
     private unsafe void OnCharacterDestructor(Character* character)
     {
-        if (character->GameObject.ObjectIndex is < CutsceneStartIdx or >= CutsceneEndIdx)
-            return;
+        if (character->GameObject.ObjectIndex < CutsceneStartIdx)
+        {
+            // Remove all associations for now non-existing actor.
+            for (var i = 0; i < _copiedCharacters.Length; ++i)
+            {
+                if (_copiedCharacters[i] == character->GameObject.ObjectIndex)
+                {
+                    // A hack to deal with GPose actors leaving and thus losing the link, we just set the home world instead.
+                    // I do not think this breaks anything?
+                    var address = (GameObject*)_objects.GetObjectAddress(i + CutsceneStartIdx);
+                    if (address != null && address->GetObjectKind() is (byte)ObjectKind.Pc)
+                        ((Character*)address)->HomeWorld = character->HomeWorld;
 
-        var idx = character->GameObject.ObjectIndex - CutsceneStartIdx;
-        _copiedCharacters[idx] = -1;
+                    _copiedCharacters[i] = -1;
+                }
+            }
+        }
+        else if (character->GameObject.ObjectIndex < CutsceneEndIdx)
+        {
+            var idx = character->GameObject.ObjectIndex - CutsceneStartIdx;
+            _copiedCharacters[idx] = -1;
+        }
     }
 
     private unsafe void OnCharacterCopy(Character* target, Character* source)
@@ -79,5 +122,46 @@ public class CutsceneService : IDisposable
 
         var idx = target->GameObject.ObjectIndex - CutsceneStartIdx;
         _copiedCharacters[idx] = (short)(source != null ? source->GameObject.ObjectIndex : -1);
+    }
+
+    /// <summary> Try to recover GPose actors on reloads into a running game. </summary>
+    /// <remarks> This is not 100% accurate due to world IDs, minions etc., but will be mostly sane. </remarks>
+    private unsafe void RecoverGPoseActors()
+    {
+        Dictionary<ByteString, short>? actors = null;
+
+        for (var i = CutsceneStartIdx; i < CutsceneEndIdx; ++i)
+        {
+            if (!TryGetName(i, out var name))
+                continue;
+
+            if ((actors ??= CreateActors()).TryGetValue(name, out var idx))
+                _copiedCharacters[i - CutsceneStartIdx] = idx;
+        }
+
+        return;
+
+        bool TryGetName(int idx, out ByteString name)
+        {
+            name = ByteString.Empty;
+            var address = (GameObject*)_objects.GetObjectAddress(idx);
+            if (address == null)
+                return false;
+
+            name = new ByteString(address->Name);
+            return !name.IsEmpty;
+        }
+
+        Dictionary<ByteString, short> CreateActors()
+        {
+            var ret = new Dictionary<ByteString, short>();
+            for (short i = 0; i < CutsceneStartIdx; ++i)
+            {
+                if (TryGetName(i, out var name))
+                    ret.TryAdd(name, i);
+            }
+
+            return ret;
+        }
     }
 }

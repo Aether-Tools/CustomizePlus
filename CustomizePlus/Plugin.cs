@@ -8,6 +8,7 @@ using CustomizePlus.UI;
 using CustomizePlus.Core;
 using CustomizePlus.Api.Compatibility;
 using CustomizePlus.Configuration.Services.Temporary;
+using OtterGui.Services;
 
 namespace CustomizePlus;
 
@@ -19,7 +20,7 @@ public sealed class Plugin : IDalamudPlugin
     public static readonly string Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? string.Empty;
 #endif
 
-    private readonly ServiceProvider _services;
+    private readonly ServiceManager _services;
 
     public static readonly Logger Logger = new(); //for loggin in static classes/methods
 
@@ -27,18 +28,18 @@ public sealed class Plugin : IDalamudPlugin
     {
         try
         {
-            _services = ServiceManager.CreateProvider(pluginInterface, Logger);
+            _services = ServiceManagerBuilder.CreateProvider(pluginInterface, Logger);
 
             //temporary
-            var configMover = _services.GetRequiredService<FantasiaPlusConfigMover>();
+            var configMover = _services.GetService<FantasiaPlusConfigMover>();
             configMover.MoveConfigsIfNeeded();
 
-            var v3ConfigFixer = _services.GetRequiredService<Version3ConfigFixer>();
+            var v3ConfigFixer = _services.GetService<Version3ConfigFixer>();
             v3ConfigFixer.FixV3ConfigIfNeeded();
 
-            _services.GetRequiredService<CustomizePlusIpc>();
-            _services.GetRequiredService<CPlusWindowSystem>();
-            _services.GetRequiredService<CommandService>();
+            _services.GetService<CustomizePlusIpc>();
+            _services.GetService<CPlusWindowSystem>();
+            _services.GetService<CommandService>();
 
             Logger.Information($"Customize+ v{Version} [FantasiaPlus] started");
         }

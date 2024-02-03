@@ -140,9 +140,17 @@ public class HookingService : IDisposable
             return;
         }
 
-        var actor = (Actor)gameObjectPtr;
-        if (actor.Valid)
-            _armatureManager.OnGameObjectMove((Actor)gameObjectPtr);
+        try
+        {
+            var actor = (Actor)gameObjectPtr;
+            if (actor.Valid)
+                _armatureManager.OnGameObjectMove((Actor)gameObjectPtr);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error($"Exception in Customize+ movement hook: {ex}");
+            _gameObjectMovementHook?.Disable();
+        }
     }
 
     public void Dispose()

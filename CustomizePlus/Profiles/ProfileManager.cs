@@ -22,6 +22,7 @@ using CustomizePlus.GameData.Data;
 using CustomizePlus.GameData.Services;
 using CustomizePlus.GameData.Extensions;
 using CustomizePlus.Profiles.Enums;
+using Penumbra.GameData.Enums;
 
 namespace CustomizePlus.Profiles;
 
@@ -35,7 +36,7 @@ public class ProfileManager : IDisposable
     private readonly SaveService _saveService;
     private readonly Logger _logger;
     private readonly PluginConfiguration _configuration;
-    private readonly ActorService _actorService;
+    private readonly ActorManager _actorManager;
     private readonly ProfileChanged _event;
     private readonly TemplateChanged _templateChangedEvent;
     private readonly ReloadEvent _reloadEvent;
@@ -51,7 +52,7 @@ public class ProfileManager : IDisposable
         SaveService saveService,
         Logger logger,
         PluginConfiguration configuration,
-        ActorService actorService,
+        ActorManager actorManager,
         ProfileChanged @event,
         TemplateChanged templateChangedEvent,
         ReloadEvent reloadEvent,
@@ -62,7 +63,7 @@ public class ProfileManager : IDisposable
         _saveService = saveService;
         _logger = logger;
         _configuration = configuration;
-        _actorService = actorService;
+        _actorManager = actorManager;
         _event = @event;
         _templateChangedEvent = templateChangedEvent;
         _templateChangedEvent.Subscribe(OnTemplateChange, TemplateChanged.Priority.ProfileManager);
@@ -375,7 +376,7 @@ public class ProfileManager : IDisposable
 
     public void AddTemporaryProfile(Profile profile, Actor actor/*, Template template*/)
     {
-        if (!actor.Identifier(_actorService.AwaitedService, out var identifier))
+        if (!actor.Identifier(_actorManager, out var identifier))
             return;
 
         profile.Enabled = true;
@@ -413,7 +414,7 @@ public class ProfileManager : IDisposable
 
     public void RemoveTemporaryProfile(Actor actor)
     {
-        if (!actor.Identifier(_actorService.AwaitedService, out var identifier))
+        if (!actor.Identifier(_actorManager, out var identifier))
             return;
 
         var profile = Profiles.FirstOrDefault(x => x.TemporaryActor == identifier && x.IsTemporary);

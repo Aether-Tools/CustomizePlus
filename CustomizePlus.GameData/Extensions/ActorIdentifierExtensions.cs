@@ -1,5 +1,7 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Penumbra.GameData.Actors;
+using Penumbra.GameData.Enums;
+using PenumbraExtensions = Penumbra.GameData.Actors.ActorIdentifierExtensions;
 
 namespace CustomizePlus.GameData.Extensions;
 
@@ -19,10 +21,10 @@ public static class ActorIdentifierExtensions
         if (identifier.Type != IdentifierType.Owned)
             return identifier.ToName();
 
-        if (ActorIdentifier.Manager == null)
+        if (PenumbraExtensions.Manager == null)
             throw new Exception("ActorIdentifier.Manager is not initialized");
 
-        return ActorIdentifier.Manager.Data.ToName(identifier.Kind, identifier.DataId);
+        return PenumbraExtensions.Manager.Data.ToName(identifier.Kind, identifier.DataId);
     }
 
     /// <summary>
@@ -93,7 +95,7 @@ public static class ActorIdentifierExtensions
         if (identifier.Type != IdentifierType.Special)
             return ActorIdentifier.Invalid;
 
-        if (ActorIdentifier.Manager == null)
+        if (PenumbraExtensions.Manager == null)
             throw new Exception("ActorIdentifier.Manager is not initialized");
 
         switch (identifier.Special)
@@ -103,12 +105,12 @@ public static class ActorIdentifierExtensions
             case ScreenActor.FittingRoom:
             case ScreenActor.DyePreview:
             case ScreenActor.Portrait:
-                return ActorIdentifier.Manager.GetCurrentPlayer();
+                return PenumbraExtensions.Manager.GetCurrentPlayer();
             case ScreenActor.ExamineScreen:
-                var examineIdentifier = ActorIdentifier.Manager.GetInspectPlayer();
+                var examineIdentifier = PenumbraExtensions.Manager.GetInspectPlayer();
 
                 if (!examineIdentifier.IsValid)
-                    examineIdentifier = ActorIdentifier.Manager.GetGlamourPlayer(); //returns ActorIdentifier.Invalid if player is invalid
+                    examineIdentifier = PenumbraExtensions.Manager.GetGlamourPlayer(); //returns ActorIdentifier.Invalid if player is invalid
 
                 if (!examineIdentifier.IsValid)
                     return ActorIdentifier.Invalid;
@@ -117,7 +119,7 @@ public static class ActorIdentifierExtensions
             case ScreenActor.Card6:
             case ScreenActor.Card7:
             case ScreenActor.Card8:
-                return ActorIdentifier.Manager.GetCardPlayer();
+                return PenumbraExtensions.Manager.GetCardPlayer();
         }
 
         return ActorIdentifier.Invalid;

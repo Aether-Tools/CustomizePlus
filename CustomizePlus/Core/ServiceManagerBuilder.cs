@@ -28,16 +28,22 @@ using CustomizePlus.Game.Services.GPose;
 using CustomizePlus.Game.Services.GPose.ExternalTools;
 using CustomizePlus.GameData.Services;
 using CustomizePlus.Configuration.Services.Temporary;
+using OtterGui.Services;
+using Penumbra.GameData.Actors;
+using Penumbra.GameData.Enums;
+using Penumbra.GameData.Structs;
+using OtterGui;
 
 namespace CustomizePlus.Core;
 
-public static class ServiceManager
+public static class ServiceManagerBuilder
 {
-    public static ServiceProvider CreateProvider(DalamudPluginInterface pi, Logger logger)
+    public static ServiceManager CreateProvider(DalamudPluginInterface pi, Logger logger)
     {
-        var services = new ServiceCollection()
-            .AddSingleton(logger)
-            .AddDalamud(pi)
+        EventWrapperBase.ChangeLogger(logger);
+
+        var services = new ServiceManager(logger)
+            .AddExistingService(logger)
             .AddCore()
             .AddEvents()
             .AddGPoseServices()
@@ -49,16 +55,20 @@ public static class ServiceManager
             .AddGameServices()
             .AddConfigServices()
             .AddRestOfServices();
-        return services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true });
-    }
 
-    private static IServiceCollection AddDalamud(this IServiceCollection services, DalamudPluginInterface pluginInterface)
-    {
-        new DalamudServices(pluginInterface).AddServices(services);
+        DalamudServices.AddServices(services, pi);
+
+        services.AddIServices(typeof(EquipItem).Assembly);
+        services.AddIServices(typeof(Plugin).Assembly);
+        services.AddIServices(typeof(ObjectManager).Assembly);
+        services.AddIServices(typeof(ImGuiUtil).Assembly);
+
+        services.CreateProvider();
+
         return services;
     }
 
-    private static IServiceCollection AddGPoseServices(this IServiceCollection services)
+    private static ServiceManager AddGPoseServices(this ServiceManager services)
     {
         services
             .AddSingleton<PosingModeDetectService>()
@@ -67,14 +77,14 @@ public static class ServiceManager
         return services;
     }
 
-    private static IServiceCollection AddArmatureServices(this IServiceCollection services)
+    private static ServiceManager AddArmatureServices(this ServiceManager services)
     {
         services
             .AddSingleton<ArmatureManager>();
         return services;
     }
 
-    private static IServiceCollection AddUI(this IServiceCollection services)
+    private static ServiceManager AddUI(this ServiceManager services)
     {
         services
             .AddSingleton<TemplateCombo>()
@@ -107,7 +117,7 @@ public static class ServiceManager
         return services;
     }
 
-    private static IServiceCollection AddEvents(this IServiceCollection services)
+    private static ServiceManager AddEvents(this ServiceManager services)
     {
         services
             .AddSingleton<ProfileChanged>()
@@ -118,7 +128,7 @@ public static class ServiceManager
         return services;
     }
 
-    private static IServiceCollection AddCore(this IServiceCollection services)
+    private static ServiceManager AddCore(this ServiceManager services)
     {
         services
             .AddSingleton<HookingService>()
@@ -133,7 +143,7 @@ public static class ServiceManager
         return services;
     }
 
-    private static IServiceCollection AddRestOfServices(this IServiceCollection services) //temp
+    private static ServiceManager AddRestOfServices(this ServiceManager services) //temp
     {
         services
             .AddSingleton<PoseFileBoneLoader>()
@@ -142,7 +152,7 @@ public static class ServiceManager
         return services;
     }
 
-    private static IServiceCollection AddConfigServices(this IServiceCollection services)
+    private static ServiceManager AddConfigServices(this ServiceManager services)
     {
         services
             .AddSingleton<PluginConfiguration>()
@@ -153,7 +163,7 @@ public static class ServiceManager
         return services;
     }
 
-    private static IServiceCollection AddGameServices(this IServiceCollection services)
+    private static ServiceManager AddGameServices(this ServiceManager services)
     {
         services
             .AddSingleton<GameObjectService>()
@@ -162,7 +172,7 @@ public static class ServiceManager
         return services;
     }
 
-    private static IServiceCollection AddProfileServices(this IServiceCollection services)
+    private static ServiceManager AddProfileServices(this ServiceManager services)
     {
         services
             .AddSingleton<ProfileManager>()
@@ -172,7 +182,7 @@ public static class ServiceManager
         return services;
     }
 
-    private static IServiceCollection AddTemplateServices(this IServiceCollection services)
+    private static ServiceManager AddTemplateServices(this ServiceManager services)
     {
         services
             .AddSingleton<TemplateManager>()
@@ -182,12 +192,13 @@ public static class ServiceManager
         return services;
     }
 
-    private static IServiceCollection AddGameDataServices(this IServiceCollection services)
+    private static ServiceManager AddGameDataServices(this ServiceManager services)
     {
         services
+            .AddSingleton<ActorManager>()
             .AddSingleton<CutsceneService>()
             .AddSingleton<GameEventManager>()
-            .AddSingleton<ActorService>()
+            .AddSingleton(p => new CutsceneResolver(idx => (short)p.GetRequiredService<CutsceneService>().GetParentIndex(idx)))
             .AddSingleton<ObjectManager>();
 
         return services;

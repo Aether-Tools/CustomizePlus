@@ -54,7 +54,7 @@ public class PluginStateBlock
         else if (_gameStateService.GameInPosingMode())
         {
             severity = PluginStateSeverity.Warning;
-            message = $"GPose active. Most editor features are unavailable while you're in this mode.";
+            message = $"GPose active. Compatibility with posing tools is limited.";
         }
         else if (!_configuration.PluginEnabled)
         {

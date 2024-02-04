@@ -20,7 +20,6 @@ public class ProfilePanel
     private readonly ProfileManager _manager;
     private readonly PluginConfiguration _configuration;
     private readonly TemplateCombo _templateCombo;
-    private readonly GameStateService _gameStateService;
 
     private string? _newName;
     private string? _newCharacterName;
@@ -37,14 +36,12 @@ public class ProfilePanel
         ProfileFileSystemSelector selector,
         ProfileManager manager,
         PluginConfiguration configuration,
-        TemplateCombo templateCombo,
-        GameStateService gameStateService)
+        TemplateCombo templateCombo)
     {
         _selector = selector;
         _manager = manager;
         _configuration = configuration;
         _templateCombo = templateCombo;
-        _gameStateService = gameStateService;
     }
 
     public void Draw()
@@ -197,40 +194,36 @@ public class ProfilePanel
                 name = _newCharacterName ?? _selector.Selected!.CharacterName;
                 ImGui.SetNextItemWidth(width.X);
 
-                using (var disabled = ImRaii.Disabled(_gameStateService.GameInPosingMode()))
+                if (!_selector.IncognitoMode)
                 {
-                    if (!_selector.IncognitoMode)
+                    if (ImGui.InputText("##CharacterName", ref name, 128))
                     {
-                        if (ImGui.InputText("##CharacterName", ref name, 128))
-                        {
-                            _newCharacterName = name;
-                            _changedProfile = _selector.Selected;
-                        }
-
-                        if (ImGui.IsItemDeactivatedAfterEdit() && _changedProfile != null)
-                        {
-                            _manager.ChangeCharacterName(_changedProfile, name);
-                            _newCharacterName = null;
-                            _changedProfile = null;
-                        }
+                        _newCharacterName = name;
+                        _changedProfile = _selector.Selected;
                     }
-                    else
-                        ImGui.TextUnformatted("Incognito active");
 
-                    ImGui.SameLine();
-                    var enabled = _selector.Selected?.LimitLookupToOwnedObjects ?? false;
-                    if (ImGui.Checkbox("##LimitLookupToOwnedObjects", ref enabled))
-                        _manager.SetLimitLookupToOwned(_selector.Selected!, enabled);
-                    ImGuiUtil.LabeledHelpMarker("Limit to my creatures",
-                        "When enabled limits the character search to only your own summons, mounts and minions.\nUseful when there is possibility there will be another character with that name owned by another player.\n* For battle chocobo use \"Chocobo\" as character name.\n** If you are changing root scale for mount and want to keep your scale make sure your own scale is set to anything other than default value.");
+                    if (ImGui.IsItemDeactivatedAfterEdit() && _changedProfile != null)
+                    {
+                        _manager.ChangeCharacterName(_changedProfile, name);
+                        _newCharacterName = null;
+                        _changedProfile = null;
+                    }
                 }
+                else
+                    ImGui.TextUnformatted("Incognito active");
+
+                ImGui.SameLine();
+                var enabled = _selector.Selected?.LimitLookupToOwnedObjects ?? false;
+                if (ImGui.Checkbox("##LimitLookupToOwnedObjects", ref enabled))
+                    _manager.SetLimitLookupToOwned(_selector.Selected!, enabled);
+                ImGuiUtil.LabeledHelpMarker("Limit to my creatures",
+                    "When enabled limits the character search to only your own summons, mounts and minions.\nUseful when there is possibility there will be another character with that name owned by another player.\n* For battle chocobo use \"Chocobo\" as character name.\n** If you are changing root scale for mount and want to keep your scale make sure your own scale is set to anything other than default value.");
             }
         }
     }
 
     private void DrawTemplateArea()
     {
-        using var disabled = ImRaii.Disabled(_gameStateService.GameInPosingMode());
         using var table = ImRaii.Table("SetTable", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollX | ImGuiTableFlags.ScrollY);
         if (!table)
             return;

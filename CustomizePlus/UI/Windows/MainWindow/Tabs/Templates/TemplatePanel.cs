@@ -22,7 +22,6 @@ public class TemplatePanel
 {
     private readonly TemplateFileSystemSelector _selector;
     private readonly TemplateManager _manager;
-    private readonly GameStateService _gameStateService;
     private readonly BoneEditorPanel _boneEditor;
     private readonly PluginConfiguration _configuration;
     private readonly MessageService _messageService;
@@ -38,7 +37,6 @@ public class TemplatePanel
     public TemplatePanel(
         TemplateFileSystemSelector selector,
         TemplateManager manager,
-        GameStateService gameStateService,
         BoneEditorPanel boneEditor,
         PluginConfiguration configuration,
         MessageService messageService,
@@ -47,7 +45,6 @@ public class TemplatePanel
     {
         _selector = selector;
         _manager = manager;
-        _gameStateService = gameStateService;
         _boneEditor = boneEditor;
         _configuration = configuration;
         _messageService = messageService;
@@ -173,7 +170,7 @@ public class TemplatePanel
     {
         if (ImGuiUtil.DrawDisabledButton($"{(_boneEditor.IsEditorActive ? "Finish" : "Start")} bone editing", Vector2.Zero,
             "Toggle the bone editor for this template",
-            (_selector.Selected?.IsWriteProtected ?? true) || _gameStateService.GameInPosingMode() || !_configuration.PluginEnabled))
+            (_selector.Selected?.IsWriteProtected ?? true) || !_configuration.PluginEnabled))
         {
             if (!_boneEditor.IsEditorActive)
                 _boneEditor.EnableEditor(_selector.Selected!);

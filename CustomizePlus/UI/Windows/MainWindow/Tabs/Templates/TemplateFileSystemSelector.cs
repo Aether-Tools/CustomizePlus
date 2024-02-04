@@ -26,6 +26,11 @@ using CustomizePlus.Profiles.Data;
 using CustomizePlus.Templates.Events;
 using CustomizePlus.Profiles.Events;
 using CustomizePlus.Templates.Data;
+using CustomizePlus.Configuration.Helpers;
+using CustomizePlus.Configuration.Data.Version3;
+using CustomizePlus.GameData.Data;
+using static OtterGui.Classes.MessageService;
+using CustomizePlus.Configuration.Data.Version2;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 
@@ -90,6 +95,8 @@ public class TemplateFileSystemSelector : FileSystemSelector<Template, TemplateS
         _popupSystem = popupSystem;
 
         _popupSystem.RegisterPopup("template_editor_active_warn", "You need to stop bone editing before doing this action"/*, false, new Vector2(5, 12)*/);
+        _popupSystem.RegisterPopup("clipboard_data_not_longterm", "Warning: clipboard data is not designed to be used as long-term way of storing your templates.\nCompatibility of clipboard data between different Customize+ is not guaranteed."/*, false, new Vector2(5, 12)*/);
+        _popupSystem.RegisterPopup("clipboard_data_unsupported_version", "Clipboard data you are trying to use cannot be used in this version of Customize+.");
 
         _templateChangedEvent.Subscribe(OnTemplateChange, TemplateChanged.Priority.TemplateFileSystemSelector);
         _profileChangedEvent.Subscribe(OnProfileChange, ProfileChanged.Priority.TemplateFileSystemSelector);
@@ -159,36 +166,77 @@ public class TemplateFileSystemSelector : FileSystemSelector<Template, TemplateS
         if (!ImGuiUtil.OpenNameField("##NewTemplate", ref _newName))
             return;
 
-        if (_clipboardText != null)
+        try
         {
-            var importVer = Base64Helper.ImportFromBase64(Clipboard.GetText(), out var json);
-
-            var template = Convert.ToInt32(importVer) switch
+            if (_clipboardText != null)
             {
-                //0 => ProfileConverter.ConvertFromConfigV0(json),
-                //2 => ProfileConverter.ConvertFromConfigV2(json),
-                //3 =>
-                4 => JsonConvert.DeserializeObject<Template>(json),
-                _ => null
-            };
-            if (template is Template tpl)
-                _templateManager.Clone(tpl, _newName, true);
+                var importVer = Base64Helper.ImportFromBase64(_clipboardText, out var json);
+
+                var template = Convert.ToInt32(importVer) switch
+                {
+                    2 => GetTemplateFromV2Profile(json),
+                    3 => GetTemplateFromV3Profile(json),
+                    4 => JsonConvert.DeserializeObject<Template>(json),
+                    _ => null
+                };
+                if (template is Template tpl && tpl != null)
+                    _templateManager.Clone(tpl, _newName, true);
+                else
+                    _popupSystem.ShowPopup("clipboard_data_unsupported_version");
+            }
+            else if (_cloneTemplate != null)
+            {
+                _templateManager.Clone(_cloneTemplate, _newName, true);
+            }
             else
-                //Messager.NotificationMessage("Could not create a template, clipboard did not contain valid template data.", NotificationType.Error, false);
-                throw new Exception("Invalid template"); //todo: temporary
+            {
+                _templateManager.Create(_newName, true);
+            }
+        }
+        catch(Exception ex)
+        {
+            _logger.Error($"Error while performing clipboard/clone/create template action: {ex}");
+            _popupSystem.ShowPopup("action_error");
+        }
+        finally
+        {
             _clipboardText = null;
-        }
-        else if (_cloneTemplate != null)
-        {
-            _templateManager.Clone(_cloneTemplate, _newName, true);
             _cloneTemplate = null;
+            _newName = string.Empty;
         }
-        else
+    }
+
+    private Template? GetTemplateFromV2Profile(string json)
+    {
+        var profile = JsonConvert.DeserializeObject<Version2Profile>(json);
+        if (profile != null)
         {
-            _templateManager.Create(_newName, true);
+            var v3Profile = V2ProfileToV3Converter.Convert(profile);
+
+            (var _, var template) = V3ProfileToV4Converter.Convert(v3Profile);
+
+            if (template != null)
+                return template;
         }
 
-        _newName = string.Empty;
+        return null;
+    }
+
+    private Template? GetTemplateFromV3Profile(string json)
+    {
+        var profile = JsonConvert.DeserializeObject<Version3Profile>(json);
+        if (profile != null)
+        {
+            if (profile.ConfigVersion != 3)
+                throw new Exception("Incompatible profile version");
+
+            (var _, var template) = V3ProfileToV4Converter.Convert(profile);
+
+            if (template != null)
+                return template;
+        }
+
+        return null;
     }
 
     private void OnTemplateChange(TemplateChanged.Type type, Template? nullable, object? arg3 = null)

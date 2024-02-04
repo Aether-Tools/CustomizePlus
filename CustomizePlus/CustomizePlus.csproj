@@ -25,11 +25,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Configuration\Data\Version2\**" />
     <Compile Remove="Util\**" />
-    <EmbeddedResource Remove="Configuration\Data\Version2\**" />
     <EmbeddedResource Remove="Util\**" />
-    <None Remove="Configuration\Data\Version2\**" />
     <None Remove="Util\**" />
   </ItemGroup>
 

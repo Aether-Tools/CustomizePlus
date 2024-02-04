@@ -14,6 +14,7 @@ using CustomizePlus.Templates;
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.Templates.Data;
+using OtterGui.Log;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 
@@ -25,6 +26,8 @@ public class TemplatePanel
     private readonly BoneEditorPanel _boneEditor;
     private readonly PluginConfiguration _configuration;
     private readonly MessageService _messageService;
+    private readonly PopupSystem _popupSystem;
+    private readonly Logger _logger;
 
     private string? _newName;
     private Template? _changedTemplate;
@@ -38,7 +41,9 @@ public class TemplatePanel
         GameStateService gameStateService,
         BoneEditorPanel boneEditor,
         PluginConfiguration configuration,
-        MessageService messageService)
+        MessageService messageService,
+        PopupSystem popupSystem,
+        Logger logger)
     {
         _selector = selector;
         _manager = manager;
@@ -46,6 +51,10 @@ public class TemplatePanel
         _boneEditor = boneEditor;
         _configuration = configuration;
         _messageService = messageService;
+        _popupSystem = popupSystem;
+        _logger = logger;
+
+        _popupSystem.RegisterPopup("clipboard_data_not_longterm", "Warning: clipboard data is not designed to be used as long-term way of storing your templates.\nCompatibility of copied data between different Customize+ versions is not guaranteed.", true, new Vector2(5, 10));
     }
 
     public void Draw()
@@ -219,11 +228,12 @@ public class TemplatePanel
         try
         {
             Clipboard.SetText(Base64Helper.ExportToBase64(_selector.Selected!, Constants.ConfigurationVersion));
+            _popupSystem.ShowPopup("clipboard_data_not_longterm");
         }
         catch (Exception ex)
         {
-            _messageService.NotificationMessage(ex, $"Could not copy {_selector.Selected!.Name} data to clipboard.",
-                $"Could not copy data from template {_selector.Selected!.UniqueId} to clipboard", NotificationType.Error, false);
+            _logger.Error($"Could not copy data from template {_selector.Selected!.UniqueId} to clipboard: {ex}");
+            _popupSystem.ShowPopup("action_error");
         }
     }
 }

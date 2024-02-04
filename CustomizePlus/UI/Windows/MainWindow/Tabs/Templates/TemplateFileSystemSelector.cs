@@ -95,7 +95,6 @@ public class TemplateFileSystemSelector : FileSystemSelector<Template, TemplateS
         _popupSystem = popupSystem;
 
         _popupSystem.RegisterPopup("template_editor_active_warn", "You need to stop bone editing before doing this action"/*, false, new Vector2(5, 12)*/);
-        _popupSystem.RegisterPopup("clipboard_data_not_longterm", "Warning: clipboard data is not designed to be used as long-term way of storing your templates.\nCompatibility of clipboard data between different Customize+ is not guaranteed."/*, false, new Vector2(5, 12)*/);
         _popupSystem.RegisterPopup("clipboard_data_unsupported_version", "Clipboard data you are trying to use cannot be used in this version of Customize+.");
 
         _templateChangedEvent.Subscribe(OnTemplateChange, TemplateChanged.Priority.TemplateFileSystemSelector);

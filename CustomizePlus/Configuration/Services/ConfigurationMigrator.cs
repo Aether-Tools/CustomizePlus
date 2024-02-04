@@ -11,6 +11,7 @@ using CustomizePlus.Configuration.Helpers;
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Core.Events;
 using CustomizePlus.Configuration.Data.Version3;
+using CustomizePlus.UI.Windows;
 
 namespace CustomizePlus.Configuration.Services;
 
@@ -18,7 +19,7 @@ public class ConfigurationMigrator
 {
     private readonly SaveService _saveService;
     private readonly BackupService _backupService;
-    private readonly MessageService _messageService;
+    private readonly MessageService _messageService; //we can't use popups here since they rely on PluginConfiguration and using them here hangs plugin loading
     private readonly Logger _logger;
     private readonly ReloadEvent _reloadEvent;
 
@@ -54,9 +55,6 @@ public class ConfigurationMigrator
         MigrateV3ToV4();
         // /V3 migration code
 
-        //I'm sorry, I'm too lazy so v3's enable root position setting is not getting migrated for now
-        //MigrateV3ToV4(configVersion);
-
         config.Version = Constants.ConfigurationVersion;
         _saveService.ImmediateSave(config);
     }
@@ -67,40 +65,53 @@ public class ConfigurationMigrator
 
         //I'm sorry, I'm too lazy so v3's enable root position setting is not getting migrated
 
+        bool anyMigrationFailures = false;
+
         var usedGuids = new HashSet<Guid>();
         foreach (var file in Directory.EnumerateFiles(_saveService.FileNames.ConfigDirectory, "*.profile", SearchOption.TopDirectoryOnly))
         {
-            _logger.Debug($"Migrating v3 profile {file}");
-
-            var legacyProfile = JsonConvert.DeserializeObject<Version3Profile>(File.ReadAllText(file));
-            if (legacyProfile == null)
-                continue;
-
-            _logger.Debug($"v3 profile {file} loaded as {legacyProfile.ProfileName}");
-
-            (var profile, var template) = V3ProfileToV4Converter.Convert(legacyProfile);
-
-            //regenerate guids just to be safe
-            do
+            try
             {
-                profile.UniqueId = Guid.NewGuid();
-            }
-            while (profile.UniqueId == Guid.Empty || usedGuids.Contains(profile.UniqueId));
-            usedGuids.Add(profile.UniqueId);
+                _logger.Debug($"Migrating v3 profile {file}");
 
-            do
+                var legacyProfile = JsonConvert.DeserializeObject<Version3Profile>(File.ReadAllText(file));
+                if (legacyProfile == null)
+                    continue;
+
+                _logger.Debug($"v3 profile {file} loaded as {legacyProfile.ProfileName}");
+
+                (var profile, var template) = V3ProfileToV4Converter.Convert(legacyProfile);
+
+                //regenerate guids just to be safe
+                do
+                {
+                    profile.UniqueId = Guid.NewGuid();
+                }
+                while (profile.UniqueId == Guid.Empty || usedGuids.Contains(profile.UniqueId));
+                usedGuids.Add(profile.UniqueId);
+
+                do
+                {
+                    template.UniqueId = Guid.NewGuid();
+                }
+                while (template.UniqueId == Guid.Empty || usedGuids.Contains(template.UniqueId));
+                usedGuids.Add(template.UniqueId);
+
+                _saveService.ImmediateSaveSync(template);
+                _saveService.ImmediateSaveSync(profile);
+
+                _logger.Debug($"Migrated v3 profile {legacyProfile.ProfileName} to profile {profile.UniqueId} and template {template.UniqueId}");
+                File.Delete(file);
+            }
+            catch(Exception ex)
             {
-                template.UniqueId = Guid.NewGuid();
+                anyMigrationFailures = true;
+                _logger.Error($"Error while migrating {file}: {ex}");
             }
-            while (template.UniqueId == Guid.Empty || usedGuids.Contains(template.UniqueId));
-            usedGuids.Add(template.UniqueId);
-
-            _saveService.ImmediateSaveSync(template);
-            _saveService.ImmediateSaveSync(profile);
-
-            _logger.Debug($"Migrated v3 profile {legacyProfile.ProfileName} to profile {profile.UniqueId} and template {template.UniqueId}");
-            File.Delete(file);
         }
+
+        if (anyMigrationFailures)
+            _messageService.NotificationMessage($"Some of your Customize+ profiles failed to migrate correctly.\nDetails have been printed to Dalamud log (/xllog in chat).", NotificationType.Error);
 
         _reloadEvent.Invoke(ReloadEvent.Type.ReloadAll);
     }

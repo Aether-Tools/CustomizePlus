@@ -12,6 +12,7 @@ using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 using CustomizePlus.UI.Windows.MainWindow;
 using static System.Windows.Forms.AxHost;
 using CustomizePlus.Profiles.Data;
+using CustomizePlus.Configuration.Data;
 
 namespace CustomizePlus.Core.Services;
 
@@ -25,6 +26,7 @@ public class CommandService : IDisposable
     private readonly MainWindow _mainWindow;
     private readonly BoneEditorPanel _boneEditorPanel;
     private readonly MessageService _messageService;
+    private readonly PluginConfiguration _pluginConfiguration;
 
     private static readonly string[] Commands = new[] { "/customize", "/c+" };
 
@@ -36,7 +38,8 @@ public class CommandService : IDisposable
         ChatService chatService,
         BoneEditorPanel boneEditorPanel,
         Logger logger,
-        MessageService messageService)
+        MessageService messageService,
+        PluginConfiguration pluginConfiguration)
     {
         _profileManager = profileManager;
         _gameObjectService = gameObjectService;
@@ -46,13 +49,15 @@ public class CommandService : IDisposable
         _mainWindow = mainWindow;
         _boneEditorPanel = boneEditorPanel;
         _messageService = messageService;
+        _pluginConfiguration = pluginConfiguration;
 
         foreach (var command in Commands)
         {
             _commandManager.AddHandler(command, new CommandInfo(OnMainCommand) { HelpMessage = "Toggles main plugin window if no commands passed. Use \"/customize help\" for list of available commands." });
         }
 
-        chatService.PrintInChat($"Started!"); //safe to assume at this point we have successfully initialized
+        if (_pluginConfiguration.CommandSettings.PrintSuccessMessages)
+            chatService.PrintInChat($"Started!"); //safe to assume at this point we have successfully initialized
     }
 
     public void Dispose()
@@ -212,13 +217,14 @@ public class CommandService : IDisposable
             else
                 _profileManager.SetEnabled(targetProfile, !targetProfile.Enabled);
 
-            _chatService.PrintInChat(new SeStringBuilder()
-                .AddText("Profile ")
-                .AddYellow(targetProfile.Name)
-                .AddText(" was successfully ")
-                .AddBlue(state != null ? ((bool)state ? "enabled" : "disabled") : "toggled")
-                .AddText(" for ")
-                .AddRed(targetProfile.CharacterName).BuiltString);
+            if (_pluginConfiguration.CommandSettings.PrintSuccessMessages)
+                _chatService.PrintInChat(new SeStringBuilder()
+                    .AddText("Profile ")
+                    .AddYellow(targetProfile.Name)
+                    .AddText(" was successfully ")
+                    .AddBlue(state != null ? ((bool)state ? "enabled" : "disabled") : "toggled")
+                    .AddText(" for ")
+                    .AddRed(targetProfile.CharacterName).BuiltString);
         }
         catch (Exception e)
         {

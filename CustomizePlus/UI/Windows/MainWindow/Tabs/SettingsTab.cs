@@ -64,6 +64,7 @@ public class SettingsTab
         using (var child2 = ImRaii.Child("SettingsChild"))
         {
             DrawInterface();
+            DrawCommands();
             DrawAdvancedSettings();
         }
 
@@ -95,6 +96,30 @@ public class SettingsTab
     }
     #endregion
 
+    #region Chat Commands Settings
+    private void DrawCommands()
+    {
+        var isShouldDraw = ImGui.CollapsingHeader("Chat Commands");
+
+        if (!isShouldDraw)
+            return;
+
+        DrawPrintSuccessMessages();
+    }
+
+    private void DrawPrintSuccessMessages()
+    {
+        var isChecked = _configuration.CommandSettings.PrintSuccessMessages;
+
+        if (CtrlHelper.CheckboxWithTextAndHelp("##displaychatcommandconfirms", "Print Successful Command Execution Messages to Chat",
+                "Controls whether successful execution of chat commands will be acknowledged by separate chat message or not.", ref isChecked))
+        {
+            _configuration.CommandSettings.PrintSuccessMessages = isChecked;
+            _configuration.Save();
+        }
+    }
+    #endregion
+
     #region Interface Settings
 
     private void DrawInterface()
@@ -117,8 +142,8 @@ public class SettingsTab
     {
         var isChecked = _configuration.UISettings.HideWindowInCutscene;
 
-        if (CtrlHelper.CheckboxWithTextAndHelp("##hidewindowincutscene", "Hide plugin windows in cutscenes",
-                "Controls whether any Fantasia+ windows are hidden during cutscenes or not.", ref isChecked))
+        if (CtrlHelper.CheckboxWithTextAndHelp("##hidewindowincutscene", "Hide Plugin Windows in Cutscenes",
+                "Controls whether any Customize+ windows are hidden during cutscenes or not.", ref isChecked))
         {
             _configuration.UISettings.HideWindowInCutscene = isChecked;
             _configuration.Save();
@@ -129,7 +154,7 @@ public class SettingsTab
     {
         var isChecked = _configuration.UISettings.FoldersDefaultOpen;
 
-        if (CtrlHelper.CheckboxWithTextAndHelp("##foldersdefaultopen", "Open all folders by default",
+        if (CtrlHelper.CheckboxWithTextAndHelp("##foldersdefaultopen", "Open All Folders by Default",
                 "Controls whether folders in template and profile lists are open by default or not.", ref isChecked))
         {
             _configuration.UISettings.FoldersDefaultOpen = isChecked;

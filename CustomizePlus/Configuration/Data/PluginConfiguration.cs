@@ -78,6 +78,14 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
 
     public EditorConfigurationEntries EditorConfiguration { get; set; } = new();
 
+    [Serializable]
+    public class CommandSettingsEntries
+    {
+        public bool PrintSuccessMessages { get; set; } = true;
+    }
+
+    public CommandSettingsEntries CommandSettings { get; set; } = new();
+
     [JsonIgnore]
     private readonly SaveService _saveService;
 

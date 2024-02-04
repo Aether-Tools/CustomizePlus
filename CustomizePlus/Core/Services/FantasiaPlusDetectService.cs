@@ -29,11 +29,9 @@ public class FantasiaPlusDetectService : IDisposable
         _popupSystem = popupSystem;
         _logger = logger;
 
-        _popupSystem.RegisterPopup("fantasia_detected_warn", "Customize+ detected that you have Fantasia+ installed.\nPlease delete or turn it off and restart your game to use Customize+.");
-
         if (CheckFantasiaPlusPresence())
         {
-            _popupSystem.ShowPopup("fantasia_detected_warn");
+            _popupSystem.ShowPopup(PopupSystem.Messages.FantasiaPlusDetected);
             _logger.Error("Fantasia+ detected during startup, plugin will be locked");
         }
         else
@@ -62,7 +60,7 @@ public class FantasiaPlusDetectService : IDisposable
     {
         if (CheckFantasiaPlusPresence())
         {
-            _popupSystem.ShowPopup("fantasia_detected_warn");
+            _popupSystem.ShowPopup(PopupSystem.Messages.FantasiaPlusDetected);
             _checkTimer!.Stop();
             _checkTimer?.Dispose();
             _logger.Error("Fantasia+ detected by timer, plugin will be locked");

@@ -94,8 +94,6 @@ public class TemplateFileSystemSelector : FileSystemSelector<Template, TemplateS
         _logger = logger;
         _popupSystem = popupSystem;
 
-        _popupSystem.RegisterPopup("template_editor_active_warn", "You need to stop bone editing before doing this action"/*, false, new Vector2(5, 12)*/);
-        _popupSystem.RegisterPopup("clipboard_data_unsupported_version", "Clipboard data you are trying to use cannot be used in this version of Customize+.");
 
         _templateChangedEvent.Subscribe(OnTemplateChange, TemplateChanged.Priority.TemplateFileSystemSelector);
         _profileChangedEvent.Subscribe(OnProfileChange, ProfileChanged.Priority.TemplateFileSystemSelector);
@@ -157,7 +155,7 @@ public class TemplateFileSystemSelector : FileSystemSelector<Template, TemplateS
 
     private void ShowEditorWarningPopup()
     {
-        _popupSystem.ShowPopup("template_editor_active_warn");
+        _popupSystem.ShowPopup(PopupSystem.Messages.TemplateEditorActiveWarning);
     }
 
     private void DrawNewTemplatePopup()
@@ -181,7 +179,7 @@ public class TemplateFileSystemSelector : FileSystemSelector<Template, TemplateS
                 if (template is Template tpl && tpl != null)
                     _templateManager.Clone(tpl, _newName, true);
                 else
-                    _popupSystem.ShowPopup("clipboard_data_unsupported_version");
+                    _popupSystem.ShowPopup(PopupSystem.Messages.ClipboardDataUnsupported);
             }
             else if (_cloneTemplate != null)
             {
@@ -195,7 +193,7 @@ public class TemplateFileSystemSelector : FileSystemSelector<Template, TemplateS
         catch(Exception ex)
         {
             _logger.Error($"Error while performing clipboard/clone/create template action: {ex}");
-            _popupSystem.ShowPopup("action_error");
+            _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
         }
         finally
         {

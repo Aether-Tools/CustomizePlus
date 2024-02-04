@@ -10,7 +10,7 @@ using CustomizePlus.Configuration.Data;
 
 namespace CustomizePlus.UI.Windows;
 
-public class PopupSystem
+public partial class PopupSystem
 {
     private readonly Logger _logger;
     private readonly PluginConfiguration _configuration;
@@ -23,7 +23,7 @@ public class PopupSystem
         _logger = logger;
         _configuration = configuration;
 
-        RegisterPopup("action_error", "Error while performing selected action.\nDetails have been printed to Dalamud log (/xllog in chat).");
+        RegisterMessages();
     }
 
     public void RegisterPopup(string name, string text, bool displayOnce = false, Vector2? sizeDividers = null)

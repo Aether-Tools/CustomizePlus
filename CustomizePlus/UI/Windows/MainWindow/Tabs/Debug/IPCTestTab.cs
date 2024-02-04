@@ -51,11 +51,6 @@ public class IPCTestTab //: IDisposable
         _gameObjectService = gameObjectService;
         _actorManager = actorManager;
 
-        _popupSystem.RegisterPopup("ipc_v4_profile_remembered", "Current profile has been copied into memory");
-        _popupSystem.RegisterPopup("ipc_get_profile_from_character_remembered", "GetProfileFromCharacter result has been copied into memory");
-        _popupSystem.RegisterPopup("ipc_set_profile_to_character_done", "SetProfileToCharacter has been called with data from memory");
-        _popupSystem.RegisterPopup("ipc_revert_done", "Revert has been called");
-
         _getApiVersion = pluginInterface.GetIpcSubscriber<(int, int)>("CustomizePlus.GetApiVersion");
         _apiVersion = _getApiVersion.InvokeFunc();
 
@@ -105,7 +100,7 @@ public class IPCTestTab //: IDisposable
                 return;
 
             _rememberedProfileJson = JsonConvert.SerializeObject(V4ProfileToV3Converter.Convert(profile));
-            _popupSystem.ShowPopup("ipc_v4_profile_remembered");
+            _popupSystem.ShowPopup(PopupSystem.Messages.IPCV4ProfileRemembered);
         }
 
         if (ImGui.Button("GetProfileFromCharacter into memory"))
@@ -115,7 +110,7 @@ public class IPCTestTab //: IDisposable
                 return;
 
             _rememberedProfileJson = _getProfileFromCharacter!.InvokeFunc(FindCharacterByAddress(actors[0].Item2.Address));
-            _popupSystem.ShowPopup("ipc_get_profile_from_character_remembered");
+            _popupSystem.ShowPopup(PopupSystem.Messages.IPCGetProfileFromChrRemembered);
         }
 
         using (var disabled = ImRaii.Disabled(_rememberedProfileJson == null))
@@ -127,7 +122,7 @@ public class IPCTestTab //: IDisposable
                     return;
 
                 _setCharacterProfile!.InvokeAction(_rememberedProfileJson, FindCharacterByAddress(actors[0].Item2.Address));
-                _popupSystem.ShowPopup("ipc_set_profile_to_character_done");
+                _popupSystem.ShowPopup(PopupSystem.Messages.IPCSetProfileToChrDone);
             }
         }
 
@@ -138,7 +133,7 @@ public class IPCTestTab //: IDisposable
                 return;
 
             _revertCharacter!.InvokeAction(FindCharacterByAddress(actors[0].Item2.Address));
-            _popupSystem.ShowPopup("ipc_revert_done");
+            _popupSystem.ShowPopup(PopupSystem.Messages.IPCRevertDone);
         }
     }
 

@@ -51,7 +51,6 @@ public class TemplatePanel
         _popupSystem = popupSystem;
         _logger = logger;
 
-        _popupSystem.RegisterPopup("clipboard_data_not_longterm", "Warning: clipboard data is not designed to be used as long-term way of storing your templates.\nCompatibility of copied data between different Customize+ versions is not guaranteed.", true, new Vector2(5, 10));
     }
 
     public void Draw()
@@ -225,12 +224,12 @@ public class TemplatePanel
         try
         {
             Clipboard.SetText(Base64Helper.ExportToBase64(_selector.Selected!, Constants.ConfigurationVersion));
-            _popupSystem.ShowPopup("clipboard_data_not_longterm");
+            _popupSystem.ShowPopup(PopupSystem.Messages.ClipboardDataNotLongTerm);
         }
         catch (Exception ex)
         {
             _logger.Error($"Could not copy data from template {_selector.Selected!.UniqueId} to clipboard: {ex}");
-            _popupSystem.ShowPopup("action_error");
+            _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
         }
     }
 }

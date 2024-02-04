@@ -28,8 +28,9 @@ public class MainWindow : Window, IDisposable
     private readonly PluginStateBlock _pluginStateBlock;
 
     private readonly TemplateEditorManager _templateEditorManager;
-    private readonly FantasiaPlusDetectService _cPlusDetectService;
+    private readonly FantasiaPlusDetectService _fantasiaPlusDetectService;
     private readonly PluginConfiguration _configuration;
+    private readonly HookingService _hookingService;
 
     public MainWindow(
         DalamudPluginInterface pluginInterface,
@@ -42,7 +43,8 @@ public class MainWindow : Window, IDisposable
         PluginStateBlock pluginStateBlock,
         TemplateEditorManager templateEditorManager,
         PluginConfiguration configuration,
-        FantasiaPlusDetectService cPlusDetectService
+        FantasiaPlusDetectService fantasiaPlusDetectService,
+        HookingService hookingService
         ) : base($"Customize+ v{Plugin.Version}###CPlusMainWindow")
     {
         _settingsTab = settingsTab;
@@ -55,8 +57,9 @@ public class MainWindow : Window, IDisposable
         _pluginStateBlock = pluginStateBlock;
 
         _templateEditorManager = templateEditorManager;
-        _cPlusDetectService = cPlusDetectService;
         _configuration = configuration;
+        _fantasiaPlusDetectService = fantasiaPlusDetectService;
+        _hookingService = hookingService;
 
         pluginInterface.UiBuilder.DisableGposeUiHide = true;
         SizeConstraints = new WindowSizeConstraints()
@@ -77,7 +80,7 @@ public class MainWindow : Window, IDisposable
     {
         var yPos = ImGui.GetCursorPosY();
 
-        using (var disabled = ImRaii.Disabled(_cPlusDetectService.IsFantasiaPlusInstalled))
+        using (var disabled = ImRaii.Disabled(_fantasiaPlusDetectService.IsFantasiaPlusInstalled || _hookingService.RenderHookFailed || _hookingService.MovementHookFailed))
         {
             LockWindowClosureIfNeeded();
             if (ImGui.BeginTabBar("##tabs", ImGuiTabBarFlags.None)) //todo: remember last selected tab

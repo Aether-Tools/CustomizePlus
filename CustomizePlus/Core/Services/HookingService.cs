@@ -32,6 +32,9 @@ public class HookingService : IDisposable
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void GameObjectMovementDelegate(nint gameObject);
 
+    public bool RenderHookFailed { get; private set; }
+    public bool MovementHookFailed { get; private set; }
+
     public HookingService(
         PluginConfiguration configuration,
         ISigScanner sigScanner,
@@ -56,6 +59,9 @@ public class HookingService : IDisposable
 
     public void ReloadHooks()
     {
+        RenderHookFailed = false;
+        MovementHookFailed = false;
+
         try
         {
             if (_configuration.PluginEnabled)
@@ -74,27 +80,25 @@ public class HookingService : IDisposable
                     _logger.Debug("Movement hook established");
                 }
 
-                _logger.Debug("Hooking render & movement functions");
-                _renderManagerHook.Enable();
-                _gameObjectMovementHook.Enable();
 
                 _logger.Debug("Hooking render manager");
                 _renderManagerHook.Enable();
 
-                //Send current player's profile update message to IPC
-                //IPCManager.OnProfileUpdate(null);
+                _logger.Debug("Hooking movement functions");
+                _gameObjectMovementHook.Enable();
             }
             else
             {
                 _logger.Debug("Unhooking...");
                 _renderManagerHook?.Disable();
                 _gameObjectMovementHook?.Disable();
-                _renderManagerHook?.Disable();
             }
         }
         catch (Exception e)
         {
-            _logger.Error($"Failed to hook Render::Manager::Render {e}");
+            _logger.Error($"Failed to hook into the game: {e}");
+            RenderHookFailed = true;
+            MovementHookFailed = true;
             throw;
         }
     }
@@ -109,8 +113,8 @@ public class HookingService : IDisposable
         if (_fantasiaPlusDetectService.IsFantasiaPlusInstalled)
         {
             _logger.Error($"Fantasia+ detected, disabling all hooks");
-            _renderManagerHook?.Disable();
-            _gameObjectMovementHook.Disable();
+            _renderManagerHook.Disable();
+            _gameObjectMovementHook?.Disable();
 
             return _renderManagerHook.Original(a1, a2, a3, a4);
         }
@@ -122,23 +126,27 @@ public class HookingService : IDisposable
         }
         catch (Exception e)
         {
+            RenderHookFailed = true;
             _logger.Error($"Error in Customize+ render hook {e}");
             _renderManagerHook?.Disable();
         }
 
-        return _renderManagerHook.Original(a1, a2, a3, a4);
+        return _renderManagerHook!.Original(a1, a2, a3, a4);
     }
 
     private unsafe void OnGameObjectMove(nint gameObjectPtr)
     {
+        if (_gameObjectMovementHook == null)
+        {
+            throw new Exception();
+        }
+
         // Call the original function.
         _gameObjectMovementHook.Original(gameObjectPtr);
 
         // If GPose and a 3rd-party posing service are active simultneously, abort
         if (_gameStateService.GameInPosingMode())
-        {
             return;
-        }
 
         try
         {
@@ -148,6 +156,7 @@ public class HookingService : IDisposable
         }
         catch (Exception ex)
         {
+            MovementHookFailed = true;
             _logger.Error($"Exception in Customize+ movement hook: {ex}");
             _gameObjectMovementHook?.Disable();
         }

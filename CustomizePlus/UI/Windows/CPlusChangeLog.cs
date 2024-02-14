@@ -15,6 +15,7 @@ public class CPlusChangeLog
         Changelog = new Changelog("Customize+ update history", ConfigData, Save);
 
         Add2_0_0_0(Changelog);
+        Add2_0_1_0(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -26,6 +27,18 @@ public class CPlusChangeLog
         _config.ChangelogSettings.ChangeLogDisplayType = type;
         _config.Save();
     }
+
+    private static void Add2_0_1_0(Changelog log)
+        => log.NextVersion("Version 2.0.1.0")
+            .RegisterHighlight("Added support for legacy clipboard copies.")
+            .RegisterEntry("Added setting allowing disabling of confirmation messages for chat commands.")
+            .RegisterEntry("Template and profile editing is no longer disabled during GPose.")
+            .RegisterImportant("Customize+ is not 100% compatible with posing tools such as Ktisis, Brio and Anamnesis. Some features of those tools might alter Customize+ behavior or prevent it from working.", 1)
+            .RegisterHighlight("Fixed crash during \"Duty Complete\" cutscenes.")
+            .RegisterEntry("Fixed settings migration failing completely if one of the profiles is corrupted.")
+            .RegisterEntry("Improved error handling.")
+            .RegisterHighlight("Customize+ window will now display warning message if plugin encounters a critical error.", 1);
+   
     private static void Add2_0_0_0(Changelog log)
         => log.NextVersion("Version 2.0.0.0")
             .RegisterHighlight("Major rework of the entire plugin.")

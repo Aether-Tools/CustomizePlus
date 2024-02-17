@@ -14,10 +14,9 @@ using System.Numerics;
 
 namespace CustomizePlus.Templates;
 
-public class TemplateEditorManager : IDisposable
+public class TemplateEditorManager
 {
     private readonly TemplateChanged _event;
-    private readonly GPoseStateChanged _gposeStateChanged;
     private readonly Logger _logger;
     private readonly GameObjectService _gameObjectService;
     private readonly TemplateManager _templateManager;
@@ -59,25 +58,16 @@ public class TemplateEditorManager : IDisposable
 
     public TemplateEditorManager(
         TemplateChanged @event,
-        GPoseStateChanged gposeStateChanged,
         Logger logger,
         TemplateManager templateManager,
         GameObjectService gameObjectService)
     {
         _event = @event;
-        _gposeStateChanged = gposeStateChanged;
         _logger = logger;
         _templateManager = templateManager;
         _gameObjectService = gameObjectService;
 
-        _gposeStateChanged.Subscribe(OnGPoseStateChanged, GPoseStateChanged.Priority.TemplateEditorManager);
-
         EditorProfile = new Profile() { Templates = new List<Template>(), Enabled = false, Name = "Template editor profile", ProfileType = ProfileType.Editor };
-    }
-
-    public void Dispose()
-    {
-        _gposeStateChanged.Unsubscribe(OnGPoseStateChanged);
     }
 
     /// <summary>
@@ -283,21 +273,6 @@ public class TemplateEditorManager : IDisposable
                 return Vector3.One;
             default:
                 return Vector3.Zero;
-        }
-    }
-
-    private void OnGPoseStateChanged(GPoseStateChanged.Type type)
-    {
-        switch (type)
-        {
-            case GPoseStateChanged.Type.Entered:
-                IsEditorPaused = true;
-                EditorProfile.Enabled = false;
-                break;
-            case GPoseStateChanged.Type.Exited:
-                EditorProfile.Enabled = true;
-                IsEditorPaused = false;
-                break;
         }
     }
 }

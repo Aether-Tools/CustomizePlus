@@ -16,6 +16,9 @@ internal static class StringExtensions
 #if !INCOGNIFY_STRINGS
         return str;
 #endif
+
+        str = str.Trim();
+
         if (str.Contains(" "))
         {
             var split = str.Split(' ');

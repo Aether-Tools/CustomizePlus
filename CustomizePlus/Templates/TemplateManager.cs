@@ -141,6 +141,8 @@ public class TemplateManager
     /// </summary>
     public void Rename(Template template, string newName)
     {
+        newName = newName.Trim();
+
         var oldName = template.Name.Text;
         if (oldName == newName)
             return;

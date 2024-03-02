@@ -145,8 +145,8 @@ public sealed class Profile : ISavable
         {
             CreationDate = creationDate,
             UniqueId = obj["UniqueId"]?.ToObject<Guid>() ?? throw new ArgumentNullException("UniqueId"),
-            Name = new LowerString(obj["Name"]?.ToObject<string>() ?? throw new ArgumentNullException("Name")),
-            CharacterName = new LowerString(obj["CharacterName"]?.ToObject<string>() ?? throw new ArgumentNullException("CharacterName")),
+            Name = new LowerString(obj["Name"]?.ToObject<string>()?.Trim() ?? throw new ArgumentNullException("Name")),
+            CharacterName = new LowerString(obj["CharacterName"]?.ToObject<string>()?.Trim() ?? throw new ArgumentNullException("CharacterName")),
             LimitLookupToOwnedObjects = obj["LimitLookupToOwnedObjects"]?.ToObject<bool>() ?? throw new ArgumentNullException("LimitLookupToOwnedObjects"),
             Enabled = obj["Enabled"]?.ToObject<bool>() ?? throw new ArgumentNullException("Enabled"),
             ModifiedDate = obj["ModifiedDate"]?.ToObject<DateTimeOffset>() ?? creationDate,

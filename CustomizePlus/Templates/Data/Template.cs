@@ -93,7 +93,7 @@ public sealed class Template : ISavable
         {
             CreationDate = creationDate,
             UniqueId = obj["UniqueId"]?.ToObject<Guid>() ?? throw new ArgumentNullException("UniqueId"),
-            Name = new LowerString(obj["Name"]?.ToObject<string>() ?? throw new ArgumentNullException("Name")),
+            Name = new LowerString(obj["Name"]?.ToObject<string>()?.Trim() ?? throw new ArgumentNullException("Name")),
             ModifiedDate = obj["ModifiedDate"]?.ToObject<DateTimeOffset>() ?? creationDate,
             Bones = obj["Bones"]?.ToObject<Dictionary<string, BoneTransform>>() ?? throw new ArgumentNullException("Bones"),
             IsWriteProtected = obj["IsWriteProtected"]?.ToObject<bool>() ?? false

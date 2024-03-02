@@ -199,6 +199,8 @@ public class ProfileManager : IDisposable
     /// </summary>
     public void Rename(Profile profile, string newName)
     {
+        newName = newName.Trim();
+
         var oldName = profile.Name.Text;
         if (oldName == newName)
             return;
@@ -216,6 +218,8 @@ public class ProfileManager : IDisposable
     /// </summary>
     public void ChangeCharacterName(Profile profile, string newName)
     {
+        newName = newName.Trim();
+
         var oldName = profile.CharacterName.Text;
         if (oldName == newName)
             return;

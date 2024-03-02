@@ -24,7 +24,7 @@ using CustomizePlus.GameData.Extensions;
 
 namespace CustomizePlus.Api.Compatibility;
 
-public class CustomizePlusIpc : IDisposable
+public class CustomizePlusLegacyIpc : IDisposable
 {
     private readonly IObjectTable _objectTable;
     private readonly DalamudPluginInterface _pluginInterface;
@@ -52,7 +52,7 @@ public class CustomizePlusIpc : IDisposable
     internal ICallGateProvider<Character?, string?>? ProviderGetProfileFromCharacter;
     internal ICallGateProvider<(int, int)>? ProviderGetApiVersion;
 
-    public CustomizePlusIpc(
+    public CustomizePlusLegacyIpc(
         IObjectTable objectTable,
         DalamudPluginInterface pluginInterface,
         Logger logger,

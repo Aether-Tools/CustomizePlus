@@ -24,6 +24,7 @@ public class IPCTestTab //: IDisposable
     private readonly ActorManager _actorManager;
 
     private readonly ICallGateSubscriber<(int, int)>? _getApiVersion;
+    private readonly ICallGateSubscriber<bool>? _isValid;
     private readonly ICallGateSubscriber<string, Character?, object>? _setCharacterProfile;
     private readonly ICallGateSubscriber<Character?, string>? _getProfileFromCharacter;
     private readonly ICallGateSubscriber<Character?, object>? _revertCharacter;
@@ -51,8 +52,10 @@ public class IPCTestTab //: IDisposable
         _gameObjectService = gameObjectService;
         _actorManager = actorManager;
 
-        _getApiVersion = pluginInterface.GetIpcSubscriber<(int, int)>("CustomizePlus.GetApiVersion");
+        _getApiVersion = pluginInterface.GetIpcSubscriber<(int, int)>("CustomizePlus.General.GetApiVersion");
         _apiVersion = _getApiVersion.InvokeFunc();
+
+        _isValid = pluginInterface.GetIpcSubscriber<bool>("CustomizePlus.General.IsValid");
 
         _setCharacterProfile = pluginInterface.GetIpcSubscriber<string, Character?, object>("CustomizePlus.SetProfileToCharacter");
         _getProfileFromCharacter = pluginInterface.GetIpcSubscriber<Character?, string>("CustomizePlus.GetProfileFromCharacter");
@@ -79,6 +82,9 @@ public class IPCTestTab //: IDisposable
             _targetCharacterName = _gameObjectService.GetCurrentPlayerName();
 
         ImGui.Text($"Version: {_apiVersion.Item1}.{_apiVersion.Item2}");
+        //
+        //ImGui.Text($"IsValid: {_isValid?.InvokeFunc()}");
+
         //ImGui.Text($"Last profile update: {_lastProfileUpdate}, Character: {_lastProfileUpdateName}");
         ImGui.Text($"Memory: {(string.IsNullOrWhiteSpace(_rememberedProfileJson) ? "empty" : "has data")}");
 

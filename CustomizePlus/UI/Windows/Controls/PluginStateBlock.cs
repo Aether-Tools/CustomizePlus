@@ -7,6 +7,7 @@ using CustomizePlus.Game.Services;
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 using CustomizePlus.Core.Helpers;
+using CustomizePlus.Api;
 
 namespace CustomizePlus.UI.Windows.Controls;
 
@@ -17,6 +18,7 @@ public class PluginStateBlock
     private readonly GameStateService _gameStateService;
     private readonly FantasiaPlusDetectService _fantasiaPlusDetectService;
     private readonly HookingService _hookingService;
+    private readonly CustomizePlusIpc _ipcService;
 
     private static Vector4 normalColor = new Vector4(1, 1, 1, 1);
     private static Vector4 warnColor = new Vector4(1, 0.5f, 0, 1);
@@ -27,13 +29,15 @@ public class PluginStateBlock
         PluginConfiguration configuration,
         GameStateService gameStateService,
         FantasiaPlusDetectService fantasiaPlusDetectService,
-        HookingService hookingService)
+        HookingService hookingService,
+        CustomizePlusIpc ipcService)
     {
         _boneEditorPanel = boneEditorPanel;
         _configuration = configuration;
         _gameStateService = gameStateService;
         _fantasiaPlusDetectService = fantasiaPlusDetectService;
         _hookingService = hookingService;
+        _ipcService = ipcService;
     }
 
     public void Draw(float yPos)
@@ -75,6 +79,11 @@ public class PluginStateBlock
 
                 message = $"Editor is active.{(_boneEditorPanel.HasChanges ? " You have unsaved changes, finish template bone editing to open save/revert dialog." : "")}";
             }
+        }
+        else if (_ipcService.IPCFailed) //this is low priority error
+        {
+            severity = PluginStateSeverity.Error;
+            message = $"Detected failure in IPC. Integrations with other plugins will not function.";
         }
 
         if (message != null)

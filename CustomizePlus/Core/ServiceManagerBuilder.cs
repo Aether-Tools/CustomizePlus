@@ -33,6 +33,7 @@ using Penumbra.GameData.Actors;
 using Penumbra.GameData.Enums;
 using Penumbra.GameData.Structs;
 using OtterGui;
+using CustomizePlus.Api;
 
 namespace CustomizePlus.Core;
 
@@ -147,6 +148,7 @@ public static class ServiceManagerBuilder
     {
         services
             .AddSingleton<PoseFileBoneLoader>()
+            .AddSingleton<CustomizePlusLegacyIpc>()
             .AddSingleton<CustomizePlusIpc>();
 
         return services;

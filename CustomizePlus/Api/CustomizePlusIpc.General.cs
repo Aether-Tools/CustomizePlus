@@ -18,7 +18,7 @@ public partial class CustomizePlusIpc
     /// When there are non-breaking changes only second number is bumped up.
     /// In general clients should not try to use IPC if they encounter unexpected Breaking version.
     /// </summary>
-    [EzIPC($"General.GetApiVersion")]
+    [EzIPC("General.GetApiVersion")]
     private (int, int) GetApiVersion()
     {
         return _apiVersion;
@@ -29,7 +29,7 @@ public partial class CustomizePlusIpc
     /// This only indicates that no fatal errors occured in Customize+.
     /// This will still be true if, for example, user turns off Customize+ in its settings.
     /// </summary>
-    [EzIPC($"General.IsValid")]
+    [EzIPC("General.IsValid")]
     private bool IsValid()
     {
         return !IPCFailed &&

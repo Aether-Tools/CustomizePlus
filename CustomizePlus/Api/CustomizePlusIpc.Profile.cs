@@ -14,7 +14,7 @@ public partial class CustomizePlusIpc
     /// Retrieve list of all user profiles
     /// </summary>
     /// <returns></returns>
-    [EzIPC($"Profile.GetProfileList")]
+    [EzIPC("Profile.GetList")]
     private IList<IPCProfileDataTuple> GetProfileList()
     {
         return _profileManager.Profiles
@@ -27,7 +27,7 @@ public partial class CustomizePlusIpc
     /// Enable profile using its Unique ID
     /// </summary>
     /// <param name="uniqueId"></param>
-    [EzIPC($"Profile.EnableByUniqueId")]
+    [EzIPC("Profile.EnableByUniqueId")]
     private void EnableProfileByUniqueId(Guid uniqueId)
     {
         _profileManager.SetEnabled(uniqueId, true);
@@ -36,7 +36,7 @@ public partial class CustomizePlusIpc
     /// <summary>
     /// Disable profile using its Unique ID
     /// </summary>
-    [EzIPC($"Profile.DisableByUniqueId")]
+    [EzIPC("Profile.DisableByUniqueId")]
     private void DisableProfileByUniqueId(Guid uniqueId)
     {
         _profileManager.SetEnabled(uniqueId, false);

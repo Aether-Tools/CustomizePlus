@@ -35,7 +35,7 @@ public class IPCTestTab //: IDisposable
     [EzIPC("General.IsValid")]
     private readonly Func<bool> _isValidIpcFunc;
 
-    [EzIPC("Profile.GetProfileList")]
+    [EzIPC("Profile.GetList")]
     private readonly Func<IList<IPCProfileDataTuple>> _getProfileListIpcFunc;
 
     [EzIPC("Profile.EnableByUniqueId")]

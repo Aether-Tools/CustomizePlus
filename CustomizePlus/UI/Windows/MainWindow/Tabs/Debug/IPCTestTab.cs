@@ -13,6 +13,10 @@ using CustomizePlus.GameData.Services;
 using Penumbra.GameData.Actors;
 using ECommons.EzIpcManager;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+
+using IPCProfileDataTuple = (System.Guid UniqueId, string Name, string CharacterName, bool IsEnabled);
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 
@@ -31,6 +35,15 @@ public class IPCTestTab //: IDisposable
     [EzIPC("General.IsValid")]
     private readonly Func<bool> _isValidIpcFunc;
 
+    [EzIPC("Profile.GetProfileList")]
+    private readonly Func<IList<IPCProfileDataTuple>> _getProfileListIpcFunc;
+
+    [EzIPC("Profile.EnableByUniqueId")]
+    private readonly Action<Guid> _enableProfileByUniqueIdIpcFunc;
+
+    [EzIPC("Profile.DisableByUniqueId")]
+    private readonly Action<Guid> _disableProfileByUniqueIdIpcFunc;
+
     private readonly ICallGateSubscriber<string, Character?, object>? _setCharacterProfile;
     private readonly ICallGateSubscriber<Character?, string>? _getProfileFromCharacter;
     private readonly ICallGateSubscriber<Character?, object>? _revertCharacter;
@@ -43,6 +56,8 @@ public class IPCTestTab //: IDisposable
     private bool _validResult;
 
     private string? _targetCharacterName;
+
+    private string _targetProfileId = "";
 
     public IPCTestTab(
         DalamudPluginInterface pluginInterface,
@@ -100,6 +115,8 @@ public class IPCTestTab //: IDisposable
             _lastValidCheckAt = DateTime.UtcNow;
         }
 
+        ImGui.Separator();
+
         //ImGui.Text($"Last profile update: {_lastProfileUpdate}, Character: {_lastProfileUpdateName}");
         ImGui.Text($"Memory: {(string.IsNullOrWhiteSpace(_rememberedProfileJson) ? "empty" : "has data")}");
 
@@ -155,6 +172,30 @@ public class IPCTestTab //: IDisposable
 
             _revertCharacter!.InvokeAction(FindCharacterByAddress(actors[0].Item2.Address));
             _popupSystem.ShowPopup(PopupSystem.Messages.IPCRevertDone);
+        }
+
+        ImGui.Separator();
+
+        if (ImGui.Button("Copy user profile list to clipboard"))
+        {
+            ImGui.SetClipboardText(string.Join("\n", _getProfileListIpcFunc().Select(x => $"{x.UniqueId}, {x.Name}, {x.CharacterName}, {x.IsEnabled}")));
+            _popupSystem.ShowPopup(PopupSystem.Messages.IPCProfileListCopied);
+        }
+
+        ImGui.Text("Profile Unique ID to set:");
+        ImGui.SameLine();
+        ImGui.InputText("##profileguid", ref _targetProfileId, 128);
+
+        if (ImGui.Button("Enable profile by Unique ID"))
+        {
+            _enableProfileByUniqueIdIpcFunc(Guid.Parse(_targetProfileId));
+            _popupSystem.ShowPopup(PopupSystem.Messages.IPCEnableProfileByIdDone);
+        }
+
+        if (ImGui.Button("Disable profile by Unique ID"))
+        {
+            _disableProfileByUniqueIdIpcFunc(Guid.Parse(_targetProfileId));
+            _popupSystem.ShowPopup(PopupSystem.Messages.IPCDisableProfileByIdDone);
         }
     }
 

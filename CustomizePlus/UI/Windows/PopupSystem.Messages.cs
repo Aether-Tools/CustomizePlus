@@ -14,6 +14,9 @@ public partial class PopupSystem
         public const string IPCGetProfileFromChrRemembered = "ipc_get_profile_from_character_remembered";
         public const string IPCSetProfileToChrDone = "ipc_set_profile_to_character_done";
         public const string IPCRevertDone = "ipc_revert_done";
+        public const string IPCProfileListCopied = "ipc_profile_list_copied";
+        public const string IPCEnableProfileByIdDone = "ipc_enable_profile_by_id_done";
+        public const string IPCDisableProfileByIdDone = "ipc_disable_profile_by_id_done";
 
         public const string TemplateEditorActiveWarning = "template_editor_active_warn";
         public const string ClipboardDataUnsupported = "clipboard_data_unsupported_version";
@@ -31,6 +34,9 @@ public partial class PopupSystem
         RegisterPopup(Messages.IPCGetProfileFromChrRemembered, "GetProfileFromCharacter result has been copied into memory");
         RegisterPopup(Messages.IPCSetProfileToChrDone, "SetProfileToCharacter has been called with data from memory");
         RegisterPopup(Messages.IPCRevertDone, "Revert has been called");
+        RegisterPopup(Messages.IPCProfileListCopied, "Profile list copied into clipboard");
+        RegisterPopup(Messages.IPCEnableProfileByIdDone, "Enable profile by id has been called");
+        RegisterPopup(Messages.IPCDisableProfileByIdDone, "Disable profile by id has been called");
 
         RegisterPopup(Messages.TemplateEditorActiveWarning, "You need to stop bone editing before doing this action");
         RegisterPopup(Messages.ClipboardDataUnsupported, "Clipboard data you are trying to use cannot be used in this version of Customize+.");

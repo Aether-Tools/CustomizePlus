@@ -10,6 +10,7 @@ using CustomizePlus.Api.Compatibility;
 using CustomizePlus.Configuration.Services.Temporary;
 using OtterGui.Services;
 using CustomizePlus.Api;
+using ECommons;
 
 namespace CustomizePlus;
 
@@ -29,6 +30,8 @@ public sealed class Plugin : IDalamudPlugin
     {
         try
         {
+            ECommonsMain.Init(pluginInterface, this);
+
             _services = ServiceManagerBuilder.CreateProvider(pluginInterface, Logger);
 
             //temporary
@@ -57,5 +60,7 @@ public sealed class Plugin : IDalamudPlugin
     public void Dispose()
     {
         _services?.Dispose();
+
+        ECommonsMain.Dispose();
     }
 }

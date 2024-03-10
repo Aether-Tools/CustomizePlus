@@ -14,3 +14,7 @@
 	path = submodules/Penumbra.String
 	url = https://github.com/Ottermandias/Penumbra.String.git
 	branch = main
+[submodule "submodules/ECommons"]
+	path = submodules/ECommons
+	url = https://github.com/NightmareXIV/ECommons.git
+	branch = master

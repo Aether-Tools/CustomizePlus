@@ -11,6 +11,8 @@ using CustomizePlus.Configuration.Helpers;
 using CustomizePlus.Game.Services;
 using CustomizePlus.GameData.Services;
 using Penumbra.GameData.Actors;
+using ECommons.EzIpcManager;
+using System;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 
@@ -23,8 +25,12 @@ public class IPCTestTab //: IDisposable
     private readonly ObjectManager _objectManager;
     private readonly ActorManager _actorManager;
 
-    private readonly ICallGateSubscriber<(int, int)>? _getApiVersion;
-    private readonly ICallGateSubscriber<bool>? _isValid;
+    [EzIPC("General.GetApiVersion")] 
+    private readonly Func<(int, int)> _getApiVersionIpcFunc;
+
+    [EzIPC("General.IsValid")]
+    private readonly Func<bool> _isValidIpcFunc;
+
     private readonly ICallGateSubscriber<string, Character?, object>? _setCharacterProfile;
     private readonly ICallGateSubscriber<Character?, string>? _getProfileFromCharacter;
     private readonly ICallGateSubscriber<Character?, object>? _revertCharacter;
@@ -33,6 +39,8 @@ public class IPCTestTab //: IDisposable
     private string? _rememberedProfileJson;
 
     private (int, int) _apiVersion;
+    private DateTime _lastValidCheckAt;
+    private bool _validResult;
 
     private string? _targetCharacterName;
 
@@ -52,10 +60,10 @@ public class IPCTestTab //: IDisposable
         _gameObjectService = gameObjectService;
         _actorManager = actorManager;
 
-        _getApiVersion = pluginInterface.GetIpcSubscriber<(int, int)>("CustomizePlus.General.GetApiVersion");
-        _apiVersion = _getApiVersion.InvokeFunc();
+        EzIPC.Init(this, "CustomizePlus");
 
-        _isValid = pluginInterface.GetIpcSubscriber<bool>("CustomizePlus.General.IsValid");
+        if (_getApiVersionIpcFunc != null)
+            _apiVersion = _getApiVersionIpcFunc();
 
         _setCharacterProfile = pluginInterface.GetIpcSubscriber<string, Character?, object>("CustomizePlus.SetProfileToCharacter");
         _getProfileFromCharacter = pluginInterface.GetIpcSubscriber<Character?, string>("CustomizePlus.GetProfileFromCharacter");
@@ -82,8 +90,15 @@ public class IPCTestTab //: IDisposable
             _targetCharacterName = _gameObjectService.GetCurrentPlayerName();
 
         ImGui.Text($"Version: {_apiVersion.Item1}.{_apiVersion.Item2}");
-        //
-        //ImGui.Text($"IsValid: {_isValid?.InvokeFunc()}");
+
+        ImGui.Text($"IsValid: {_validResult} ({_lastValidCheckAt} UTC)");
+
+        ImGui.SameLine();
+        if(ImGui.Button("Check IPC validity") || _lastValidCheckAt == DateTime.MinValue)
+        {
+            _validResult = _isValidIpcFunc();
+            _lastValidCheckAt = DateTime.UtcNow;
+        }
 
         //ImGui.Text($"Last profile update: {_lastProfileUpdate}, Character: {_lastProfileUpdateName}");
         ImGui.Text($"Memory: {(string.IsNullOrWhiteSpace(_rememberedProfileJson) ? "empty" : "has data")}");

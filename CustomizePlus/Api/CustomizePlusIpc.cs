@@ -1,11 +1,12 @@
 ﻿using CustomizePlus.Core.Services;
 using Dalamud.Plugin;
+using ECommons.EzIpcManager;
 using OtterGui.Log;
 using System;
 
 namespace CustomizePlus.Api;
 
-public partial class CustomizePlusIpc : IDisposable
+public partial class CustomizePlusIpc
 {
     private readonly DalamudPluginInterface _pluginInterface;
     private readonly Logger _logger;
@@ -25,32 +26,6 @@ public partial class CustomizePlusIpc : IDisposable
         _logger = logger;
         _hookingService = hookingService;
 
-        InitializeProviders();
-    }
-
-    private void InitializeProviders()
-    {
-        try
-        {
-            InitializeGeneralProviders();
-        }
-        catch(Exception ex)
-        {
-            _logger.Fatal($"Fatal error while initializing Customize+ IPC: {ex}");
-
-            IPCFailed = true;
-
-            DisposeProviders();
-        }
-    }
-
-    private void DisposeProviders()
-    {
-        DisposeGeneralProviders();
-    }
-
-    public void Dispose()
-    {
-        DisposeProviders();
+        EzIPC.Init(this, "CustomizePlus");
     }
 }

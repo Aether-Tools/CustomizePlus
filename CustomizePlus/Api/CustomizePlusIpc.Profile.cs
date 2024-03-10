@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CustomizePlus.Api;
 
-public partial class CustomizePlusIpc : IDisposable
+public partial class CustomizePlusIpc
 {
 
 }

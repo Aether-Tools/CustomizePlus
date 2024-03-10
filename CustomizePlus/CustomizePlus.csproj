@@ -50,6 +50,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <ProjectReference Include="..\CustomizePlus.GameData\CustomizePlus.GameData.csproj" />
+    <ProjectReference Include="..\submodules\ECommons\ECommons\ECommons.csproj" />
     <ProjectReference Include="..\submodules\OtterGui\OtterGui.csproj" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>$(DalamudLibPath)Newtonsoft.Json.dll</HintPath>

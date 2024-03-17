@@ -105,7 +105,7 @@ public partial class CustomizePlusIpc
 
         try
         {
-            _profileManager.SetEnabled(uniqueId, true);
+            _profileManager.SetEnabled(uniqueId, state);
             return ErrorCode.Success;
         }
         catch (ProfileNotFoundException ex)

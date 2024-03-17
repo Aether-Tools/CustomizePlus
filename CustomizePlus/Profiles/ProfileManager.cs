@@ -23,6 +23,7 @@ using CustomizePlus.GameData.Services;
 using CustomizePlus.GameData.Extensions;
 using CustomizePlus.Profiles.Enums;
 using Penumbra.GameData.Enums;
+using CustomizePlus.Profiles.Exceptions;
 
 namespace CustomizePlus.Profiles;
 
@@ -299,6 +300,8 @@ public class ProfileManager : IDisposable
         {
             SetEnabled(profile, value);
         }
+        else
+            throw new ProfileNotFoundException();
     }
 
     public void SetLimitLookupToOwned(Profile profile, bool value)
@@ -390,7 +393,7 @@ public class ProfileManager : IDisposable
     public void AddTemporaryProfile(Profile profile, Actor actor/*, Template template*/)
     {
         if (!actor.Identifier(_actorManager, out var identifier))
-            return;
+            throw new ActorNotFoundException();
 
         profile.Enabled = true;
         profile.ProfileType = ProfileType.Temporary;
@@ -418,21 +421,30 @@ public class ProfileManager : IDisposable
     public void RemoveTemporaryProfile(Profile profile)
     {
         if (!Profiles.Remove(profile))
-            return;
+            throw new ProfileNotFoundException();
 
         _logger.Debug($"Removed temporary profile for {profile.CharacterName}");
 
         _event.Invoke(ProfileChanged.Type.TemporaryProfileDeleted, profile, null);
     }
 
+    public void RemoveTemporaryProfile(Guid profileId)
+    {
+        var profile = Profiles.FirstOrDefault(x => x.UniqueId == profileId && x.IsTemporary);
+        if (profile == null)
+            throw new ProfileNotFoundException();
+
+        RemoveTemporaryProfile(profile);
+    }
+
     public void RemoveTemporaryProfile(Actor actor)
     {
         if (!actor.Identifier(_actorManager, out var identifier))
-            return;
+            throw new ActorNotFoundException();
 
         var profile = Profiles.FirstOrDefault(x => x.TemporaryActor == identifier && x.IsTemporary);
         if (profile == null)
-            return;
+            throw new ProfileNotFoundException();
 
         RemoveTemporaryProfile(profile);
     }

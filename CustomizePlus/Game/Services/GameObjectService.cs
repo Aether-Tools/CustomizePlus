@@ -6,6 +6,7 @@ using CustomizePlus.GameData.Data;
 using CustomizePlus.GameData.Services;
 using CustomizePlus.GameData.Extensions;
 using Penumbra.GameData.Enums;
+using DalamudGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 
 namespace CustomizePlus.Game.Services;
 
@@ -68,5 +69,15 @@ public class GameObjectService
                     yield return (kvPair.Key.CreatePermanent(), kvPair.Value.Objects[0]);
             }
         }
+    }
+
+    public Actor GetLocalPlayerActor()
+    {
+        return _objectManager.Player;
+    }
+
+    public DalamudGameObject? GetDalamudGameObjectFromActor(Actor actor)
+    {
+        return _objectTable.CreateObjectReference(actor);
     }
 }

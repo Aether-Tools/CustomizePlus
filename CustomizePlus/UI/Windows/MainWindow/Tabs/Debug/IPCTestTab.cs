@@ -17,6 +17,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 using IPCProfileDataTuple = (System.Guid UniqueId, string Name, string CharacterName, bool IsEnabled);
+using OtterGui.Log;
+using CustomizePlus.Core.Extensions;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 
@@ -28,6 +30,7 @@ public class IPCTestTab //: IDisposable
     private readonly GameObjectService _gameObjectService;
     private readonly ObjectManager _objectManager;
     private readonly ActorManager _actorManager;
+    private readonly Logger _logger;
 
     [EzIPC("General.GetApiVersion")] 
     private readonly Func<(int, int)> _getApiVersionIpcFunc;
@@ -44,9 +47,24 @@ public class IPCTestTab //: IDisposable
     [EzIPC("Profile.DisableByUniqueId")]
     private readonly Action<Guid> _disableProfileByUniqueIdIpcFunc;
 
-    private readonly ICallGateSubscriber<string, Character?, object>? _setCharacterProfile;
-    private readonly ICallGateSubscriber<Character?, string>? _getProfileFromCharacter;
-    private readonly ICallGateSubscriber<Character?, object>? _revertCharacter;
+    [EzIPC("Profile.GetCurrentlyActiveProfileOnCharacter")]
+    private readonly Func<Character, (int, string?)> _getCurrentlyActiveProfileOnCharacterIpcFunc;
+
+    [EzIPC("Profile.SetTemporaryProfileOnCharacter")]
+    private readonly Func<Character, string, (int, Guid?)> _setTemporaryProfileOnCharacterIpcFunc;
+
+    [EzIPC("Profile.DeleteTemporaryProfileOnCharacter")]
+    private readonly Func<Character, int> _deleteTemporaryProfileOnCharacterIpcFunc;
+
+    [EzIPC("Profile.DeleteTemporaryProfileByUniqueId")]
+    private readonly Func<Guid, int> _deleteTemporaryProfileByUniqueIdIpcFunc;
+
+    [EzIPC("Profile.GetProfileById")]
+    private readonly Func<Guid, (int, string?)> _getProfileByIdIpcFunc;
+
+    //private readonly ICallGateSubscriber<string, Character?, object>? _setCharacterProfile;
+    //private readonly ICallGateSubscriber<Character?, string>? _getProfileFromCharacter;
+    //private readonly ICallGateSubscriber<Character?, object>? _revertCharacter;
     //private readonly ICallGateSubscriber<string?, string?, object?>? _onProfileUpdate;
 
     private string? _rememberedProfileJson;
@@ -66,7 +84,8 @@ public class IPCTestTab //: IDisposable
         PopupSystem popupSystem,
         ObjectManager objectManager,
         GameObjectService gameObjectService,
-        ActorManager actorManager)
+        ActorManager actorManager,
+        Logger logger)
     {
         _objectTable = objectTable;
         _profileManager = profileManager;
@@ -74,15 +93,16 @@ public class IPCTestTab //: IDisposable
         _objectManager = objectManager;
         _gameObjectService = gameObjectService;
         _actorManager = actorManager;
+        _logger = logger;
 
         EzIPC.Init(this, "CustomizePlus");
 
         if (_getApiVersionIpcFunc != null)
             _apiVersion = _getApiVersionIpcFunc();
 
-        _setCharacterProfile = pluginInterface.GetIpcSubscriber<string, Character?, object>("CustomizePlus.SetProfileToCharacter");
-        _getProfileFromCharacter = pluginInterface.GetIpcSubscriber<Character?, string>("CustomizePlus.GetProfileFromCharacter");
-        _revertCharacter = pluginInterface.GetIpcSubscriber<Character?, object>("CustomizePlus.RevertCharacter");
+        //_setCharacterProfile = pluginInterface.GetIpcSubscriber<string, Character?, object>("CustomizePlus.SetProfileToCharacter");
+        //_getProfileFromCharacter = pluginInterface.GetIpcSubscriber<Character?, string>("CustomizePlus.GetProfileFromCharacter");
+        //_revertCharacter = pluginInterface.GetIpcSubscriber<Character?, object>("CustomizePlus.RevertCharacter");
         /*_onProfileUpdate = pluginInterface.GetIpcSubscriber<string?, string?, object?>("CustomizePlus.OnProfileUpdate");
         _onProfileUpdate.Subscribe(OnProfileUpdate);*/
     }
@@ -141,37 +161,59 @@ public class IPCTestTab //: IDisposable
             _popupSystem.ShowPopup(PopupSystem.Messages.IPCV4ProfileRemembered);
         }
 
-        if (ImGui.Button("GetProfileFromCharacter into memory"))
+        if (ImGui.Button("GetCurrentlyActiveProfileOnCharacter into memory"))
         {
             var actors = _gameObjectService.FindActorsByName(_targetCharacterName).ToList();
             if (actors.Count == 0)
                 return;
 
-            _rememberedProfileJson = _getProfileFromCharacter!.InvokeFunc(FindCharacterByAddress(actors[0].Item2.Address));
-            _popupSystem.ShowPopup(PopupSystem.Messages.IPCGetProfileFromChrRemembered);
+            (int result, _rememberedProfileJson) = _getCurrentlyActiveProfileOnCharacterIpcFunc(FindCharacterByAddress(actors[0].Item2.Address));
+
+            if(result == 0)
+                _popupSystem.ShowPopup(PopupSystem.Messages.IPCGetProfileFromChrRemembered);
+            else
+            {
+                _logger.Error($"Error code {result} while calling GetCurrentlyActiveProfileOnCharacter");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
         }
 
         using (var disabled = ImRaii.Disabled(_rememberedProfileJson == null))
         {
-            if (ImGui.Button("SetProfileToCharacter from memory") && _rememberedProfileJson != null)
+            if (ImGui.Button("SetTemporaryProfileOnCharacter from memory") && _rememberedProfileJson != null)
             {
                 var actors = _gameObjectService.FindActorsByName(_targetCharacterName).ToList();
                 if (actors.Count == 0)
                     return;
 
-                _setCharacterProfile!.InvokeAction(_rememberedProfileJson, FindCharacterByAddress(actors[0].Item2.Address));
-                _popupSystem.ShowPopup(PopupSystem.Messages.IPCSetProfileToChrDone);
+                (int result, Guid? profileGuid) = _setTemporaryProfileOnCharacterIpcFunc(FindCharacterByAddress(actors[0].Item2.Address),_rememberedProfileJson);
+                if (result == 0)
+                {
+                    _popupSystem.ShowPopup(PopupSystem.Messages.IPCSetProfileToChrDone);
+                    _logger.Information($"Temporary profile id: {profileGuid}");
+                }
+                else
+                {
+                    _logger.Error($"Error code {result} while calling SetTemporaryProfileOnCharacter");
+                    _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+                }
             }
         }
 
-        if (ImGui.Button("RevertCharacter") && _rememberedProfileJson != null)
+        if (ImGui.Button("DeleteTemporaryProfileOnCharacter"))
         {
             var actors = _gameObjectService.FindActorsByName(_targetCharacterName).ToList();
             if (actors.Count == 0)
                 return;
 
-            _revertCharacter!.InvokeAction(FindCharacterByAddress(actors[0].Item2.Address));
-            _popupSystem.ShowPopup(PopupSystem.Messages.IPCRevertDone);
+            int result = _deleteTemporaryProfileOnCharacterIpcFunc(FindCharacterByAddress(actors[0].Item2.Address));
+            if (result == 0)
+                _popupSystem.ShowPopup(PopupSystem.Messages.IPCRevertDone);
+            else
+            {
+                _logger.Error($"Error code {result} while calling DeleteTemporaryProfileOnCharacter");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
         }
 
         ImGui.Separator();
@@ -179,12 +221,27 @@ public class IPCTestTab //: IDisposable
         if (ImGui.Button("Copy user profile list to clipboard"))
         {
             ImGui.SetClipboardText(string.Join("\n", _getProfileListIpcFunc().Select(x => $"{x.UniqueId}, {x.Name}, {x.CharacterName}, {x.IsEnabled}")));
-            _popupSystem.ShowPopup(PopupSystem.Messages.IPCProfileListCopied);
+            _popupSystem.ShowPopup(PopupSystem.Messages.IPCCopiedToClipboard);
         }
 
-        ImGui.Text("Profile Unique ID to set:");
+        ImGui.Text("Profile Unique ID:");
         ImGui.SameLine();
         ImGui.InputText("##profileguid", ref _targetProfileId, 128);
+
+        if (ImGui.Button("Get profile by Unique ID"))
+        {
+            (int result, string? profileJson) = _getProfileByIdIpcFunc(Guid.Parse(_targetProfileId));
+            if (result == 0)
+            {
+                ImGui.SetClipboardText(profileJson);
+                _popupSystem.ShowPopup(PopupSystem.Messages.IPCCopiedToClipboard);
+            }
+            else
+            {
+                _logger.Error($"Error code {result} while calling GetProfileById");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
+        }
 
         if (ImGui.Button("Enable profile by Unique ID"))
         {
@@ -197,6 +254,28 @@ public class IPCTestTab //: IDisposable
             _disableProfileByUniqueIdIpcFunc(Guid.Parse(_targetProfileId));
             _popupSystem.ShowPopup(PopupSystem.Messages.IPCDisableProfileByIdDone);
         }
+
+        if (ImGui.Button("DeleteTemporaryProfileByUniqueId"))
+        {
+            var actors = _gameObjectService.FindActorsByName(_targetCharacterName).ToList();
+            if (actors.Count == 0)
+                return;
+
+            int result = _deleteTemporaryProfileByUniqueIdIpcFunc(Guid.Parse(_targetProfileId));
+            if (result == 0)
+                _popupSystem.ShowPopup(PopupSystem.Messages.IPCRevertDone);
+            else
+            {
+                _logger.Error($"Error code {result} while calling DeleteTemporaryProfileByUniqueId");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
+        }
+    }
+
+    [EzIPCEvent("Profile.OnUpdate")]
+    private void OnProfileUpdate(Character Character, Guid? ProfileUniqueId)
+    {
+        _logger.Debug($"IPC Test Tab - OnProfileUpdate: Character: {Character.Name.ToString().Incognify()}, Profile ID: {(ProfileUniqueId != null ? ProfileUniqueId.ToString() : "no id")}");
     }
 
     private Character? FindCharacterByAddress(nint address)

@@ -14,7 +14,7 @@ public partial class PopupSystem
         public const string IPCGetProfileFromChrRemembered = "ipc_get_profile_from_character_remembered";
         public const string IPCSetProfileToChrDone = "ipc_set_profile_to_character_done";
         public const string IPCRevertDone = "ipc_revert_done";
-        public const string IPCProfileListCopied = "ipc_profile_list_copied";
+        public const string IPCCopiedToClipboard = "ipc_copied_to clipboard";
         public const string IPCEnableProfileByIdDone = "ipc_enable_profile_by_id_done";
         public const string IPCDisableProfileByIdDone = "ipc_disable_profile_by_id_done";
 
@@ -32,9 +32,9 @@ public partial class PopupSystem
 
         RegisterPopup(Messages.IPCV4ProfileRemembered, "Current profile has been copied into memory");
         RegisterPopup(Messages.IPCGetProfileFromChrRemembered, "GetProfileFromCharacter result has been copied into memory");
-        RegisterPopup(Messages.IPCSetProfileToChrDone, "SetProfileToCharacter has been called with data from memory");
+        RegisterPopup(Messages.IPCSetProfileToChrDone, "SetProfileToCharacter has been called with data from memory, profile id printed to log");
         RegisterPopup(Messages.IPCRevertDone, "Revert has been called");
-        RegisterPopup(Messages.IPCProfileListCopied, "Profile list copied into clipboard");
+        RegisterPopup(Messages.IPCCopiedToClipboard, "Copied into clipboard");
         RegisterPopup(Messages.IPCEnableProfileByIdDone, "Enable profile by id has been called");
         RegisterPopup(Messages.IPCDisableProfileByIdDone, "Disable profile by id has been called");
 

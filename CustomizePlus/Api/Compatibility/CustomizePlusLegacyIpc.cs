@@ -24,6 +24,7 @@ using CustomizePlus.GameData.Extensions;
 
 namespace CustomizePlus.Api.Compatibility;
 
+[Obsolete("Will be removed in the next release")]
 public class CustomizePlusLegacyIpc : IDisposable
 {
     private readonly IObjectTable _objectTable;

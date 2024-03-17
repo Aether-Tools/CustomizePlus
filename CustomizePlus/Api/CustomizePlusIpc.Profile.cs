@@ -84,18 +84,18 @@ public partial class CustomizePlusIpc
     /// </summary>
     /// <param name="uniqueId"></param>
     [EzIPC("Profile.EnableByUniqueId")]
-    private ErrorCode EnableProfileByUniqueId(Guid uniqueId)
+    private int EnableProfileByUniqueId(Guid uniqueId)
     {
-        return SetProfileStateInternal(uniqueId, true);
+        return (int)SetProfileStateInternal(uniqueId, true);
     }
 
     /// <summary>
     /// Disable profile using its Unique ID. Does not work on temporary profiles.
     /// </summary>
     [EzIPC("Profile.DisableByUniqueId")]
-    private ErrorCode DisableProfileByUniqueId(Guid uniqueId)
+    private int DisableProfileByUniqueId(Guid uniqueId)
     {
-        return SetProfileStateInternal(uniqueId, false);
+        return (int)SetProfileStateInternal(uniqueId, false);
     }
 
     private ErrorCode SetProfileStateInternal(Guid uniqueId, bool state)

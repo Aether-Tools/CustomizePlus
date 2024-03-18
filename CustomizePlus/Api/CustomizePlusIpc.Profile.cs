@@ -27,7 +27,7 @@ public partial class CustomizePlusIpc
     /// <summary>
     /// Triggered when changes in currently active profiles are detected. (like changing active profile or making any changes to it)
     /// Not triggered if any changes happen due to character no longer existing.
-    /// Right now ignores every character but local player.
+    /// Right now ignores every character but local player. It is not recommended to assume that this will always be the case and not perform any checks on your side.
     /// Ignores temporary profiles.
     /// </summary>
     [EzIPCEvent("Profile.OnUpdate")]

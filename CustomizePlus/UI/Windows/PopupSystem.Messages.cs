@@ -11,7 +11,7 @@ public partial class PopupSystem
         public const string FantasiaPlusDetected = "fantasia_detected_warn";
 
         public const string IPCV4ProfileRemembered = "ipc_v4_profile_remembered";
-        public const string IPCGetProfileFromChrRemembered = "ipc_get_profile_from_character_remembered";
+        public const string IPCGetProfileByIdRemembered = "ipc_get_profile_by_id_remembered";
         public const string IPCSetProfileToChrDone = "ipc_set_profile_to_character_done";
         public const string IPCRevertDone = "ipc_revert_done";
         public const string IPCCopiedToClipboard = "ipc_copied_to clipboard";
@@ -31,9 +31,9 @@ public partial class PopupSystem
         RegisterPopup(Messages.FantasiaPlusDetected, "Customize+ detected that you have Fantasia+ installed.\nPlease delete or turn it off and restart your game to use Customize+.");
 
         RegisterPopup(Messages.IPCV4ProfileRemembered, "Current profile has been copied into memory");
-        RegisterPopup(Messages.IPCGetProfileFromChrRemembered, "GetProfileFromCharacter result has been copied into memory");
+        RegisterPopup(Messages.IPCGetProfileByIdRemembered, "GetProfileByUniqueId result has been copied into memory");
         RegisterPopup(Messages.IPCSetProfileToChrDone, "SetProfileToCharacter has been called with data from memory, profile id printed to log");
-        RegisterPopup(Messages.IPCRevertDone, "Revert has been called");
+        RegisterPopup(Messages.IPCRevertDone, "DeleteTemporaryProfileByUniqueId has been called");
         RegisterPopup(Messages.IPCCopiedToClipboard, "Copied into clipboard");
         RegisterPopup(Messages.IPCEnableProfileByIdDone, "Enable profile by id has been called");
         RegisterPopup(Messages.IPCDisableProfileByIdDone, "Disable profile by id has been called");

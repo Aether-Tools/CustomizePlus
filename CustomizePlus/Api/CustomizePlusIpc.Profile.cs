@@ -49,8 +49,8 @@ public partial class CustomizePlusIpc
     /// <summary>
     /// Get JSON copy of profile with specified unique id
     /// </summary>
-    [EzIPC("Profile.GetProfileById")]
-    private (int, string?) GetProfileById(Guid uniqueId)
+    [EzIPC("Profile.GetProfileByUniqueId")]
+    private (int, string?) GetProfileByUniqueId(Guid uniqueId)
     {
         if (uniqueId == Guid.Empty)
             return ((int)ErrorCode.ProfileNotFound, null);
@@ -120,10 +120,10 @@ public partial class CustomizePlusIpc
     }
 
     /// <summary>
-    /// Get JSON copy of active profile for character.
+    /// Get unique id of currently active profile for character.
     /// </summary>
-    [EzIPC("Profile.GetCurrentlyActiveProfileOnCharacter")]
-    private (int, string?) GetCurrentlyActiveProfileOnCharacter(Character character)
+    [EzIPC("Profile.GetActiveProfileIdOnCharacter")]
+    private (int, Guid?) GetActiveProfileIdOnCharacter(Character character)
     {
         if (character == null)
             return ((int)ErrorCode.InvalidCharacter, null);
@@ -133,23 +133,7 @@ public partial class CustomizePlusIpc
         if (profile == null)
             return ((int)ErrorCode.ProfileNotFound, null);
 
-        var convertedProfile = IPCCharacterProfile.FromFullProfile(profile);
-
-        if (convertedProfile == null)
-        {
-            _logger.Error($"IPCCharacterProfile.FromFullProfile returned empty converted profile for character {character?.Name.ToString().Incognify()}, profile: {profile.UniqueId}");
-            return ((int)ErrorCode.UnknownError, null);
-        }
-
-        try
-        {
-            return ((int)ErrorCode.Success, JsonConvert.SerializeObject(convertedProfile));
-        }
-        catch(Exception ex)
-        {
-            _logger.Error($"Exception in IPCCharacterProfile.FromFullProfile for character {character?.Name.ToString().Incognify()}, profile: {profile.UniqueId}: {ex}");
-            return ((int)ErrorCode.UnknownError, null);
-        }
+        return ((int)ErrorCode.Success, profile.UniqueId);
     }
 
     /// <summary>

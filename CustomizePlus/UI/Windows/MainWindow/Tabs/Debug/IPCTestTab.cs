@@ -47,8 +47,8 @@ public class IPCTestTab //: IDisposable
     [EzIPC("Profile.DisableByUniqueId")]
     private readonly Action<Guid> _disableProfileByUniqueIdIpcFunc;
 
-    [EzIPC("Profile.GetCurrentlyActiveProfileOnCharacter")]
-    private readonly Func<Character, (int, string?)> _getCurrentlyActiveProfileOnCharacterIpcFunc;
+    [EzIPC("Profile.GetActiveProfileIdOnCharacter")]
+    private readonly Func<Character, (int, Guid?)> _getActiveProfileIdOnCharacterIpcFunc;
 
     [EzIPC("Profile.SetTemporaryProfileOnCharacter")]
     private readonly Func<Character, string, (int, Guid?)> _setTemporaryProfileOnCharacterIpcFunc;
@@ -59,7 +59,7 @@ public class IPCTestTab //: IDisposable
     [EzIPC("Profile.DeleteTemporaryProfileByUniqueId")]
     private readonly Func<Guid, int> _deleteTemporaryProfileByUniqueIdIpcFunc;
 
-    [EzIPC("Profile.GetProfileById")]
+    [EzIPC("Profile.GetProfileByUniqueId")]
     private readonly Func<Guid, (int, string?)> _getProfileByIdIpcFunc;
 
     //private readonly ICallGateSubscriber<string, Character?, object>? _setCharacterProfile;
@@ -161,16 +161,19 @@ public class IPCTestTab //: IDisposable
             _popupSystem.ShowPopup(PopupSystem.Messages.IPCV4ProfileRemembered);
         }
 
-        if (ImGui.Button("GetCurrentlyActiveProfileOnCharacter into memory"))
+        if (ImGui.Button("GetActiveProfileIdOnCharacter into clipboard"))
         {
             var actors = _gameObjectService.FindActorsByName(_targetCharacterName).ToList();
             if (actors.Count == 0)
                 return;
 
-            (int result, _rememberedProfileJson) = _getCurrentlyActiveProfileOnCharacterIpcFunc(FindCharacterByAddress(actors[0].Item2.Address));
+            (int result, Guid? uniqueId) = _getActiveProfileIdOnCharacterIpcFunc(FindCharacterByAddress(actors[0].Item2.Address));
 
             if(result == 0)
-                _popupSystem.ShowPopup(PopupSystem.Messages.IPCGetProfileFromChrRemembered);
+            {
+                ImGui.SetClipboardText(uniqueId.ToString());
+                _popupSystem.ShowPopup(PopupSystem.Messages.IPCCopiedToClipboard);
+            }
             else
             {
                 _logger.Error($"Error code {result} while calling GetCurrentlyActiveProfileOnCharacter");
@@ -186,7 +189,7 @@ public class IPCTestTab //: IDisposable
                 if (actors.Count == 0)
                     return;
 
-                (int result, Guid? profileGuid) = _setTemporaryProfileOnCharacterIpcFunc(FindCharacterByAddress(actors[0].Item2.Address),_rememberedProfileJson);
+                (int result, Guid? profileGuid) = _setTemporaryProfileOnCharacterIpcFunc(FindCharacterByAddress(actors[0].Item2.Address), _rememberedProfileJson);
                 if (result == 0)
                 {
                     _popupSystem.ShowPopup(PopupSystem.Messages.IPCSetProfileToChrDone);
@@ -228,13 +231,28 @@ public class IPCTestTab //: IDisposable
         ImGui.SameLine();
         ImGui.InputText("##profileguid", ref _targetProfileId, 128);
 
-        if (ImGui.Button("Get profile by Unique ID"))
+        if (ImGui.Button("Get profile by Unique ID into clipboard"))
         {
             (int result, string? profileJson) = _getProfileByIdIpcFunc(Guid.Parse(_targetProfileId));
             if (result == 0)
             {
                 ImGui.SetClipboardText(profileJson);
                 _popupSystem.ShowPopup(PopupSystem.Messages.IPCCopiedToClipboard);
+            }
+            else
+            {
+                _logger.Error($"Error code {result} while calling GetProfileById");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
+        }
+
+        if (ImGui.Button("Get profile by Unique ID into memory"))
+        {
+            (int result, string? profileJson) = _getProfileByIdIpcFunc(Guid.Parse(_targetProfileId));
+            if (result == 0)
+            {
+                _rememberedProfileJson = profileJson;
+                _popupSystem.ShowPopup(PopupSystem.Messages.IPCV4ProfileRemembered);
             }
             else
             {

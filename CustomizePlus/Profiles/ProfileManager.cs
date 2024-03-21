@@ -23,6 +23,7 @@ using CustomizePlus.GameData.Services;
 using CustomizePlus.GameData.Extensions;
 using CustomizePlus.Profiles.Enums;
 using Penumbra.GameData.Enums;
+using Penumbra.GameData.Interop;
 
 namespace CustomizePlus.Profiles;
 

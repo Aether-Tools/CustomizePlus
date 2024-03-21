@@ -1,4 +1,6 @@
-﻿namespace CustomizePlus.GameData.Data;
+﻿using Penumbra.GameData.Interop;
+
+namespace CustomizePlus.GameData.Data;
 
 /// <summary>
 /// A single actor with its label and the list of associated game objects.

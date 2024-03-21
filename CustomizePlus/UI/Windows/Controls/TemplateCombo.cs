@@ -30,7 +30,7 @@ public abstract class TemplateComboBase : FilterComboCache<Tuple<Template, strin
         TemplateChanged templateChanged,
         //TabSelected tabSelected,
         PluginConfiguration configuration)
-        : base(generator, logger)
+        : base(generator, MouseWheelType.Control, logger)
     {
         _templateChanged = templateChanged;
         //TabSelected = tabSelected;

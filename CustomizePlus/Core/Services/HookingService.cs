@@ -10,6 +10,7 @@ using CustomizePlus.Configuration.Data;
 using CustomizePlus.Profiles;
 using CustomizePlus.Armatures.Services;
 using CustomizePlus.GameData.Data;
+using Penumbra.GameData.Interop;
 
 namespace CustomizePlus.Core.Services;
 

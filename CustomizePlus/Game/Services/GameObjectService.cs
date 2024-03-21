@@ -1,11 +1,11 @@
-﻿using Dalamud.Plugin.Services;
-using Penumbra.GameData.Actors;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using CustomizePlus.Core.Data;
-using CustomizePlus.GameData.Data;
-using CustomizePlus.GameData.Services;
 using CustomizePlus.GameData.Extensions;
+using Dalamud.Plugin.Services;
+using Penumbra.GameData.Actors;
 using Penumbra.GameData.Enums;
+using Penumbra.GameData.Interop;
+using ObjectManager = CustomizePlus.GameData.Services.ObjectManager;
 
 namespace CustomizePlus.Game.Services;
 

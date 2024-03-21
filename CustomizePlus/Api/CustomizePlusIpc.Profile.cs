@@ -18,6 +18,7 @@ using Dalamud.Game.ClientState.Objects.Types;
 using Penumbra.GameData.Actors;
 
 using IPCProfileDataTuple = (System.Guid UniqueId, string Name, string CharacterName, bool IsEnabled);
+using Penumbra.GameData.Interop;
 //using OnUpdateTuple = (Dalamud.Game.ClientState.Objects.Types.Character Character, System.Guid? ProfileUniqueId, string? ProfileJson);
 
 namespace CustomizePlus.Api;
@@ -29,9 +30,10 @@ public partial class CustomizePlusIpc
     /// Not triggered if any changes happen due to character no longer existing.
     /// Right now ignores every character but local player. It is not recommended to assume that this will always be the case and not perform any checks on your side.
     /// Ignores temporary profiles.
+    /// /!\ If no profile is set on specified character profile id will be equal to Guid.Empty
     /// </summary>
     [EzIPCEvent("Profile.OnUpdate")]
-    private Action<Character, Guid?> OnProfileUpdate;
+    private Action<Character, Guid> OnProfileUpdate;
 
     /// <summary>
     /// Retrieve list of all user profiles
@@ -49,7 +51,7 @@ public partial class CustomizePlusIpc
     /// <summary>
     /// Get JSON copy of profile with specified unique id
     /// </summary>
-    [EzIPC("Profile.GetProfileByUniqueId")]
+    [EzIPC("Profile.GetByUniqueId")]
     private (int, string?) GetProfileByUniqueId(Guid uniqueId)
     {
         if (uniqueId == Guid.Empty)
@@ -327,6 +329,6 @@ public partial class CustomizePlusIpc
 
         _logger.Debug($"Sending player update message: Character: {character.Name.ToString().Incognify()}, Profile: {(profile != null ? profile.ToString() : "no profile")}");
 
-        OnProfileUpdate(character, profile != null ? profile.UniqueId : null);
+        OnProfileUpdate(character, profile != null ? profile.UniqueId : Guid.Empty);
     }
 }

@@ -42,10 +42,10 @@ public class IPCTestTab //: IDisposable
     private readonly Func<IList<IPCProfileDataTuple>> _getProfileListIpcFunc;
 
     [EzIPC("Profile.EnableByUniqueId")]
-    private readonly Action<Guid> _enableProfileByUniqueIdIpcFunc;
+    private readonly Func<Guid, int> _enableProfileByUniqueIdIpcFunc;
 
     [EzIPC("Profile.DisableByUniqueId")]
-    private readonly Action<Guid> _disableProfileByUniqueIdIpcFunc;
+    private readonly Func<Guid, int> _disableProfileByUniqueIdIpcFunc;
 
     [EzIPC("Profile.GetActiveProfileIdOnCharacter")]
     private readonly Func<Character, (int, Guid?)> _getActiveProfileIdOnCharacterIpcFunc;
@@ -59,7 +59,7 @@ public class IPCTestTab //: IDisposable
     [EzIPC("Profile.DeleteTemporaryProfileByUniqueId")]
     private readonly Func<Guid, int> _deleteTemporaryProfileByUniqueIdIpcFunc;
 
-    [EzIPC("Profile.GetProfileByUniqueId")]
+    [EzIPC("Profile.GetByUniqueId")]
     private readonly Func<Guid, (int, string?)> _getProfileByIdIpcFunc;
 
     //private readonly ICallGateSubscriber<string, Character?, object>? _setCharacterProfile;
@@ -263,14 +263,30 @@ public class IPCTestTab //: IDisposable
 
         if (ImGui.Button("Enable profile by Unique ID"))
         {
-            _enableProfileByUniqueIdIpcFunc(Guid.Parse(_targetProfileId));
-            _popupSystem.ShowPopup(PopupSystem.Messages.IPCEnableProfileByIdDone);
+            int result = _enableProfileByUniqueIdIpcFunc(Guid.Parse(_targetProfileId));
+            if (result == 0)
+            {
+                _popupSystem.ShowPopup(PopupSystem.Messages.IPCEnableProfileByIdDone);
+            }
+            else
+            {
+                _logger.Error($"Error code {result} while calling EnableByUniqueId");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
         }
 
         if (ImGui.Button("Disable profile by Unique ID"))
         {
-            _disableProfileByUniqueIdIpcFunc(Guid.Parse(_targetProfileId));
-            _popupSystem.ShowPopup(PopupSystem.Messages.IPCDisableProfileByIdDone);
+            int result = _disableProfileByUniqueIdIpcFunc(Guid.Parse(_targetProfileId));
+            if (result == 0)
+            {
+                _popupSystem.ShowPopup(PopupSystem.Messages.IPCDisableProfileByIdDone);
+            }
+            else
+            {
+                _logger.Error($"Error code {result} while calling DisableByUniqueId");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
         }
 
         if (ImGui.Button("DeleteTemporaryProfileByUniqueId"))
@@ -293,7 +309,7 @@ public class IPCTestTab //: IDisposable
     [EzIPCEvent("Profile.OnUpdate")]
     private void OnProfileUpdate(Character Character, Guid? ProfileUniqueId)
     {
-        _logger.Debug($"IPC Test Tab - OnProfileUpdate: Character: {Character.Name.ToString().Incognify()}, Profile ID: {(ProfileUniqueId != null ? ProfileUniqueId.ToString() : "no id")}");
+        _logger.Debug($"IPC Test Tab - OnProfileUpdate: Character: {Character.Name.ToString().Incognify()}, Profile ID: {(ProfileUniqueId != Guid.Empty ? ProfileUniqueId.ToString() : "no id")}");
     }
 
     private Character? FindCharacterByAddress(nint address)

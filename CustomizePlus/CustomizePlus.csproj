@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <Platforms>x64</Platforms>
     <Nullable>enable</Nullable>
     <LangVersion>preview</LangVersion>
@@ -23,12 +23,6 @@
     <CopyLocalLockfileAssemblies>true</CopyLocalLockfileAssemblies>
     <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="Util\**" />
-    <EmbeddedResource Remove="Util\**" />
-    <None Remove="Util\**" />
-  </ItemGroup>
 
   <ItemGroup>
     <Content Include="..\Data\icon.png">
@@ -44,7 +38,7 @@
 
   <ItemGroup>
     <!--<PackageReference Include="DalamudPackager" Version="2.1.12" />-->
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

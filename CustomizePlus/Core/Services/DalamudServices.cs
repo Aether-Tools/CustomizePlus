@@ -25,6 +25,8 @@ public class DalamudServices
             .AddDalamudService<IKeyState>(pi)
             .AddDalamudService<IDataManager>(pi)
             .AddDalamudService<IPluginLog>(pi)
-            .AddDalamudService<ITargetManager>(pi);
+            .AddDalamudService<ITargetManager>(pi)
+            .AddDalamudService<INotificationManager>(pi)
+            .AddDalamudService<IContextMenu>(pi);
     }
 }

@@ -22,8 +22,9 @@ using CustomizePlus.GameData.Data;
 using CustomizePlus.GameData.Services;
 using CustomizePlus.GameData.Extensions;
 using CustomizePlus.Profiles.Enums;
-using Penumbra.GameData.Enums;
 using CustomizePlus.Profiles.Exceptions;
+using Penumbra.GameData.Enums;
+using Penumbra.GameData.Interop;
 
 namespace CustomizePlus.Profiles;
 
@@ -292,7 +293,7 @@ public class ProfileManager : IDisposable
             _event.Invoke(ProfileChanged.Type.Toggled, profile, value);
         }
     }
-
+    
     public void SetEnabled(Guid guid, bool value)
     {
         var profile = Profiles.FirstOrDefault(x => x.UniqueId == guid && x.ProfileType == ProfileType.Normal);
@@ -303,7 +304,6 @@ public class ProfileManager : IDisposable
         else
             throw new ProfileNotFoundException();
     }
-
     public void SetLimitLookupToOwned(Profile profile, bool value)
     {
         if (profile.LimitLookupToOwnedObjects != value)

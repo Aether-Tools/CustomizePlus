@@ -33,6 +33,7 @@ using Penumbra.GameData.Actors;
 using Penumbra.GameData.Enums;
 using Penumbra.GameData.Structs;
 using OtterGui;
+using OtterGui.Raii;
 using CustomizePlus.Api;
 
 namespace CustomizePlus.Core;
@@ -62,7 +63,7 @@ public static class ServiceManagerBuilder
         services.AddIServices(typeof(EquipItem).Assembly);
         services.AddIServices(typeof(Plugin).Assembly);
         services.AddIServices(typeof(ObjectManager).Assembly);
-        services.AddIServices(typeof(ImGuiUtil).Assembly);
+        services.AddIServices(typeof(ImRaii).Assembly);
 
         services.CreateProvider();
 
@@ -148,7 +149,7 @@ public static class ServiceManagerBuilder
     {
         services
             .AddSingleton<PoseFileBoneLoader>()
-            .AddSingleton<CustomizePlusLegacyIpc>()
+			.AddSingleton<CustomizePlusLegacyIpc>()
             .AddSingleton<CustomizePlusIpc>();
 
         return services;

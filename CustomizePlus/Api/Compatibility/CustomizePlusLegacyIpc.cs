@@ -21,6 +21,7 @@ using CustomizePlus.Core.Extensions;
 using CustomizePlus.Armatures.Events;
 using CustomizePlus.Armatures.Data;
 using CustomizePlus.GameData.Extensions;
+using Penumbra.GameData.Interop;
 
 namespace CustomizePlus.Api.Compatibility;
 

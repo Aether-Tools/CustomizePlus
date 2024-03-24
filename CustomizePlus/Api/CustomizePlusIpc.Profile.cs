@@ -36,7 +36,6 @@ public partial class CustomizePlusIpc
     /// Retrieve list of all user profiles
     /// /!\ This might be somewhat heavy method to call, so please use with caution.
     /// </summary>
-    /// <returns></returns>
     [EzIPC("Profile.GetList")]
     private IList<IPCProfileDataTuple> GetProfileList()
     {
@@ -86,7 +85,6 @@ public partial class CustomizePlusIpc
     /// <summary>
     /// Enable profile using its Unique ID. Does not work on temporary profiles.
     /// </summary>
-    /// <param name="uniqueId"></param>
     [EzIPC("Profile.EnableByUniqueId")]
     private int EnableProfileByUniqueId(Guid uniqueId)
     {

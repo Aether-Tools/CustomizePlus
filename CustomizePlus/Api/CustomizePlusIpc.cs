@@ -10,6 +10,13 @@ using System;
 
 namespace CustomizePlus.Api;
 
+/// <summary>
+/// Customize+ IPC.
+/// All of the function/event names start with "CustomizePlus." prefix.
+/// For example: CustomizePlus.Profile.GetList.
+/// While Customize+ is using EzIPC to make it easier to work with IPC,
+/// you are not required to use it to interact with the plugin.
+/// </summary>
 public partial class CustomizePlusIpc : IDisposable
 {
     private readonly DalamudPluginInterface _pluginInterface;

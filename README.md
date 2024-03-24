@@ -20,7 +20,7 @@ Most of the things should be self-explanatory, if you do need help you can join 
 This plugin is being worked on when developers have free time and have a desire to do so, therefore update schedule does not exist. Real life and paid employment take priority over this project.
 
 ### IPC
-Current IPC is designed to be used by Mare Synchronos and can be changed without any warning. In the future general purpose IPC will be introduced with functionality better designed for usage by other plugins.
+Customize+ provides IPC for integrations with other plugins. We have opted for inline documentation, so please head over to `CustomizePlus/Api` directory and check source code files to see what kind of functionality is provided.
 
 ## Contributing
 **This is important, please read before contributing.**

@@ -5,21 +5,18 @@ using System.Linq;
 using ECommons.EzIpcManager;
 using Newtonsoft.Json;
 using CustomizePlus.Api.Data;
-using CustomizePlus.GameData.Data;
 using CustomizePlus.Api.Enums;
 using CustomizePlus.Profiles.Exceptions;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Core.Extensions;
-using CustomizePlus.Profiles.Events;
 using CustomizePlus.Armatures.Data;
 using CustomizePlus.Armatures.Events;
 using CustomizePlus.GameData.Extensions;
 using Dalamud.Game.ClientState.Objects.Types;
-using Penumbra.GameData.Actors;
-
-using IPCProfileDataTuple = (System.Guid UniqueId, string Name, string CharacterName, bool IsEnabled);
 using Penumbra.GameData.Interop;
-//using OnUpdateTuple = (Dalamud.Game.ClientState.Objects.Types.Character Character, System.Guid? ProfileUniqueId, string? ProfileJson);
+
+//Virtual path is full path to the profile in the virtual folders created by user in the profile list UI
+using IPCProfileDataTuple = (System.Guid UniqueId, string Name, string VirtualPath, string CharacterName, bool IsEnabled);
 
 namespace CustomizePlus.Api;
 
@@ -37,6 +34,7 @@ public partial class CustomizePlusIpc
 
     /// <summary>
     /// Retrieve list of all user profiles
+    /// /!\ This might be somewhat heavy method to call, so please use with caution.
     /// </summary>
     /// <returns></returns>
     [EzIPC("Profile.GetList")]
@@ -44,7 +42,11 @@ public partial class CustomizePlusIpc
     {
         return _profileManager.Profiles
             .Where(x => x.ProfileType == ProfileType.Normal)
-            .Select(x => (x.UniqueId, x.Name.Text, x.CharacterName.Text, x.Enabled))
+            .Select(x =>
+            {
+                string path = _profileFileSystem.FindLeaf(x, out var leaf) ? leaf.FullName() : x.Name.Text;
+                return (x.UniqueId, x.Name.Text, path, x.CharacterName.Text, x.Enabled);
+            })
             .ToList();
     }
 
@@ -285,7 +287,7 @@ public partial class CustomizePlusIpc
             type == ArmatureChanged.Type.Updated)
         {
             if (armature.Profile == null)
-                _logger.Fatal("INTEGRITY ERROR: Armature created/rebound and profile is null");
+                _logger.Fatal("INTEGRITY ERROR: Armature created/updated and profile is null");
 
             (Profile? activeProfile, Profile? oldProfile) = (null, null);
             if (type == ArmatureChanged.Type.Created)

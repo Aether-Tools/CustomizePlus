@@ -17,6 +17,7 @@ public partial class CustomizePlusIpc : IDisposable
     private readonly HookingService _hookingService;
     private readonly ProfileManager _profileManager;
     private readonly GameObjectService _gameObjectService;
+    private readonly ProfileFileSystem _profileFileSystem;
 
     private readonly ArmatureChanged _armatureChangedEvent;
 
@@ -31,6 +32,7 @@ public partial class CustomizePlusIpc : IDisposable
         HookingService hookingService,
         ProfileManager profileManager,
         GameObjectService gameObjectService,
+        ProfileFileSystem profileFileSystem,
         ArmatureChanged armatureChangedEvent)
     {
         _pluginInterface = pluginInterface;
@@ -38,6 +40,7 @@ public partial class CustomizePlusIpc : IDisposable
         _hookingService = hookingService;
         _profileManager = profileManager;
         _gameObjectService = gameObjectService;
+        _profileFileSystem = profileFileSystem;
 
         _armatureChangedEvent = armatureChangedEvent;
 

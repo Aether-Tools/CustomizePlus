@@ -18,7 +18,6 @@ public partial class CustomizePlusIpc : IDisposable
     private readonly ProfileManager _profileManager;
     private readonly GameObjectService _gameObjectService;
 
-    private readonly ProfileChanged _profileChangedEvent;
     private readonly ArmatureChanged _armatureChangedEvent;
 
     /// <summary>
@@ -32,8 +31,7 @@ public partial class CustomizePlusIpc : IDisposable
         HookingService hookingService,
         ProfileManager profileManager,
         GameObjectService gameObjectService,
-        ArmatureChanged armatureChangedEvent,
-        ProfileChanged profileChangedEvent)
+        ArmatureChanged armatureChangedEvent)
     {
         _pluginInterface = pluginInterface;
         _logger = logger;
@@ -41,19 +39,15 @@ public partial class CustomizePlusIpc : IDisposable
         _profileManager = profileManager;
         _gameObjectService = gameObjectService;
 
-
-        _profileChangedEvent = profileChangedEvent;
         _armatureChangedEvent = armatureChangedEvent;
 
         EzIPC.Init(this, "CustomizePlus");
 
-        _profileChangedEvent.Subscribe(OnProfileChange, ProfileChanged.Priority.CustomizePlusIpc);
         _armatureChangedEvent.Subscribe(OnArmatureChanged, ArmatureChanged.Priority.CustomizePlusIpc);
     }
 
     public void Dispose()
     {
-        _profileChangedEvent.Unsubscribe(OnProfileChange);
         _armatureChangedEvent.Unsubscribe(OnArmatureChanged);
     }
 }

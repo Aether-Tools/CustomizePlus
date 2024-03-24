@@ -270,27 +270,6 @@ public partial class CustomizePlusIpc
     }
 
     //warn: limitation - ignores default profiles but why you would use default profile on your own character
-    private void OnProfileChange(ProfileChanged.Type type, Profile? profile, object? arg3)
-    {
-        if (type != ProfileChanged.Type.AddedTemplate &&
-            type != ProfileChanged.Type.RemovedTemplate &&
-            type != ProfileChanged.Type.MovedTemplate &&
-            type != ProfileChanged.Type.ChangedTemplate &&
-            type != ProfileChanged.Type.Toggled)
-            return;
-
-        if (profile == null ||
-            !profile.Enabled ||  //profile = null event will be sent from OnArmatureChanged
-            profile.CharacterName.Text != _gameObjectService.GetCurrentPlayerName())
-            return;
-
-        Character? localPlayerCharacter = (Character?)_gameObjectService.GetDalamudGameObjectFromActor(_gameObjectService.GetLocalPlayerActor());
-        if (localPlayerCharacter == null)
-            return;
-
-        OnProfileUpdateInternal(localPlayerCharacter, profile);
-    }
-
     private void OnArmatureChanged(ArmatureChanged.Type type, Armature armature, object? arg3)
     {
         string currentPlayerName = _gameObjectService.GetCurrentPlayerName();
@@ -302,13 +281,34 @@ public partial class CustomizePlusIpc
         if (localPlayerCharacter == null)
             return;
 
-        if (type == ArmatureChanged.Type.Created || //todo: might create second call after OnProfileChange?
-            type == ArmatureChanged.Type.Rebound)
+        if (type == ArmatureChanged.Type.Created ||
+            type == ArmatureChanged.Type.Updated)
         {
             if (armature.Profile == null)
-                _logger.Warning("Armature created/rebound and profile is null");
+                _logger.Fatal("INTEGRITY ERROR: Armature created/rebound and profile is null");
 
-            OnProfileUpdateInternal(localPlayerCharacter, armature.Profile);
+            (Profile? activeProfile, Profile? oldProfile) = (null, null);
+            if (type == ArmatureChanged.Type.Created)
+                (activeProfile, oldProfile) = ((Profile?)arg3, null);
+            else
+                (activeProfile, oldProfile) = ((Profile?, Profile?))arg3;
+
+            if (activeProfile != null)
+            {
+                if (activeProfile == _profileManager.DefaultProfile)
+                    return; //default profiles are not allowed to be sent
+
+                if (activeProfile.ProfileType == ProfileType.Editor)
+                {
+                    if (activeProfile == oldProfile) //ignore any changes while player is in editor
+                        return;
+
+                    OnProfileUpdateInternal(localPlayerCharacter, null); //send empty profile when player enters editor
+                    return;
+                }
+            }
+
+            OnProfileUpdateInternal(localPlayerCharacter, activeProfile);
             return;
         }
 

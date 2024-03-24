@@ -200,7 +200,7 @@ public unsafe class Armature
 
         _partialSkeletons = newPartials.Select(x => x.ToArray()).ToArray();
 
-        RebuildBoneTemplateBinding();
+        RebuildBoneTemplateBinding(); //todo: intentionally not calling ArmatureChanged.Type.Updated because this is pending rewrite
 
         Plugin.Logger.Debug($"Rebuilt {this}");
     }
@@ -237,7 +237,7 @@ public unsafe class Armature
 
         _partialSkeletons = oldPartials.Select(x => x.ToArray()).ToArray();
 
-        RebuildBoneTemplateBinding();
+        RebuildBoneTemplateBinding(); //todo: intentionally not calling ArmatureChanged.Type.Updated because this is pending rewrite
 
         Plugin.Logger.Debug($"Augmented {this} with new bones");
     }

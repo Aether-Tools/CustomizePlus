@@ -41,6 +41,6 @@ public sealed class ProfileChanged() : EventWrapper<ProfileChanged.Type, Profile
         ProfileFileSystem,
         ArmatureManager,
         TemplateManager,
-        CustomizePlusIpc
+        CustomizePlusLegacyIpc
     }
 }

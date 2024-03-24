@@ -73,7 +73,7 @@ public class TemplateEditorManager
     /// <summary>
     /// Turn on editing of a specific template. If character name not set will default to local player.
     /// </summary>
-    internal bool EnableEditor(Template template, string? characterName = null) //todo: editor is borked
+    internal bool EnableEditor(Template template, string? characterName = null)
     {
         if (IsEditorActive || IsEditorPaused)
             return false;

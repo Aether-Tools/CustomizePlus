@@ -11,6 +11,7 @@ using CustomizePlus.Game.Services;
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.UI.Windows.Controls;
+using CustomizePlus.Templates;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 
@@ -20,6 +21,7 @@ public class ProfilePanel
     private readonly ProfileManager _manager;
     private readonly PluginConfiguration _configuration;
     private readonly TemplateCombo _templateCombo;
+    private readonly TemplateEditorManager _templateEditorManager;
 
     private string? _newName;
     private string? _newCharacterName;
@@ -36,12 +38,14 @@ public class ProfilePanel
         ProfileFileSystemSelector selector,
         ProfileManager manager,
         PluginConfiguration configuration,
-        TemplateCombo templateCombo)
+        TemplateCombo templateCombo,
+        TemplateEditorManager templateEditorManager)
     {
         _selector = selector;
         _manager = manager;
         _configuration = configuration;
         _templateCombo = templateCombo;
+        _templateEditorManager = templateEditorManager;
     }
 
     public void Draw()
@@ -139,8 +143,11 @@ public class ProfilePanel
         using (var style = ImRaii.PushStyle(ImGuiStyleVar.ItemSpacing, spacing))
         {
             var enabled = _selector.Selected?.Enabled ?? false;
-            if (ImGui.Checkbox("##Enabled", ref enabled))
-                _manager.SetEnabled(_selector.Selected!, enabled);
+            using (ImRaii.Disabled(_templateEditorManager.IsEditorActive || _templateEditorManager.IsEditorPaused))
+            {
+                if (ImGui.Checkbox("##Enabled", ref enabled))
+                    _manager.SetEnabled(_selector.Selected!, enabled);
+            }
             ImGuiUtil.LabeledHelpMarker("Enabled",
                 "Whether the templates in this profile should be applied at all. Only one profile can be enabled for a character at the same time.");
 

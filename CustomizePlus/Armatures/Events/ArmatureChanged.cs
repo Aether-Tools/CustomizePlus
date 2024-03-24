@@ -13,7 +13,10 @@ public sealed class ArmatureChanged() : EventWrapper<ArmatureChanged.Type, Armat
     {
         Created,
         Deleted,
-        Rebound
+        /// <summary>
+        /// Called when armature was rebound to other profile or bone template bindings were rebuilt
+        /// </summary>
+        Updated
     }
 
     public enum Priority

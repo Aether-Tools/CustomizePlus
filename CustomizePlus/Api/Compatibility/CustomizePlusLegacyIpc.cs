@@ -25,7 +25,7 @@ using Penumbra.GameData.Interop;
 
 namespace CustomizePlus.Api.Compatibility;
 
-[Obsolete("Will be removed in the next release")]
+[Obsolete("Will be removed in the near future, do not use this IPC")]
 public class CustomizePlusLegacyIpc : IDisposable
 {
     private readonly IObjectTable _objectTable;
@@ -73,7 +73,7 @@ public class CustomizePlusLegacyIpc : IDisposable
 
         InitializeProviders();
 
-        _profileChangedEvent.Subscribe(OnProfileChange, ProfileChanged.Priority.CustomizePlusIpc);
+        _profileChangedEvent.Subscribe(OnProfileChange, ProfileChanged.Priority.CustomizePlusLegacyIpc);
         _armatureChangedEvent.Subscribe(OnArmatureChanged, ArmatureChanged.Priority.CustomizePlusIpc);
     }
 
@@ -109,10 +109,10 @@ public class CustomizePlusLegacyIpc : IDisposable
             return;
 
         if (type == ArmatureChanged.Type.Created ||
-            type == ArmatureChanged.Type.Rebound)
+            type == ArmatureChanged.Type.Updated)
         {
             if(armature.Profile == null)
-                _logger.Warning("Armature created/rebound and profile is null");
+                _logger.Warning("[LEGACY IPC DO NOT USE] Armature created/rebound and profile is null");
 
             OnProfileUpdate(armature.Profile);
             return;
@@ -127,7 +127,7 @@ public class CustomizePlusLegacyIpc : IDisposable
 
     private void InitializeProviders()
     {
-        _logger.Debug("Initializing legacy Customize+ IPC providers.");
+        _logger.Debug("[LEGACY IPC DO NOT USE] Initializing legacy Customize+ IPC providers.");
         try
         {
             ProviderGetApiVersion = _pluginInterface.GetIpcProvider<(int, int)>(ProviderApiVersionLabel);
@@ -135,7 +135,7 @@ public class CustomizePlusLegacyIpc : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.Error($"Error registering legacy Customize+ IPC provider for {ProviderApiVersionLabel}: {ex}");
+            _logger.Error($"[LEGACY IPC DO NOT USE] Error registering legacy Customize+ IPC provider for {ProviderApiVersionLabel}: {ex}");
         }
 
         try
@@ -146,7 +146,7 @@ public class CustomizePlusLegacyIpc : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.Error($"Error registering legacy Customize+ IPC provider for {GetProfileFromCharacterLabel}: {ex}");
+            _logger.Error($"[LEGACY IPC DO NOT USE] Error registering legacy Customize+ IPC provider for {GetProfileFromCharacterLabel}: {ex}");
         }
 
         try
@@ -157,7 +157,7 @@ public class CustomizePlusLegacyIpc : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.Error($"Error registering legacy Customize+ IPC provider for {SetProfileToCharacterLabel}: {ex}");
+            _logger.Error($"[LEGACY IPC DO NOT USE] Error registering legacy Customize+ IPC provider for {SetProfileToCharacterLabel}: {ex}");
         }
 
         try
@@ -168,7 +168,7 @@ public class CustomizePlusLegacyIpc : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.Error($"Error registering legacy Customize+ IPC provider for {RevertCharacterLabel}: {ex}");
+            _logger.Error($"[LEGACY IPC DO NOT USE] Error registering legacy Customize+ IPC provider for {RevertCharacterLabel}: {ex}");
         }
         
         try
@@ -177,7 +177,7 @@ public class CustomizePlusLegacyIpc : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.Error($"Error registering legacy Customize+ IPC provider for {OnProfileUpdateLabel}: {ex}");
+            _logger.Error($"[LEGACY IPC DO NOT USE] Error registering legacy Customize+ IPC provider for {OnProfileUpdateLabel}: {ex}");
         }
     }
 
@@ -192,7 +192,7 @@ public class CustomizePlusLegacyIpc : IDisposable
 
     private void OnProfileUpdate(Profile? profile)
     {
-        _logger.Debug($"Sending local player update message: {(profile != null ? profile.ToString() : "no profile")}");
+        _logger.Debug($"[LEGACY IPC DO NOT USE] Sending local player update message: {(profile != null ? profile.ToString() : "no profile")}");
 
         var convertedProfile = profile != null ? GetVersion3Profile(profile) : null;
 
@@ -246,7 +246,7 @@ public class CustomizePlusLegacyIpc : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.Warning($"Unable to set body profile. Character: {character?.Name}, exception: {ex}, debug data: {GetBase64String(profileJson)}");
+            _logger.Warning($"[LEGACY IPC DO NOT USE] Unable to set body profile. Character: {character?.Name}, exception: {ex}, debug data: {GetBase64String(profileJson)}");
         }
     }
 

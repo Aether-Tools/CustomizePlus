@@ -163,28 +163,28 @@ public unsafe sealed class ArmatureManager : IDisposable
 
             if (armature.IsPendingProfileRebind)
             {
-                _logger.Debug($"Armature {armature} is pending profile rebind, rebinding...");
+                _logger.Debug($"Armature {armature} is pending profile/bone rebind, rebinding...");
                 armature.IsPendingProfileRebind = false;
 
                 var activeProfile = GetProfileForActor(actorIdentifier);
-                if (activeProfile == armature.Profile)
-                    continue;
-
-                if (activeProfile == null)
+                Profile? oldProfile = armature.Profile;
+                if (activeProfile != armature.Profile)
                 {
-                    _logger.Debug($"Removing armature {armature} because it doesn't have any active profiles");
-                    RemoveArmature(armature, ArmatureChanged.DeletionReason.NoActiveProfiles);
-                    continue;
+                    if (activeProfile == null)
+                    {
+                        _logger.Debug($"Removing armature {armature} because it doesn't have any active profiles");
+                        RemoveArmature(armature, ArmatureChanged.DeletionReason.NoActiveProfiles);
+                        continue;
+                    }
+
+                    armature.Profile.Armatures.Remove(armature);
+                    armature.Profile = activeProfile;
+                    activeProfile.Armatures.Add(armature);
                 }
 
-                Profile oldProfile = armature.Profile;
-
-                armature.Profile.Armatures.Remove(armature);
-                armature.Profile = activeProfile;
-                activeProfile.Armatures.Add(armature);
                 armature.RebuildBoneTemplateBinding();
 
-                _event.Invoke(ArmatureChanged.Type.Rebound, armature, activeProfile);
+                _event.Invoke(ArmatureChanged.Type.Updated, armature, (activeProfile, oldProfile));
             }
 
             //Needed because skeleton sometimes appears to be not ready when armature is created
@@ -379,7 +379,7 @@ public unsafe sealed class ArmatureManager : IDisposable
                     if (!profile.Enabled || profile.Armatures.Count == 0)
                         continue;
 
-                    profile.Armatures.ForEach(x => x.RebuildBoneTemplateBinding());
+                    profile.Armatures.ForEach(x => x.IsPendingProfileRebind = true);
                 }
             });
 
@@ -548,7 +548,7 @@ public unsafe sealed class ArmatureManager : IDisposable
 
         _logger.Debug($"ArmatureManager.OnProfileChange Added/Deleted/Moved/Changed template: {type}, data payload: {arg3?.ToString()}, profile: {profile.Name}->{profile.Enabled}->{profile.Armatures.Count} armatures");
 
-        profile!.Armatures.ForEach(x => x.RebuildBoneTemplateBinding());
+        profile!.Armatures.ForEach(x => x.IsPendingProfileRebind = true);
     }
 
     private IEnumerable<Armature> GetArmaturesForCharacterName(string characterName)

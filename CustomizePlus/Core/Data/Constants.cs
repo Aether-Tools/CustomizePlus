@@ -1,4 +1,5 @@
 ﻿using FFXIVClientStructs.Havok;
+using System.Numerics;
 
 namespace CustomizePlus.Core.Data;
 
@@ -79,4 +80,11 @@ internal static class Constants
     /// Movement hook address, used for position offset and other changes which cannot be done in main hook
     /// </summary>
     public const string MovementHookAddress = "E8 ?? ?? ?? ?? EB 29 48 8B 5F 08";
+
+    internal static class Colors
+    {
+        public static Vector4 Normal = new Vector4(1, 1, 1, 1);
+        public static Vector4 Warning = new Vector4(1, 0.5f, 0, 1);
+        public static Vector4 Error = new Vector4(1, 0, 0, 1);
+    }
 }

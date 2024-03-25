@@ -12,6 +12,10 @@ using CustomizePlus.Configuration.Data;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.UI.Windows.Controls;
 using CustomizePlus.Templates;
+using CustomizePlus.Core.Helpers;
+using System.Windows.Forms;
+using CustomizePlus.Core.Data;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 
@@ -147,16 +151,28 @@ public class ProfilePanel
             {
                 if (ImGui.Checkbox("##Enabled", ref enabled))
                     _manager.SetEnabled(_selector.Selected!, enabled);
+                ImGuiUtil.LabeledHelpMarker("Enabled",
+                    "Whether the templates in this profile should be applied at all. Only one profile can be enabled for a character at the same time.");
             }
-            ImGuiUtil.LabeledHelpMarker("Enabled",
-                "Whether the templates in this profile should be applied at all. Only one profile can be enabled for a character at the same time.");
 
             ImGui.SameLine();
             var isDefault = _manager.DefaultProfile == _selector.Selected;
-            if (ImGui.Checkbox("##DefaultProfile", ref isDefault))
-                _manager.SetDefaultProfile(isDefault ? _selector.Selected! : null);
-            ImGuiUtil.LabeledHelpMarker("Default profile (Players and Retainers only)",
-                "Whether the templates in this profile are applied to all players and retainers without a specific profile. Only one profile can be default at the same time.");
+            var isDefaultEnabled = _manager.DefaultProfile?.Enabled ?? false;
+            using (ImRaii.Disabled(isDefaultEnabled))
+            {
+                if (ImGui.Checkbox("##DefaultProfile", ref isDefault))
+                    _manager.SetDefaultProfile(isDefault ? _selector.Selected! : null);
+                ImGuiUtil.LabeledHelpMarker("Default profile (Players and Retainers only)",
+                    "Whether the templates in this profile are applied to all players and retainers without a specific profile. Only one profile can be default at the same time.");
+            }
+            if(isDefaultEnabled)
+            {
+                ImGui.SameLine();
+                ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Warning);
+                ImGuiUtil.PrintIcon(FontAwesomeIcon.ExclamationTriangle);
+                ImGui.PopStyleColor();
+                ImGuiUtil.HoverTooltip("Can only be changed while the default profile is disabled.");
+            }
         }
     }
 
@@ -224,7 +240,7 @@ public class ProfilePanel
                 if (ImGui.Checkbox("##LimitLookupToOwnedObjects", ref enabled))
                     _manager.SetLimitLookupToOwned(_selector.Selected!, enabled);
                 ImGuiUtil.LabeledHelpMarker("Limit to my creatures",
-                    "When enabled limits the character search to only your own summons, mounts and minions.\nUseful when there is possibility there will be another character with that name owned by another player.\n* For battle chocobo use \"Chocobo\" as character name.\n** If you are changing root scale for mount and want to keep your scale make sure your own scale is set to anything other than default value.");
+                    "When enabled limits the character search to only your own summons, mounts and minions.\nUseful when there is possibility there will be another character with that name owned by another player.\n* For battle chocobo use \"Chocobo\" as character name.");
             }
         }
     }

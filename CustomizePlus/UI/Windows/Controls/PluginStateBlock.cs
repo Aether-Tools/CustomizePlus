@@ -8,6 +8,7 @@ using CustomizePlus.Configuration.Data;
 using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.Api;
+using CustomizePlus.Core.Data;
 
 namespace CustomizePlus.UI.Windows.Controls;
 
@@ -19,10 +20,6 @@ public class PluginStateBlock
     private readonly FantasiaPlusDetectService _fantasiaPlusDetectService;
     private readonly HookingService _hookingService;
     private readonly CustomizePlusIpc _ipcService;
-
-    private static Vector4 normalColor = new Vector4(1, 1, 1, 1);
-    private static Vector4 warnColor = new Vector4(1, 0.5f, 0, 1);
-    private static Vector4 errorColor = new Vector4(1, 0, 0, 1);
 
     public PluginStateBlock(
         BoneEditorPanel boneEditorPanel,
@@ -55,11 +52,6 @@ public class PluginStateBlock
             severity = PluginStateSeverity.Error;
             message = $"Fantasia+ detected. The plugin is disabled until Fantasia+ is disabled and the game is restarted.";
         }
-        else if (_gameStateService.GameInPosingMode())
-        {
-            severity = PluginStateSeverity.Warning;
-            message = $"GPose active. Compatibility with posing tools is limited.";
-        }
         else if (!_configuration.PluginEnabled)
         {
             severity = PluginStateSeverity.Warning;
@@ -80,7 +72,12 @@ public class PluginStateBlock
                 message = $"Editor is active.{(_boneEditorPanel.HasChanges ? " You have unsaved changes, finish template bone editing to open save/revert dialog." : "")}";
             }
         }
-        else if (_ipcService.IPCFailed) //this is low priority error
+        else if (_gameStateService.GameInPosingMode())
+        {
+            severity = PluginStateSeverity.Warning;
+            message = $"GPose active. Compatibility with posing tools is limited.";
+        }
+        else if (_ipcService.IPCFailed) //this is a low priority error
         {
             severity = PluginStateSeverity.Error;
             message = $"Detected failure in IPC. Integrations with other plugins will not function.";
@@ -91,16 +88,16 @@ public class PluginStateBlock
             ImGui.SetCursorPos(new Vector2(ImGui.GetWindowContentRegionMax().X - ImGui.CalcTextSize(message).X - 30, yPos - ImGuiHelpers.GlobalScale));
 
             var icon = FontAwesomeIcon.InfoCircle;
-            var color = normalColor;
+            var color = Constants.Colors.Normal;
             switch (severity)
             {
                 case PluginStateSeverity.Warning:
                     icon = FontAwesomeIcon.ExclamationTriangle;
-                    color = warnColor;
+                    color = Constants.Colors.Warning;
                     break;
                 case PluginStateSeverity.Error:
                     icon = FontAwesomeIcon.ExclamationTriangle;
-                    color = errorColor;
+                    color = Constants.Colors.Error;
                     break;
             }
 

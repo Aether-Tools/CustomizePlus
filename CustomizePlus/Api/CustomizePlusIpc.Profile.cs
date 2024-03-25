@@ -152,12 +152,6 @@ public partial class CustomizePlusIpc
         if (!actor.Valid)
             return ((int)ErrorCode.InvalidCharacter, null);
 
-        /*if (character == _objectTable[0])
-        {
-            _logger.Error($"Received request to set profile on local character, this is not allowed");
-            return;
-        }*/
-
         try
         {
             IPCCharacterProfile? profile;
@@ -203,12 +197,6 @@ public partial class CustomizePlusIpc
         var actor = (Actor)character.Address;
         if (!actor.Valid)
             return (int)ErrorCode.InvalidCharacter;
-
-        /*if (character == _objectTable[0])
-        {
-            _logger.Error($"Received request to revert profile on local character, this is not allowed");
-            return;
-        }*/
 
         try
         {
@@ -269,7 +257,7 @@ public partial class CustomizePlusIpc
         }
     }
 
-    //warn: limitation - ignores default profiles but why you would use default profile on your own character
+    //warn: intended limitation - ignores default profiles because why you would use default profile on your own character
     private void OnArmatureChanged(ArmatureChanged.Type type, Armature armature, object? arg3)
     {
         string currentPlayerName = _gameObjectService.GetCurrentPlayerName();
@@ -295,18 +283,23 @@ public partial class CustomizePlusIpc
 
             if (activeProfile != null)
             {
-                if (activeProfile == _profileManager.DefaultProfile)
-                    return; //default profiles are not allowed to be sent
-
-                if (activeProfile.ProfileType == ProfileType.Editor)
+                if (activeProfile == _profileManager.DefaultProfile || activeProfile.ProfileType == ProfileType.Editor)
                 {
-                    if (activeProfile == oldProfile) //ignore any changes while player is in editor
+                    //ignore any changes while player is in editor or if player changes between default profiles
+                    //also do not send event if there were no active profile before
+                    if (activeProfile == oldProfile || oldProfile == null)
                         return;
 
-                    OnProfileUpdateInternal(localPlayerCharacter, null); //send empty profile when player enters editor
+                    OnProfileUpdateInternal(localPlayerCharacter, null); //send empty profile when player enters editor or turns on default profile
                     return;
                 }
             }
+
+            //do not send event if we are exiting editor or disabling default profile and don't have any active profile
+            if (oldProfile != null &&
+                (oldProfile == _profileManager.DefaultProfile || oldProfile.ProfileType == ProfileType.Editor) &&
+                activeProfile == null)
+                return;
 
             OnProfileUpdateInternal(localPlayerCharacter, activeProfile);
             return;
@@ -314,6 +307,10 @@ public partial class CustomizePlusIpc
 
         if (type == ArmatureChanged.Type.Deleted)
         {
+            //Do not send event if default or editor profile was used
+            if (armature.Profile == _profileManager.DefaultProfile || armature.Profile.ProfileType == ProfileType.Editor)
+                return;
+
             OnProfileUpdateInternal(localPlayerCharacter, null);
             return;
         }

@@ -197,7 +197,7 @@ public class SettingsTab
     {
         var isChecked = _configuration.DebuggingModeEnabled;
         if (CtrlHelper.CheckboxWithTextAndHelp("##debugmode", "Debug mode",
-                "Enables debug mode", ref isChecked))
+                "Enables debug mode. Requires plugin restart for all features to become properly initialized.", ref isChecked))
         {
             _configuration.DebuggingModeEnabled = isChecked;
             _configuration.Save();

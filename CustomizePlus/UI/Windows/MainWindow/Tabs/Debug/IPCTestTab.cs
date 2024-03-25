@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using IPCProfileDataTuple = (System.Guid UniqueId, string Name, string VirtualPath, string CharacterName, bool IsEnabled);
 using OtterGui.Log;
 using CustomizePlus.Core.Extensions;
+using CustomizePlus.Configuration.Data;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 
@@ -85,7 +86,8 @@ public class IPCTestTab //: IDisposable
         ObjectManager objectManager,
         GameObjectService gameObjectService,
         ActorManager actorManager,
-        Logger logger)
+        Logger logger,
+        PluginConfiguration configuration)
     {
         _objectTable = objectTable;
         _profileManager = profileManager;
@@ -95,7 +97,8 @@ public class IPCTestTab //: IDisposable
         _actorManager = actorManager;
         _logger = logger;
 
-        EzIPC.Init(this, "CustomizePlus");
+        if(configuration.DebuggingModeEnabled)
+            EzIPC.Init(this, "CustomizePlus"); //do not init EzIPC if debugging disabled so no debug event hook is created
 
         if (_getApiVersionIpcFunc != null)
             _apiVersion = _getApiVersionIpcFunc();

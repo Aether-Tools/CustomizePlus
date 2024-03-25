@@ -129,8 +129,8 @@ public unsafe sealed class ArmatureManager : IDisposable
             foreach (var profile in _profileManager.GetEnabledProfilesByActor(identifier))
             {
                 if (profile.LimitLookupToOwnedObjects &&
-                    identifier.Type == IdentifierType.Owned &&
-                    identifier.PlayerName != _objectManager.PlayerData.Identifier.PlayerName)
+                    (identifier.Type != IdentifierType.Owned ||
+                    identifier.PlayerName != _objectManager.PlayerData.Identifier.PlayerName))
                     continue;
 
                 return profile;

@@ -50,7 +50,7 @@ public class GameObjectService
     /// <returns></returns>
     public IEnumerable<(ActorIdentifier, Actor)> FindActorsByName(string name)
     {
-        foreach (var kvPair in _objectManager)
+        foreach (var kvPair in _objectManager.Identifiers)
         {
             var identifier = kvPair.Key;
 

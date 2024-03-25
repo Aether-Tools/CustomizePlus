@@ -88,7 +88,7 @@ public class StateMonitoringTab
 
     private void DrawObjectManager()
     {
-        foreach (var kvPair in _objectManager)
+        foreach (var kvPair in _objectManager.Identifiers)
         {
             var show = ImGui.CollapsingHeader($"{kvPair.Key} ({kvPair.Value.Objects.Count} objects)###object-{kvPair.Key}");
 

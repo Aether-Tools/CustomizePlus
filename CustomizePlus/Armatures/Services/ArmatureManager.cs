@@ -139,7 +139,7 @@ public unsafe sealed class ArmatureManager : IDisposable
             return null;
         }
 
-        foreach (var obj in _objectManager)
+        foreach (var obj in _objectManager.Identifiers)
         {
             var actorIdentifier = obj.Key.CreatePermanent();
             if (!Armatures.ContainsKey(actorIdentifier))

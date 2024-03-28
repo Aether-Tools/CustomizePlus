@@ -159,7 +159,7 @@ public class BoneEditorPanel
                         _configuration.Save();
                     }
                     ImGuiUtil.LabeledHelpMarker("Limit to my creatures",
-                        "When enabled limits the character search to only your own summons, mounts and minions.\nUseful when there is possibility there will be another character with that name owned by another player.\n* For battle chocobo use \"Chocobo\" as character name.\n** If you are changing root scale for mount and want to keep your scale make sure your own scale is set to anything other than default value.");
+                        "When enabled limits the character search to only your own summons, mounts and minions.\nUseful when there is possibility there will be another character with that name owned by another player.\n* For battle chocobo use \"Chocobo\" as character name.");
                 }
             }
 

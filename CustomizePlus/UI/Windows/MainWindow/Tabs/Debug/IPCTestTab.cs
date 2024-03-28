@@ -310,7 +310,7 @@ public class IPCTestTab //: IDisposable
     }
 
     [EzIPCEvent("Profile.OnUpdate")]
-    private void OnProfileUpdate(Character Character, Guid? ProfileUniqueId)
+    private void OnProfileUpdate(Character Character, Guid ProfileUniqueId)
     {
         _logger.Debug($"IPC Test Tab - OnProfileUpdate: Character: {Character.Name.ToString().Incognify()}, Profile ID: {(ProfileUniqueId != Guid.Empty ? ProfileUniqueId.ToString() : "no id")}");
     }

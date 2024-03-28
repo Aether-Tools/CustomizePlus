@@ -30,13 +30,18 @@ public class CPlusChangeLog
     }
 
     private static void Add2_0_2_2(Changelog log)
-    => log.NextVersion("Version 2.0.2.2")
-        .RegisterHighlight("Added brand new IPC (version 4) for cross-plugin interraction. (2.0.2.0)")
-        .RegisterEntry("Please refer to repository readme on GitHub for information about using it.", 1)
-        .RegisterImportant("Old IPC (version 3) is still available, but it will be removed sometime before Dawntrail release. Plugin developers are advised to migrate as soon as possible.", 1)
-        .RegisterEntry("Updated to .NET 8. (2.0.2.0)")
-        .RegisterEntry("Updated external libraries. (2.0.2.1)")
-        .RegisterEntry("Added additional cleanup of user input. (2.0.2.0)");
+        => log.NextVersion("Version 2.0.2.2")
+            .RegisterHighlight("Added brand new IPC (version 4) for cross-plugin interraction. (2.0.2.0)")
+            .RegisterEntry("Please refer to repository readme on GitHub for information about using it.", 1)
+            .RegisterImportant("Old IPC (version 3) is still available, but it will be removed sometime before Dawntrail release. Plugin developers are advised to migrate as soon as possible.", 1)
+            .RegisterEntry("Updated to .NET 8. (2.0.2.0)")
+            .RegisterEntry("Updated external libraries. (2.0.2.1)")
+            .RegisterEntry("Added additional cleanup of user input. (2.0.2.0)")
+            .RegisterEntry("Selected default profile can no longer be changed if profile set as default is enabled. (2.0.2.1)")
+            .RegisterEntry("Profiles can no longer be enabled/disabled while editor is active. (2.0.2.1)")
+            .RegisterEntry("Fixed incorrect warning message priorities in main window. (2.0.2.1)")
+            .RegisterEntry("Fixed \"Limit to my creatures\" not ignoring objects other than minions and mounts. (2.0.2.1)")
+            .RegisterEntry("Fixed text in various places. (2.0.2.1)");
 
     private static void Add2_0_1_0(Changelog log)
         => log.NextVersion("Version 2.0.1.0")

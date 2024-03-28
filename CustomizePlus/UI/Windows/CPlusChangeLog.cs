@@ -16,6 +16,7 @@ public class CPlusChangeLog
 
         Add2_0_0_0(Changelog);
         Add2_0_1_0(Changelog);
+        Add2_0_2_2(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -27,6 +28,15 @@ public class CPlusChangeLog
         _config.ChangelogSettings.ChangeLogDisplayType = type;
         _config.Save();
     }
+
+    private static void Add2_0_2_2(Changelog log)
+    => log.NextVersion("Version 2.0.2.2")
+        .RegisterHighlight("Added brand new IPC (version 4) for cross-plugin interraction. (2.0.2.0)")
+        .RegisterEntry("Please refer to repository readme on GitHub for information about using it.", 1)
+        .RegisterImportant("Old IPC (version 3) is still available, but it will be removed sometime before Dawntrail release. Plugin developers are advised to migrate as soon as possible.", 1)
+        .RegisterEntry("Updated to .NET 8. (2.0.2.0)")
+        .RegisterEntry("Updated external libraries. (2.0.2.1)")
+        .RegisterEntry("Added additional cleanup of user input. (2.0.2.0)");
 
     private static void Add2_0_1_0(Changelog log)
         => log.NextVersion("Version 2.0.1.0")

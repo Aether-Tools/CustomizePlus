@@ -40,7 +40,7 @@ public class CPlusChangeLog
             .RegisterEntry("Selected default profile can no longer be changed if profile set as default is enabled. (2.0.2.1)")
             .RegisterEntry("Profiles can no longer be enabled/disabled while editor is active. (2.0.2.1)")
             .RegisterEntry("Fixed incorrect warning message priorities in main window. (2.0.2.1)")
-            .RegisterEntry("Fixed \"Limit to my creatures\" not ignoring objects other than minions and mounts. (2.0.2.1)")
+            .RegisterEntry("Fixed \"Limit to my creatures\" not ignoring objects other than summons, minions and mounts. (2.0.2.1)")
             .RegisterEntry("Fixed text in various places. (2.0.2.1)");
 
     private static void Add2_0_1_0(Changelog log)

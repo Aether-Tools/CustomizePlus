@@ -22,6 +22,7 @@ using CustomizePlus.Armatures.Events;
 using CustomizePlus.Armatures.Data;
 using CustomizePlus.GameData.Extensions;
 using Penumbra.GameData.Interop;
+using CustomizePlus.Profiles.Exceptions;
 
 namespace CustomizePlus.Api.Compatibility;
 
@@ -265,7 +266,14 @@ public class CustomizePlusLegacyIpc : IDisposable
             return;
         }*/
 
-        _profileManager.RemoveTemporaryProfile(actor);
+        try
+        {
+            _profileManager.RemoveTemporaryProfile(actor);
+        }
+        catch (Exception ex)
+        {
+            _logger.Warning($"[LEGACY IPC DO NOT USE] Unable to revert character. Character: {character?.Name}, exception: {ex}");
+        }
     }
 
     private string GetBase64String(string data)

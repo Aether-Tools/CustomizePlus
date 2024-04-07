@@ -553,16 +553,10 @@ public unsafe sealed class ArmatureManager : IDisposable
 
     private IEnumerable<Armature> GetArmaturesForCharacterName(string characterName)
     {
-        var actors = _gameObjectService.FindActorsByName(characterName).ToList();
-        if (actors.Count == 0)
-            yield break;
-
-        foreach (var actorData in actors)
+        foreach(var kvPair in Armatures)
         {
-            if (!Armatures.TryGetValue(actorData.Item1, out var armature))
-                continue;
-
-            yield return armature;
+            if(kvPair.Key.ToNameWithoutOwnerName() == characterName)
+                yield return kvPair.Value;
         }
     }
 }

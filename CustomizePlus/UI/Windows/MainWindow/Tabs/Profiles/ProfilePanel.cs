@@ -157,21 +157,21 @@ public class ProfilePanel
 
             ImGui.SameLine();
             var isDefault = _manager.DefaultProfile == _selector.Selected;
-            var isDefaultEnabled = _manager.DefaultProfile?.Enabled ?? false;
-            using (ImRaii.Disabled(isDefaultEnabled))
+            var isDefaultOrCurrentProfilesEnabled = _manager.DefaultProfile?.Enabled ?? false || enabled;
+            using (ImRaii.Disabled(isDefaultOrCurrentProfilesEnabled))
             {
                 if (ImGui.Checkbox("##DefaultProfile", ref isDefault))
                     _manager.SetDefaultProfile(isDefault ? _selector.Selected! : null);
                 ImGuiUtil.LabeledHelpMarker("Default profile (Players and Retainers only)",
                     "Whether the templates in this profile are applied to all players and retainers without a specific profile. Only one profile can be default at the same time.");
             }
-            if(isDefaultEnabled)
+            if(isDefaultOrCurrentProfilesEnabled)
             {
                 ImGui.SameLine();
                 ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Warning);
                 ImGuiUtil.PrintIcon(FontAwesomeIcon.ExclamationTriangle);
                 ImGui.PopStyleColor();
-                ImGuiUtil.HoverTooltip("Can only be changed while the default profile is disabled.");
+                ImGuiUtil.HoverTooltip("Can only be changed while currently selected and the default profiles are disabled.");
             }
         }
     }

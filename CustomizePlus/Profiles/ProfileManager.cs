@@ -583,9 +583,18 @@ public class ProfileManager : IDisposable
 
             var profile = armature!.Profile;
 
+            if (!profile.IsTemporary)
+                return;
+
+            //Do not proceed unless there are no armatures left
+            //because this might be the case of examine window actor being gone.
+            //Profiles for those are shared with the original actor.
+            if (profile.Armatures.Count > 0)
+                return;
+
             //todo: TemporaryProfileDeleted ends up calling this again, fix this.
             //Profiles.Remove check won't allow for infinite loop but this isn't good anyway
-            if (!profile.IsTemporary || !Profiles.Remove(profile))
+            if (!Profiles.Remove(profile))
                 return;
 
             _logger.Debug($"ProfileManager.OnArmatureChange: Removed unused temporary profile for {profile.CharacterName}");

@@ -145,6 +145,7 @@ public partial class CustomizePlusIpc
     [EzIPC("Profile.SetTemporaryProfileOnCharacter")]
     private (int, Guid?) SetTemporaryProfileOnCharacter(Character character, string profileJson)
     {
+        //todo: do not allow to set temporary profile on reserved actors (examine, etc)
         if (character == null)
             return ((int)ErrorCode.InvalidCharacter, null);
 

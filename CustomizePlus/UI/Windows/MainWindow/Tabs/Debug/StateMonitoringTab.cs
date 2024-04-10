@@ -96,7 +96,7 @@ public class StateMonitoringTab
                 continue;
 
             ImGui.Text($"ActorIdentifier");
-            ImGui.Text($"PlayerName: {kvPair.Key.PlayerName}");
+            ImGui.Text($"PlayerName: {kvPair.Key.PlayerName.ToString()}");
             ImGui.Text($"HomeWorld: {kvPair.Key.HomeWorld}");
             ImGui.Text($"Retainer: {kvPair.Key.Retainer}");
             ImGui.Text($"Kind: {kvPair.Key.Kind}");
@@ -106,6 +106,8 @@ public class StateMonitoringTab
             ImGui.Text($"Special: {kvPair.Key.Special.ToString()}");
             ImGui.Text($"ToName: {kvPair.Key.ToName()}");
             ImGui.Text($"ToNameWithoutOwnerName: {kvPair.Key.ToNameWithoutOwnerName()}");
+            if(kvPair.Key.Type == Penumbra.GameData.Enums.IdentifierType.Special)
+                ImGui.Text($"True actor: {kvPair.Key.GetTrueActorForSpecialType().ToName()}");
 
             ImGui.Spacing();
             ImGui.Spacing();

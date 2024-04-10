@@ -111,8 +111,10 @@ public unsafe sealed class ArmatureManager : IDisposable
         foreach (var kvPair in Armatures.ToList())
         {
             var armature = kvPair.Value;
+            //Only remove armatures which haven't been seen for a while
+            //But remove armatures of special actors (like examine screen) right away
             if (!_objectManager.ContainsKey(kvPair.Value.ActorIdentifier) &&
-                armature.LastSeen <= armatureExpirationDateTime) //Only remove armatures which haven't been seen for a while
+                (armature.LastSeen <= armatureExpirationDateTime || armature.ActorIdentifier.Type == IdentifierType.Special))
             {
                 _logger.Debug($"Removing armature {armature} because {kvPair.Key.IncognitoDebug()} is gone");
                 RemoveArmature(armature, ArmatureChanged.DeletionReason.Gone);
@@ -124,27 +126,12 @@ public unsafe sealed class ArmatureManager : IDisposable
             armature.IsVisible = armature.LastSeen.AddSeconds(1) >= currentTime;
         }
 
-        Profile? GetProfileForActor(ActorIdentifier identifier)
-        {
-            foreach (var profile in _profileManager.GetEnabledProfilesByActor(identifier))
-            {
-                if (profile.LimitLookupToOwnedObjects &&
-                    (identifier.Type != IdentifierType.Owned ||
-                    identifier.PlayerName != _objectManager.PlayerData.Identifier.PlayerName))
-                    continue;
-
-                return profile;
-            }
-
-            return null;
-        }
-
         foreach (var obj in _objectManager.Identifiers)
         {
             var actorIdentifier = obj.Key.CreatePermanent();
             if (!Armatures.ContainsKey(actorIdentifier))
             {
-                var activeProfile = GetProfileForActor(actorIdentifier);
+                var activeProfile = _profileManager.GetEnabledProfilesByActor(actorIdentifier).FirstOrDefault();
                 if (activeProfile == null)
                     continue;
 
@@ -166,7 +153,7 @@ public unsafe sealed class ArmatureManager : IDisposable
                 _logger.Debug($"Armature {armature} is pending profile/bone rebind, rebinding...");
                 armature.IsPendingProfileRebind = false;
 
-                var activeProfile = GetProfileForActor(actorIdentifier);
+                var activeProfile = _profileManager.GetEnabledProfilesByActor(actorIdentifier).FirstOrDefault();
                 Profile? oldProfile = armature.Profile;
                 if (activeProfile != armature.Profile)
                 {
@@ -555,7 +542,11 @@ public unsafe sealed class ArmatureManager : IDisposable
     {
         foreach(var kvPair in Armatures)
         {
-            if(kvPair.Key.ToNameWithoutOwnerName() == characterName)
+            var actorIdentifier = kvPair.Key;
+            if (actorIdentifier.Type == IdentifierType.Special)
+                actorIdentifier = actorIdentifier.GetTrueActorForSpecialType();
+
+            if(actorIdentifier.ToNameWithoutOwnerName() == characterName)
                 yield return kvPair.Value;
         }
     }

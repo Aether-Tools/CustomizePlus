@@ -25,6 +25,7 @@ using CustomizePlus.Profiles.Enums;
 using CustomizePlus.Profiles.Exceptions;
 using Penumbra.GameData.Enums;
 using Penumbra.GameData.Interop;
+using System.Runtime.Serialization;
 
 namespace CustomizePlus.Profiles;
 
@@ -487,17 +488,21 @@ public class ProfileManager : IDisposable
         if (name.IsNullOrWhitespace())
             yield break;
 
-        if (_templateEditorManager.IsEditorActive && _templateEditorManager.EditorProfile.Enabled)
+        bool IsProfileAppliesToCurrentActor(Profile profile)
         {
-            if (ProfileAppliesTo(_templateEditorManager.EditorProfile, name))
-            {
-                yield return _templateEditorManager.EditorProfile;
-            }
+            return profile.CharacterName.Text == name &&
+                (!profile.LimitLookupToOwnedObjects ||
+                    (actorIdentifier.Type == IdentifierType.Owned &&
+                    actorIdentifier.PlayerName != _actorManager.GetCurrentPlayer().PlayerName));
         }
+
+
+        if (_templateEditorManager.IsEditorActive && _templateEditorManager.EditorProfile.Enabled && IsProfileAppliesToCurrentActor(_templateEditorManager.EditorProfile))
+            yield return _templateEditorManager.EditorProfile;
 
         foreach (var profile in Profiles)
         {
-            if (ProfileAppliesTo(profile, name) && profile.Enabled)
+            if (IsProfileAppliesToCurrentActor(profile) && profile.Enabled)
                 yield return profile;
         }
 
@@ -519,11 +524,6 @@ public class ProfileManager : IDisposable
         if (_templateEditorManager.EditorProfile.Templates.Contains(template))
             yield return _templateEditorManager.EditorProfile;
     }
-
-    /// <summary>
-    /// Returns whether or not profile applies to the object with the indicated name.
-    /// </summary>
-    public bool ProfileAppliesTo(Profile profile, string objectName) => !string.IsNullOrWhiteSpace(objectName) && objectName == profile.CharacterName.Text;
 
     private void SaveProfile(Profile profile)
     {

@@ -11,6 +11,7 @@ using CustomizePlus.GameData.Extensions;
 using CustomizePlus.GameData.Services;
 using CustomizePlus.Core.Extensions;
 using System.Numerics;
+using CustomizePlus.Game.Services;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 
@@ -20,17 +21,20 @@ public class StateMonitoringTab
     private readonly TemplateManager _templateManager;
     private readonly ArmatureManager _armatureManager;
     private readonly ObjectManager _objectManager;
+    private readonly GameObjectService _gameObjectService;
 
     public StateMonitoringTab(
         ProfileManager profileManager,
         TemplateManager templateManager,
         ArmatureManager armatureManager,
-        ObjectManager objectManager)
+        ObjectManager objectManager,
+        GameObjectService gameObjectService)
     {
         _profileManager = profileManager;
         _templateManager = templateManager;
         _armatureManager = armatureManager;
         _objectManager = objectManager;
+        _gameObjectService = gameObjectService;
     }
 
     public void Draw()
@@ -106,8 +110,8 @@ public class StateMonitoringTab
             ImGui.Text($"Special: {kvPair.Key.Special.ToString()}");
             ImGui.Text($"ToName: {kvPair.Key.ToName()}");
             ImGui.Text($"ToNameWithoutOwnerName: {kvPair.Key.ToNameWithoutOwnerName()}");
-            if(kvPair.Key.Type == Penumbra.GameData.Enums.IdentifierType.Special)
-                ImGui.Text($"True actor: {kvPair.Key.GetTrueActorForSpecialType().ToName()}");
+            (var actorIdentifier, var specialResult) = _gameObjectService.GetTrueActorForSpecialTypeActor(kvPair.Key);
+            ImGui.Text($"True actor: {actorIdentifier.ToName()} ({specialResult})");
 
             ImGui.Spacing();
             ImGui.Spacing();

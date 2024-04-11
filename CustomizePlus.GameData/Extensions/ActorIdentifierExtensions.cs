@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Penumbra.GameData.Actors;
 using Penumbra.GameData.Enums;
+using Penumbra.GameData.Interop;
 using PenumbraExtensions = Penumbra.GameData.Actors.ActorIdentifierExtensions;
 
 namespace CustomizePlus.GameData.Extensions;
@@ -79,49 +80,5 @@ public static class ActorIdentifierExtensions
             default:
                 return false;
         }
-    }
-
-    /// <summary>
-    /// Get "true" actor for special actors. Returns ActorIdentifier.Invalid for non-special actors or if actor cannot be found.
-    /// </summary>
-    /// <param name="identifier"></param>
-    /// <returns></returns>
-    /// <exception cref="Exception"></exception>
-    public static ActorIdentifier GetTrueActorForSpecialType(this ActorIdentifier identifier)
-    {
-        if (!identifier.IsValid)
-            return ActorIdentifier.Invalid;
-
-        if (identifier.Type != IdentifierType.Special)
-            return ActorIdentifier.Invalid;
-
-        if (PenumbraExtensions.Manager == null)
-            throw new Exception("ActorIdentifier.Manager is not initialized");
-
-        switch (identifier.Special)
-        {
-            case ScreenActor.GPosePlayer:
-            case ScreenActor.CharacterScreen:
-            case ScreenActor.FittingRoom:
-            case ScreenActor.DyePreview:
-            case ScreenActor.Portrait:
-                return PenumbraExtensions.Manager.GetCurrentPlayer();
-            case ScreenActor.ExamineScreen:
-                var examineIdentifier = PenumbraExtensions.Manager.GetInspectPlayer();
-
-                if (!examineIdentifier.IsValid)
-                    examineIdentifier = PenumbraExtensions.Manager.GetGlamourPlayer(); //returns ActorIdentifier.Invalid if player is invalid
-
-                if (!examineIdentifier.IsValid)
-                    return ActorIdentifier.Invalid;
-
-                return examineIdentifier;
-            case ScreenActor.Card6:
-            case ScreenActor.Card7:
-            case ScreenActor.Card8:
-                return PenumbraExtensions.Manager.GetCardPlayer();
-        }
-
-        return ActorIdentifier.Invalid;
     }
 }

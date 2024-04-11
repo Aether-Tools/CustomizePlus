@@ -100,6 +100,15 @@ public unsafe sealed class ArmatureManager : IDisposable
     }
 
     /// <summary>
+    /// Force profile rebind for all armatures
+    /// </summary>
+    public void RebindAllArmatures()
+    {
+        foreach (var kvPair in Armatures)
+            kvPair.Value.IsPendingProfileRebind = true;
+    }
+
+    /// <summary>
     /// Deletes armatures which no longer have actor associated with them and creates armatures for new actors
     /// </summary>
     private void RefreshArmatures()
@@ -542,9 +551,7 @@ public unsafe sealed class ArmatureManager : IDisposable
     {
         foreach(var kvPair in Armatures)
         {
-            var actorIdentifier = kvPair.Key;
-            if (actorIdentifier.Type == IdentifierType.Special)
-                actorIdentifier = actorIdentifier.GetTrueActorForSpecialType();
+            (var actorIdentifier, _) = _gameObjectService.GetTrueActorForSpecialTypeActor(kvPair.Key);
 
             if(actorIdentifier.ToNameWithoutOwnerName() == characterName)
                 yield return kvPair.Value;

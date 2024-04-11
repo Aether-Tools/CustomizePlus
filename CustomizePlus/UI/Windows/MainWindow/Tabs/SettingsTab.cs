@@ -14,6 +14,7 @@ using CustomizePlus.Configuration.Data;
 using CustomizePlus.Profiles;
 using CustomizePlus.Templates;
 using CustomizePlus.Core.Helpers;
+using CustomizePlus.Armatures.Services;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs;
 
@@ -22,29 +23,23 @@ public class SettingsTab
     private const uint DiscordColor = 0xFFDA8972;
 
     private readonly PluginConfiguration _configuration;
-    private readonly TemplateManager _templateManager;
-    private readonly ProfileManager _profileManager;
+    private readonly ArmatureManager _armatureManager;
     private readonly HookingService _hookingService;
-    private readonly SaveService _saveService;
     private readonly TemplateEditorManager _templateEditorManager;
     private readonly CPlusChangeLog _changeLog;
     private readonly MessageService _messageService;
 
     public SettingsTab(
         PluginConfiguration configuration,
-        TemplateManager templateManager,
-        ProfileManager profileManager,
+        ArmatureManager armatureManager,
         HookingService hookingService,
-        SaveService saveService,
         TemplateEditorManager templateEditorManager,
         CPlusChangeLog changeLog,
         MessageService messageService)
     {
         _configuration = configuration;
-        _templateManager = templateManager;
-        _profileManager = profileManager;
+        _armatureManager = armatureManager;
         _hookingService = hookingService;
-        _saveService = saveService;
         _templateEditorManager = templateEditorManager;
         _changeLog = changeLog;
         _messageService = messageService;
@@ -63,6 +58,7 @@ public class SettingsTab
 
         using (var child2 = ImRaii.Child("SettingsChild"))
         {
+            DrawProfileApplicationSettings();
             DrawInterface();
             DrawCommands();
             DrawAdvancedSettings();
@@ -92,6 +88,73 @@ public class SettingsTab
                 _configuration.Save();
                 _hookingService.ReloadHooks();
             }
+        }
+    }
+    #endregion
+
+    #region Profile application settings
+    private void DrawProfileApplicationSettings()
+    {
+        var isShouldDraw = ImGui.CollapsingHeader("Profile Application");
+
+        if (!isShouldDraw)
+            return;
+
+        DrawApplyInCharacterWindowCheckbox();
+        DrawApplyInTryOnCheckbox();
+        DrawApplyInCardsCheckbox();
+        DrawApplyInInspectCheckbox();
+    }
+
+    private void DrawApplyInCharacterWindowCheckbox()
+    {
+        var isChecked = _configuration.ProfileApplicationSettings.ApplyInCharacterWindow;
+
+        if (CtrlHelper.CheckboxWithTextAndHelp("##applyincharwindow", "Apply Profiles in Character Window",
+                "Apply profile for your character in your main character window, if it is set.", ref isChecked))
+        {
+            _configuration.ProfileApplicationSettings.ApplyInCharacterWindow = isChecked;
+            _configuration.Save();
+            _armatureManager.RebindAllArmatures();
+        }
+    }
+
+    private void DrawApplyInTryOnCheckbox()
+    {
+        var isChecked = _configuration.ProfileApplicationSettings.ApplyInTryOn;
+
+        if (CtrlHelper.CheckboxWithTextAndHelp("##applyintryon", "Apply Profiles in Try-On Window",
+                "Apply profile for your character in your try-on, dye preview or glamour plate window, if it is set.", ref isChecked))
+        {
+            _configuration.ProfileApplicationSettings.ApplyInTryOn = isChecked;
+            _configuration.Save();
+            _armatureManager.RebindAllArmatures();
+        }
+    }
+
+    private void DrawApplyInCardsCheckbox()
+    {
+        var isChecked = _configuration.ProfileApplicationSettings.ApplyInCards;
+
+        if (CtrlHelper.CheckboxWithTextAndHelp("##applyincards", "Apply Profiles in Adventurer Cards",
+                "Apply appropriate profile for the adventurer card you are currently looking at.", ref isChecked))
+        {
+            _configuration.ProfileApplicationSettings.ApplyInCards = isChecked;
+            _configuration.Save();
+            _armatureManager.RebindAllArmatures();
+        }
+    }
+
+    private void DrawApplyInInspectCheckbox()
+    {
+        var isChecked = _configuration.ProfileApplicationSettings.ApplyInInspect;
+
+        if (CtrlHelper.CheckboxWithTextAndHelp("##applyininspect", "Apply Profiles in Inspect Window",
+                "Apply appropriate profile for the character you are currently inspecting.", ref isChecked))
+        {
+            _configuration.ProfileApplicationSettings.ApplyInInspect = isChecked;
+            _configuration.Save();
+            _armatureManager.RebindAllArmatures();
         }
     }
     #endregion

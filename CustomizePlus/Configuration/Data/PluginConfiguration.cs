@@ -86,6 +86,17 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
 
     public CommandSettingsEntries CommandSettings { get; set; } = new();
 
+    [Serializable]
+    public class ProfileApplicationSettingsEntries
+    {
+        public bool ApplyInCharacterWindow { get; set; } = true;
+        public bool ApplyInTryOn { get; set; } = true;
+        public bool ApplyInCards { get; set; } = true;
+        public bool ApplyInInspect { get; set; } = true;
+    }
+
+    public ProfileApplicationSettingsEntries ProfileApplicationSettings { get; set; } = new();
+
     [JsonIgnore]
     private readonly SaveService _saveService;
 

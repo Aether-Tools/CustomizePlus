@@ -7,6 +7,9 @@ using Penumbra.GameData.Enums;
 using Penumbra.GameData.Interop;
 using ObjectManager = CustomizePlus.GameData.Services.ObjectManager;
 using DalamudGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
+using ECommons.Configuration;
+using System;
+using CustomizePlus.Configuration.Data;
 
 namespace CustomizePlus.Game.Services;
 
@@ -15,12 +18,18 @@ public class GameObjectService
     private readonly ActorManager _actorManager;
     private readonly IObjectTable _objectTable;
     private readonly ObjectManager _objectManager;
+    private readonly PluginConfiguration _configuration;
 
-    public GameObjectService(ActorManager actorManager, IObjectTable objectTable, ObjectManager objectManager)
+    public GameObjectService(
+        ActorManager actorManager,
+        IObjectTable objectTable,
+        ObjectManager objectManager,
+        PluginConfiguration configuration)
     {
         _actorManager = actorManager;
         _objectTable = objectTable;
         _objectManager = objectManager;
+        _configuration = configuration;
     }
 
     public string GetCurrentPlayerName()
@@ -54,8 +63,7 @@ public class GameObjectService
         {
             var identifier = kvPair.Key;
 
-            if (kvPair.Key.Type == IdentifierType.Special)
-                identifier = identifier.GetTrueActorForSpecialType();
+            (identifier, _) = GetTrueActorForSpecialTypeActor(identifier);
 
             if (!identifier.IsValid)
                 continue;
@@ -79,5 +87,71 @@ public class GameObjectService
     public DalamudGameObject? GetDalamudGameObjectFromActor(Actor actor)
     {
         return _objectTable.CreateObjectReference(actor);
+    }
+
+
+    /// <summary>
+    /// Get "true" actor for special actors.
+    /// This should be used everywhere where resolving proper actor is crucial for proper profile application
+    /// as identifiers returned by object manager with type "Special" need special handling.
+    /// </summary>
+    public (ActorIdentifier, SpecialResult) GetTrueActorForSpecialTypeActor(ActorIdentifier identifier)
+    {
+        if (identifier.Type != IdentifierType.Special)
+            return (identifier, SpecialResult.Invalid);
+
+        if (_actorManager.ResolvePartyBannerPlayer(identifier.Special, out var id))
+            return _configuration.ProfileApplicationSettings.ApplyInCards ? (id, SpecialResult.PartyBanner) : (identifier, SpecialResult.Invalid);
+
+        if (_actorManager.ResolvePvPBannerPlayer(identifier.Special, out id))
+            return _configuration.ProfileApplicationSettings.ApplyInCards ? (id, SpecialResult.PvPBanner) : (identifier, SpecialResult.Invalid);
+
+        if (_actorManager.ResolveMahjongPlayer(identifier.Special, out id))
+            return _configuration.ProfileApplicationSettings.ApplyInCards ? (id, SpecialResult.Mahjong) : (identifier, SpecialResult.Invalid);
+
+        switch (identifier.Special)
+        {
+            case ScreenActor.GPosePlayer:
+                return (_actorManager.GetCurrentPlayer(), SpecialResult.GPosePlayer);
+            case ScreenActor.CharacterScreen when _configuration.ProfileApplicationSettings.ApplyInCharacterWindow:
+                return (_actorManager.GetCurrentPlayer(), SpecialResult.CharacterScreen);
+            case ScreenActor.FittingRoom when _configuration.ProfileApplicationSettings.ApplyInTryOn:
+                return (_actorManager.GetCurrentPlayer(), SpecialResult.FittingRoom);
+            case ScreenActor.DyePreview when _configuration.ProfileApplicationSettings.ApplyInTryOn:
+                return (_actorManager.GetCurrentPlayer(), SpecialResult.DyePreview);
+            case ScreenActor.Portrait when _configuration.ProfileApplicationSettings.ApplyInCards:
+                return (_actorManager.GetCurrentPlayer(), SpecialResult.Portrait);
+            case ScreenActor.ExamineScreen:
+                {
+                    identifier = _actorManager.GetInspectPlayer();
+                    if (identifier.IsValid)
+                        return (_configuration.ProfileApplicationSettings.ApplyInInspect ? identifier : ActorIdentifier.Invalid, SpecialResult.Inspect);
+
+                    identifier = _actorManager.GetCardPlayer();
+                    if (identifier.IsValid)
+                        return (_configuration.ProfileApplicationSettings.ApplyInInspect ? identifier : ActorIdentifier.Invalid, SpecialResult.Card);
+
+                    return _configuration.ProfileApplicationSettings.ApplyInTryOn
+                        ? (_actorManager.GetGlamourPlayer(), SpecialResult.Glamour) //returns ActorIdentifier.Invalid if player is invalid
+                        : (identifier, SpecialResult.Invalid);
+                }
+            default: return (identifier, SpecialResult.Invalid);
+        }
+    }
+
+    public enum SpecialResult
+    {
+        PartyBanner,
+        PvPBanner,
+        Mahjong,
+        CharacterScreen,
+        FittingRoom,
+        DyePreview,
+        Portrait,
+        Inspect,
+        Card,
+        Glamour,
+        GPosePlayer,
+        Invalid,
     }
 }

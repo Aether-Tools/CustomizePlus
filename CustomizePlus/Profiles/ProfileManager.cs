@@ -26,6 +26,7 @@ using CustomizePlus.Profiles.Exceptions;
 using Penumbra.GameData.Enums;
 using Penumbra.GameData.Interop;
 using System.Runtime.Serialization;
+using CustomizePlus.Game.Services;
 
 namespace CustomizePlus.Profiles;
 
@@ -40,6 +41,7 @@ public class ProfileManager : IDisposable
     private readonly Logger _logger;
     private readonly PluginConfiguration _configuration;
     private readonly ActorManager _actorManager;
+    private readonly GameObjectService _gameObjectService;
     private readonly ProfileChanged _event;
     private readonly TemplateChanged _templateChangedEvent;
     private readonly ReloadEvent _reloadEvent;
@@ -56,6 +58,7 @@ public class ProfileManager : IDisposable
         Logger logger,
         PluginConfiguration configuration,
         ActorManager actorManager,
+        GameObjectService gameObjectService,
         ProfileChanged @event,
         TemplateChanged templateChangedEvent,
         ReloadEvent reloadEvent,
@@ -67,6 +70,7 @@ public class ProfileManager : IDisposable
         _logger = logger;
         _configuration = configuration;
         _actorManager = actorManager;
+        _gameObjectService = gameObjectService;
         _event = @event;
         _templateChangedEvent = templateChangedEvent;
         _templateChangedEvent.Subscribe(OnTemplateChange, TemplateChanged.Priority.ProfileManager);
@@ -477,8 +481,7 @@ public class ProfileManager : IDisposable
         //performance: using textual override for ProfileAppliesTo here to not call
         //GetGameObjectName every time we are trying to check object against profiles
 
-        if (actorIdentifier.Type == IdentifierType.Special)
-            actorIdentifier = actorIdentifier.GetTrueActorForSpecialType();
+        (actorIdentifier, _) = _gameObjectService.GetTrueActorForSpecialTypeActor(actorIdentifier);
 
         if (!actorIdentifier.IsValid)
             yield break;

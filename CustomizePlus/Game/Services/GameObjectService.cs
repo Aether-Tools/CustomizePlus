@@ -59,6 +59,8 @@ public class GameObjectService
     /// <returns></returns>
     public IEnumerable<(ActorIdentifier, Actor)> FindActorsByName(string name)
     {
+        _objectManager.Update();
+
         foreach (var kvPair in _objectManager.Identifiers)
         {
             var identifier = kvPair.Key;
@@ -81,6 +83,7 @@ public class GameObjectService
 
     public Actor GetLocalPlayerActor()
     {
+        _objectManager.Update();
         return _objectManager.Player;
     }
 

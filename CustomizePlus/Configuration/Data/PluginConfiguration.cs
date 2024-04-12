@@ -13,6 +13,7 @@ using CustomizePlus.Core.Data;
 using CustomizePlus.Configuration.Services;
 using CustomizePlus.Game.Services;
 using CustomizePlus.UI.Windows;
+using Dalamud.Plugin.Services;
 
 namespace CustomizePlus.Configuration.Data;
 
@@ -73,7 +74,10 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
         public string? PreviewCharacterName { get; set; } = null;
 
         public int EditorValuesPrecision { get; set; } = 3;
+
         public BoneAttribute EditorMode { get; set; } = BoneAttribute.Position;
+
+        public bool SetPreviewToCurrentCharacterOnLogin { get; set; } = false;
     }
 
     public EditorConfigurationEntries EditorConfiguration { get; set; } = new();
@@ -101,24 +105,14 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
     private readonly SaveService _saveService;
 
     [JsonIgnore]
-    private readonly Logger _logger;
-
-    [JsonIgnore]
-    private readonly ChatService _chatService;
-
-    [JsonIgnore]
     private readonly MessageService _messageService;
 
     public PluginConfiguration(
         SaveService saveService,
-        Logger logger,
-        ChatService chatService,
         MessageService messageService,
         ConfigurationMigrator migrator)
     {
         _saveService = saveService;
-        _logger = logger;
-        _chatService = chatService;
         _messageService = messageService;
 
         Load(migrator);

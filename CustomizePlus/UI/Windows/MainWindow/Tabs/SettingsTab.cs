@@ -194,6 +194,7 @@ public class SettingsTab
 
         DrawHideWindowInCutscene();
         DrawFoldersDefaultOpen();
+        DrawSetPreviewToCurrentCharacterOnLogin();
 
         if (Widget.DoubleModifierSelector("Template Deletion Modifier",
             "A modifier you need to hold while clicking the Delete Template button for it to take effect.", 100 * ImGuiHelpers.GlobalScale,
@@ -221,6 +222,18 @@ public class SettingsTab
                 "Controls whether folders in template and profile lists are open by default or not.", ref isChecked))
         {
             _configuration.UISettings.FoldersDefaultOpen = isChecked;
+            _configuration.Save();
+        }
+    }
+
+    private void DrawSetPreviewToCurrentCharacterOnLogin()
+    {
+        var isChecked = _configuration.EditorConfiguration.SetPreviewToCurrentCharacterOnLogin;
+
+        if (CtrlHelper.CheckboxWithTextAndHelp("##setpreviewcharaonlogin", "Automatically Set Current Character as Editor Preview Character",
+                "Controls whether editor character will be automatically set to the current character during login.", ref isChecked))
+        {
+            _configuration.EditorConfiguration.SetPreviewToCurrentCharacterOnLogin = isChecked;
             _configuration.Save();
         }
     }

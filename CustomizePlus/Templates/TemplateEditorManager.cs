@@ -1,4 +1,5 @@
-﻿using CustomizePlus.Core.Data;
+﻿using CustomizePlus.Configuration.Data;
+using CustomizePlus.Core.Data;
 using CustomizePlus.Game.Events;
 using CustomizePlus.Game.Services;
 using CustomizePlus.Profiles;
@@ -6,20 +7,24 @@ using CustomizePlus.Profiles.Data;
 using CustomizePlus.Profiles.Enums;
 using CustomizePlus.Templates.Data;
 using CustomizePlus.Templates.Events;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using OtterGui.Log;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 
 namespace CustomizePlus.Templates;
 
-public class TemplateEditorManager
+public class TemplateEditorManager : IDisposable
 {
     private readonly TemplateChanged _event;
     private readonly Logger _logger;
     private readonly GameObjectService _gameObjectService;
     private readonly TemplateManager _templateManager;
+    private readonly IClientState _clientState;
+    private readonly PluginConfiguration _configuration;
 
     /// <summary>
     /// Reference to the original template which is currently being edited, should not be edited!
@@ -54,31 +59,59 @@ public class TemplateEditorManager
     /// </summary>
     public bool HasChanges { get; private set; }
 
+    /// <summary>
+    /// Name of the preview character for the editor
+    /// </summary>
+    public string CharacterName => EditorProfile.CharacterName;
+
+    /// <summary>
+    /// Checks if preview character exists at the time of call
+    /// </summary>
+    public bool IsCharacterFound => _gameObjectService.FindActorsByName(CharacterName).Count() > 0;
+
     public bool IsKeepOnlyEditorProfileActive { get; set; } //todo
 
     public TemplateEditorManager(
         TemplateChanged @event,
         Logger logger,
         TemplateManager templateManager,
-        GameObjectService gameObjectService)
+        GameObjectService gameObjectService,
+        IClientState clientState,
+        PluginConfiguration configuration)
     {
         _event = @event;
         _logger = logger;
         _templateManager = templateManager;
         _gameObjectService = gameObjectService;
+        _clientState = clientState;
+        _configuration = configuration;
 
-        EditorProfile = new Profile() { Templates = new List<Template>(), Enabled = false, Name = "Template editor profile", ProfileType = ProfileType.Editor };
+        _clientState.Login += OnLogin;
+
+        EditorProfile = new Profile() 
+        { 
+            Templates = new List<Template>(),
+            Enabled = false,
+            Name = "Template editor profile",
+            ProfileType = ProfileType.Editor,
+            CharacterName = configuration.EditorConfiguration.PreviewCharacterName!
+        };
+    }
+
+    public void Dispose()
+    {
+        _clientState.Login -= OnLogin;
     }
 
     /// <summary>
     /// Turn on editing of a specific template. If character name not set will default to local player.
     /// </summary>
-    internal bool EnableEditor(Template template, string? characterName = null)
+    internal bool EnableEditor(Template template)
     {
         if (IsEditorActive || IsEditorPaused)
             return false;
 
-        _logger.Debug($"Enabling editor profile for {template.Name} via character {characterName}");
+        _logger.Debug($"Enabling editor profile for {template.Name} via character {CharacterName}");
 
         CurrentlyEditedTemplateId = template.UniqueId;
         _currentlyEditedTemplateOriginal = template;
@@ -90,10 +123,10 @@ public class TemplateEditorManager
             Name = "Template editor temporary template"
         };
 
-        if (characterName != null)
-            EditorProfile.CharacterName = characterName;
-        else //safeguard
-            EditorProfile.CharacterName = _gameObjectService.GetCurrentPlayerName();
+        if (CharacterName == null) //safeguard
+            ChangeEditorCharacterInternal(_gameObjectService.GetCurrentPlayerName()); //will also set EditorProfile.CharacterName
+        else
+            EditorProfile.CharacterName = CharacterName;
 
         EditorProfile.Templates.Clear(); //safeguard
         EditorProfile.Templates.Add(CurrentlyEditedTemplate);
@@ -101,7 +134,7 @@ public class TemplateEditorManager
         HasChanges = false;
         IsEditorActive = true;
 
-        _event.Invoke(TemplateChanged.Type.EditorEnabled, template, characterName);
+        _event.Invoke(TemplateChanged.Type.EditorEnabled, template, CharacterName);
 
         return true;
     }
@@ -116,17 +149,14 @@ public class TemplateEditorManager
 
         _logger.Debug($"Disabling editor profile");
 
-        string characterName = EditorProfile.CharacterName;
-
         CurrentlyEditedTemplateId = Guid.Empty;
         CurrentlyEditedTemplate = null;
         EditorProfile.Enabled = false;
-        EditorProfile.CharacterName = "";
         EditorProfile.Templates.Clear();
         IsEditorActive = false;
         HasChanges = false;
 
-        _event.Invoke(TemplateChanged.Type.EditorDisabled, null, characterName);
+        _event.Invoke(TemplateChanged.Type.EditorDisabled, null, CharacterName);
 
         return true;
     }
@@ -145,12 +175,21 @@ public class TemplateEditorManager
 
     public bool ChangeEditorCharacter(string characterName)
     {
-        if (!IsEditorActive || EditorProfile.CharacterName == characterName || IsEditorPaused)
+        if (!IsEditorActive || CharacterName == characterName || IsEditorPaused)
             return false;
 
+        return ChangeEditorCharacterInternal(characterName);
+    }
+
+    private bool ChangeEditorCharacterInternal(string characterName)
+    {
         _logger.Debug($"Changing character name for editor profile from {EditorProfile.CharacterName} to {characterName}");
 
         EditorProfile.CharacterName = characterName;
+
+        _configuration.EditorConfiguration.PreviewCharacterName = CharacterName;
+        _configuration.Save();
+
         _event.Invoke(TemplateChanged.Type.EditorCharacterChanged, CurrentlyEditedTemplate, (characterName, EditorProfile));
 
         return true;
@@ -263,6 +302,21 @@ public class TemplateEditorManager
             HasChanges = true;
 
         return true;
+    }
+
+    private void OnLogin()
+    {
+        if (_configuration.EditorConfiguration.SetPreviewToCurrentCharacterOnLogin ||
+            string.IsNullOrWhiteSpace(_configuration.EditorConfiguration.PreviewCharacterName))
+        {
+            var localPlayerName = _gameObjectService.GetCurrentPlayerName();
+
+            if (_configuration.EditorConfiguration.PreviewCharacterName != localPlayerName)
+            {
+                _logger.Debug("Resetting editor character because automatic condition triggered in OnLogin");
+                ChangeEditorCharacterInternal(localPlayerName);
+            }
+        }
     }
 
     private Vector3 GetResetValueForAttribute(BoneAttribute attribute)

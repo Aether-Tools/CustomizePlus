@@ -42,12 +42,7 @@ public class BoneEditorPanel
     public bool HasChanges => _editorManager.HasChanges;
     public bool IsEditorActive => _editorManager.IsEditorActive;
     public bool IsEditorPaused => _editorManager.IsEditorPaused;
-
-    /// <summary>
-    /// Was character with name from CharacterName found in the object table or not
-    /// </summary>
-    public bool IsCharacterFound { get; private set; }
-    public string CharacterName { get; private set; }
+    public bool IsCharacterFound => _editorManager.IsCharacterFound;
 
     public BoneEditorPanel(
         TemplateFileSystemSelector templateFileSystemSelector,
@@ -64,12 +59,11 @@ public class BoneEditorPanel
         _isMirrorModeEnabled = configuration.EditorConfiguration.BoneMirroringEnabled;
         _precision = configuration.EditorConfiguration.EditorValuesPrecision;
         _editingAttribute = configuration.EditorConfiguration.EditorMode;
-        CharacterName = configuration.EditorConfiguration.PreviewCharacterName!;
     }
 
     public bool EnableEditor(Template template)
     {
-        if (_editorManager.EnableEditor(template, CharacterName))
+        if (_editorManager.EnableEditor(template))
         {
             _editorManager.SetLimitLookupToOwned(_configuration.EditorConfiguration.LimitLookupToOwnedObjects);
 
@@ -94,17 +88,7 @@ public class BoneEditorPanel
 
     public void Draw()
     {
-        IsCharacterFound = _gameObjectService.FindActorsByName(CharacterName).Count() > 0;
         _isUnlocked = IsCharacterFound && IsEditorActive && !IsEditorPaused;
-
-        if (string.IsNullOrWhiteSpace(CharacterName))
-        {
-            CharacterName = _gameObjectService.GetCurrentPlayerName();
-            _editorManager.ChangeEditorCharacter(CharacterName);
-
-            _configuration.EditorConfiguration.PreviewCharacterName = CharacterName;
-            _configuration.Save();
-        }
 
         DrawEditorConfirmationPopup();
 
@@ -121,7 +105,7 @@ public class BoneEditorPanel
                 ImGuiUtil.DrawFrameColumn("Show editor preview on");
                 ImGui.TableNextColumn();
                 var width = new Vector2(ImGui.GetContentRegionAvail().X - ImGui.CalcTextSize("Limit to my creatures").X - 68, 0);
-                var name = _newCharacterName ?? CharacterName;
+                var name = _newCharacterName ?? _editorManager.CharacterName;
                 ImGui.SetNextItemWidth(width.X);
 
                 using (var disabled = ImRaii.Disabled(!IsEditorActive || IsEditorPaused))
@@ -135,13 +119,10 @@ public class BoneEditorPanel
 
                         if (ImGui.IsItemDeactivatedAfterEdit())
                         {
-                            if (_newCharacterName == "")
+                            if (string.IsNullOrWhiteSpace(_newCharacterName))
                                 _newCharacterName = _gameObjectService.GetCurrentPlayerName();
-                            CharacterName = _newCharacterName!;
-                            _editorManager.ChangeEditorCharacter(CharacterName);
 
-                            _configuration.EditorConfiguration.PreviewCharacterName = CharacterName;
-                            _configuration.Save();
+                            _editorManager.ChangeEditorCharacter(_newCharacterName);
 
                             _newCharacterName = null;
                         }

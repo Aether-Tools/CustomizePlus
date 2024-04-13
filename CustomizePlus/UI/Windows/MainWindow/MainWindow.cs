@@ -13,6 +13,9 @@ using CustomizePlus.UI.Windows.Controls;
 using CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 using CustomizePlus.UI.Windows.MainWindow.Tabs;
 using CustomizePlus.Templates;
+using ECommons.ImGuiMethods;
+using static System.Windows.Forms.AxHost;
+using Dalamud.Interface.Colors;
 
 namespace CustomizePlus.UI.Windows.MainWindow;
 
@@ -83,50 +86,13 @@ public class MainWindow : Window, IDisposable
         using (var disabled = ImRaii.Disabled(_fantasiaPlusDetectService.IsFantasiaPlusInstalled || _hookingService.RenderHookFailed || _hookingService.MovementHookFailed))
         {
             LockWindowClosureIfNeeded();
-            if (ImGui.BeginTabBar("##tabs", ImGuiTabBarFlags.None)) //todo: remember last selected tab
-            {
-                if (ImGui.BeginTabItem("Settings"))
-                {
-                    _settingsTab.Draw();
-                    ImGui.EndTabItem();
-                }
-
-                if (ImGui.BeginTabItem("Templates"))
-                {
-                    _templatesTab.Draw();
-                    ImGui.EndTabItem();
-                }
-
-                if (ImGui.BeginTabItem("Profiles"))
-                {
-                    _profilesTab.Draw();
-                    ImGui.EndTabItem();
-                }
-
-                //if(_messagesTab.IsVisible)
-                //{
-                /*if (ImGui.BeginTabItem("Messages"))
-                {
-                    _messagesTab.Draw();
-                    ImGui.EndTabItem();
-                }*/
-                //}
-
-                if (_configuration.DebuggingModeEnabled)
-                {
-                    if (ImGui.BeginTabItem("IPC Test"))
-                    {
-                        _ipcTestTab.Draw();
-                        ImGui.EndTabItem();
-                    }
-
-                    if (ImGui.BeginTabItem("State monitoring"))
-                    {
-                        _stateMonitoringTab.Draw();
-                        ImGui.EndTabItem();
-                    }
-                }
-            }
+            ImGuiEx.EzTabBar("##tabs", [
+                ("Settings", _settingsTab.Draw, null, true),
+                ("Templates", _templatesTab.Draw, null, true),
+                ("Profiles", _profilesTab.Draw, null, true),
+                (_configuration.DebuggingModeEnabled ? "IPC Test" : null, _ipcTestTab.Draw, ImGuiColors.DalamudGrey, true),
+                (_configuration.DebuggingModeEnabled ? "State monitoring" : null, _stateMonitoringTab.Draw, ImGuiColors.DalamudGrey, true),
+            ]);
         }
 
         _pluginStateBlock.Draw(yPos);

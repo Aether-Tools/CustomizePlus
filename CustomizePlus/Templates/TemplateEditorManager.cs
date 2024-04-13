@@ -9,6 +9,7 @@ using CustomizePlus.Templates.Data;
 using CustomizePlus.Templates.Events;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
+using OtterGui.Classes;
 using OtterGui.Log;
 using System;
 using System.Collections.Generic;
@@ -94,7 +95,7 @@ public class TemplateEditorManager : IDisposable
             Enabled = false,
             Name = "Template editor profile",
             ProfileType = ProfileType.Editor,
-            CharacterName = configuration.EditorConfiguration.PreviewCharacterName!
+            CharacterName = configuration.EditorConfiguration.PreviewCharacterName ?? LowerString.Empty
         };
     }
 
@@ -123,10 +124,8 @@ public class TemplateEditorManager : IDisposable
             Name = "Template editor temporary template"
         };
 
-        if (CharacterName == null) //safeguard
-            ChangeEditorCharacterInternal(_gameObjectService.GetCurrentPlayerName()); //will also set EditorProfile.CharacterName
-        else
-            EditorProfile.CharacterName = CharacterName;
+        if (string.IsNullOrWhiteSpace(CharacterName)) //safeguard
+            ChangeEditorCharacterInternal(_gameObjectService.GetCurrentPlayerName()); //will set EditorProfile.CharacterName
 
         EditorProfile.Templates.Clear(); //safeguard
         EditorProfile.Templates.Add(CurrentlyEditedTemplate);
@@ -175,7 +174,7 @@ public class TemplateEditorManager : IDisposable
 
     public bool ChangeEditorCharacter(string characterName)
     {
-        if (!IsEditorActive || CharacterName == characterName || IsEditorPaused)
+        if (!IsEditorActive || CharacterName == characterName || IsEditorPaused || string.IsNullOrWhiteSpace(characterName))
             return false;
 
         return ChangeEditorCharacterInternal(characterName);
@@ -310,6 +309,11 @@ public class TemplateEditorManager : IDisposable
             string.IsNullOrWhiteSpace(_configuration.EditorConfiguration.PreviewCharacterName))
         {
             var localPlayerName = _gameObjectService.GetCurrentPlayerName();
+            if(string.IsNullOrWhiteSpace(localPlayerName))
+            {
+                _logger.Warning("Can't retrieve local player name on login");
+                return;
+            }
 
             if (_configuration.EditorConfiguration.PreviewCharacterName != localPlayerName)
             {

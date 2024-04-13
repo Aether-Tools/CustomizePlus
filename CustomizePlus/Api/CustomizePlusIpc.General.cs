@@ -1,11 +1,4 @@
-﻿using Dalamud.Plugin.Ipc;
-using ECommons.EzIpcManager;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Penumbra.Api.Ipc;
+﻿using ECommons.EzIpcManager;
 
 namespace CustomizePlus.Api;
 

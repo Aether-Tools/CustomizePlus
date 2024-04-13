@@ -17,7 +17,6 @@ public class PluginStateBlock
     private readonly BoneEditorPanel _boneEditorPanel;
     private readonly PluginConfiguration _configuration;
     private readonly GameStateService _gameStateService;
-    private readonly FantasiaPlusDetectService _fantasiaPlusDetectService;
     private readonly HookingService _hookingService;
     private readonly CustomizePlusIpc _ipcService;
 
@@ -25,14 +24,12 @@ public class PluginStateBlock
         BoneEditorPanel boneEditorPanel,
         PluginConfiguration configuration,
         GameStateService gameStateService,
-        FantasiaPlusDetectService fantasiaPlusDetectService,
         HookingService hookingService,
         CustomizePlusIpc ipcService)
     {
         _boneEditorPanel = boneEditorPanel;
         _configuration = configuration;
         _gameStateService = gameStateService;
-        _fantasiaPlusDetectService = fantasiaPlusDetectService;
         _hookingService = hookingService;
         _ipcService = ipcService;
     }
@@ -46,11 +43,6 @@ public class PluginStateBlock
         {
             severity = PluginStateSeverity.Error;
             message = $"Detected failure in game hooks. Customize+ disabled.";
-        }
-        else if (_fantasiaPlusDetectService.IsFantasiaPlusInstalled)
-        {
-            severity = PluginStateSeverity.Error;
-            message = $"Fantasia+ detected. The plugin is disabled until Fantasia+ is disabled and the game is restarted.";
         }
         else if (!_configuration.PluginEnabled)
         {

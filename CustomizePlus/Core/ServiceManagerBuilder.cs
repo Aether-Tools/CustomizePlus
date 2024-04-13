@@ -56,7 +56,8 @@ public static class ServiceManagerBuilder
             .AddProfileServices()
             .AddGameServices()
             .AddConfigServices()
-            .AddRestOfServices();
+            .AddDataLoaders()
+            .AddApi();
 
         DalamudServices.AddServices(services, pi);
 
@@ -139,16 +140,22 @@ public static class ServiceManagerBuilder
             .AddSingleton<SaveService>()
             .AddSingleton<FilenameService>()
             .AddSingleton<BackupService>()
-            .AddSingleton<FantasiaPlusDetectService>()
             .AddSingleton<FrameworkManager>();
 
         return services;
     }
 
-    private static ServiceManager AddRestOfServices(this ServiceManager services) //temp
+    private static ServiceManager AddDataLoaders(this ServiceManager services)
     {
         services
-            .AddSingleton<PoseFileBoneLoader>()
+            .AddSingleton<PoseFileBoneLoader>();
+
+        return services;
+    }
+
+    private static ServiceManager AddApi(this ServiceManager services)
+    {
+        services
 			.AddSingleton<CustomizePlusLegacyIpc>()
             .AddSingleton<CustomizePlusIpc>();
 

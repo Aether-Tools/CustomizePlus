@@ -22,7 +22,6 @@ public class HookingService : IDisposable
     private readonly ProfileManager _profileManager;
     private readonly ArmatureManager _armatureManager;
     private readonly GameStateService _gameStateService;
-    private readonly FantasiaPlusDetectService _fantasiaPlusDetectService;
     private readonly Logger _logger;
 
     private Hook<RenderDelegate>? _renderManagerHook;
@@ -43,7 +42,6 @@ public class HookingService : IDisposable
         ProfileManager profileManager,
         ArmatureManager armatureManager,
         GameStateService gameStateService,
-        FantasiaPlusDetectService fantasiaPlusDetectService,
         Logger logger)
     {
         _configuration = configuration;
@@ -52,7 +50,6 @@ public class HookingService : IDisposable
         _profileManager = profileManager;
         _armatureManager = armatureManager;
         _gameStateService = gameStateService;
-        _fantasiaPlusDetectService = fantasiaPlusDetectService;
         _logger = logger;
 
         ReloadHooks();
@@ -109,15 +106,6 @@ public class HookingService : IDisposable
         if (_renderManagerHook == null)
         {
             throw new Exception();
-        }
-
-        if (_fantasiaPlusDetectService.IsFantasiaPlusInstalled)
-        {
-            _logger.Error($"Fantasia+ detected, disabling all hooks");
-            _renderManagerHook.Disable();
-            _gameObjectMovementHook?.Disable();
-
-            return _renderManagerHook.Original(a1, a2, a3, a4);
         }
 
         try

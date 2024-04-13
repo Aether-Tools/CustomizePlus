@@ -31,7 +31,6 @@ public class MainWindow : Window, IDisposable
     private readonly PluginStateBlock _pluginStateBlock;
 
     private readonly TemplateEditorManager _templateEditorManager;
-    private readonly FantasiaPlusDetectService _fantasiaPlusDetectService;
     private readonly PluginConfiguration _configuration;
     private readonly HookingService _hookingService;
 
@@ -46,7 +45,6 @@ public class MainWindow : Window, IDisposable
         PluginStateBlock pluginStateBlock,
         TemplateEditorManager templateEditorManager,
         PluginConfiguration configuration,
-        FantasiaPlusDetectService fantasiaPlusDetectService,
         HookingService hookingService
         ) : base($"Customize+ v{Plugin.Version}###CPlusMainWindow")
     {
@@ -61,7 +59,6 @@ public class MainWindow : Window, IDisposable
 
         _templateEditorManager = templateEditorManager;
         _configuration = configuration;
-        _fantasiaPlusDetectService = fantasiaPlusDetectService;
         _hookingService = hookingService;
 
         pluginInterface.UiBuilder.DisableGposeUiHide = true;
@@ -83,7 +80,7 @@ public class MainWindow : Window, IDisposable
     {
         var yPos = ImGui.GetCursorPosY();
 
-        using (var disabled = ImRaii.Disabled(_fantasiaPlusDetectService.IsFantasiaPlusInstalled || _hookingService.RenderHookFailed || _hookingService.MovementHookFailed))
+        using (var disabled = ImRaii.Disabled(_hookingService.RenderHookFailed || _hookingService.MovementHookFailed))
         {
             LockWindowClosureIfNeeded();
             ImGuiEx.EzTabBar("##tabs", [

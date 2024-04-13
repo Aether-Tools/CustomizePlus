@@ -35,9 +35,6 @@ public sealed class Plugin : IDalamudPlugin
             _services = ServiceManagerBuilder.CreateProvider(pluginInterface, Logger);
 
             //temporary
-            var configMover = _services.GetService<FantasiaPlusConfigMover>();
-            configMover.MoveConfigsIfNeeded();
-
             var v3ConfigFixer = _services.GetService<Version3ConfigFixer>();
             v3ConfigFixer.FixV3ConfigIfNeeded();
 

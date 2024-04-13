@@ -167,7 +167,6 @@ public static class ServiceManagerBuilder
         services
             .AddSingleton<PluginConfiguration>()
             .AddSingleton<ConfigurationMigrator>()
-            .AddSingleton<FantasiaPlusConfigMover>()
             .AddSingleton<Version3ConfigFixer>();
 
         return services;

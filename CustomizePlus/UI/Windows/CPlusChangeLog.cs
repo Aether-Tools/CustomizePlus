@@ -17,6 +17,7 @@ public class CPlusChangeLog
         Add2_0_0_0(Changelog);
         Add2_0_1_0(Changelog);
         Add2_0_2_2(Changelog);
+        Add2_0_3_0(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -28,6 +29,22 @@ public class CPlusChangeLog
         _config.ChangelogSettings.ChangeLogDisplayType = type;
         _config.Save();
     }
+
+    private static void Add2_0_3_0(Changelog log)
+        => log.NextVersion("Version 2.0.3.0")
+            .RegisterEntry("Added option to configure if profiles should affect various parts of game's user interface:")
+            .RegisterEntry("Character window", 1)
+            .RegisterEntry("Try-On, Dye Preview, Glamour Plate windows", 1)
+            .RegisterEntry("Adventurer Cards (Portraits)", 1)
+            .RegisterEntry("Inspect window", 1)
+            .RegisterEntry("Added option to configure if template editor preview character should be automatically set to current character when you login. This is disabled by default.")
+            .RegisterEntry("Enabled profiles can no longer be set as default profile.")
+            .RegisterEntry("Fixed current player character's profile applying to special actors (portraits, etc) of other characters.")
+            .RegisterEntry("Fixed temporary profile being removed when closing inspection window of character with active temporary profile.")
+            .RegisterEntry("Fixed profile not applying if it was enabled shortly after doing penumbra redraw.")
+            .RegisterEntry("Fixed issue when switching to a different profile did not reflect on special actors (portraits, etc).")
+            .RegisterEntry("Fixed legacy IPC's RevertCharacter method leaking exceptions. (2.0.2.4)")
+            .RegisterEntry("Source code maintenance - external libraries update, refactoring, cleanup.");
 
     private static void Add2_0_2_2(Changelog log)
         => log.NextVersion("Version 2.0.2.2")

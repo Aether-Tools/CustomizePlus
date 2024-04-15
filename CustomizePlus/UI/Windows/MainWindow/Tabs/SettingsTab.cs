@@ -104,6 +104,7 @@ public class SettingsTab
         DrawApplyInTryOnCheckbox();
         DrawApplyInCardsCheckbox();
         DrawApplyInInspectCheckbox();
+        DrawApplyInLobbyCheckbox();
     }
 
     private void DrawApplyInCharacterWindowCheckbox()
@@ -153,6 +154,19 @@ public class SettingsTab
                 "Apply appropriate profile for the character you are currently inspecting.", ref isChecked))
         {
             _configuration.ProfileApplicationSettings.ApplyInInspect = isChecked;
+            _configuration.Save();
+            _armatureManager.RebindAllArmatures();
+        }
+    }
+
+    private void DrawApplyInLobbyCheckbox()
+    {
+        var isChecked = _configuration.ProfileApplicationSettings.ApplyInLobby;
+
+        if (CtrlHelper.CheckboxWithTextAndHelp("##applyinlobby", "Apply Profiles on Character Select Screen",
+                "Apply appropriate profile for the character you have currently selected on character select screen during login.", ref isChecked))
+        {
+            _configuration.ProfileApplicationSettings.ApplyInLobby = isChecked;
             _configuration.Save();
             _armatureManager.RebindAllArmatures();
         }

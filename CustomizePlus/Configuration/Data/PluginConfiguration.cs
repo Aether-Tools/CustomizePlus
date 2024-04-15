@@ -97,6 +97,7 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
         public bool ApplyInTryOn { get; set; } = true;
         public bool ApplyInCards { get; set; } = true;
         public bool ApplyInInspect { get; set; } = true;
+        public bool ApplyInLobby { get; set; } = true;
     }
 
     public ProfileApplicationSettingsEntries ProfileApplicationSettings { get; set; } = new();

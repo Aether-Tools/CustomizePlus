@@ -3,10 +3,12 @@ using Dalamud.Game.ClientState.Objects;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using OtterGui.Log;
 using Penumbra.GameData.Actors;
 using Penumbra.GameData.Enums;
 using Penumbra.GameData.Interop;
+using Penumbra.String;
 
 namespace CustomizePlus.GameData.Services;
 
@@ -25,6 +27,8 @@ public class ObjectManager(
 
     private DateTime _identifierUpdate;
     public bool IsInGPose { get; private set; }
+    //c+ custom
+    public bool IsInLobby { get; private set; }
     public ushort World { get; private set; }
 
     private readonly Dictionary<ActorIdentifier, ActorData> _identifiers = new(200);
@@ -78,6 +82,10 @@ public class ObjectManager(
 
         var gPose = GPosePlayer;
         IsInGPose = gPose.Utf8Name.Length > 0;
+
+        //C+ custom
+        IsInLobby = AddLobbyCharacter();
+
         return true;
     }
 
@@ -127,6 +135,10 @@ public class ObjectManager(
             }
         }
     }
+
+    //c+ custom
+    public Actor LobbyActor
+        => IsInLobby ? this[200] : nint.Zero;
 
     public Actor GPosePlayer
         => this[(int)ScreenActor.GPosePlayer];
@@ -203,5 +215,26 @@ public class ObjectManager(
             _ => (Actor.Null, false),
         };
         return ret;
+    }
+
+    //c+ custom
+    private unsafe bool AddLobbyCharacter()
+    {
+        var agent = AgentLobby.Instance();
+        if (agent == null || agent->LobbyData.CharaSelectEntries.Size() == 0)
+            return false;
+
+        var chara = agent->LobbyData.CharaSelectEntries.Get((ulong)agent->SelectedCharacterIndex).Value;
+        if (chara == null)
+            return false;
+
+        var actor = CutsceneCharacters.FirstOrDefault();
+
+        if (!actor.Valid)
+            return false;
+
+        HandleIdentifier(actors.CreatePlayer(new ByteString(chara->Name), chara->HomeWorldId), actor);
+
+        return true;
     }
 }

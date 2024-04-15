@@ -27,6 +27,7 @@ using Penumbra.GameData.Enums;
 using Penumbra.GameData.Interop;
 using System.Runtime.Serialization;
 using CustomizePlus.Game.Services;
+using ObjectManager = CustomizePlus.GameData.Services.ObjectManager;
 
 namespace CustomizePlus.Profiles;
 
@@ -42,6 +43,7 @@ public class ProfileManager : IDisposable
     private readonly PluginConfiguration _configuration;
     private readonly ActorManager _actorManager;
     private readonly GameObjectService _gameObjectService;
+    private readonly ObjectManager _objectManager;
     private readonly ProfileChanged _event;
     private readonly TemplateChanged _templateChangedEvent;
     private readonly ReloadEvent _reloadEvent;
@@ -59,6 +61,7 @@ public class ProfileManager : IDisposable
         PluginConfiguration configuration,
         ActorManager actorManager,
         GameObjectService gameObjectService,
+        ObjectManager objectManager,
         ProfileChanged @event,
         TemplateChanged templateChangedEvent,
         ReloadEvent reloadEvent,
@@ -71,6 +74,7 @@ public class ProfileManager : IDisposable
         _configuration = configuration;
         _actorManager = actorManager;
         _gameObjectService = gameObjectService;
+        _objectManager = objectManager;
         _event = @event;
         _templateChangedEvent = templateChangedEvent;
         _templateChangedEvent.Subscribe(OnTemplateChange, TemplateChanged.Priority.ProfileManager);
@@ -481,6 +485,12 @@ public class ProfileManager : IDisposable
         //performance: using textual override for ProfileAppliesTo here to not call
         //GetGameObjectName every time we are trying to check object against profiles
 
+        if (_objectManager.LobbyActor.Valid &&
+            _objectManager.TryGetValue(actorIdentifier, out var actorData) &&
+            actorData.Objects.Count == 1 &&
+            _objectManager.LobbyActor == actorData.Objects[0] && !_configuration.ProfileApplicationSettings.ApplyInLobby)
+            yield break;
+
         (actorIdentifier, _) = _gameObjectService.GetTrueActorForSpecialTypeActor(actorIdentifier);
 
         if (!actorIdentifier.IsValid)
@@ -498,7 +508,6 @@ public class ProfileManager : IDisposable
                     (actorIdentifier.Type == IdentifierType.Owned &&
                     actorIdentifier.PlayerName != _actorManager.GetCurrentPlayer().PlayerName));
         }
-
 
         if (_templateEditorManager.IsEditorActive && _templateEditorManager.EditorProfile.Enabled && IsProfileAppliesToCurrentActor(_templateEditorManager.EditorProfile))
             yield return _templateEditorManager.EditorProfile;

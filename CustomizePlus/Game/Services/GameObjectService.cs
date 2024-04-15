@@ -10,6 +10,10 @@ using DalamudGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 using ECommons.Configuration;
 using System;
 using CustomizePlus.Configuration.Data;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using Penumbra.GameData;
+using Penumbra.String;
+using Dalamud.Logging;
 
 namespace CustomizePlus.Game.Services;
 
@@ -91,7 +95,6 @@ public class GameObjectService
     {
         return _objectTable.CreateObjectReference(actor);
     }
-
 
     /// <summary>
     /// Get "true" actor for special actors.

@@ -122,7 +122,7 @@ public class StateMonitoringTab
             ImGui.Text($"Count: {kvPair.Value.Objects.Count}");
             foreach (var item in kvPair.Value.Objects)
             {
-                ImGui.Text($"{item}, valid: {item.Valid}");
+                ImGui.Text($"[{item.Index}] - {item}, valid: {item.Valid}");
             }
 
             ImGui.Spacing();

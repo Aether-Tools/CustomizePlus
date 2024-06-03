@@ -20,6 +20,7 @@ using IPCProfileDataTuple = (System.Guid UniqueId, string Name, string VirtualPa
 using OtterGui.Log;
 using CustomizePlus.Core.Extensions;
 using CustomizePlus.Configuration.Data;
+using CustomizePlus.Api.Data;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 
@@ -146,6 +147,23 @@ public class IPCTestTab //: IDisposable
         ImGui.Text("Character to operate on:");
         ImGui.SameLine();
         ImGui.InputText("##operateon", ref _targetCharacterName, 128);
+
+        if (ImGui.Button("Copy current profile into memory"))
+        {
+            var actors = _gameObjectService.FindActorsByName(_targetCharacterName).ToList();
+            if (actors.Count == 0)
+                return;
+
+            if (!actors[0].Item2.Identifier(_actorManager, out var identifier))
+                return;
+
+            var profile = _profileManager.GetEnabledProfilesByActor(identifier).FirstOrDefault();
+            if (profile == null)
+                return;
+
+            _rememberedProfileJson = JsonConvert.SerializeObject(IPCCharacterProfile.FromFullProfile(profile));
+            _popupSystem.ShowPopup(PopupSystem.Messages.IPCProfileRemembered);
+        }
 
         if (ImGui.Button("GetActiveProfileIdOnCharacter into clipboard"))
         {

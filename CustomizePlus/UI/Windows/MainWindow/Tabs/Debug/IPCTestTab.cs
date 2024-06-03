@@ -147,23 +147,6 @@ public class IPCTestTab //: IDisposable
         ImGui.SameLine();
         ImGui.InputText("##operateon", ref _targetCharacterName, 128);
 
-        if (ImGui.Button("Copy current profile into memory as V3"))
-        {
-            var actors = _gameObjectService.FindActorsByName(_targetCharacterName).ToList();
-            if (actors.Count == 0)
-                return;
-
-            if (!actors[0].Item2.Identifier(_actorManager, out var identifier))
-                return;
-
-            var profile = _profileManager.GetEnabledProfilesByActor(identifier).FirstOrDefault();
-            if (profile == null)
-                return;
-
-            _rememberedProfileJson = JsonConvert.SerializeObject(V4ProfileToV3Converter.Convert(profile));
-            _popupSystem.ShowPopup(PopupSystem.Messages.IPCV4ProfileRemembered);
-        }
-
         if (ImGui.Button("GetActiveProfileIdOnCharacter into clipboard"))
         {
             var actors = _gameObjectService.FindActorsByName(_targetCharacterName).ToList();
@@ -255,7 +238,7 @@ public class IPCTestTab //: IDisposable
             if (result == 0)
             {
                 _rememberedProfileJson = profileJson;
-                _popupSystem.ShowPopup(PopupSystem.Messages.IPCV4ProfileRemembered);
+                _popupSystem.ShowPopup(PopupSystem.Messages.IPCProfileRemembered);
             }
             else
             {

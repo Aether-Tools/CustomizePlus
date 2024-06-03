@@ -23,16 +23,13 @@ using CustomizePlus.UI.Windows;
 using CustomizePlus.UI.Windows.MainWindow.Tabs;
 using CustomizePlus.Templates.Events;
 using CustomizePlus.Profiles.Events;
-using CustomizePlus.Api.Compatibility;
 using CustomizePlus.Game.Services.GPose;
 using CustomizePlus.Game.Services.GPose.ExternalTools;
 using CustomizePlus.GameData.Services;
 using CustomizePlus.Configuration.Services.Temporary;
 using OtterGui.Services;
 using Penumbra.GameData.Actors;
-using Penumbra.GameData.Enums;
 using Penumbra.GameData.Structs;
-using OtterGui;
 using OtterGui.Raii;
 using CustomizePlus.Api;
 
@@ -156,7 +153,6 @@ public static class ServiceManagerBuilder
     private static ServiceManager AddApi(this ServiceManager services)
     {
         services
-			.AddSingleton<CustomizePlusLegacyIpc>()
             .AddSingleton<CustomizePlusIpc>();
 
         return services;

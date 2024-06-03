@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Reflection;
 using Dalamud.Plugin;
-using Microsoft.Extensions.DependencyInjection;
 using OtterGui.Log;
 using CustomizePlus.Core.Services;
 using CustomizePlus.UI;
 using CustomizePlus.Core;
-using CustomizePlus.Api.Compatibility;
 using CustomizePlus.Configuration.Services.Temporary;
 using OtterGui.Services;
 using CustomizePlus.Api;
@@ -39,7 +37,6 @@ public sealed class Plugin : IDalamudPlugin
             v3ConfigFixer.FixV3ConfigIfNeeded();
 
             _services.GetService<CustomizePlusIpc>();
-            _services.GetService<CustomizePlusLegacyIpc>();
             _services.GetService<CPlusWindowSystem>();
             _services.GetService<CommandService>();
 

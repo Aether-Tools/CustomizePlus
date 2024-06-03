@@ -10,7 +10,7 @@ public partial class PopupSystem
 
         public const string FantasiaPlusDetected = "fantasia_detected_warn";
 
-        public const string IPCV4ProfileRemembered = "ipc_v4_profile_remembered";
+        public const string IPCProfileRemembered = "ipc_profile_remembered";
         public const string IPCGetProfileByIdRemembered = "ipc_get_profile_by_id_remembered";
         public const string IPCSetProfileToChrDone = "ipc_set_profile_to_character_done";
         public const string IPCRevertDone = "ipc_revert_done";
@@ -30,7 +30,7 @@ public partial class PopupSystem
 
         RegisterPopup(Messages.FantasiaPlusDetected, "Customize+ detected that you have Fantasia+ installed.\nPlease delete or turn it off and restart your game to use Customize+.");
 
-        RegisterPopup(Messages.IPCV4ProfileRemembered, "Current profile has been copied into memory");
+        RegisterPopup(Messages.IPCProfileRemembered, "Current profile has been copied into memory");
         RegisterPopup(Messages.IPCGetProfileByIdRemembered, "GetProfileByUniqueId result has been copied into memory");
         RegisterPopup(Messages.IPCSetProfileToChrDone, "SetProfileToCharacter has been called with data from memory, profile id printed to log");
         RegisterPopup(Messages.IPCRevertDone, "DeleteTemporaryProfileByUniqueId has been called");

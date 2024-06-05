@@ -89,7 +89,7 @@ public unsafe class ModelBone
 
             CustomizedTransform = null;
 
-            Plugin.Logger.Information($"Unlinked {BoneName} from all templates");
+            Plugin.Logger.Debug($"Unlinked {BoneName} from all templates");
 
             return true;
         }
@@ -97,7 +97,7 @@ public unsafe class ModelBone
         if (!template.Bones.ContainsKey(BoneName))
             return false;
 
-        Plugin.Logger.Information($"Linking {BoneName} to {template.Name}");
+        Plugin.Logger.Debug($"Linking {BoneName} to {template.Name}");
         CustomizedTransform = template.Bones[BoneName];
 
         return true;

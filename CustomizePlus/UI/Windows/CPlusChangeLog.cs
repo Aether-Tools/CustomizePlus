@@ -18,6 +18,7 @@ public class CPlusChangeLog
         Add2_0_1_0(Changelog);
         Add2_0_2_2(Changelog);
         Add2_0_3_0(Changelog);
+        Add2_0_4_0(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -29,6 +30,14 @@ public class CPlusChangeLog
         _config.ChangelogSettings.ChangeLogDisplayType = type;
         _config.Save();
     }
+
+    private static void Add2_0_4_0(Changelog log)
+        => log.NextVersion("Version 2.0.4.0")
+            .RegisterImportant("Version 3 IPC has been removed, any plugins still relying on it will stop working until updated.")
+            .RegisterEntry("Mare Synchronos and Dynamic Bridge are not affected.", 1)
+            .RegisterEntry("Added option to configure if profiles should be applied on character select screen during login.")
+            .RegisterEntry("Made information level plugin logs less verbose.")
+            .RegisterEntry("Source code maintenance - external libraries update.");
 
     private static void Add2_0_3_0(Changelog log)
         => log.NextVersion("Version 2.0.3.0")

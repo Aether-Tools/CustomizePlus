@@ -19,6 +19,7 @@ public class CPlusChangeLog
         Add2_0_2_2(Changelog);
         Add2_0_3_0(Changelog);
         Add2_0_4_0(Changelog);
+        Add2_0_4_1(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -30,6 +31,11 @@ public class CPlusChangeLog
         _config.ChangelogSettings.ChangeLogDisplayType = type;
         _config.Save();
     }
+
+    private static void Add2_0_4_1(Changelog log)
+    => log.NextVersion("Version 2.0.4.1")
+        .RegisterEntry("Added support for new worlds.", 1)
+        .RegisterEntry("Source code maintenance - external libraries update.");
 
     private static void Add2_0_4_0(Changelog log)
         => log.NextVersion("Version 2.0.4.0")

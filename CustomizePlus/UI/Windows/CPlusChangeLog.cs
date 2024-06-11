@@ -34,7 +34,7 @@ public class CPlusChangeLog
 
     private static void Add2_0_4_1(Changelog log)
     => log.NextVersion("Version 2.0.4.1")
-        .RegisterEntry("Added support for new worlds.", 1)
+        .RegisterEntry("Added support for new worlds.")
         .RegisterEntry("Source code maintenance - external libraries update.");
 
     private static void Add2_0_4_0(Changelog log)

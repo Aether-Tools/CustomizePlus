@@ -95,7 +95,7 @@ public class ProfileManager : IDisposable
 
     public void LoadProfiles()
     {
-        _logger.Information("Loading profiles from directory...");
+        _logger.Information("Loading profiles...");
 
         //todo: hot reload was not tested
         //save temp profiles
@@ -105,6 +105,8 @@ public class ProfileManager : IDisposable
         List<(Profile, string)> invalidNames = new();
         foreach (var file in _saveService.FileNames.Profiles())
         {
+            _logger.Debug($"Reading profile {file.FullName}");
+
             try
             {
                 var text = File.ReadAllText(file.FullName);
@@ -146,7 +148,7 @@ public class ProfileManager : IDisposable
             _logger.Information(
                 $"Moved {invalidNames.Count - failed} profiles to correct names.{(failed > 0 ? $" Failed to move {failed} profiles to correct names." : string.Empty)}");
 
-        _logger.Information("Directory load complete");
+        _logger.Information("Profiles load complete");
         _event.Invoke(ProfileChanged.Type.ReloadedAll, null, null);
     }
 
@@ -506,7 +508,7 @@ public class ProfileManager : IDisposable
             return profile.CharacterName.Text == name &&
                 (!profile.LimitLookupToOwnedObjects ||
                     (actorIdentifier.Type == IdentifierType.Owned &&
-                    actorIdentifier.PlayerName != _actorManager.GetCurrentPlayer().PlayerName));
+                    actorIdentifier.PlayerName == _actorManager.GetCurrentPlayer().PlayerName));
         }
 
         if (_templateEditorManager.IsEditorActive && _templateEditorManager.EditorProfile.Enabled && IsProfileAppliesToCurrentActor(_templateEditorManager.EditorProfile))

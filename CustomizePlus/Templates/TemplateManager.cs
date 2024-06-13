@@ -45,12 +45,13 @@ public class TemplateManager
 
     public void LoadTemplates()
     {
-        _logger.Information("Loading templates from directory...");
+        _logger.Information("Loading templates...");
 
         _templates.Clear();
         List<(Template, string)> invalidNames = new();
         foreach (var file in _saveService.FileNames.Templates())
         {
+            _logger.Debug($"Reading template {file.FullName}");
             try
             {
                 var text = File.ReadAllText(file.FullName);
@@ -77,7 +78,7 @@ public class TemplateManager
             _logger.Information(
                 $"Moved {invalidNames.Count - failed} templates to correct names.{(failed > 0 ? $" Failed to move {failed} templates to correct names." : string.Empty)}");
 
-        _logger.Information("Directory load complete");
+        _logger.Information("Templates load complete");
         _event.Invoke(TemplateChanged.Type.ReloadedAll, null, null);
     }
 

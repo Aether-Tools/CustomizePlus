@@ -13,7 +13,7 @@ using System.Linq;
 
 namespace CustomizePlus.Templates;
 
-public class TemplateManager
+public class TemplateManager : IDisposable
 {
     private readonly SaveService _saveService;
     private readonly Logger _logger;
@@ -39,6 +39,11 @@ public class TemplateManager
 
         CreateTemplateFolder(saveService);
         LoadTemplates();
+    }
+
+    public void Dispose()
+    {
+        _reloadEvent.Unsubscribe(OnReload);
     }
 
     public Template? GetTemplate(Guid templateId) => _templates.FirstOrDefault(d => d.UniqueId == templateId);

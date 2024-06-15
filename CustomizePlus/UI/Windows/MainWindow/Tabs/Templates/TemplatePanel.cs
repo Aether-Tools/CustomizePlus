@@ -15,10 +15,12 @@ using CustomizePlus.Configuration.Data;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.Templates.Data;
 using OtterGui.Log;
+using CustomizePlus.Templates.Events;
+using ECommons.Schedulers;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 
-public class TemplatePanel
+public class TemplatePanel : IDisposable
 {
     private readonly TemplateFileSystemSelector _selector;
     private readonly TemplateManager _manager;
@@ -28,8 +30,15 @@ public class TemplatePanel
     private readonly PopupSystem _popupSystem;
     private readonly Logger _logger;
 
+    private readonly TemplateEditorEvent _editorEvent;
+
     private string? _newName;
     private Template? _changedTemplate;
+
+    /// <summary>
+    /// Set to true if we received OnEditorEvent EditorEnableRequested and waiting for selector value to be changed.
+    /// </summary>
+    private bool _isEditorEnablePending = false;
 
     private string SelectionName
         => _selector.Selected == null ? "No Selection" : _selector.IncognitoMode ? _selector.Selected.Incognito : _selector.Selected.Name.Text;
@@ -41,7 +50,8 @@ public class TemplatePanel
         PluginConfiguration configuration,
         MessageService messageService,
         PopupSystem popupSystem,
-        Logger logger)
+        Logger logger,
+        TemplateEditorEvent editorEvent)
     {
         _selector = selector;
         _manager = manager;
@@ -51,6 +61,11 @@ public class TemplatePanel
         _popupSystem = popupSystem;
         _logger = logger;
 
+        _editorEvent = editorEvent;
+
+        _editorEvent.Subscribe(OnEditorEvent, TemplateEditorEvent.Priority.TemplatePanel);
+
+        _selector.SelectionChanged += SelectorSelectionChanged;
     }
 
     public void Draw()
@@ -65,6 +80,11 @@ public class TemplatePanel
             DrawHeader();
             DrawPanel();
         }
+    }
+
+    public void Dispose()
+    {
+        _editorEvent.Unsubscribe(OnEditorEvent);
     }
 
     private HeaderDrawer.Button LockButton()
@@ -167,15 +187,21 @@ public class TemplatePanel
 
     private void DrawEditorToggle()
     {
+        (bool isEditorAllowed, bool isEditorActive) = CanToggleEditor();
+
         if (ImGuiUtil.DrawDisabledButton($"{(_boneEditor.IsEditorActive ? "Finish" : "Start")} bone editing", Vector2.Zero,
-            "Toggle the bone editor for this template",
-            (_selector.Selected?.IsWriteProtected ?? true) || !_configuration.PluginEnabled))
+            "Toggle the bone editor for this template", !isEditorAllowed))
         {
-            if (!_boneEditor.IsEditorActive)
+            if (!isEditorActive)
                 _boneEditor.EnableEditor(_selector.Selected!);
             else
                 _boneEditor.DisableEditor();
         }
+    }
+
+    private (bool isEditorAllowed, bool isEditorActive) CanToggleEditor()
+    {
+        return ((!_selector.Selected?.IsWriteProtected ?? false) || _configuration.PluginEnabled, _boneEditor.IsEditorActive);
     }
 
     private void DrawBasicSettings()
@@ -214,11 +240,6 @@ public class TemplatePanel
         }
     }
 
-    /*private void SetFromClipboard()
-    {
-
-    }*/
-
     private void ExportToClipboard()
     {
         try
@@ -231,5 +252,39 @@ public class TemplatePanel
             _logger.Error($"Could not copy data from template {_selector.Selected!.UniqueId} to clipboard: {ex}");
             _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
         }
+    }
+
+
+    private void SelectorSelectionChanged(Template? oldSelection, Template? newSelection, in TemplateFileSystemSelector.TemplateState state)
+    {
+        if (!_isEditorEnablePending)
+            return;
+
+        _isEditorEnablePending = false;
+
+        _boneEditor.EnableEditor(_selector.Selected!);
+    }
+
+    private void OnEditorEvent(TemplateEditorEvent.Type type, Template? template)
+    {
+        if (type != TemplateEditorEvent.Type.EditorEnableRequestedStage2)
+            return;
+
+        if(template == null)
+            return;
+
+        (bool isEditorAllowed, bool isEditorActive) = CanToggleEditor();
+
+        if (!isEditorAllowed || isEditorActive)
+            return;
+
+        if(_selector.Selected != template)
+        {
+            _selector.SelectByValue(template);
+
+            _isEditorEnablePending = true;
+        }
+        else
+            _boneEditor.EnableEditor(_selector.Selected!);
     }
 }

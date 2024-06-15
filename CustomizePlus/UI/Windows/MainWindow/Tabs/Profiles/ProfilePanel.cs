@@ -7,15 +7,12 @@ using System;
 using System.Linq;
 using System.Numerics;
 using CustomizePlus.Profiles;
-using CustomizePlus.Game.Services;
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.UI.Windows.Controls;
 using CustomizePlus.Templates;
-using CustomizePlus.Core.Helpers;
-using System.Windows.Forms;
 using CustomizePlus.Core.Data;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using CustomizePlus.Templates.Events;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 
@@ -26,6 +23,7 @@ public class ProfilePanel
     private readonly PluginConfiguration _configuration;
     private readonly TemplateCombo _templateCombo;
     private readonly TemplateEditorManager _templateEditorManager;
+    private readonly TemplateEditorEvent _templateEditorEvent;
 
     private string? _newName;
     private string? _newCharacterName;
@@ -43,13 +41,15 @@ public class ProfilePanel
         ProfileManager manager,
         PluginConfiguration configuration,
         TemplateCombo templateCombo,
-        TemplateEditorManager templateEditorManager)
+        TemplateEditorManager templateEditorManager,
+        TemplateEditorEvent templateEditorEvent)
     {
         _selector = selector;
         _manager = manager;
         _configuration = configuration;
         _templateCombo = templateCombo;
         _templateEditorManager = templateEditorManager;
+        _templateEditorEvent = templateEditorEvent;
     }
 
     public void Draw()
@@ -247,7 +247,7 @@ public class ProfilePanel
 
     private void DrawTemplateArea()
     {
-        using var table = ImRaii.Table("SetTable", 3, ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollX | ImGuiTableFlags.ScrollY);
+        using var table = ImRaii.Table("SetTable", 4, ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollX | ImGuiTableFlags.ScrollY);
         if (!table)
             return;
 
@@ -255,6 +255,8 @@ public class ProfilePanel
         ImGui.TableSetupColumn("##Index", ImGuiTableColumnFlags.WidthFixed, 30 * ImGuiHelpers.GlobalScale);
 
         ImGui.TableSetupColumn("Template", ImGuiTableColumnFlags.WidthFixed, 220 * ImGuiHelpers.GlobalScale);
+
+        ImGui.TableSetupColumn("##editbtn", ImGuiTableColumnFlags.WidthFixed, 120 * ImGuiHelpers.GlobalScale);
 
         ImGui.TableHeadersRow();
 
@@ -277,6 +279,24 @@ public class ProfilePanel
             ImGui.TableNextColumn();
             _templateCombo.Draw(_selector.Selected!, template, idx);
             DrawDragDrop(_selector.Selected!, idx);
+            ImGui.TableNextColumn();
+
+            var disabledCondition = _templateEditorManager.IsEditorActive || template.IsWriteProtected;
+            using (var disabled = ImRaii.Disabled(disabledCondition))
+            {
+                if (ImGui.Button("Open in editor"))
+                    _templateEditorEvent.Invoke(TemplateEditorEvent.Type.EditorEnableRequested, template);
+                ImGuiUtil.HoverTooltip("Open this template in the template editor");
+            }
+
+            if(disabledCondition)
+            {
+                ImGui.SameLine();
+                ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Warning);
+                ImGuiUtil.PrintIcon(FontAwesomeIcon.ExclamationTriangle);
+                ImGui.PopStyleColor();
+                ImGuiUtil.HoverTooltip("Can not be edited because this template is either write protected or template editor is already enabled.");
+            }
         }
 
         ImGui.TableNextColumn();

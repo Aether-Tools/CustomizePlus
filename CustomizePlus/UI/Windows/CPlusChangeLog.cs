@@ -20,6 +20,7 @@ public class CPlusChangeLog
         Add2_0_3_0(Changelog);
         Add2_0_4_0(Changelog);
         Add2_0_4_1(Changelog);
+        Add2_0_4_4(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -32,10 +33,16 @@ public class CPlusChangeLog
         _config.Save();
     }
 
+    private static void Add2_0_4_4(Changelog log)
+    => log.NextVersion("Version 2.0.4.4")
+        .RegisterHighlight("Added edit button to the template selector in the profile editor which allows to quickly begin editing associated template.")
+        .RegisterEntry("Fixed \"Limit to my creatures\" setting not working correctly. (2.0.4.2)")
+        .RegisterEntry("Added additional logging. (2.0.4.2)");
+
     private static void Add2_0_4_1(Changelog log)
-    => log.NextVersion("Version 2.0.4.1")
-        .RegisterEntry("Added support for new worlds.")
-        .RegisterEntry("Source code maintenance - external libraries update.");
+        => log.NextVersion("Version 2.0.4.1")
+            .RegisterEntry("Added support for new worlds.")
+            .RegisterEntry("Source code maintenance - external libraries update.");
 
     private static void Add2_0_4_0(Changelog log)
         => log.NextVersion("Version 2.0.4.0")

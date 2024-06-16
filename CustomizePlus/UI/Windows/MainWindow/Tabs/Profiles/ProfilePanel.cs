@@ -171,7 +171,7 @@ public class ProfilePanel
                 ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Warning);
                 ImGuiUtil.PrintIcon(FontAwesomeIcon.ExclamationTriangle);
                 ImGui.PopStyleColor();
-                ImGuiUtil.HoverTooltip("Can only be changed while currently selected and the default profiles are disabled.");
+                ImGuiUtil.HoverTooltip("Can only be changed when currently selected and the default profiles are disabled.");
             }
         }
     }
@@ -282,20 +282,18 @@ public class ProfilePanel
             ImGui.TableNextColumn();
 
             var disabledCondition = _templateEditorManager.IsEditorActive || template.IsWriteProtected;
-            using (var disabled = ImRaii.Disabled(disabledCondition))
-            {
-                if (ImGui.Button("Open in editor"))
-                    _templateEditorEvent.Invoke(TemplateEditorEvent.Type.EditorEnableRequested, template);
-                ImGuiUtil.HoverTooltip("Open this template in the template editor");
-            }
 
-            if(disabledCondition)
+            if (ImGuiUtil.DrawDisabledButton(FontAwesomeIcon.Edit.ToIconString(), new Vector2(ImGui.GetFrameHeight()), "Open this template in the template editor", disabledCondition, true))
+                _templateEditorEvent.Invoke(TemplateEditorEvent.Type.EditorEnableRequested, template);
+
+            if (disabledCondition)
             {
+                //todo: make helper
                 ImGui.SameLine();
                 ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Warning);
                 ImGuiUtil.PrintIcon(FontAwesomeIcon.ExclamationTriangle);
                 ImGui.PopStyleColor();
-                ImGuiUtil.HoverTooltip("Can not be edited because this template is either write protected or template editor is already enabled.");
+                ImGuiUtil.HoverTooltip("This template cannot be edited because it is either write protected or you are already editing one of the templates.");
             }
         }
 

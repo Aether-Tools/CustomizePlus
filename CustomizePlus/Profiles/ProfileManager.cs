@@ -505,6 +505,10 @@ public class ProfileManager : IDisposable
 
         bool IsProfileAppliesToCurrentActor(Profile profile)
         {
+            //default profile check is done later
+            if (profile == DefaultProfile)
+                return false;
+
             return profile.CharacterName.Text == name &&
                 (!profile.LimitLookupToOwnedObjects ||
                     (actorIdentifier.Type == IdentifierType.Owned &&

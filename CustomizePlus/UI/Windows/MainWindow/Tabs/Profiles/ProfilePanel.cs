@@ -162,8 +162,8 @@ public class ProfilePanel
             {
                 if (ImGui.Checkbox("##DefaultProfile", ref isDefault))
                     _manager.SetDefaultProfile(isDefault ? _selector.Selected! : null);
-                ImGuiUtil.LabeledHelpMarker("Default profile (Players and Retainers only)",
-                    "Whether the templates in this profile are applied to all players and retainers without a specific profile. Only one profile can be default at the same time.");
+                ImGuiUtil.LabeledHelpMarker("Apply to all players and retainers",
+                    "Whether the templates in this profile are applied to all players and retainers without a specific profile. This setting cannot be applied to multiple profiles.");
             }
             if(isDefaultOrCurrentProfilesEnabled)
             {
@@ -171,7 +171,7 @@ public class ProfilePanel
                 ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Warning);
                 ImGuiUtil.PrintIcon(FontAwesomeIcon.ExclamationTriangle);
                 ImGui.PopStyleColor();
-                ImGuiUtil.HoverTooltip("Can only be changed when currently selected and the default profiles are disabled.");
+                ImGuiUtil.HoverTooltip("Can only be changed when both currently selected and profile where this checkbox is checked are disabled.");
             }
         }
     }
@@ -217,30 +217,35 @@ public class ProfilePanel
                 name = _newCharacterName ?? _selector.Selected!.CharacterName;
                 ImGui.SetNextItemWidth(width.X);
 
-                if (!_selector.IncognitoMode)
+                if(_manager.DefaultProfile != _selector.Selected)
                 {
-                    if (ImGui.InputText("##CharacterName", ref name, 128))
+                    if (!_selector.IncognitoMode)
                     {
-                        _newCharacterName = name;
-                        _changedProfile = _selector.Selected;
-                    }
+                        if (ImGui.InputText("##CharacterName", ref name, 128))
+                        {
+                            _newCharacterName = name;
+                            _changedProfile = _selector.Selected;
+                        }
 
-                    if (ImGui.IsItemDeactivatedAfterEdit() && _changedProfile != null)
-                    {
-                        _manager.ChangeCharacterName(_changedProfile, name);
-                        _newCharacterName = null;
-                        _changedProfile = null;
+                        if (ImGui.IsItemDeactivatedAfterEdit() && _changedProfile != null)
+                        {
+                            _manager.ChangeCharacterName(_changedProfile, name);
+                            _newCharacterName = null;
+                            _changedProfile = null;
+                        }
                     }
+                    else
+                        ImGui.TextUnformatted("Incognito active");
+
+                    ImGui.SameLine();
+                    var enabled = _selector.Selected?.LimitLookupToOwnedObjects ?? false;
+                    if (ImGui.Checkbox("##LimitLookupToOwnedObjects", ref enabled))
+                        _manager.SetLimitLookupToOwned(_selector.Selected!, enabled);
+                    ImGuiUtil.LabeledHelpMarker("Limit to my creatures",
+                        "When enabled limits the character search to only your own summons, mounts and minions.\nUseful when there is possibility there will be another character with that name owned by another player.\n* For battle chocobo use \"Chocobo\" as character name.");
                 }
                 else
-                    ImGui.TextUnformatted("Incognito active");
-
-                ImGui.SameLine();
-                var enabled = _selector.Selected?.LimitLookupToOwnedObjects ?? false;
-                if (ImGui.Checkbox("##LimitLookupToOwnedObjects", ref enabled))
-                    _manager.SetLimitLookupToOwned(_selector.Selected!, enabled);
-                ImGuiUtil.LabeledHelpMarker("Limit to my creatures",
-                    "When enabled limits the character search to only your own summons, mounts and minions.\nUseful when there is possibility there will be another character with that name owned by another player.\n* For battle chocobo use \"Chocobo\" as character name.");
+                    ImGui.TextUnformatted("All players and retainers");
             }
         }
     }

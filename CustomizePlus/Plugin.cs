@@ -9,13 +9,25 @@ using CustomizePlus.Configuration.Services.Temporary;
 using OtterGui.Services;
 using CustomizePlus.Api;
 using ECommons;
+using ECommons.Commands;
+using ECommons.Configuration;
+using OtterGui;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
+using System.Linq;
+using CustomizePlus.Configuration.Data;
+using CustomizePlus.Core.Extensions;
+using CustomizePlus.Templates;
+using CustomizePlus.Profiles;
+using CustomizePlus.Armatures.Services;
 
 namespace CustomizePlus;
 
 public sealed class Plugin : IDalamudPlugin
 {
 #if DEBUG
-    public static readonly string Version = $"{Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? string.Empty} [DEBUG]";
+    public static readonly string Version = $"{ThisAssembly.Git.Commit}+{ThisAssembly.Git.Sha} [DEBUG]";
 #else
     public static readonly string Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? string.Empty;
 #endif
@@ -40,7 +52,7 @@ public sealed class Plugin : IDalamudPlugin
             _services.GetService<CPlusWindowSystem>();
             _services.GetService<CommandService>();
 
-            Logger.Information($"Customize+ v{Version} [FantasiaPlus] started");
+            Logger.Information($"Customize+ v{Version} ({ThisAssembly.Git.Commit}+{ThisAssembly.Git.Sha}) [FantasiaPlus] started");
         }
         catch (Exception ex)
         {

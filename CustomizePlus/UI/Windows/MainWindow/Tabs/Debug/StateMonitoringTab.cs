@@ -12,6 +12,7 @@ using CustomizePlus.GameData.Services;
 using CustomizePlus.Core.Extensions;
 using System.Numerics;
 using CustomizePlus.Game.Services;
+using CustomizePlus.Core.Data;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 
@@ -187,7 +188,7 @@ public class StateMonitoringTab
 #if !INCOGNIFY_STRINGS
             ImGui.Text($"{kvPair.Key}: p: {kvPair.Value.Translation} | r: {kvPair.Value.Rotation} | s: {kvPair.Value.Scaling}");
 #else
-            ImGui.Text($"{kvPair.Key}: p: {(kvPair.Value.Translation.IsApproximately(Vector3.Zero) ? "Approx. not changed" : "Changed")} | r: {(kvPair.Value.Rotation.IsApproximately(Vector3.Zero) ? "Approx. not changed" : "Changed")} | s: {(kvPair.Value.Scaling.IsApproximately(Vector3.One) ? "Not changed" : "Changed")}");
+            ImGui.Text($"{BoneData.GetBoneDisplayName(kvPair.Key)} ({kvPair.Key}): p: {(kvPair.Value.Translation.IsApproximately(Vector3.Zero) ? "Approx. not changed" : "Changed")} | r: {(kvPair.Value.Rotation.IsApproximately(Vector3.Zero) ? "Approx. not changed" : "Changed")} | s: {(kvPair.Value.Scaling.IsApproximately(Vector3.One) ? "Not changed" : "Changed")}");
 #endif
         }
     }
@@ -215,7 +216,7 @@ public class StateMonitoringTab
         ImGui.Text($"Bone template bindings:");
         foreach (var kvPair in armature.BoneTemplateBinding)
         {
-            ImGui.Text($"{kvPair.Key} -> {kvPair.Value.Name.Text.Incognify()} ({kvPair.Value.UniqueId})");
+            ImGui.Text($"{BoneData.GetBoneDisplayName(kvPair.Key)} ({kvPair.Key}) -> {kvPair.Value.Name.Text.Incognify()} ({kvPair.Value.UniqueId})");
         }
     }
 }

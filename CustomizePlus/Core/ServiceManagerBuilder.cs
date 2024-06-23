@@ -137,7 +137,8 @@ public static class ServiceManagerBuilder
             .AddSingleton<SaveService>()
             .AddSingleton<FilenameService>()
             .AddSingleton<BackupService>()
-            .AddSingleton<FrameworkManager>();
+            .AddSingleton<FrameworkManager>()
+            .AddSingleton<SupportLogBuilderService>();
 
         return services;
     }

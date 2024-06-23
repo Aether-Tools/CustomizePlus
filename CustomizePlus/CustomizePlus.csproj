@@ -38,6 +38,10 @@
 
   <ItemGroup>
     <!--<PackageReference Include="DalamudPackager" Version="2.1.12" />-->
+    <PackageReference Include="GitInfo" Version="3.3.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
@@ -82,7 +86,7 @@
     </None>
   </ItemGroup>
 
-<!--  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+  <!--<PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <DefineConstants>INCOGNIFY_STRINGS</DefineConstants>
   </PropertyGroup>-->
 

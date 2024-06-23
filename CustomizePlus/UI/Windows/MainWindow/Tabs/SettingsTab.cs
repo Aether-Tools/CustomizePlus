@@ -28,6 +28,7 @@ public class SettingsTab
     private readonly TemplateEditorManager _templateEditorManager;
     private readonly CPlusChangeLog _changeLog;
     private readonly MessageService _messageService;
+    private readonly SupportLogBuilderService _supportLogBuilderService;
 
     public SettingsTab(
         PluginConfiguration configuration,
@@ -35,7 +36,8 @@ public class SettingsTab
         HookingService hookingService,
         TemplateEditorManager templateEditorManager,
         CPlusChangeLog changeLog,
-        MessageService messageService)
+        MessageService messageService,
+        SupportLogBuilderService supportLogBuilderService)
     {
         _configuration = configuration;
         _armatureManager = armatureManager;
@@ -43,6 +45,7 @@ public class SettingsTab
         _templateEditorManager = templateEditorManager;
         _changeLog = changeLog;
         _messageService = messageService;
+        _supportLogBuilderService = supportLogBuilderService;
     }
 
     public void Draw()
@@ -53,6 +56,7 @@ public class SettingsTab
 
         DrawGeneralSettings();
 
+        ImGui.NewLine();
         ImGui.NewLine();
         ImGui.NewLine();
 
@@ -299,7 +303,7 @@ public class SettingsTab
     #region Support Area
     private void DrawSupportButtons()
     {
-        var width = ImGui.CalcTextSize("Join Discord for Support").X + ImGui.GetStyle().FramePadding.X * 2;
+        var width = ImGui.CalcTextSize("Copy Support Info to Clipboard").X + ImGui.GetStyle().FramePadding.X * 2;
         var xPos = ImGui.GetWindowWidth() - width;
         // Respect the scroll bar width.
         if (ImGui.GetScrollMaxY() > 0)
@@ -311,6 +315,14 @@ public class SettingsTab
         ImGui.SetCursorPos(new Vector2(xPos, 1 * ImGui.GetFrameHeightWithSpacing()));
         if (ImGui.Button("Show update history", new Vector2(width, 0)))
             _changeLog.Changelog.ForceOpen = true;
+
+        ImGui.SetCursorPos(new Vector2(xPos, 2 * ImGui.GetFrameHeightWithSpacing()));
+        if (!ImGui.Button("Copy Support Info to Clipboard"))
+            return;
+
+        var text = _supportLogBuilderService.BuildSupportLog();
+        ImGui.SetClipboardText(text);
+        _messageService.NotificationMessage($"Copied Support Info to Clipboard.", NotificationType.Success, false);
     }
 
     /// <summary> Draw a button to open the official discord server. </summary>

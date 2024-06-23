@@ -313,16 +313,16 @@ public class SettingsTab
         DrawDiscordButton(width);
 
         ImGui.SetCursorPos(new Vector2(xPos, 1 * ImGui.GetFrameHeightWithSpacing()));
-        if (ImGui.Button("Show update history", new Vector2(width, 0)))
-            _changeLog.Changelog.ForceOpen = true;
+        if (ImGui.Button("Copy Support Info to Clipboard"))
+        {
+            var text = _supportLogBuilderService.BuildSupportLog();
+            ImGui.SetClipboardText(text);
+            _messageService.NotificationMessage($"Copied Support Info to Clipboard.", NotificationType.Success, false);
+        }
 
         ImGui.SetCursorPos(new Vector2(xPos, 2 * ImGui.GetFrameHeightWithSpacing()));
-        if (!ImGui.Button("Copy Support Info to Clipboard"))
-            return;
-
-        var text = _supportLogBuilderService.BuildSupportLog();
-        ImGui.SetClipboardText(text);
-        _messageService.NotificationMessage($"Copied Support Info to Clipboard.", NotificationType.Success, false);
+        if (ImGui.Button("Show update history", new Vector2(width, 0)))
+            _changeLog.Changelog.ForceOpen = true;
     }
 
     /// <summary> Draw a button to open the official discord server. </summary>

@@ -42,65 +42,64 @@ public class SupportLogBuilderService
     {
         var sb = new StringBuilder(10240);
         sb.AppendLine("**Settings**");
-        sb.Append($"> **`Plugin Version:              `** {Plugin.Version}\n");
-        sb.Append($"> **`Commit Hash:                 `** {ThisAssembly.Git.Commit}+{ThisAssembly.Git.Sha}\n");
-        sb.Append($"> **`Root editing:                 `** {_configuration.EditorConfiguration.RootPositionEditingEnabled}\n");
+        sb.Append($"> **`Plugin Version:                 `** {Plugin.Version}\n");
+        sb.Append($"> **`Commit Hash:                    `** {ThisAssembly.Git.Commit}+{ThisAssembly.Git.Sha}\n");
+        sb.Append($"> **`Root editing:                   `** {_configuration.EditorConfiguration.RootPositionEditingEnabled}\n");
         sb.AppendLine("**Settings -> Editor Settings**");
-        sb.Append($"> **`Limit to my creatures (editor):                 `** {_configuration.EditorConfiguration.LimitLookupToOwnedObjects}\n");
-        sb.Append($"> **`Preview character (editor):                 `** {_configuration.EditorConfiguration.PreviewCharacterName?.Incognify() ?? "Not set"}\n");
+        sb.Append($"> **`Limit to my creatures (editor): `** {_configuration.EditorConfiguration.LimitLookupToOwnedObjects}\n");
+        sb.Append($"> **`Preview character (editor):     `** {_configuration.EditorConfiguration.PreviewCharacterName?.Incognify() ?? "Not set"}\n");
         sb.AppendLine("**Settings -> Profile application**");
-        sb.Append($"> **`Character window:                 `** {_configuration.ProfileApplicationSettings.ApplyInCharacterWindow}\n");
-        sb.Append($"> **`Try On:                 `** {_configuration.ProfileApplicationSettings.ApplyInTryOn}\n");
-        sb.Append($"> **`Cards:                 `** {_configuration.ProfileApplicationSettings.ApplyInCards}\n");
-        sb.Append($"> **`Inspect:                 `** {_configuration.ProfileApplicationSettings.ApplyInInspect}\n");
-        sb.Append($"> **`Lobby:                 `** {_configuration.ProfileApplicationSettings.ApplyInLobby}\n");
+        sb.Append($"> **`Character window:               `** {_configuration.ProfileApplicationSettings.ApplyInCharacterWindow}\n");
+        sb.Append($"> **`Try On:                         `** {_configuration.ProfileApplicationSettings.ApplyInTryOn}\n");
+        sb.Append($"> **`Cards:                          `** {_configuration.ProfileApplicationSettings.ApplyInCards}\n");
+        sb.Append($"> **`Inspect:                        `** {_configuration.ProfileApplicationSettings.ApplyInInspect}\n");
+        sb.Append($"> **`Lobby:                          `** {_configuration.ProfileApplicationSettings.ApplyInLobby}\n");
         sb.AppendLine("**Relevant plugins**");
         GatherRelevantPlugins(sb);
         sb.AppendLine("**Templates**");
-        sb.Append($"> **`Count:              `** {_templateManager.Templates.Count}\n");
+        sb.Append($"> **`Count:                          `** {_templateManager.Templates.Count}\n");
         foreach (var template in _templateManager.Templates)
         {
-            sb.Append($">   > **`{template.ToString(),-29}`**\n");
+            sb.Append($">   > **`{template.ToString(),-32}`**\n");
         }
         sb.AppendLine("**Profiles**");
-        sb.Append($"> **`Count:              `** {_profileManager.Profiles.Count}\n");
+        sb.Append($"> **`Count:                          `** {_profileManager.Profiles.Count}\n");
         foreach (var profile in _profileManager.Profiles)
         {
             sb.Append($">   > =====\n");
-            sb.Append($">   > **`{profile.ToString(),-29}`*\n");
-            sb.Append($">   > **`Name: {profile.Name.Text.Incognify()}`**\n");
-            sb.Append($">   > **`Type: {profile.ProfileType}`**\n");
-            sb.Append($">   > **`Character name: {profile.CharacterName.Text.Incognify()}`**\n");
-            sb.Append($">   > **`Limit to my creatures: {profile.LimitLookupToOwnedObjects}`**\n");
+            sb.Append($">   > **`{profile.ToString(),-32}`*\n");
+            sb.Append($">   > **`Name:                       `** {profile.Name.Text.Incognify()}\n");
+            sb.Append($">   > **`Type:                       `** {profile.ProfileType} \n");
+            sb.Append($">   > **`Character name:             `** {profile.CharacterName.Text.Incognify()}\n");
+            sb.Append($">   > **`Limit to my creatures:      `** {profile.LimitLookupToOwnedObjects}\n");
             sb.Append($">   > **`Templates:`**\n");
-            sb.Append($">   >   > **`Count: {profile.Templates.Count}`**\n");
+            sb.Append($">   >   > **`Count:                  `** {profile.Templates.Count}\n");
             foreach (var template in profile.Templates)
             {
-                sb.Append($">   >   > **`{template.ToString()}`**\n");
+                sb.Append($">   >   > **`{template.ToString(), -32}`**\n");
             }
             sb.Append($">   > **`Armatures:`**\n");
-            sb.Append($">   >   > **`Count: {profile.Armatures.Count}`**\n");
+            sb.Append($">   >   > **`Count:                  `** {profile.Armatures.Count}\n");
             foreach (var armature in profile.Armatures)
             {
-                sb.Append($">   >   > **`{armature.ToString()}`**\n");
+                sb.Append($">   >   > **`{armature.ToString(), -32}`**\n");
             }
             sb.Append($">   > =====\n");
         }
         sb.AppendLine("**Armatures**");
-        sb.Append($"> **`Count:              `** {_armatureManager.Armatures.Count}\n");
+        sb.Append($"> **`Count:                          `** {_armatureManager.Armatures.Count}\n");
         foreach (var kvPair in _armatureManager.Armatures)
         {
             var identifier = kvPair.Key;
             var armature = kvPair.Value;
             sb.Append($">   > =====\n");
-            sb.Append($">   > **`{armature.ToString(),-29}`**\n");
-            sb.Append($">   > **`Actor: {armature.ActorIdentifier.Incognito(null) ?? "None"}`**\n");
-            sb.Append($">   > **`Built: {armature.IsBuilt}`**\n");
-            sb.Append($">   > **`Visible: {armature.IsVisible}`**\n");
-            sb.Append($">   > **`Pending rebind: {armature.IsPendingProfileRebind}`**\n");
-            sb.Append($">   > **`Last seen: {armature.LastSeen}`**\n");
-            sb.Append($">   > **`Profile: {armature.Profile?.ToString() ?? "None"}`**\n");
-            sb.Append($">   > **`Main Root Bone/Total Bones/Partial Skeleton Count: {armature.MainRootBone}/{armature.TotalBoneCount}/{armature.PartialSkeletonCount}`**\n");
+            sb.Append($">   > **`{armature.ToString(),-32}`**\n");
+            sb.Append($">   > **`Actor:                      `** {armature.ActorIdentifier.Incognito(null) ?? "None"}\n");
+            sb.Append($">   > **`Built:                      `** {armature.IsBuilt}\n");
+            sb.Append($">   > **`Visible:                    `** {armature.IsVisible}\n");
+            sb.Append($">   > **`Pending rebind:             `** {armature.IsPendingProfileRebind}\n");
+            sb.Append($">   > **`Last seen:                  `** {armature.LastSeen}\n");
+            sb.Append($">   > **`Profile:                    `** {armature.Profile?.ToString() ?? "None"}\n");
             sb.Append($">   > **`Bone template bindings:`**\n");
             foreach (var bindingKvPair in armature.BoneTemplateBinding)
             {
@@ -128,7 +127,7 @@ public class SupportLogBuilderService
         foreach (var plugin in relevantPlugins)
         {
             if (plugins.TryGetValue(plugin, out var data))
-                sb.Append($"> **`{data.Name + ':',-29}`** {data.Version}{(data.IsLoaded ? string.Empty : " (Disabled)")}\n");
+                sb.Append($"> **`{data.Name + ':',-32}`** {data.Version}{(data.IsLoaded ? string.Empty : " (Disabled)")}\n");
         }
     }
 }

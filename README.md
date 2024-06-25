@@ -10,8 +10,11 @@ Then search for Customize+ in the plugin manager.
 
 ## FAQ
 
-### How do I report an issue with Customize+?
-Please join [XIV Tools Discord](https://discord.gg/KvGJCCnG8t) to report issues with Customize+.
+### How do I get help with using Customize+?
+Please join [XIV Tools Discord](https://discord.gg/KvGJCCnG8t).
+
+### How do I report a bug in Customize+ or leave a suggestion?
+GitHub issues is the primary place for posting bugs and suggestions related to Customize+. **But!** First we ask you join [XIV Tools Discord](https://discord.gg/KvGJCCnG8t) and consult our help team about your issue first. It's highly likely that you are not experiencing a bug in Customize+.
 
 ### Where do I learn how to use Customize+?
 Most of the things should be self-explanatory, if you do need help you can join the [XIV Tools Discord](https://discord.gg/KvGJCCnG8t) and ask in the appropriate channel.

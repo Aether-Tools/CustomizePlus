@@ -55,6 +55,7 @@ public class HookingService : IDisposable
         ReloadHooks();
     }
 
+    [Obsolete("To be updated for Dawntrail")]
     public void ReloadHooks()
     {
         RenderHookFailed = false;
@@ -64,7 +65,7 @@ public class HookingService : IDisposable
         {
             if (_configuration.PluginEnabled)
             {
-                if (_renderManagerHook == null)
+                /*if (_renderManagerHook == null)
                 {
                     var renderAddress = _sigScanner.ScanText(Constants.RenderHookAddress);
                     _renderManagerHook = _hooker.HookFromAddress<RenderDelegate>(renderAddress, OnRender);
@@ -83,7 +84,7 @@ public class HookingService : IDisposable
                 _renderManagerHook.Enable();
 
                 _logger.Debug("Hooking movement functions");
-                _gameObjectMovementHook.Enable();
+                _gameObjectMovementHook.Enable();*/
             }
             else
             {

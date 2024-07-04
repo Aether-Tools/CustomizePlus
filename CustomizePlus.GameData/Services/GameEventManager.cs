@@ -29,7 +29,7 @@ public unsafe class GameEventManager : IDisposable
         interop.InitializeFromAttributes(this);
 
         _copyCharacterHook =
-            interop.HookFromAddress<CopyCharacterDelegate>((nint)CharacterSetup.MemberFunctionPointers.CopyFromCharacter, CopyCharacterDetour);
+            interop.HookFromAddress<CopyCharacterDelegate>((nint)CharacterSetupContainer.MemberFunctionPointers.CopyFromCharacter, CopyCharacterDetour);
         _characterBaseCreateHook =
             interop.HookFromAddress<CharacterBaseCreateDelegate>((nint)CharacterBase.MemberFunctionPointers.Create, CharacterBaseCreateDetour);
         _characterBaseDestructorHook =
@@ -83,11 +83,11 @@ public unsafe class GameEventManager : IDisposable
 
     #region Copy Character
 
-    private delegate ulong CopyCharacterDelegate(CharacterSetup* target, GameObject* source, uint unk);
+    private delegate ulong CopyCharacterDelegate(CharacterSetupContainer* target, GameObject* source, uint unk);
 
     private readonly Hook<CopyCharacterDelegate> _copyCharacterHook;
 
-    private ulong CopyCharacterDetour(CharacterSetup* target, GameObject* source, uint unk)
+    private ulong CopyCharacterDetour(CharacterSetupContainer* target, GameObject* source, uint unk)
     {
         // TODO: update when CS updated.
         var character = ((Character**)target)[1];

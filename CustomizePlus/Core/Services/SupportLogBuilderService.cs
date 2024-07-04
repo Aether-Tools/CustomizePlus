@@ -22,14 +22,14 @@ public class SupportLogBuilderService
     private readonly TemplateManager _templateManager;
     private readonly ProfileManager _profileManager;
     private readonly ArmatureManager _armatureManager;
-    private readonly DalamudPluginInterface _dalamudPluginInterface;
+    private readonly IDalamudPluginInterface _dalamudPluginInterface;
 
     public SupportLogBuilderService(
         PluginConfiguration configuration,
         TemplateManager templateManager,
         ProfileManager profileManager,
         ArmatureManager armatureManager,
-        DalamudPluginInterface dalamudPluginInterface)
+        IDalamudPluginInterface dalamudPluginInterface)
     {
         _configuration = configuration;
         _templateManager = templateManager;

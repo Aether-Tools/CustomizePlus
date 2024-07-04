@@ -37,7 +37,7 @@ namespace CustomizePlus.Core;
 
 public static class ServiceManagerBuilder
 {
-    public static ServiceManager CreateProvider(DalamudPluginInterface pi, Logger logger)
+    public static ServiceManager CreateProvider(IDalamudPluginInterface pi, Logger logger)
     {
         EventWrapperBase.ChangeLogger(logger);
 

@@ -1,5 +1,4 @@
-﻿using Dalamud.Interface.Internal.Notifications;
-using OtterGui.Classes;
+﻿using OtterGui.Classes;
 using OtterGui.Filesystem;
 using OtterGui.Log;
 using System;
@@ -10,6 +9,7 @@ using System.Text.RegularExpressions;
 using CustomizePlus.Core.Services;
 using CustomizePlus.Templates.Events;
 using CustomizePlus.Templates.Data;
+using Dalamud.Interface.ImGuiNotification;
 
 namespace CustomizePlus.Templates;
 

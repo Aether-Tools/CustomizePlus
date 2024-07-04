@@ -56,9 +56,9 @@ public class GPoseService : IDisposable
 
         GPoseState = clientState.IsGPosing ? GPoseState.Inside : GPoseState.Outside;
 
-        var uiModule = Framework.Instance()->GetUiModule();
-        var enterGPoseAddress = (nint)uiModule->VTable->EnterGPose;
-        var exitGPoseAddress = (nint)uiModule->VTable->ExitGPose;
+        var uiModule = Framework.Instance()->GetUIModule();
+        var enterGPoseAddress = (nint)uiModule->VirtualTable->EnterGPose;
+        var exitGPoseAddress = (nint)uiModule->VirtualTable->ExitGPose;
 
         _enterGPoseHook = hooker.HookFromAddress<EnterGPoseDelegate>(enterGPoseAddress, EnteringGPoseDetour);
         _enterGPoseHook.Enable();

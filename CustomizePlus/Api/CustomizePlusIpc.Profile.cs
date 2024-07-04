@@ -30,7 +30,7 @@ public partial class CustomizePlusIpc
     /// /!\ If no profile is set on specified character profile id will be equal to Guid.Empty
     /// </summary>
     [EzIPCEvent("Profile.OnUpdate")]
-    private Action<Character, Guid> OnProfileUpdate;
+    private Action<ICharacter, Guid> OnProfileUpdate;
 
     /// <summary>
     /// Retrieve list of all user profiles
@@ -125,7 +125,7 @@ public partial class CustomizePlusIpc
     /// Get unique id of currently active profile for character.
     /// </summary>
     [EzIPC("Profile.GetActiveProfileIdOnCharacter")]
-    private (int, Guid?) GetActiveProfileIdOnCharacter(Character character)
+    private (int, Guid?) GetActiveProfileIdOnCharacter(ICharacter character)
     {
         if (character == null)
             return ((int)ErrorCode.InvalidCharacter, null);
@@ -143,7 +143,7 @@ public partial class CustomizePlusIpc
     /// Returns profile's unique id which can be used to manipulate it at a later date.
     /// </summary>
     [EzIPC("Profile.SetTemporaryProfileOnCharacter")]
-    private (int, Guid?) SetTemporaryProfileOnCharacter(Character character, string profileJson)
+    private (int, Guid?) SetTemporaryProfileOnCharacter(ICharacter character, string profileJson)
     {
         //todo: do not allow to set temporary profile on reserved actors (examine, etc)
         if (character == null)
@@ -190,7 +190,7 @@ public partial class CustomizePlusIpc
     /// Delete temporary profile currently active on character
     /// </summary>
     [EzIPC("Profile.DeleteTemporaryProfileOnCharacter")]
-    private int DeleteTemporaryProfileOnCharacter(Character character)
+    private int DeleteTemporaryProfileOnCharacter(ICharacter character)
     {
         if (character == null)
             return (int)ErrorCode.InvalidCharacter;
@@ -266,7 +266,7 @@ public partial class CustomizePlusIpc
         if (armature.ActorIdentifier.ToNameWithoutOwnerName() != currentPlayerName)
             return;
 
-        Character? localPlayerCharacter = (Character?)_gameObjectService.GetDalamudGameObjectFromActor(_gameObjectService.GetLocalPlayerActor());
+        ICharacter? localPlayerCharacter = (ICharacter?)_gameObjectService.GetDalamudGameObjectFromActor(_gameObjectService.GetLocalPlayerActor());
         if (localPlayerCharacter == null)
             return;
 
@@ -317,7 +317,7 @@ public partial class CustomizePlusIpc
         }
     }
 
-    private void OnProfileUpdateInternal(Character character, Profile? profile)
+    private void OnProfileUpdateInternal(ICharacter character, Profile? profile)
     {
         if (character == null)
             return;

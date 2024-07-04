@@ -50,13 +50,13 @@ public class IPCTestTab //: IDisposable
     private readonly Func<Guid, int> _disableProfileByUniqueIdIpcFunc;
 
     [EzIPC("Profile.GetActiveProfileIdOnCharacter")]
-    private readonly Func<Character, (int, Guid?)> _getActiveProfileIdOnCharacterIpcFunc;
+    private readonly Func<ICharacter, (int, Guid?)> _getActiveProfileIdOnCharacterIpcFunc;
 
     [EzIPC("Profile.SetTemporaryProfileOnCharacter")]
-    private readonly Func<Character, string, (int, Guid?)> _setTemporaryProfileOnCharacterIpcFunc;
+    private readonly Func<ICharacter, string, (int, Guid?)> _setTemporaryProfileOnCharacterIpcFunc;
 
     [EzIPC("Profile.DeleteTemporaryProfileOnCharacter")]
-    private readonly Func<Character, int> _deleteTemporaryProfileOnCharacterIpcFunc;
+    private readonly Func<ICharacter, int> _deleteTemporaryProfileOnCharacterIpcFunc;
 
     [EzIPC("Profile.DeleteTemporaryProfileByUniqueId")]
     private readonly Func<Guid, int> _deleteTemporaryProfileByUniqueIdIpcFunc;
@@ -80,7 +80,7 @@ public class IPCTestTab //: IDisposable
     private string _targetProfileId = "";
 
     public IPCTestTab(
-        DalamudPluginInterface pluginInterface,
+        IDalamudPluginInterface pluginInterface,
         IObjectTable objectTable,
         ProfileManager profileManager,
         PopupSystem popupSystem,
@@ -311,16 +311,16 @@ public class IPCTestTab //: IDisposable
     }
 
     [EzIPCEvent("Profile.OnUpdate")]
-    private void OnProfileUpdate(Character Character, Guid ProfileUniqueId)
+    private void OnProfileUpdate(ICharacter Character, Guid ProfileUniqueId)
     {
         _logger.Debug($"IPC Test Tab - OnProfileUpdate: Character: {Character.Name.ToString().Incognify()}, Profile ID: {(ProfileUniqueId != Guid.Empty ? ProfileUniqueId.ToString() : "no id")}");
     }
 
-    private Character? FindCharacterByAddress(nint address)
+    private ICharacter? FindCharacterByAddress(nint address)
     {
         foreach (var obj in _objectTable)
             if (obj.Address == address)
-                return (Character)obj;
+                return (ICharacter)obj;
 
         return null;
     }

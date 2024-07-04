@@ -36,7 +36,7 @@ public sealed class Plugin : IDalamudPlugin
 
     public static readonly Logger Logger = new(); //for loggin in static classes/methods
 
-    public Plugin(DalamudPluginInterface pluginInterface)
+    public Plugin(IDalamudPluginInterface pluginInterface)
     {
         try
         {
@@ -52,7 +52,7 @@ public sealed class Plugin : IDalamudPlugin
             _services.GetService<CPlusWindowSystem>();
             _services.GetService<CommandService>();
 
-            Logger.Information($"Customize+ v{Version} ({ThisAssembly.Git.Commit}+{ThisAssembly.Git.Sha}) [FantasiaPlus] started");
+            Logger.Information($"Customize+ {Version} ({ThisAssembly.Git.Commit}+{ThisAssembly.Git.Sha}) [FantasiaPlus] started");
         }
         catch (Exception ex)
         {

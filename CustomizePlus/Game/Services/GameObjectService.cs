@@ -6,7 +6,7 @@ using Penumbra.GameData.Actors;
 using Penumbra.GameData.Enums;
 using Penumbra.GameData.Interop;
 using ObjectManager = CustomizePlus.GameData.Services.ObjectManager;
-using DalamudGameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
+using DalamudGameObject = Dalamud.Game.ClientState.Objects.Types.IGameObject;
 using ECommons.Configuration;
 using System;
 using CustomizePlus.Configuration.Data;

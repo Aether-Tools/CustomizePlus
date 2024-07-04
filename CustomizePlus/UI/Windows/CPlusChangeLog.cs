@@ -21,6 +21,7 @@ public class CPlusChangeLog
         Add2_0_4_0(Changelog);
         Add2_0_4_1(Changelog);
         Add2_0_4_4(Changelog);
+        //Add2_0_5_0(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -32,6 +33,13 @@ public class CPlusChangeLog
         _config.ChangelogSettings.ChangeLogDisplayType = type;
         _config.Save();
     }
+
+    private static void Add2_0_5_0(Changelog log)
+    => log.NextVersion("Version 2.0.5.0")
+        .RegisterHighlight("Customize+ has been updated to support Dawntrail.")
+        .RegisterEntry("Added \"Copy Support Info to Clipboard\" button to Settings tab.")
+        .RegisterEntry("Renamed \"Default profile\" to \"Apply to all players and retainers\" to try and improve understanding of the function by the users. (2.0.4.5)")
+        .RegisterEntry("Improved UI behavior when \"Apply to all players and retainers\" is enabled. (2.0.4.5)");
 
     private static void Add2_0_4_4(Changelog log)
     => log.NextVersion("Version 2.0.4.4")

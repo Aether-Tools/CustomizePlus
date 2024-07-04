@@ -20,7 +20,7 @@ public class CutsceneService : IService, IDisposable
     private readonly CharacterDestructor _characterDestructor;
     private readonly short[] _copiedCharacters = Enumerable.Repeat((short)-1, CutsceneSlots).ToArray();
 
-    public IEnumerable<KeyValuePair<int, Dalamud.Game.ClientState.Objects.Types.GameObject>> Actors
+    public IEnumerable<KeyValuePair<int, Dalamud.Game.ClientState.Objects.Types.IGameObject>> Actors
         => Enumerable.Range(CutsceneStartIdx, CutsceneSlots)
             .Where(i => _objects[i] != null)
             .Select(i => KeyValuePair.Create(i, this[i] ?? _objects[i]!));
@@ -43,7 +43,7 @@ public class CutsceneService : IService, IDisposable
     /// Does not check for valid input index.
     /// Returns null if no connected actor is set or the actor does not exist anymore.
     /// </summary>
-    public Dalamud.Game.ClientState.Objects.Types.GameObject? this[int idx]
+    public Dalamud.Game.ClientState.Objects.Types.IGameObject? this[int idx]
     {
         get
         {
@@ -101,7 +101,7 @@ public class CutsceneService : IService, IDisposable
                     // A hack to deal with GPose actors leaving and thus losing the link, we just set the home world instead.
                     // I do not think this breaks anything?
                     var address = (GameObject*)_objects.GetObjectAddress(i + CutsceneStartIdx);
-                    if (address != null && address->GetObjectKind() is (byte)ObjectKind.Pc)
+                    if (address != null && address->GetObjectKind() is ObjectKind.Pc)
                         ((Character*)address)->HomeWorld = character->HomeWorld;
 
                     _copiedCharacters[i] = -1;

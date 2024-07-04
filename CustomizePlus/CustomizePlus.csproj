@@ -93,4 +93,8 @@
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <DefineConstants>INCOGNIFY_STRINGS</DefineConstants>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <GitVersion>false</GitVersion>
+  </PropertyGroup>
 </Project>

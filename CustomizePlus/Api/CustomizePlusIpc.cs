@@ -19,7 +19,7 @@ namespace CustomizePlus.Api;
 /// </summary>
 public partial class CustomizePlusIpc : IDisposable
 {
-    private readonly DalamudPluginInterface _pluginInterface;
+    private readonly IDalamudPluginInterface _pluginInterface;
     private readonly Logger _logger;
     private readonly HookingService _hookingService;
     private readonly ProfileManager _profileManager;
@@ -34,7 +34,7 @@ public partial class CustomizePlusIpc : IDisposable
     public bool IPCFailed { get; private set; }
 
     public CustomizePlusIpc(
-        DalamudPluginInterface pluginInterface,
+        IDalamudPluginInterface pluginInterface,
         Logger logger,
         HookingService hookingService,
         ProfileManager profileManager,

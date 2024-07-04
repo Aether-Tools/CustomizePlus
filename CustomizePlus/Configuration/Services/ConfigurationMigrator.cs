@@ -1,5 +1,4 @@
-﻿using Dalamud.Interface.Internal.Notifications;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using OtterGui.Classes;
 using OtterGui.Log;
 using System;
@@ -11,7 +10,7 @@ using CustomizePlus.Configuration.Helpers;
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Core.Events;
 using CustomizePlus.Configuration.Data.Version3;
-using CustomizePlus.UI.Windows;
+using Dalamud.Interface.ImGuiNotification;
 
 namespace CustomizePlus.Configuration.Services;
 

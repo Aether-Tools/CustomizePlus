@@ -21,7 +21,7 @@ public class CPlusChangeLog
         Add2_0_4_0(Changelog);
         Add2_0_4_1(Changelog);
         Add2_0_4_4(Changelog);
-        //Add2_0_5_0(Changelog);
+        Add2_0_5_0(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -37,6 +37,9 @@ public class CPlusChangeLog
     private static void Add2_0_5_0(Changelog log)
     => log.NextVersion("Version 2.0.5.0")
         .RegisterHighlight("Customize+ has been updated to support Dawntrail.")
+        .RegisterImportant("Known issues:", 1)
+        .RegisterImportant("Profiles are not applied on Character Select Screen.", 2)
+        .RegisterImportant("IPC needs additional work and has been disabled for now. Expect issues if you decide to call it anyway.", 2)
         .RegisterEntry("Added \"Copy Support Info to Clipboard\" button to Settings tab.")
         .RegisterEntry("Renamed \"Default profile\" to \"Apply to all players and retainers\" to try and improve understanding of the function by the users. (2.0.4.5)")
         .RegisterEntry("Improved UI behavior when \"Apply to all players and retainers\" is enabled. (2.0.4.5)");

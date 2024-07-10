@@ -55,7 +55,7 @@ public class StateMonitoringTab
         if (showArmatures)
             DrawArmatures();
 
-        var showObjectManager = ImGui.CollapsingHeader($"Object manager ({_objectManager.Count})###objectmanager_header");
+        var showObjectManager = ImGui.CollapsingHeader($"Object manager ({_objectManager.Identifiers.Count})###objectmanager_header");
 
         if (showObjectManager)
             DrawObjectManager();

@@ -22,14 +22,14 @@ public class SupportLogBuilderService
     private readonly TemplateManager _templateManager;
     private readonly ProfileManager _profileManager;
     private readonly ArmatureManager _armatureManager;
-    private readonly DalamudPluginInterface _dalamudPluginInterface;
+    private readonly IDalamudPluginInterface _dalamudPluginInterface;
 
     public SupportLogBuilderService(
         PluginConfiguration configuration,
         TemplateManager templateManager,
         ProfileManager profileManager,
         ArmatureManager armatureManager,
-        DalamudPluginInterface dalamudPluginInterface)
+        IDalamudPluginInterface dalamudPluginInterface)
     {
         _configuration = configuration;
         _templateManager = templateManager;
@@ -40,14 +40,16 @@ public class SupportLogBuilderService
 
     public string BuildSupportLog()
     {
-        var sb = new StringBuilder(10240);
+        var sb = new StringBuilder(102400); //it's fair to assume this will very often be quite large
         sb.AppendLine("**Settings**");
         sb.Append($"> **`Plugin Version:                 `** {Plugin.Version}\n");
         sb.Append($"> **`Commit Hash:                    `** {ThisAssembly.Git.Commit}+{ThisAssembly.Git.Sha}\n");
-        sb.Append($"> **`Root editing:                   `** {_configuration.EditorConfiguration.RootPositionEditingEnabled}\n");
+        sb.Append($"> **`Plugin enabled:                 `** {_configuration.PluginEnabled}\n");
         sb.AppendLine("**Settings -> Editor Settings**");
         sb.Append($"> **`Limit to my creatures (editor): `** {_configuration.EditorConfiguration.LimitLookupToOwnedObjects}\n");
         sb.Append($"> **`Preview character (editor):     `** {_configuration.EditorConfiguration.PreviewCharacterName?.Incognify() ?? "Not set"}\n");
+        sb.Append($"> **`Set preview character on login: `** {_configuration.EditorConfiguration.SetPreviewToCurrentCharacterOnLogin}\n");
+        sb.Append($"> **`Root editing:                   `** {_configuration.EditorConfiguration.RootPositionEditingEnabled}\n");
         sb.AppendLine("**Settings -> Profile application**");
         sb.Append($"> **`Character window:               `** {_configuration.ProfileApplicationSettings.ApplyInCharacterWindow}\n");
         sb.Append($"> **`Try On:                         `** {_configuration.ProfileApplicationSettings.ApplyInTryOn}\n");
@@ -63,6 +65,7 @@ public class SupportLogBuilderService
             sb.Append($">   > **`{template.ToString(),-32}`**\n");
         }
         sb.AppendLine("**Profiles**");
+        sb.Append($"> **`Default profile:                `** {_profileManager.DefaultProfile?.ToString() ?? "None"}\n");
         sb.Append($"> **`Count:                          `** {_profileManager.Profiles.Count}\n");
         foreach (var profile in _profileManager.Profiles)
         {

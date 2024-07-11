@@ -15,7 +15,7 @@ public class FilenameService
     public readonly string TemplateDirectory;
     public readonly string TemplateFileSystem;
 
-    public FilenameService(DalamudPluginInterface pi)
+    public FilenameService(IDalamudPluginInterface pi)
     {
         ConfigDirectory = pi.ConfigDirectory.FullName;
         ConfigFile = pi.ConfigFile.FullName;

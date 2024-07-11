@@ -4,6 +4,7 @@ using System.Runtime.Serialization;
 using CustomizePlus.Core.Extensions;
 using CustomizePlus.Game.Services.GPose.ExternalTools;
 using FFXIVClientStructs.Havok;
+using FFXIVClientStructs.Havok.Common.Base.Math.QsTransform;
 
 namespace CustomizePlus.Core.Data;
 

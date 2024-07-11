@@ -10,12 +10,12 @@ namespace CustomizePlus.UI;
 public class CPlusWindowSystem : IDisposable
 {
     private readonly WindowSystem _windowSystem = new("Customize+");
-    private readonly UiBuilder _uiBuilder;
+    private readonly IUiBuilder _uiBuilder;
     private readonly MainWindow _mainWindow;
     private readonly PopupSystem _popupSystem;
 
     public CPlusWindowSystem(
-        UiBuilder uiBuilder,
+        IUiBuilder uiBuilder,
         MainWindow mainWindow,
         CPlusChangeLog changelog,
         PopupSystem popupSystem,

@@ -2,6 +2,8 @@
 using System.Numerics;
 using CustomizePlus.Anamnesis.Data;
 using FFXIVClientStructs.Havok;
+using FFXIVClientStructs.Havok.Common.Base.Math.Quaternion;
+using FFXIVClientStructs.Havok.Common.Base.Math.Vector;
 
 namespace CustomizePlus.Core.Extensions;
 

@@ -2,18 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using Dalamud.Configuration;
-using Dalamud.Interface.Internal.Notifications;
 using Newtonsoft.Json;
 using OtterGui.Classes;
-using OtterGui.Log;
 using OtterGui.Widgets;
 using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 using CustomizePlus.Core.Services;
 using CustomizePlus.Core.Data;
 using CustomizePlus.Configuration.Services;
-using CustomizePlus.Game.Services;
 using CustomizePlus.UI.Windows;
-using Dalamud.Plugin.Services;
+using Dalamud.Interface.ImGuiNotification;
 
 namespace CustomizePlus.Configuration.Data;
 

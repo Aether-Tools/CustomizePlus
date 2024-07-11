@@ -1,5 +1,4 @@
 ﻿using Dalamud.Game.Command;
-using Dalamud.Interface.Internal.Notifications;
 using Dalamud.Plugin.Services;
 using OtterGui.Classes;
 using System;
@@ -13,6 +12,7 @@ using CustomizePlus.UI.Windows.MainWindow;
 using static System.Windows.Forms.AxHost;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Configuration.Data;
+using Dalamud.Interface.ImGuiNotification;
 
 namespace CustomizePlus.Core.Services;
 

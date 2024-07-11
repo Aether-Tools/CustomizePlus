@@ -16,7 +16,7 @@ public class ObjectManager(
     IFramework framework,
     IClientState clientState,
     IObjectTable objects,
-    DalamudPluginInterface pi,
+    IDalamudPluginInterface pi,
     Logger log,
     ActorManager actors,
     ITargetManager targets)
@@ -218,13 +218,16 @@ public class ObjectManager(
     }
 
     //c+ custom
+    [Obsolete("To be updated for DT")]
     private unsafe bool AddLobbyCharacter()
     {
+        return false;
+        /*
         var agent = AgentLobby.Instance();
-        if (agent == null || agent->LobbyData.CharaSelectEntries.Size() == 0)
+        if (agent == null || agent->LobbyData.CharaSelectEntries.LongCount() == 0)
             return false;
 
-        var chara = agent->LobbyData.CharaSelectEntries.Get((ulong)agent->SelectedCharacterIndex).Value;
+        var chara = agent->LobbyData.CharaSelectEntries.Get((ulong)agent->SelectedCharacterContentId).Value;
         if (chara == null)
             return false;
 
@@ -235,6 +238,6 @@ public class ObjectManager(
 
         HandleIdentifier(actors.CreatePlayer(new ByteString(chara->Name), chara->HomeWorldId), actor);
 
-        return true;
+        return true;*/
     }
 }

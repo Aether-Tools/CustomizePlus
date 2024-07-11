@@ -11,12 +11,9 @@ using System;
 using System.Numerics;
 using static CustomizePlus.UI.Windows.MainWindow.Tabs.Templates.TemplateFileSystemSelector;
 using Newtonsoft.Json;
-using System.Windows.Forms;
 using System.Linq;
-using Dalamud.Interface.Internal.Notifications;
 using Dalamud.Interface.ImGuiFileDialog;
 using System.IO;
-using System.Reflection;
 using CustomizePlus.Templates;
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Profiles;
@@ -28,9 +25,8 @@ using CustomizePlus.Profiles.Events;
 using CustomizePlus.Templates.Data;
 using CustomizePlus.Configuration.Helpers;
 using CustomizePlus.Configuration.Data.Version3;
-using CustomizePlus.GameData.Data;
-using static OtterGui.Classes.MessageService;
 using CustomizePlus.Configuration.Data.Version2;
+using Dalamud.Interface.ImGuiNotification;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 

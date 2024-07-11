@@ -47,7 +47,7 @@ public class MainWindow : Window, IDisposable
     private Action? _actionAfterTabSwitch = null;
 
     public MainWindow(
-        DalamudPluginInterface pluginInterface,
+        IDalamudPluginInterface pluginInterface,
         SettingsTab settingsTab,
         TemplatesTab templatesTab,
         ProfilesTab profilesTab,
@@ -59,7 +59,7 @@ public class MainWindow : Window, IDisposable
         PluginConfiguration configuration,
         HookingService hookingService,
         TemplateEditorEvent templateEditorEvent
-        ) : base($"Customize+ v{Plugin.Version}###CPlusMainWindow")
+        ) : base($"Customize+ {Plugin.Version}###CPlusMainWindow")
     {
         _settingsTab = settingsTab;
         _templatesTab = templatesTab;

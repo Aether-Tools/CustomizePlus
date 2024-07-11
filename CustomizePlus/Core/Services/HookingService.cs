@@ -27,7 +27,7 @@ public class HookingService : IDisposable
     private Hook<RenderDelegate>? _renderManagerHook;
     private Hook<GameObjectMovementDelegate>? _gameObjectMovementHook;
 
-    private delegate nint RenderDelegate(nint a1, nint a2, int a3, int a4);
+    private delegate nint RenderDelegate(nint a1, nint a2, nint a3, int a4);
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate void GameObjectMovementDelegate(nint gameObject);
@@ -101,7 +101,7 @@ public class HookingService : IDisposable
         }
     }
 
-    private nint OnRender(nint a1, nint a2, int a3, int a4)
+    private nint OnRender(nint a1, nint a2, nint a3, int a4)
     {
         if (_renderManagerHook == null)
         {

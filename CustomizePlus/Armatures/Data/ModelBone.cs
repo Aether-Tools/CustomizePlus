@@ -5,6 +5,7 @@ using CustomizePlus.Core.Data;
 using CustomizePlus.Templates.Data;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.Havok;
+using FFXIVClientStructs.Havok.Common.Base.Math.QsTransform;
 
 namespace CustomizePlus.Armatures.Data;
 

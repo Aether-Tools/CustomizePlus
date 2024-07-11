@@ -1,6 +1,4 @@
-﻿//using CustomizePlus.UI.Windows.Debug;
-using Dalamud.Interface;
-using Dalamud.Interface.Internal.Notifications;
+﻿using Dalamud.Interface;
 using Dalamud.Interface.Utility;
 using ImGuiNET;
 using OtterGui.Classes;
@@ -15,6 +13,7 @@ using CustomizePlus.Profiles;
 using CustomizePlus.Templates;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.Armatures.Services;
+using Dalamud.Interface.ImGuiNotification;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs;
 

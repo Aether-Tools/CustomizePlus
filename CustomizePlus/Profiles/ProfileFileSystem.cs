@@ -6,10 +6,10 @@ using System.Text.RegularExpressions;
 using System;
 using System.Linq;
 using OtterGui.Classes;
-using Dalamud.Interface.Internal.Notifications;
 using CustomizePlus.Core.Services;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Profiles.Events;
+using Dalamud.Interface.ImGuiNotification;
 
 namespace CustomizePlus.Profiles;
 

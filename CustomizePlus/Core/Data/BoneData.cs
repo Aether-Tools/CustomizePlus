@@ -227,7 +227,7 @@ public static class BoneData //todo: DI, do not show IVCS unless IVCS is install
         "n_buki_l,Weapon Left,Equipment,FALSE,FALSE,j_te_l,n_buki_r",
         "n_buki_r,Weapon Right,Equipment,FALSE,FALSE,j_te_r,n_buki_l",
 
-        "j_f_face,Face (DT),Face,TRUE,FALSE,j_kao,",
+        "j_f_face,Face Root (Dawntrail),Face,TRUE,FALSE,j_kao,",
         "j_f_hana,Nose,Face,TRUE,FALSE,j_kao,",
         "j_f_hana_l,Nose Left,Face,TRUE,FALSE,j_f_hana,j_f_hana_r",
         "j_f_hana_r,Nose Right,Face,TRUE,FALSE,j_f_hana,j_f_hana_l",

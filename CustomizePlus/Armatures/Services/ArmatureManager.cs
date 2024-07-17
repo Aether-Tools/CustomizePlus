@@ -335,9 +335,9 @@ public unsafe sealed class ArmatureManager : IDisposable
 
             var newPosition = new FFXIVClientStructs.FFXIV.Common.Math.Vector3
             {
-                X = cBase->DrawObject.Object.Position.X + MathF.Max(rootBoneTransform.Translation.X, 0.01f),
-                Y = cBase->DrawObject.Object.Position.Y + MathF.Max(rootBoneTransform.Translation.Y, 0.01f),
-                Z = cBase->DrawObject.Object.Position.Z + MathF.Max(rootBoneTransform.Translation.Z, 0.01f)
+                X = cBase->DrawObject.Object.Position.X + rootBoneTransform.Translation.X,
+                Y = cBase->DrawObject.Object.Position.Y + rootBoneTransform.Translation.Y,
+                Z = cBase->DrawObject.Object.Position.Z + rootBoneTransform.Translation.Z
             };
 
             cBase->DrawObject.Object.Position = newPosition;

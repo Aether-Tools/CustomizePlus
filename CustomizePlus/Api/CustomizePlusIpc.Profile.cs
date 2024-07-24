@@ -127,9 +127,6 @@ public partial class CustomizePlusIpc
     [EzIPC("Profile.GetActiveProfileIdOnCharacter")]
     private (int, Guid?) GetActiveProfileIdOnCharacter(ICharacter character)
     {
-        //todo: temporary
-        return ((int)ErrorCode.UnknownError, null);
-
         if (character == null)
             return ((int)ErrorCode.InvalidCharacter, null);
 
@@ -148,9 +145,6 @@ public partial class CustomizePlusIpc
     [EzIPC("Profile.SetTemporaryProfileOnCharacter")]
     private (int, Guid?) SetTemporaryProfileOnCharacter(ICharacter character, string profileJson)
     {
-        //todo: temporary
-        return ((int)ErrorCode.UnknownError, null);
-
         //todo: do not allow to set temporary profile on reserved actors (examine, etc)
         if (character == null)
             return ((int)ErrorCode.InvalidCharacter, null);
@@ -198,9 +192,6 @@ public partial class CustomizePlusIpc
     [EzIPC("Profile.DeleteTemporaryProfileOnCharacter")]
     private int DeleteTemporaryProfileOnCharacter(ICharacter character)
     {
-        //todo: temporary
-        return (int)ErrorCode.UnknownError;
-
         if (character == null)
             return (int)ErrorCode.InvalidCharacter;
 
@@ -270,9 +261,6 @@ public partial class CustomizePlusIpc
     //warn: intended limitation - ignores default profiles because why you would use default profile on your own character
     private void OnArmatureChanged(ArmatureChanged.Type type, Armature armature, object? arg3)
     {
-        //todo: temporary
-        return;
-
         string currentPlayerName = _gameObjectService.GetCurrentPlayerName();
 
         if (armature.ActorIdentifier.ToNameWithoutOwnerName() != currentPlayerName)

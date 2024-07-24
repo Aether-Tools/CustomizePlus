@@ -25,8 +25,6 @@ public partial class CustomizePlusIpc
     [EzIPC("General.IsValid")]
     private bool IsValid()
     {
-        return false;
-
         return !IPCFailed &&
             !_hookingService.RenderHookFailed &&
             !_hookingService.MovementHookFailed;

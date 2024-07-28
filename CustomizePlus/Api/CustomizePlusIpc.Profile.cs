@@ -30,7 +30,7 @@ public partial class CustomizePlusIpc
     /// /!\ If no profile is set on specified character profile id will be equal to Guid.Empty
     /// </summary>
     [EzIPCEvent("Profile.OnUpdate")]
-    private Action<ICharacter, Guid> OnProfileUpdate;
+    private Action<ulong, Guid> OnProfileUpdate;
 
     /// <summary>
     /// Retrieve list of all user profiles
@@ -125,10 +125,9 @@ public partial class CustomizePlusIpc
     /// Get unique id of currently active profile for character.
     /// </summary>
     [EzIPC("Profile.GetActiveProfileIdOnCharacter")]
-    private (int, Guid?) GetActiveProfileIdOnCharacter(ICharacter character)
+    private (int, Guid?) GetActiveProfileIdOnCharacter(ulong characterObjectId)
     {
-        //todo: temporary
-        return ((int)ErrorCode.UnknownError, null);
+        var character = (ICharacter?)_gameObjectService.GetGameObjectById(characterObjectId);
 
         if (character == null)
             return ((int)ErrorCode.InvalidCharacter, null);
@@ -146,10 +145,9 @@ public partial class CustomizePlusIpc
     /// Returns profile's unique id which can be used to manipulate it at a later date.
     /// </summary>
     [EzIPC("Profile.SetTemporaryProfileOnCharacter")]
-    private (int, Guid?) SetTemporaryProfileOnCharacter(ICharacter character, string profileJson)
+    private (int, Guid?) SetTemporaryProfileOnCharacter(ulong characterObjectId, string profileJson)
     {
-        //todo: temporary
-        return ((int)ErrorCode.UnknownError, null);
+        var character = (ICharacter?)_gameObjectService.GetGameObjectById(characterObjectId);
 
         //todo: do not allow to set temporary profile on reserved actors (examine, etc)
         if (character == null)
@@ -196,10 +194,9 @@ public partial class CustomizePlusIpc
     /// Delete temporary profile currently active on character
     /// </summary>
     [EzIPC("Profile.DeleteTemporaryProfileOnCharacter")]
-    private int DeleteTemporaryProfileOnCharacter(ICharacter character)
+    private int DeleteTemporaryProfileOnCharacter(ulong characterObjectId)
     {
-        //todo: temporary
-        return (int)ErrorCode.UnknownError;
+        var character = (ICharacter?)_gameObjectService.GetGameObjectById(characterObjectId);
 
         if (character == null)
             return (int)ErrorCode.InvalidCharacter;
@@ -339,6 +336,6 @@ public partial class CustomizePlusIpc
 
         _logger.Debug($"Sending player update message: Character: {character.Name.ToString().Incognify()}, Profile: {(profile != null ? profile.ToString() : "no profile")}");
 
-        OnProfileUpdate(character, profile != null ? profile.UniqueId : Guid.Empty);
+        OnProfileUpdate(character.GameObjectId, profile != null ? profile.UniqueId : Guid.Empty);
     }
 }

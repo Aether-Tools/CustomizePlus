@@ -56,6 +56,11 @@ public class GameObjectService
                 || actor == _objectTable.GetObjectAddress(0));
     }
 
+    public DalamudGameObject? GetGameObjectById(ulong id)
+    {
+        return _objectTable.SearchById(id);
+    }
+
     /// <summary>
     /// Case sensitive
     /// </summary>

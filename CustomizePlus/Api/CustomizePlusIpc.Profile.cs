@@ -154,7 +154,7 @@ public partial class CustomizePlusIpc
             return ((int)ErrorCode.InvalidCharacter, null);
 
         var actor = (Actor)character.Address;
-        if (!actor.Valid)
+        if (!actor.Valid || !actor.IsCharacter)
             return ((int)ErrorCode.InvalidCharacter, null);
 
         try
@@ -202,7 +202,7 @@ public partial class CustomizePlusIpc
             return (int)ErrorCode.InvalidCharacter;
 
         var actor = (Actor)character.Address;
-        if (!actor.Valid)
+        if (!actor.Valid || !actor.IsCharacter)
             return (int)ErrorCode.InvalidCharacter;
 
         try

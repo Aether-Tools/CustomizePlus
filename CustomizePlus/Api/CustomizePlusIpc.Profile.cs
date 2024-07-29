@@ -30,7 +30,7 @@ public partial class CustomizePlusIpc
     /// /!\ If no profile is set on specified character profile id will be equal to Guid.Empty
     /// </summary>
     [EzIPCEvent("Profile.OnUpdate")]
-    private Action<ICharacter, Guid> OnProfileUpdate;
+    private Action<ushort, Guid> OnProfileUpdate;
 
     /// <summary>
     /// Retrieve list of all user profiles
@@ -125,12 +125,14 @@ public partial class CustomizePlusIpc
     /// Get unique id of currently active profile for character.
     /// </summary>
     [EzIPC("Profile.GetActiveProfileIdOnCharacter")]
-    private (int, Guid?) GetActiveProfileIdOnCharacter(ICharacter character)
+    private (int, Guid?) GetActiveProfileIdOnCharacter(ushort gameObjectIndex)
     {
-        if (character == null)
+        var actor = _gameObjectService.GetActorByObjectIndex(gameObjectIndex);
+
+        if (actor == null || !actor.Value.Valid || !actor.Value.IsCharacter)
             return ((int)ErrorCode.InvalidCharacter, null);
 
-        var profile = _profileManager.GetProfileByCharacterName(character.Name.ToString(), true);
+        var profile = _profileManager.GetProfileByCharacterName(actor.Value.Utf8Name.ToString(), true);
 
         if (profile == null)
             return ((int)ErrorCode.ProfileNotFound, null);
@@ -143,14 +145,12 @@ public partial class CustomizePlusIpc
     /// Returns profile's unique id which can be used to manipulate it at a later date.
     /// </summary>
     [EzIPC("Profile.SetTemporaryProfileOnCharacter")]
-    private (int, Guid?) SetTemporaryProfileOnCharacter(ICharacter character, string profileJson)
+    private (int, Guid?) SetTemporaryProfileOnCharacter(ushort gameObjectIndex, string profileJson)
     {
-        //todo: do not allow to set temporary profile on reserved actors (examine, etc)
-        if (character == null)
-            return ((int)ErrorCode.InvalidCharacter, null);
+        var actor = _gameObjectService.GetActorByObjectIndex(gameObjectIndex);
 
-        var actor = (Actor)character.Address;
-        if (!actor.Valid)
+        //todo: do not allow to set temporary profile on reserved actors (examine, etc)
+        if (actor == null || !actor.Value.Valid || !actor.Value.IsCharacter)
             return ((int)ErrorCode.InvalidCharacter, null);
 
         try
@@ -162,26 +162,26 @@ public partial class CustomizePlusIpc
             }
             catch (Exception ex)
             {
-                _logger.Error($"IPCCharacterProfile deserialization issue. Character: {character?.Name.ToString().Incognify()}, exception: {ex}.");
+                _logger.Error($"IPCCharacterProfile deserialization issue. Character: {actor.Value.Utf8Name.ToString().Incognify()}, exception: {ex}.");
                 return ((int)ErrorCode.CorruptedProfile, null);
             }
 
             if (profile == null)
             {
-                _logger.Error($"IPCCharacterProfile is null after deserialization. Character: {character?.Name.ToString().Incognify()}.");
+                _logger.Error($"IPCCharacterProfile is null after deserialization. Character: {actor.Value.Utf8Name.ToString().Incognify()}.");
                 return ((int)ErrorCode.CorruptedProfile, null);
             }
 
             //todo: ideally we'd probably want to make sure ID returned by that function does not have collision with other profiles
             var fullProfile = IPCCharacterProfile.ToFullProfile(profile).Item1;
 
-            _profileManager.AddTemporaryProfile(fullProfile, actor);
+            _profileManager.AddTemporaryProfile(fullProfile, actor.Value);
             return ((int)ErrorCode.Success, fullProfile.UniqueId);
 
         }
         catch (Exception ex)
         {
-            _logger.Error($"Unable to set temporary profile. Character: {character?.Name.ToString().Incognify()}, exception: {ex}.");
+            _logger.Error($"Unable to set temporary profile. Character: {actor.Value.Utf8Name.ToString().Incognify()}, exception: {ex}.");
             return ((int)ErrorCode.UnknownError, null);
         }
     }
@@ -190,18 +190,16 @@ public partial class CustomizePlusIpc
     /// Delete temporary profile currently active on character
     /// </summary>
     [EzIPC("Profile.DeleteTemporaryProfileOnCharacter")]
-    private int DeleteTemporaryProfileOnCharacter(ICharacter character)
+    private int DeleteTemporaryProfileOnCharacter(ushort gameObjectIndex)
     {
-        if (character == null)
-            return (int)ErrorCode.InvalidCharacter;
+        var actor = _gameObjectService.GetActorByObjectIndex(gameObjectIndex);
 
-        var actor = (Actor)character.Address;
-        if (!actor.Valid)
+        if (actor == null || !actor.Value.Valid || !actor.Value.IsCharacter)
             return (int)ErrorCode.InvalidCharacter;
 
         try
         {
-            _profileManager.RemoveTemporaryProfile(actor);
+            _profileManager.RemoveTemporaryProfile(actor.Value);
             return (int)ErrorCode.Success;
         }
         catch(ProfileException ex)
@@ -213,13 +211,13 @@ public partial class CustomizePlusIpc
                 case ProfileNotFoundException:
                     return (int)ErrorCode.ProfileNotFound;
                 default:
-                    _logger.Error($"Exception in DeleteTemporaryProfileOnCharacter. Character: {character?.Name.ToString().Incognify()}. Exception: {ex}");
+                    _logger.Error($"Exception in DeleteTemporaryProfileOnCharacter. Character: {actor.Value.Utf8Name.ToString().Incognify()}. Exception: {ex}");
                     return (int)ErrorCode.UnknownError;
             }
         }
         catch(Exception ex)
         {
-            _logger.Error($"Exception in DeleteTemporaryProfileOnCharacter. Character: {character?.Name.ToString().Incognify()}. Exception: {ex}");
+            _logger.Error($"Exception in DeleteTemporaryProfileOnCharacter. Character: {actor.Value.Utf8Name.ToString().Incognify()}. Exception: {ex}");
             return (int)ErrorCode.UnknownError;
         }
     }
@@ -309,7 +307,7 @@ public partial class CustomizePlusIpc
         if (type == ArmatureChanged.Type.Deleted)
         {
             //Do not send event if default or editor profile was used
-            if (armature.Profile == _profileManager.DefaultProfile || armature.Profile.ProfileType == ProfileType.Editor)
+            if (armature.Profile == _profileManager.DefaultProfile || armature.Profile.ProfileType == ProfileType.Editor) //todo: never send if ProfileType != normal?
                 return;
 
             OnProfileUpdateInternal(localPlayerCharacter, null);
@@ -327,6 +325,6 @@ public partial class CustomizePlusIpc
 
         _logger.Debug($"Sending player update message: Character: {character.Name.ToString().Incognify()}, Profile: {(profile != null ? profile.ToString() : "no profile")}");
 
-        OnProfileUpdate(character, profile != null ? profile.UniqueId : Guid.Empty);
+        OnProfileUpdate(character.ObjectIndex, profile != null ? profile.UniqueId : Guid.Empty);
     }
 }

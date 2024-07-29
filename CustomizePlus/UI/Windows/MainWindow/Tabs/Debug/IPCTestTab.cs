@@ -50,24 +50,19 @@ public class IPCTestTab //: IDisposable
     private readonly Func<Guid, int> _disableProfileByUniqueIdIpcFunc;
 
     [EzIPC("Profile.GetActiveProfileIdOnCharacter")]
-    private readonly Func<ICharacter, (int, Guid?)> _getActiveProfileIdOnCharacterIpcFunc;
+    private readonly Func<ushort, (int, Guid?)> _getActiveProfileIdOnCharacterIpcFunc;
 
     [EzIPC("Profile.SetTemporaryProfileOnCharacter")]
-    private readonly Func<ICharacter, string, (int, Guid?)> _setTemporaryProfileOnCharacterIpcFunc;
+    private readonly Func<ushort, string, (int, Guid?)> _setTemporaryProfileOnCharacterIpcFunc;
 
     [EzIPC("Profile.DeleteTemporaryProfileOnCharacter")]
-    private readonly Func<ICharacter, int> _deleteTemporaryProfileOnCharacterIpcFunc;
+    private readonly Func<ushort, int> _deleteTemporaryProfileOnCharacterIpcFunc;
 
     [EzIPC("Profile.DeleteTemporaryProfileByUniqueId")]
     private readonly Func<Guid, int> _deleteTemporaryProfileByUniqueIdIpcFunc;
 
     [EzIPC("Profile.GetByUniqueId")]
     private readonly Func<Guid, (int, string?)> _getProfileByIdIpcFunc;
-
-    //private readonly ICallGateSubscriber<string, Character?, object>? _setCharacterProfile;
-    //private readonly ICallGateSubscriber<Character?, string>? _getProfileFromCharacter;
-    //private readonly ICallGateSubscriber<Character?, object>? _revertCharacter;
-    //private readonly ICallGateSubscriber<string?, string?, object?>? _onProfileUpdate;
 
     private string? _rememberedProfileJson;
 
@@ -103,24 +98,8 @@ public class IPCTestTab //: IDisposable
 
         if (_getApiVersionIpcFunc != null)
             _apiVersion = _getApiVersionIpcFunc();
-
-        //_setCharacterProfile = pluginInterface.GetIpcSubscriber<string, Character?, object>("CustomizePlus.SetProfileToCharacter");
-        //_getProfileFromCharacter = pluginInterface.GetIpcSubscriber<Character?, string>("CustomizePlus.GetProfileFromCharacter");
-        //_revertCharacter = pluginInterface.GetIpcSubscriber<Character?, object>("CustomizePlus.RevertCharacter");
-        /*_onProfileUpdate = pluginInterface.GetIpcSubscriber<string?, string?, object?>("CustomizePlus.OnProfileUpdate");
-        _onProfileUpdate.Subscribe(OnProfileUpdate);*/
     }
-    /* public void Dispose()
-     {
-         _onProfileUpdate?.Unsubscribe(OnProfileUpdate);
-     }
 
-     private void OnProfileUpdate(string? characterName, string? profileJson)
-     {
-         _lastProfileUpdate = DateTime.Now;
-         _lastProfileUpdateName = characterName;
-     }
-    */
     public unsafe void Draw()
     {
         _objectManager.Update();
@@ -141,7 +120,6 @@ public class IPCTestTab //: IDisposable
 
         ImGui.Separator();
 
-        //ImGui.Text($"Last profile update: {_lastProfileUpdate}, Character: {_lastProfileUpdateName}");
         ImGui.Text($"Memory: {(string.IsNullOrWhiteSpace(_rememberedProfileJson) ? "empty" : "has data")}");
 
         ImGui.Text("Character to operate on:");
@@ -171,7 +149,7 @@ public class IPCTestTab //: IDisposable
             if (actors.Count == 0)
                 return;
 
-            (int result, Guid? uniqueId) = _getActiveProfileIdOnCharacterIpcFunc(FindCharacterByAddress(actors[0].Item2.Address));
+            (int result, Guid? uniqueId) = _getActiveProfileIdOnCharacterIpcFunc(actors[0].Item2.Index.Index);
 
             if(result == 0)
             {
@@ -193,7 +171,7 @@ public class IPCTestTab //: IDisposable
                 if (actors.Count == 0)
                     return;
 
-                (int result, Guid? profileGuid) = _setTemporaryProfileOnCharacterIpcFunc(FindCharacterByAddress(actors[0].Item2.Address), _rememberedProfileJson);
+                (int result, Guid? profileGuid) = _setTemporaryProfileOnCharacterIpcFunc(actors[0].Item2.Index.Index, _rememberedProfileJson);
                 if (result == 0)
                 {
                     _popupSystem.ShowPopup(PopupSystem.Messages.IPCSetProfileToChrDone);
@@ -213,7 +191,7 @@ public class IPCTestTab //: IDisposable
             if (actors.Count == 0)
                 return;
 
-            int result = _deleteTemporaryProfileOnCharacterIpcFunc(FindCharacterByAddress(actors[0].Item2.Address));
+            int result = _deleteTemporaryProfileOnCharacterIpcFunc(actors[0].Item2.Index.Index);
             if (result == 0)
                 _popupSystem.ShowPopup(PopupSystem.Messages.IPCRevertDone);
             else
@@ -311,17 +289,10 @@ public class IPCTestTab //: IDisposable
     }
 
     [EzIPCEvent("Profile.OnUpdate")]
-    private void OnProfileUpdate(ICharacter Character, Guid ProfileUniqueId)
+    private void OnProfileUpdate(ushort gameObjectIndex, Guid profileUniqueId)
     {
-        _logger.Debug($"IPC Test Tab - OnProfileUpdate: Character: {Character.Name.ToString().Incognify()}, Profile ID: {(ProfileUniqueId != Guid.Empty ? ProfileUniqueId.ToString() : "no id")}");
-    }
+        var actor = _gameObjectService.GetActorByObjectIndex(gameObjectIndex);
 
-    private ICharacter? FindCharacterByAddress(nint address)
-    {
-        foreach (var obj in _objectTable)
-            if (obj.Address == address)
-                return (ICharacter)obj;
-
-        return null;
+        _logger.Debug($"IPC Test Tab - OnProfileUpdate: Character: {actor?.Utf8Name.ToString().Incognify() ?? "None"}, Profile ID: {(profileUniqueId != Guid.Empty ? profileUniqueId.ToString() : "no id")}");
     }
 }

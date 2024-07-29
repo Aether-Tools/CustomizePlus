@@ -7,13 +7,8 @@ using Penumbra.GameData.Enums;
 using Penumbra.GameData.Interop;
 using ObjectManager = CustomizePlus.GameData.Services.ObjectManager;
 using DalamudGameObject = Dalamud.Game.ClientState.Objects.Types.IGameObject;
-using ECommons.Configuration;
-using System;
 using CustomizePlus.Configuration.Data;
-using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using Penumbra.GameData;
-using Penumbra.String;
-using Dalamud.Logging;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
 
 namespace CustomizePlus.Game.Services;
 
@@ -143,6 +138,19 @@ public class GameObjectService
                 }
             default: return (identifier, SpecialResult.Invalid);
         }
+    }
+
+    /// <summary>
+    /// Find actor in object manager based on its Object ID.
+    /// </summary>
+    public Actor? GetActorByObjectIndex(ushort objectIndex)
+    {
+        if (objectIndex < 0 || objectIndex >= _objectManager.TotalCount)
+            return null;
+
+        var ptr = _objectManager[(int)objectIndex];
+
+        return ptr;
     }
 
     public enum SpecialResult

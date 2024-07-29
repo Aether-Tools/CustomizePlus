@@ -310,7 +310,7 @@ public static class BoneData //todo: DI, do not show IVCS unless IVCS is install
         { BoneFamily.Arms, null },
         { BoneFamily.Hands, null },
         { BoneFamily.Tail, null },
-        { BoneFamily.Groin, "NSFW IVCS Bones" },
+        { BoneFamily.Groin, "NSFW IVCS Compatible Bones" },
         { BoneFamily.Legs, null },
         { BoneFamily.Feet, null },
         { BoneFamily.Earrings, "Some mods utilize these bones for their physics properties" },
@@ -449,9 +449,9 @@ public static class BoneData //todo: DI, do not show IVCS unless IVCS is install
         return BoneTable.TryGetValue(codename, out var row) ? row.RowIndex : 0;
     }
 
-    public static bool IsIVCSBone(string codename)
+    public static bool IsIVCSCompatibleBone(string codename)
     {
-        return BoneTable.TryGetValue(codename, out var row) && row.IsIVCS;
+        return BoneTable.TryGetValue(codename, out var row) && row.IsIVCSCompatible;
     }
 
     public static string? GetBoneMirror(string codename)
@@ -518,7 +518,7 @@ public static class BoneData //todo: DI, do not show IVCS unless IVCS is install
         public BoneFamily Family;
 
         public bool IsDefault;
-        public bool IsIVCS;
+        public bool IsIVCSCompatible;
 
         public string? Parent;
         public string? MirroredCodename;
@@ -537,7 +537,7 @@ public static class BoneData //todo: DI, do not show IVCS unless IVCS is install
             Family = ParseFamilyName(fields[i++]);
 
             IsDefault = bool.Parse(fields[i++]);
-            IsIVCS = bool.Parse(fields[i++]);
+            IsIVCSCompatible = bool.Parse(fields[i++]);
 
             Parent = fields[i].IsNullOrEmpty() ? null : fields[i];
             i++;
@@ -595,7 +595,7 @@ public static class BoneData //todo: DI, do not show IVCS unless IVCS is install
                         DisplayName = dispName.ToString(),
                         Family = BoneFamily.Hair,
                         IsDefault = false,
-                        IsIVCS = false,
+                        IsIVCSCompatible = false,
                         Parent = "j_kao",
                         Children = Array.Empty<string>(),
                         MirroredCodename = null

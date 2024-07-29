@@ -479,7 +479,7 @@ public class BoneEditorPanel
 
         //----------------------------------
         ImGui.TableNextColumn();
-        CtrlHelper.StaticLabel(displayName, CtrlHelper.TextAlignment.Left, BoneData.IsIVCSBone(codename) ? $"(IVCS) {codename}" : codename);
+        CtrlHelper.StaticLabel(displayName, CtrlHelper.TextAlignment.Left, BoneData.IsIVCSCompatibleBone(codename) ? $"(IVCS Compatible) {codename}" : codename);
 
         if (flagUpdate)
         {
@@ -488,7 +488,7 @@ public class BoneEditorPanel
             _editorManager.ModifyBoneTransform(codename, transform);
             if (_isMirrorModeEnabled && bone.Basis?.TwinBone != null) //todo: put it inside manager
                 _editorManager.ModifyBoneTransform(bone.Basis.TwinBone.BoneName,
-                    BoneData.IsIVCSBone(codename) ? transform.GetSpecialReflection() : transform.GetStandardReflection());
+                    BoneData.IsIVCSCompatibleBone(codename) ? transform.GetSpecialReflection() : transform.GetStandardReflection());
         }
 
         ImGui.TableNextRow();

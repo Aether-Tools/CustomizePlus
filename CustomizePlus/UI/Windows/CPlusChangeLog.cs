@@ -22,6 +22,7 @@ public class CPlusChangeLog
         Add2_0_4_1(Changelog);
         Add2_0_4_4(Changelog);
         Add2_0_5_0(Changelog);
+        Add2_0_6_0(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -33,6 +34,17 @@ public class CPlusChangeLog
         _config.ChangelogSettings.ChangeLogDisplayType = type;
         _config.Save();
     }
+
+    private static void Add2_0_6_0(Changelog log)
+    => log.NextVersion("Version 2.0.6.0")
+        .RegisterHighlight("IPC has been re-enabled.")
+        .RegisterImportant("If you are regular user you have to wait until other plugins implement necessary changes. Please ask developers of those plugins for further information.", 1)
+        .RegisterImportant("Breaking change: IPC version has been bumped to 5.0", 1)
+        .RegisterImportant("Breaking change: All functions now operate using object table indices. This has been made in order to be more in line with how this is being handled by other major plugins and to try to minimize the chances of being affected by broken things in Dalamud again.", 1)
+        .RegisterHighlight("Dawntrail facial bones have been categorized. Contribution by Kaze. (2.0.5.1)")
+        .RegisterEntry("Renamed all mentions of IVCS to \"IVCS Compatible\" to reflect that it is now possible to use alternative IVCS-compatible skeletons for IVCS mods.")
+        .RegisterEntry("Fixed negative values not working with Root bone.")
+        .RegisterEntry("Fixed issues caused by opening Adventurer Plate window.");
 
     private static void Add2_0_5_0(Changelog log)
     => log.NextVersion("Version 2.0.5.0")

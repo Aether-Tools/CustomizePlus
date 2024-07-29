@@ -27,6 +27,7 @@ public partial class CustomizePlusIpc
     /// Not triggered if any changes happen due to character no longer existing.
     /// Right now ignores every character but local player. It is not recommended to assume that this will always be the case and not perform any checks on your side.
     /// Ignores temporary profiles.
+    /// Returns game object table index and profile id
     /// /!\ If no profile is set on specified character profile id will be equal to Guid.Empty
     /// </summary>
     [EzIPCEvent("Profile.OnUpdate")]
@@ -122,7 +123,7 @@ public partial class CustomizePlusIpc
     }
 
     /// <summary>
-    /// Get unique id of currently active profile for character.
+    /// Get unique id of currently active profile for character using its game object table index.
     /// </summary>
     [EzIPC("Profile.GetActiveProfileIdOnCharacter")]
     private (int, Guid?) GetActiveProfileIdOnCharacter(ushort gameObjectIndex)
@@ -141,7 +142,7 @@ public partial class CustomizePlusIpc
     }
 
     /// <summary>
-    /// Apply provided profile as temporary profile on specified character.
+    /// Apply provided profile as temporary profile on specified character using its game object table index.
     /// Returns profile's unique id which can be used to manipulate it at a later date.
     /// </summary>
     [EzIPC("Profile.SetTemporaryProfileOnCharacter")]
@@ -187,7 +188,7 @@ public partial class CustomizePlusIpc
     }
 
     /// <summary>
-    /// Delete temporary profile currently active on character
+    /// Delete temporary profile currently active on character using its game object table index.
     /// </summary>
     [EzIPC("Profile.DeleteTemporaryProfileOnCharacter")]
     private int DeleteTemporaryProfileOnCharacter(ushort gameObjectIndex)
@@ -223,7 +224,7 @@ public partial class CustomizePlusIpc
     }
 
     /// <summary>
-    /// Delete temporary profile using its unique id
+    /// Delete temporary profile using its unique id.
     /// </summary>
     [EzIPC("Profile.DeleteTemporaryProfileByUniqueId")]
     private int DeleteTemporaryProfileByUniqueId(Guid uniqueId)

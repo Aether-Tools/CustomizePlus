@@ -218,16 +218,13 @@ public class ObjectManager(
     }
 
     //c+ custom
-    [Obsolete("To be updated for DT")]
     private unsafe bool AddLobbyCharacter()
     {
-        return false;
-        /*
         var agent = AgentLobby.Instance();
         if (agent == null || agent->LobbyData.CharaSelectEntries.LongCount() == 0)
             return false;
 
-        var chara = agent->LobbyData.CharaSelectEntries.Get((ulong)agent->SelectedCharacterContentId).Value;
+        var chara = agent->LobbyData.CharaSelectEntries[(long)agent->SelectedCharacterContentId].Value;
         if (chara == null)
             return false;
 
@@ -238,6 +235,6 @@ public class ObjectManager(
 
         HandleIdentifier(actors.CreatePlayer(new ByteString(chara->Name), chara->HomeWorldId), actor);
 
-        return true;*/
+        return true;
     }
 }

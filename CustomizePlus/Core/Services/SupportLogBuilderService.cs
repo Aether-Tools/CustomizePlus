@@ -118,7 +118,7 @@ public class SupportLogBuilderService
     {
         ReadOnlySpan<string> relevantPlugins =
         [
-            "MareSynchronos", "Ktisis", "Brio", "DynamicBridge"
+            "MareSynchronos", "Ktisis", "Brio", "DynamicBridge", "SimpleHeels", "IllusioVitae"
         ];
         var plugins = _dalamudPluginInterface.InstalledPlugins
             .GroupBy(p => p.InternalName)

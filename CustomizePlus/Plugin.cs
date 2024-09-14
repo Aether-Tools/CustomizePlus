@@ -21,6 +21,7 @@ using CustomizePlus.Core.Extensions;
 using CustomizePlus.Templates;
 using CustomizePlus.Profiles;
 using CustomizePlus.Armatures.Services;
+using CustomizePlus.Armatures.Data;
 
 namespace CustomizePlus;
 
@@ -41,6 +42,7 @@ public sealed class Plugin : IDalamudPlugin
         try
         {
             ECommonsMain.Init(pluginInterface, this);
+            InteropAlloc.Init();
 
             _services = ServiceManagerBuilder.CreateProvider(pluginInterface, Logger);
 

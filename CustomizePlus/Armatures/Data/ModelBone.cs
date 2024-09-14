@@ -1,11 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
+using CustomizePlus.Configuration.Data.Version3;
 using CustomizePlus.Core.Data;
+using CustomizePlus.Core.Extensions;
 using CustomizePlus.Templates.Data;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.Havok;
+using FFXIVClientStructs.Havok.Animation.Rig;
 using FFXIVClientStructs.Havok.Common.Base.Math.QsTransform;
+using OtterGui.Text.EndObjects;
+using Penumbra.GameData;
+using static CustomizePlus.Anamnesis.Data.PoseFile;
+using static FFXIVClientStructs.Havok.Animation.Rig.hkaPose;
 
 namespace CustomizePlus.Armatures.Data;
 
@@ -39,6 +47,15 @@ public unsafe class ModelBone
     /// A model bone may have zero children.
     /// </summary>
     public IEnumerable<ModelBone> ChildBones => _childPartialIndices.Zip(_childBoneIndices, (x, y) => MasterArmature[x, y]);
+    public IEnumerable<ModelBone> GetDescendants()
+    {
+        var list = ChildBones.ToList();
+        for (var i = 0; i < list.Count; i++)
+        {
+            list.AddRange(list[i].ChildBones.ToList());
+        }
+        return list;
+    }
     private List<int> _childPartialIndices = new();
     private List<int> _childBoneIndices = new();
 
@@ -210,6 +227,26 @@ public unsafe class ModelBone
         };
     }
 
+    public hkQsTransformf* GetGameTransformAccess(CharacterBase* cBase, PoseType refFrame)
+    {
+
+        var skelly = cBase->Skeleton;
+        var pSkelly = skelly->PartialSkeletons[PartialSkeletonIndex];
+        var targetPose = pSkelly.GetHavokPose(Constants.TruePoseIndex);
+        //hkaPose* targetPose = cBase->Skeleton->PartialSkeletons[PartialSkeletonIndex].GetHavokPose(Constants.TruePoseIndex);
+
+        if (targetPose == null) return null;
+        const PropagateOrNot DO_NOT_PROPAGATE = 0;
+
+        return refFrame switch
+        {
+            PoseType.Local => targetPose->AccessBoneLocalSpace(BoneIndex),
+            PoseType.Model => targetPose->AccessBoneModelSpace(BoneIndex, DO_NOT_PROPAGATE),
+            _ => null
+            //TODO properly implement the other options
+        }; ;
+    }
+
     private void SetGameTransform(CharacterBase* cBase, hkQsTransformf transform, PoseType refFrame)
     {
         SetGameTransform(cBase, transform, PartialSkeletonIndex, BoneIndex, refFrame);
@@ -245,19 +282,61 @@ public unsafe class ModelBone
     /// Apply this model bone's associated transformation to its in-game sibling within
     /// the skeleton of the given character base.
     /// </summary>
+
     public void ApplyModelTransform(CharacterBase* cBase)
     {
         if (!IsActive)
             return;
 
         if (cBase != null
-            && CustomizedTransform.IsEdited()
-            && GetGameTransform(cBase, PoseType.Model) is hkQsTransformf gameTransform
-            && !gameTransform.Equals(Constants.NullTransform)
-            && CustomizedTransform.ModifyExistingTransform(gameTransform) is hkQsTransformf modTransform
-            && !modTransform.Equals(Constants.NullTransform))
+            && CustomizedTransform != null && CustomizedTransform.IsEdited())
         {
-            SetGameTransform(cBase, modTransform, PoseType.Model);
+            var gameTransformAccess = GetGameTransformAccess(cBase, PoseType.Model);
+            if (gameTransformAccess != null)
+            {
+                var initialPos = gameTransformAccess->Translation.ToVector3();
+                var initialRot = gameTransformAccess->Rotation.ToQuaternion();
+
+                var accessRef = *gameTransformAccess;
+                var modTransform = CustomizedTransform.ModifyExistingTransform(accessRef);
+                SetGameTransform(cBase, modTransform, PoseType.Model);
+
+                var access2 = GetGameTransformAccess(cBase, PoseType.Model);
+
+                const bool doPropagate = true;
+                var hasTranslation = !CustomizedTransform.Translation.Equals(Vector3.Zero);
+                var hasRotation = !CustomizedTransform.Rotation.Equals(Vector3.Zero);
+
+                if (doPropagate && (hasRotation || hasTranslation))
+                {
+                    // Plugin.Logger.Debug($">>> Start propagating from {BoneName}");
+                    PropagateChildren(cBase, access2, initialPos, initialRot);
+                }
+            }
+        }
+    }
+
+    public unsafe void PropagateChildren(CharacterBase* cBase, hkQsTransformf* transform, Vector3 initialPos, Quaternion initialRot, bool includePartials = true)
+    {
+        // Bone parenting
+        // Adapted from Anamnesis Studio code shared by Yuki - thank you!
+
+        var sourcePos = transform->Translation.ToVector3();
+        var deltaRot = transform->Rotation.ToQuaternion() / initialRot;
+        var deltaPos = sourcePos - initialPos;
+
+        foreach (var child in GetDescendants())
+        {
+            // Plugin.Logger.Debug($"Propagating to {child.BoneName}...");
+            var access = child.GetGameTransformAccess(cBase, PoseType.Model);
+
+            var offset = access->Translation.ToVector3() - sourcePos;
+            offset = Vector3.Transform(offset, deltaRot);
+
+            var matrix = InteropAlloc.GetMatrix(access);
+            matrix *= Matrix4x4.CreateFromQuaternion(deltaRot);
+            matrix.Translation = deltaPos + sourcePos + offset;
+            InteropAlloc.SetMatrix(access, matrix);
         }
     }
 

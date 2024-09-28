@@ -290,33 +290,38 @@ public unsafe class ModelBone
 
         if (cBase != null
             && CustomizedTransform != null && CustomizedTransform.IsEdited())
-        {
+        {   
             var gameTransformAccess = GetGameTransformAccess(cBase, PoseType.Model);
             if (gameTransformAccess != null)
             {
+                // Transforms before any modifications
                 var initialPos = gameTransformAccess->Translation.ToVector3();
                 var initialRot = gameTransformAccess->Rotation.ToQuaternion();
+                var initialScale = gameTransformAccess->Scale.ToVector3();
 
-                var accessRef = *gameTransformAccess;
-                var modTransform = CustomizedTransform.ModifyExistingTransform(accessRef);
+                var modTransform = CustomizedTransform.ModifyExistingTransform(*gameTransformAccess);
                 SetGameTransform(cBase, modTransform, PoseType.Model);
 
+                // Getting it again, because SetGameTransform replaced the previous Havok transform object
                 var access2 = GetGameTransformAccess(cBase, PoseType.Model);
 
-                const bool doPropagate = true;
-                var hasTranslation = !CustomizedTransform.Translation.Equals(Vector3.Zero);
-                var hasRotation = !CustomizedTransform.Rotation.Equals(Vector3.Zero);
+                var propagateTranslation = CustomizedTransform.propagateTranslation &&
+                                           !CustomizedTransform.Translation.Equals(Vector3.Zero);
+                var propagateRotation = CustomizedTransform.propagateRotation &&
+                                           !CustomizedTransform.Rotation.Equals(Vector3.Zero);
+                var propagateScale = CustomizedTransform.propagateScale &&
+                                           !CustomizedTransform.Scaling.Equals(Vector3.One);
 
-                if (doPropagate && (hasRotation || hasTranslation))
+                if (propagateTranslation || propagateRotation || propagateScale)
                 {
-                    // Plugin.Logger.Debug($">>> Start propagating from {BoneName}");
-                    PropagateChildren(cBase, access2, initialPos, initialRot);
+                    // Plugin.Logger.Debug($">>> Start propagating from {BoneName}, Translation: {propagateTranslation} Rotation: {propagateRotation} Scale: {propagateScale}");
+                    PropagateChildren(cBase, access2, initialPos, initialRot, initialScale, propagateTranslation, propagateRotation, propagateScale);
                 }
             }
         }
     }
 
-    public unsafe void PropagateChildren(CharacterBase* cBase, hkQsTransformf* transform, Vector3 initialPos, Quaternion initialRot, bool includePartials = true)
+    public unsafe void PropagateChildren(CharacterBase* cBase, hkQsTransformf* transform, Vector3 initialPos, Quaternion initialRot, Vector3 initialScale, bool propagateTranslation, bool propagateRotation, bool propagateScale, bool includePartials = true)
     {
         // Bone parenting
         // Adapted from Anamnesis Studio code shared by Yuki - thank you!
@@ -324,6 +329,7 @@ public unsafe class ModelBone
         var sourcePos = transform->Translation.ToVector3();
         var deltaRot = transform->Rotation.ToQuaternion() / initialRot;
         var deltaPos = sourcePos - initialPos;
+        var deltaScale = transform->Scale.ToVector3() / initialScale;
 
         foreach (var child in GetDescendants())
         {
@@ -331,10 +337,19 @@ public unsafe class ModelBone
             var access = child.GetGameTransformAccess(cBase, PoseType.Model);
 
             var offset = access->Translation.ToVector3() - sourcePos;
-            offset = Vector3.Transform(offset, deltaRot);
 
             var matrix = InteropAlloc.GetMatrix(access);
-            matrix *= Matrix4x4.CreateFromQuaternion(deltaRot);
+            if (propagateScale)
+            {
+                var scaleMatrix = Matrix4x4.CreateScale(deltaScale, Vector3.Zero);
+                matrix *= scaleMatrix;
+                offset = Vector3.Transform(offset, scaleMatrix);
+            }
+            if (propagateRotation)
+            {
+                matrix *= Matrix4x4.CreateFromQuaternion(deltaRot);
+                offset = Vector3.Transform(offset, deltaRot);
+            }
             matrix.Translation = deltaPos + sourcePos + offset;
             InteropAlloc.SetMatrix(access, matrix);
         }

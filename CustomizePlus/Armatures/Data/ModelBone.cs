@@ -218,6 +218,8 @@ public unsafe class ModelBone
 
         if (targetPose == null) return Constants.NullTransform;
 
+        if (BoneIndex >= targetPose->Skeleton->Bones.Length) return Constants.NullTransform;
+
         return refFrame switch
         {
             PoseType.Local => targetPose->LocalPose[BoneIndex],
@@ -237,6 +239,9 @@ public unsafe class ModelBone
 
         if (targetPose == null) return null;
         const PropagateOrNot DO_NOT_PROPAGATE = 0;
+
+        // It's really gonna crash without it, skeleton changes aren't getting picked up fast enough
+        if (BoneIndex >= targetPose->Skeleton->Bones.Length) return null;
 
         return refFrame switch
         {
@@ -326,7 +331,9 @@ public unsafe class ModelBone
         // Bone parenting
         // Adapted from Anamnesis Studio code shared by Yuki - thank you!
 
+        // Original Parent Bone position after it had its offsets applied
         var sourcePos = transform->Translation.ToVector3();
+
         var deltaRot = transform->Rotation.ToQuaternion() / initialRot;
         var deltaPos = sourcePos - initialPos;
         var deltaScale = transform->Scale.ToVector3() / initialScale;
@@ -335,23 +342,26 @@ public unsafe class ModelBone
         {
             // Plugin.Logger.Debug($"Propagating to {child.BoneName}...");
             var access = child.GetGameTransformAccess(cBase, PoseType.Model);
-
-            var offset = access->Translation.ToVector3() - sourcePos;
-
-            var matrix = InteropAlloc.GetMatrix(access);
-            if (propagateScale)
+            if (access != null)
             {
-                var scaleMatrix = Matrix4x4.CreateScale(deltaScale, Vector3.Zero);
-                matrix *= scaleMatrix;
-                offset = Vector3.Transform(offset, scaleMatrix);
+
+                var offset = access->Translation.ToVector3() - sourcePos;
+
+                var matrix = InteropAlloc.GetMatrix(access);
+                if (propagateScale)
+                {
+                    var scaleMatrix = Matrix4x4.CreateScale(deltaScale, Vector3.Zero);
+                    matrix *= scaleMatrix;
+                    offset = Vector3.Transform(offset, scaleMatrix);
+                }
+                if (propagateRotation)
+                {
+                    matrix *= Matrix4x4.CreateFromQuaternion(deltaRot);
+                    offset = Vector3.Transform(offset, deltaRot);
+                }
+                matrix.Translation = deltaPos + sourcePos + offset;
+                InteropAlloc.SetMatrix(access, matrix);
             }
-            if (propagateRotation)
-            {
-                matrix *= Matrix4x4.CreateFromQuaternion(deltaRot);
-                offset = Vector3.Transform(offset, deltaRot);
-            }
-            matrix.Translation = deltaPos + sourcePos + offset;
-            InteropAlloc.SetMatrix(access, matrix);
         }
     }
 

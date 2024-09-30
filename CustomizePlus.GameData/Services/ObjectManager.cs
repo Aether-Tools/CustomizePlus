@@ -3,13 +3,11 @@ using Dalamud.Game.ClientState.Objects;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
-using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using OtterGui.Log;
 using Penumbra.GameData.Actors;
 using Penumbra.GameData.Enums;
 using Penumbra.GameData.Interop;
-using Penumbra.GameData.Structs;
 using Penumbra.String;
 
 namespace CustomizePlus.GameData.Services;
@@ -218,6 +216,9 @@ public class ObjectManager(
     //c+ custom
     private unsafe bool AddLobbyCharacters()
     {
+        if (clientState.IsLoggedIn)
+            return false;
+
         var agent = AgentLobby.Instance();
         if (agent == null)
             return false;

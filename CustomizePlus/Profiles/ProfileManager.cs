@@ -487,10 +487,7 @@ public class ProfileManager : IDisposable
         //performance: using textual override for ProfileAppliesTo here to not call
         //GetGameObjectName every time we are trying to check object against profiles
 
-        if (_objectManager.LobbyActor.Valid &&
-            _objectManager.TryGetValue(actorIdentifier, out var actorData) &&
-            actorData.Objects.Count == 1 &&
-            _objectManager.LobbyActor == actorData.Objects[0] && !_configuration.ProfileApplicationSettings.ApplyInLobby)
+        if (_objectManager.IsInLobby && !_configuration.ProfileApplicationSettings.ApplyInLobby)
             yield break;
 
         (actorIdentifier, _) = _gameObjectService.GetTrueActorForSpecialTypeActor(actorIdentifier);

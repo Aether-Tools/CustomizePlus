@@ -64,6 +64,12 @@ public class IPCTestTab //: IDisposable
     [EzIPC("Profile.GetByUniqueId")]
     private readonly Func<Guid, (int, string?)> _getProfileByIdIpcFunc;
 
+    [EzIPC("GameState.GetCutsceneParentIndex")]
+    private readonly Func<int, int> _getCutsceneParentIdxIpcFunc;
+
+    [EzIPC("GameState.SetCutsceneParentIndex")]
+    private readonly Func<int, int, int> _setCutsceneParentIdxIpcFunc;
+
     private string? _rememberedProfileJson;
 
     private (int, int) _apiVersion;
@@ -73,6 +79,10 @@ public class IPCTestTab //: IDisposable
     private string? _targetCharacterName;
 
     private string _targetProfileId = "";
+
+    private int _cutsceneActorIdx;
+    private int _cutsceneActorParentIdx;
+
 
     public IPCTestTab(
         IDalamudPluginInterface pluginInterface,
@@ -283,6 +293,44 @@ public class IPCTestTab //: IDisposable
             else
             {
                 _logger.Error($"Error code {result} while calling DeleteTemporaryProfileByUniqueId");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
+        }
+
+        ImGui.Text("Cutscene actor index:");
+        ImGui.SameLine();
+        ImGui.InputInt("##cutsceneactoridx", ref _cutsceneActorIdx);
+
+        ImGui.Text("Cutscene actor parent index:");
+        ImGui.SameLine();
+        ImGui.InputInt("##cutsceneactorparentidx", ref _cutsceneActorParentIdx);
+
+        if (ImGui.Button("GameState.GetCutsceneParentIndex"))
+        {
+            int result = _getCutsceneParentIdxIpcFunc(_cutsceneActorIdx);
+            if (result > -1)
+            {
+                _cutsceneActorParentIdx = result;
+                _popupSystem.ShowPopup(PopupSystem.Messages.IPCSuccessfullyExecuted);
+            }
+            else
+            {
+                _logger.Error($"No parent for actor or actor not found while caling GetCutsceneParentIndex");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
+        }
+
+        if (ImGui.Button("GameState.SetCutsceneParentIndex"))
+        {
+            int result = _setCutsceneParentIdxIpcFunc(_cutsceneActorIdx, _cutsceneActorParentIdx);
+            if (result == 0)
+            {
+                _cutsceneActorParentIdx = result;
+                _popupSystem.ShowPopup(PopupSystem.Messages.IPCSuccessfullyExecuted);
+            }
+            else
+            {
+                _logger.Error($"Error code {result} while calling GameState.SetCutsceneParentIndex");
                 _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
             }
         }

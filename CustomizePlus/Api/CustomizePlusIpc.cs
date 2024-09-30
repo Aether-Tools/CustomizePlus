@@ -1,6 +1,7 @@
 ﻿using CustomizePlus.Armatures.Events;
 using CustomizePlus.Core.Services;
 using CustomizePlus.Game.Services;
+using CustomizePlus.GameData.Services;
 using CustomizePlus.Profiles;
 using CustomizePlus.Profiles.Events;
 using Dalamud.Plugin;
@@ -25,6 +26,7 @@ public partial class CustomizePlusIpc : IDisposable
     private readonly ProfileManager _profileManager;
     private readonly GameObjectService _gameObjectService;
     private readonly ProfileFileSystem _profileFileSystem;
+    private readonly CutsceneService _cutsceneService;
 
     private readonly ArmatureChanged _armatureChangedEvent;
 
@@ -40,6 +42,7 @@ public partial class CustomizePlusIpc : IDisposable
         ProfileManager profileManager,
         GameObjectService gameObjectService,
         ProfileFileSystem profileFileSystem,
+        CutsceneService cutsceneService,
         ArmatureChanged armatureChangedEvent)
     {
         _pluginInterface = pluginInterface;
@@ -48,6 +51,7 @@ public partial class CustomizePlusIpc : IDisposable
         _profileManager = profileManager;
         _gameObjectService = gameObjectService;
         _profileFileSystem = profileFileSystem;
+        _cutsceneService = cutsceneService;
 
         _armatureChangedEvent = armatureChangedEvent;
 

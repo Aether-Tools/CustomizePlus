@@ -291,7 +291,7 @@ public unsafe class Armature
                     {
                         //time to build a new bone
                         ModelBone newBone = new(arm, boneName, pSkeleIndex, boneIndex);
-                        Plugin.Logger.Debug($"Created new bone: {boneName} on {pSkeleIndex}->{boneIndex} arm: {arm._localId}");
+                        Plugin.Logger.Verbose($"Created new bone: {boneName} on {pSkeleIndex}->{boneIndex} arm: {arm._localId}");
 
                         if (currentPose->Skeleton->ParentIndices[boneIndex] is short parentIndex
                             && parentIndex >= 0)

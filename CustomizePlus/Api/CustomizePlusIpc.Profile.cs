@@ -17,6 +17,7 @@ using Penumbra.GameData.Interop;
 
 //Virtual path is full path to the profile in the virtual folders created by user in the profile list UI
 using IPCProfileDataTuple = (System.Guid UniqueId, string Name, string VirtualPath, string CharacterName, bool IsEnabled);
+using Penumbra.GameData.Structs;
 
 namespace CustomizePlus.Api;
 
@@ -263,6 +264,9 @@ public partial class CustomizePlusIpc
         string currentPlayerName = _gameObjectService.GetCurrentPlayerName();
 
         if (armature.ActorIdentifier.ToNameWithoutOwnerName() != currentPlayerName)
+            return;
+
+        if (armature.ActorIdentifier.HomeWorld == WorldId.AnyWorld) //Cutscene/GPose actors
             return;
 
         ICharacter? localPlayerCharacter = (ICharacter?)_gameObjectService.GetDalamudGameObjectFromActor(_gameObjectService.GetLocalPlayerActor());

@@ -122,7 +122,7 @@ public unsafe sealed class ArmatureManager : IDisposable
             var armature = kvPair.Value;
             //Only remove armatures which haven't been seen for a while
             //But remove armatures of special actors (like examine screen) right away
-            if (!_objectManager.ContainsKey(kvPair.Value.ActorIdentifier) &&
+            if (!_objectManager.Identifiers.ContainsKey(kvPair.Value.ActorIdentifier) &&
                 (armature.LastSeen <= armatureExpirationDateTime || armature.ActorIdentifier.Type == IdentifierType.Special))
             {
                 _logger.Debug($"Removing armature {armature} because {kvPair.Key.IncognitoDebug()} is gone");
@@ -194,9 +194,10 @@ public unsafe sealed class ArmatureManager : IDisposable
         foreach (var kvPair in Armatures)
         {
             var armature = kvPair.Value;
-            if (armature.IsBuilt && armature.IsVisible && _objectManager.ContainsKey(armature.ActorIdentifier))
+
+            if (armature.IsBuilt && armature.IsVisible && _objectManager.TryGetValue(armature.ActorIdentifier, out var actorData))
             {
-                foreach (var actor in _objectManager[armature.ActorIdentifier].Objects)
+                foreach (var actor in actorData.Objects)
                     ApplyPiecewiseTransformation(armature, actor, armature.ActorIdentifier);
             }
         }
@@ -212,7 +213,7 @@ public unsafe sealed class ArmatureManager : IDisposable
 
         try
         {
-            if (!_objectManager.ContainsKey(armature.ActorIdentifier))
+            if (!_objectManager.Identifiers.ContainsKey(armature.ActorIdentifier))
                 return false;
 
             var actor = _objectManager[armature.ActorIdentifier].Objects[0];

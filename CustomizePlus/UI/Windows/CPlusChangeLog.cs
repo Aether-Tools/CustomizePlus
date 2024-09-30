@@ -23,6 +23,7 @@ public class CPlusChangeLog
         Add2_0_4_4(Changelog);
         Add2_0_5_0(Changelog);
         Add2_0_6_0(Changelog);
+        Add2_0_6_3(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -35,8 +36,18 @@ public class CPlusChangeLog
         _config.Save();
     }
 
+    private static void Add2_0_6_3(Changelog log)
+        => log.NextVersion("Version 2.0.6.3")
+            .RegisterEntry("Added new IPC methods: GameState.GetCutsceneParentIndex, GameState.SetCutsceneParentIndex.")
+            .RegisterImportant("Those methods were requested by Ktisis developer. Other developers are advised to not use them unless absolutely sure what they are doing.", 1)
+            .RegisterEntry("Improved support logs. (2.0.6.2)")
+            .RegisterEntry("Tweaked logging a bit to be less spammy in \"Debug+\" mode.")
+            .RegisterEntry("Made Character Select Screen handling more reliable. (2.0.6.1, 2.0.6.3)")
+            .RegisterEntry("Fixed incorrect handling of GPose actors.")
+            .RegisterEntry("Source code maintenance - external libraries update.");
+
     private static void Add2_0_6_0(Changelog log)
-    => log.NextVersion("Version 2.0.6.0")
+        => log.NextVersion("Version 2.0.6.0")
         .RegisterHighlight("IPC has been re-enabled.")
         .RegisterImportant("If you are regular user you have to wait until other plugins implement necessary changes. Please ask developers of those plugins for further information.", 1)
         .RegisterImportant("Breaking change: IPC version has been bumped to 5.0", 1)
@@ -47,7 +58,7 @@ public class CPlusChangeLog
         .RegisterEntry("Fixed issues caused by opening Adventurer Plate window.");
 
     private static void Add2_0_5_0(Changelog log)
-    => log.NextVersion("Version 2.0.5.0")
+        => log.NextVersion("Version 2.0.5.0")
         .RegisterHighlight("Customize+ has been updated to support Dawntrail.")
         .RegisterImportant("If you edited any facial bones it is possible that you will have to make adjustments to your edits.", 1)
         .RegisterImportant("Known issues:", 1)
@@ -59,7 +70,7 @@ public class CPlusChangeLog
         .RegisterEntry("Improved UI behavior when \"Apply to all players and retainers\" is enabled. (2.0.4.5)");
 
     private static void Add2_0_4_4(Changelog log)
-    => log.NextVersion("Version 2.0.4.4")
+        => log.NextVersion("Version 2.0.4.4")
         .RegisterHighlight("Added edit button to the template selector in the profile editor which allows to quickly begin editing associated template.")
         .RegisterEntry("Fixed \"Limit to my creatures\" setting not working correctly. (2.0.4.2)")
         .RegisterEntry("Added additional logging. (2.0.4.2)");

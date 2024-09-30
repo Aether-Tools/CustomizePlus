@@ -29,6 +29,8 @@ internal static class VectorExtensions
         return d < errorMargin;
     }
 
+    public static Vector3 ToVector3(this hkVector4f vec) => new Vector3(vec.X, vec.Y, vec.Z);
+
     public static Quaternion ToQuaternion(this Vector3 rotation)
     {
         return Quaternion.CreateFromYawPitchRoll(

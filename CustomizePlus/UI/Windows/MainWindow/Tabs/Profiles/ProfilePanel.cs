@@ -23,6 +23,7 @@ public class ProfilePanel
     private readonly PluginConfiguration _configuration;
     private readonly TemplateCombo _templateCombo;
     private readonly TemplateEditorManager _templateEditorManager;
+    private readonly ActorAssignmentUi _actorAssignmentUi;
     private readonly TemplateEditorEvent _templateEditorEvent;
 
     private string? _newName;
@@ -42,6 +43,7 @@ public class ProfilePanel
         PluginConfiguration configuration,
         TemplateCombo templateCombo,
         TemplateEditorManager templateEditorManager,
+        ActorAssignmentUi actorAssignmentUi,
         TemplateEditorEvent templateEditorEvent)
     {
         _selector = selector;
@@ -49,6 +51,7 @@ public class ProfilePanel
         _configuration = configuration;
         _templateCombo = templateCombo;
         _templateEditorManager = templateEditorManager;
+        _actorAssignmentUi = actorAssignmentUi;
         _templateEditorEvent = templateEditorEvent;
     }
 
@@ -211,7 +214,7 @@ public class ProfilePanel
 
                 ImGui.TableNextRow();
 
-                ImGuiUtil.DrawFrameColumn("Character Name");
+                ImGuiUtil.DrawFrameColumn("Character");
                 ImGui.TableNextColumn();
                 width = new Vector2(ImGui.GetContentRegionAvail().X - ImGui.CalcTextSize("Limit to my creatures").X - 68, 0);
                 name = _newCharacterName ?? _selector.Selected!.CharacterName;
@@ -221,7 +224,7 @@ public class ProfilePanel
                 {
                     if (!_selector.IncognitoMode)
                     {
-                        if (ImGui.InputText("##CharacterName", ref name, 128))
+                        /*if (ImGui.InputText("##CharacterName", ref name, 128))
                         {
                             _newCharacterName = name;
                             _changedProfile = _selector.Selected;
@@ -232,7 +235,14 @@ public class ProfilePanel
                             _manager.ChangeCharacterName(_changedProfile, name);
                             _newCharacterName = null;
                             _changedProfile = null;
-                        }
+                        }*/
+                        _actorAssignmentUi.DrawWorldCombo(width.X / 2);
+                        ImGui.SameLine();
+                        _actorAssignmentUi.DrawPlayerInput(width.X);
+
+                        _actorAssignmentUi.DrawObjectKindCombo(width.X / 2);
+                        ImGui.SameLine();
+                        _actorAssignmentUi.DrawNpcInput(width.X);
                     }
                     else
                         ImGui.TextUnformatted("Incognito active");

@@ -34,7 +34,7 @@ namespace CustomizePlus.Profiles;
 /// <summary>
 ///     Container class for administrating <see cref="Profile" />s during runtime.
 /// </summary>
-public class ProfileManager : IDisposable
+public partial class ProfileManager : IDisposable
 {
     private readonly TemplateManager _templateManager;
     private readonly TemplateEditorManager _templateEditorManager;
@@ -91,65 +91,6 @@ public class ProfileManager : IDisposable
     public void Dispose()
     {
         _templateChangedEvent.Unsubscribe(OnTemplateChange);
-    }
-
-    public void LoadProfiles()
-    {
-        _logger.Information("Loading profiles...");
-
-        //todo: hot reload was not tested
-        //save temp profiles
-        var temporaryProfiles = Profiles.Where(x => x.IsTemporary).ToList();
-
-        Profiles.Clear();
-        List<(Profile, string)> invalidNames = new();
-        foreach (var file in _saveService.FileNames.Profiles())
-        {
-            _logger.Debug($"Reading profile {file.FullName}");
-
-            try
-            {
-                var text = File.ReadAllText(file.FullName);
-                var data = JObject.Parse(text);
-                var profile = Profile.Load(_templateManager, data);
-                if (profile.UniqueId.ToString() != Path.GetFileNameWithoutExtension(file.Name))
-                    invalidNames.Add((profile, file.FullName));
-                if (Profiles.Any(f => f.UniqueId == profile.UniqueId))
-                    throw new Exception($"ID {profile.UniqueId} was not unique.");
-
-                Profiles.Add(profile);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"Could not load profile, skipped:\n{ex}");
-                //++skipped;
-            }
-        }
-
-        foreach (var profile in Profiles)
-        {
-            //This will solve any issues if file on disk was manually edited and we have more than a single active profile
-            if (profile.Enabled)
-                SetEnabled(profile, true, true);
-
-            if (_configuration.DefaultProfile == profile.UniqueId)
-                DefaultProfile = profile;
-        }
-
-        //insert temp profiles back into profile list
-        if (temporaryProfiles.Count > 0)
-        {
-            Profiles.AddRange(temporaryProfiles);
-            Profiles.Sort((x, y) => y.IsTemporary.CompareTo(x.IsTemporary));
-        }
-
-        var failed = MoveInvalidNames(invalidNames);
-        if (invalidNames.Count > 0)
-            _logger.Information(
-                $"Moved {invalidNames.Count - failed} profiles to correct names.{(failed > 0 ? $" Failed to move {failed} profiles to correct names." : string.Empty)}");
-
-        _logger.Information("Profiles load complete");
-        _event.Invoke(ProfileChanged.Type.ReloadedAll, null, null);
     }
 
     /// <summary>

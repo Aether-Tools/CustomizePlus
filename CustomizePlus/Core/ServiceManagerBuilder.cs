@@ -89,6 +89,7 @@ public static class ServiceManagerBuilder
         services
             .AddSingleton<TemplateCombo>()
             .AddSingleton<PluginStateBlock>()
+            .AddSingleton<ActorAssignmentUi>()
             .AddSingleton<SettingsTab>()
             // template
             .AddSingleton<TemplatesTab>()

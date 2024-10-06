@@ -81,46 +81,44 @@ public partial class ProfileManager : IDisposable
         return version switch
         {
             //Ignore everything below v4
-            // 4 => LoadV4(obj),
-            // 5 => LoadV5(obj),
-            4 => LoadV5(obj),
+             4 => LoadV4(obj),
+             5 => LoadV5(obj),
             _ => throw new Exception("The profile to be loaded has no valid Version."),
         };
     }
 
     private Profile LoadV4(JObject obj)
     {
-        var characterName = new LowerString(obj["CharacterName"]?.ToObject<string>()?.Trim() ?? throw new ArgumentNullException("CharacterName"));
+        var profile = LoadProfileV4V5(obj);
 
-        ByteString.FromString(characterName, out var nameByteString);
-        var character = _actorManager.CreatePlayer(nameByteString, WorldId.AnyWorld); //todo: detect type
-
-        obj["Character"] = character.ToJson();
-
-        var profile = LoadV5(obj);
-
-        profile.ModifiedDate = DateTimeOffset.UtcNow;
-        _saveService.ImmediateSave(profile);
+        profile.CharacterName = new LowerString(obj["CharacterName"]?.ToObject<string>()?.Trim() ?? throw new ArgumentNullException("CharacterName"));
 
         return profile;
     }
 
     private Profile LoadV5(JObject obj)
     {
+        var profile = LoadProfileV4V5(obj);
+
+        var character = _actorManager.FromJson(obj["Character"] as JObject);
+
+        profile.Character = character;
+        profile.ApplyToCurrentlyActiveCharacter = obj["ApplyToCurrentlyActiveCharacter"]?.ToObject<bool>() ?? false;
+        profile.CharacterName = new LowerString(obj["CharacterName"]?.ToObject<string>()?.Trim() ?? throw new ArgumentNullException("CharacterName")); //temp
+
+        return profile;
+    }
+
+    //V4 and V5 are mostly not different, so common loading logic is here
+    private Profile LoadProfileV4V5(JObject obj)
+    {
         var creationDate = obj["CreationDate"]?.ToObject<DateTimeOffset>() ?? throw new ArgumentNullException("CreationDate");
-
-        /*var character = _actorManager.FromJson(obj["Character"] as JObject);
-
-        if (!character.IsValid)
-            throw new ArgumentException("Character");*/
 
         var profile = new Profile()
         {
             CreationDate = creationDate,
             UniqueId = obj["UniqueId"]?.ToObject<Guid>() ?? throw new ArgumentNullException("UniqueId"),
             Name = new LowerString(obj["Name"]?.ToObject<string>()?.Trim() ?? throw new ArgumentNullException("Name")),
-            //Character = character,
-            CharacterName = new LowerString(obj["CharacterName"]?.ToObject<string>()?.Trim() ?? throw new ArgumentNullException("CharacterName")),
             LimitLookupToOwnedObjects = obj["LimitLookupToOwnedObjects"]?.ToObject<bool>() ?? throw new ArgumentNullException("LimitLookupToOwnedObjects"),
             Enabled = obj["Enabled"]?.ToObject<bool>() ?? throw new ArgumentNullException("Enabled"),
             ModifiedDate = obj["ModifiedDate"]?.ToObject<DateTimeOffset>() ?? creationDate,

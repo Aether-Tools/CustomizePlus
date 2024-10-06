@@ -13,6 +13,9 @@ using CustomizePlus.UI.Windows.Controls;
 using CustomizePlus.Templates;
 using CustomizePlus.Core.Data;
 using CustomizePlus.Templates.Events;
+using Penumbra.GameData.Actors;
+using Penumbra.String;
+using static FFXIVClientStructs.FFXIV.Client.LayoutEngine.ILayoutInstance;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 
@@ -24,10 +27,11 @@ public class ProfilePanel
     private readonly TemplateCombo _templateCombo;
     private readonly TemplateEditorManager _templateEditorManager;
     private readonly ActorAssignmentUi _actorAssignmentUi;
+    private readonly ActorManager _actorManager;
     private readonly TemplateEditorEvent _templateEditorEvent;
 
     private string? _newName;
-    private string? _newCharacterName;
+    //private string? _newCharacterName;
     private Profile? _changedProfile;
 
     private Action? _endAction;
@@ -44,6 +48,7 @@ public class ProfilePanel
         TemplateCombo templateCombo,
         TemplateEditorManager templateEditorManager,
         ActorAssignmentUi actorAssignmentUi,
+        ActorManager actorManager,
         TemplateEditorEvent templateEditorEvent)
     {
         _selector = selector;
@@ -52,6 +57,7 @@ public class ProfilePanel
         _templateCombo = templateCombo;
         _templateEditorManager = templateEditorManager;
         _actorAssignmentUi = actorAssignmentUi;
+        _actorManager = actorManager;
         _templateEditorEvent = templateEditorEvent;
     }
 
@@ -217,37 +223,76 @@ public class ProfilePanel
                 ImGuiUtil.DrawFrameColumn("Character");
                 ImGui.TableNextColumn();
                 width = new Vector2(ImGui.GetContentRegionAvail().X - ImGui.CalcTextSize("Limit to my creatures").X - 68, 0);
-                name = _newCharacterName ?? _selector.Selected!.CharacterName;
+                //name = _newCharacterName ?? _selector.Selected!.CharacterName;
                 ImGui.SetNextItemWidth(width.X);
 
                 if(_manager.DefaultProfile != _selector.Selected)
                 {
                     if (!_selector.IncognitoMode)
                     {
-                        /*if (ImGui.InputText("##CharacterName", ref name, 128))
+                        if(!_selector.Selected!.ApplyToCurrentlyActiveCharacter)
                         {
-                            _newCharacterName = name;
-                            _changedProfile = _selector.Selected;
+                           /* if (ImGui.InputText("##CharacterName", ref name, 128))
+                            {
+                                _newCharacterName = name;
+                                _changedProfile = _selector.Selected;
+                            }
+
+                            if (ImGui.IsItemDeactivatedAfterEdit() && _changedProfile != null)
+                            {
+                                _manager.ChangeCharacterName(_changedProfile, name);
+                                _newCharacterName = null;
+                                _changedProfile = null;
+                            }
+                            ImGui.Separator();*/
+                            ImGui.Text($"Character: {(_selector.Selected?.Character.ToString() ?? "Character field empty")}");
+                            ImGui.Separator();
+
+                            _actorAssignmentUi.DrawWorldCombo(width.X / 2);
+                            ImGui.SameLine();
+                            _actorAssignmentUi.DrawPlayerInput(width.X / 2);
+
+                            var buttonWidth = new Vector2(165 * ImGuiHelpers.GlobalScale - ImGui.GetStyle().ItemSpacing.X / 2, 0);
+
+                            if (ImGuiUtil.DrawDisabledButton("Apply to player character", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetPlayer))
+                                _manager.ChangeCharacter(_selector.Selected!, _actorAssignmentUi.PlayerIdentifier);
+
+                            ImGui.SameLine();
+
+                            if (ImGuiUtil.DrawDisabledButton("Apply to retainer", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetRetainer))
+                                _manager.ChangeCharacter(_selector.Selected!, _actorAssignmentUi.RetainerIdentifier);
+
+                            ImGui.SameLine();
+
+                            if (ImGuiUtil.DrawDisabledButton("Apply to mannequin", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetMannequin))
+                                _manager.ChangeCharacter(_selector.Selected!, _actorAssignmentUi.MannequinIdentifier);
+
+                            ImGui.Separator();
+
+                            _actorAssignmentUi.DrawObjectKindCombo(width.X / 2);
+                            ImGui.SameLine();
+                            _actorAssignmentUi.DrawNpcInput(width.X / 2);
+
+                            if (ImGui.Button("Apply to selected non-player character"))
+                            {
+
+                            }
                         }
-
-                        if (ImGui.IsItemDeactivatedAfterEdit() && _changedProfile != null)
+                        else
                         {
-                            _manager.ChangeCharacterName(_changedProfile, name);
-                            _newCharacterName = null;
-                            _changedProfile = null;
-                        }*/
-                        _actorAssignmentUi.DrawWorldCombo(width.X / 2);
-                        ImGui.SameLine();
-                        _actorAssignmentUi.DrawPlayerInput(width.X);
-
-                        _actorAssignmentUi.DrawObjectKindCombo(width.X / 2);
-                        ImGui.SameLine();
-                        _actorAssignmentUi.DrawNpcInput(width.X);
+                            ImGui.TextUnformatted("Any character you are logged in with");
+                        }
                     }
                     else
                         ImGui.TextUnformatted("Incognito active");
 
-                    ImGui.SameLine();
+                    var anyActiveCharaBool = _selector.Selected?.ApplyToCurrentlyActiveCharacter ?? false;
+                    if (ImGui.Checkbox("##ApplyToCurrentlyActiveCharacter", ref anyActiveCharaBool))
+                        _manager.SetApplyToCurrentlyActiveCharacter(_selector.Selected!, anyActiveCharaBool);
+                    ImGuiUtil.LabeledHelpMarker("Apply to any character you are logged in with",
+                        "When enabled applies this profile to any character you are currently logged in with.");
+
+                    //ImGui.SameLine();
                     var enabled = _selector.Selected?.LimitLookupToOwnedObjects ?? false;
                     if (ImGui.Checkbox("##LimitLookupToOwnedObjects", ref enabled))
                         _manager.SetLimitLookupToOwned(_selector.Selected!, enabled);
@@ -352,5 +397,10 @@ public class ProfilePanel
                 }
             }
         }
+    }
+
+    private void UpdateIdentifiers()
+    {
+
     }
 }

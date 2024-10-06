@@ -132,7 +132,7 @@ public class ProfileFileSystemSelector : FileSystemSelector<Profile, ProfileStat
             case ProfileChanged.Type.Deleted:
             case ProfileChanged.Type.Renamed:
             case ProfileChanged.Type.Toggled:
-            case ProfileChanged.Type.ChangedCharacterName:
+            case ProfileChanged.Type.ChangedCharacter:
             case ProfileChanged.Type.ReloadedAll:
                 SetFilterDirty();
                 break;
@@ -239,9 +239,9 @@ public class ProfileFileSystemSelector : FileSystemSelector<Profile, ProfileStat
         }
 
         if (leaf.Value.Enabled)
-            state.Color = leaf.Value.CharacterName == _gameObjectService.GetCurrentPlayerName() ? ColorId.LocalCharacterEnabledProfile : ColorId.EnabledProfile;
+            state.Color = leaf.Value.Character.Matches(_gameObjectService.GetCurrentPlayerActorIdentifier()) ? ColorId.LocalCharacterEnabledProfile : ColorId.EnabledProfile;
         else
-            state.Color = leaf.Value.CharacterName == _gameObjectService.GetCurrentPlayerName() ? ColorId.LocalCharacterDisabledProfile : ColorId.DisabledProfile;
+            state.Color = leaf.Value.Character.Matches(_gameObjectService.GetCurrentPlayerActorIdentifier()) ? ColorId.LocalCharacterDisabledProfile : ColorId.DisabledProfile;
 
         return ApplyStringFilters(leaf, leaf.Value);
     }

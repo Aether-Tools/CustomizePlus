@@ -443,9 +443,10 @@ public unsafe sealed class ArmatureManager : IDisposable
             type is not ProfileChanged.Type.Deleted &&
             type is not ProfileChanged.Type.TemporaryProfileAdded &&
             type is not ProfileChanged.Type.TemporaryProfileDeleted &&
-            type is not ProfileChanged.Type.ChangedCharacterName &&
+            type is not ProfileChanged.Type.ChangedCharacter &&
             type is not ProfileChanged.Type.ChangedDefaultProfile &&
-            type is not ProfileChanged.Type.LimitLookupToOwnedChanged)
+            type is not ProfileChanged.Type.LimitLookupToOwnedChanged &&
+            type is not ProfileChanged.Type.ApplyToCurrentlyActiveCharacterChanged)
             return;
 
         if (type == ProfileChanged.Type.ChangedDefaultProfile)
@@ -488,10 +489,10 @@ public unsafe sealed class ArmatureManager : IDisposable
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(profile.CharacterName))
+            if (!profile.Character.IsValid)
                 return;
 
-            foreach (var armature in GetArmaturesForCharacterName(profile.CharacterName))
+            foreach (var armature in GetArmaturesForCharacter(profile.Character))
             {
                 armature.IsPendingProfileRebind = true;
                 _logger.Debug($"ArmatureManager.OnProfileChange profile {profile} toggled, planning rebind for armature {armature}");
@@ -502,10 +503,10 @@ public unsafe sealed class ArmatureManager : IDisposable
 
         if (type == ProfileChanged.Type.TemporaryProfileAdded)
         {
-            if (!profile.TemporaryActor.IsValid || !Armatures.ContainsKey(profile.TemporaryActor))
+            if (!profile.Character.IsValid || !Armatures.ContainsKey(profile.Character)) //todo: any world support
                 return;
 
-            var armature = Armatures[profile.TemporaryActor];
+            var armature = Armatures[profile.Character];
             if (armature.Profile == profile)
                 return;
 
@@ -518,10 +519,11 @@ public unsafe sealed class ArmatureManager : IDisposable
             return;
         }
 
-        if (type == ProfileChanged.Type.ChangedCharacterName ||
+        if (type == ProfileChanged.Type.ChangedCharacter ||
             type == ProfileChanged.Type.Deleted ||
             type == ProfileChanged.Type.TemporaryProfileDeleted ||
-            type == ProfileChanged.Type.LimitLookupToOwnedChanged)
+            type == ProfileChanged.Type.LimitLookupToOwnedChanged ||
+            type == ProfileChanged.Type.ApplyToCurrentlyActiveCharacterChanged)
         {
             if (profile.Armatures.Count == 0)
                 return;
@@ -534,7 +536,7 @@ public unsafe sealed class ArmatureManager : IDisposable
                 armature.IsPendingProfileRebind = true;
             }
 
-            _logger.Debug($"ArmatureManager.OnProfileChange CCN/DEL/TPD/LLTOC, armature rebind scheduled: {type}, data payload: {arg3?.ToString()?.Incognify()}, profile: {profile.Name.Text.Incognify()}->{profile.Enabled}");
+            _logger.Debug($"ArmatureManager.OnProfileChange CC/DEL/TPD/LLTOC/ATCACC, armature rebind scheduled: {type}, data payload: {arg3?.ToString()?.Incognify()}, profile: {profile.Name.Text.Incognify()}->{profile.Enabled}");
 
             return;
         }
@@ -555,6 +557,17 @@ public unsafe sealed class ArmatureManager : IDisposable
             (var actorIdentifier, _) = _gameObjectService.GetTrueActorForSpecialTypeActor(kvPair.Key);
 
             if(actorIdentifier.ToNameWithoutOwnerName() == characterName)
+                yield return kvPair.Value;
+        }
+    }
+
+    private IEnumerable<Armature> GetArmaturesForCharacter(ActorIdentifier actorIdentifier)
+    {
+        foreach (var kvPair in Armatures)
+        {
+            (var armatureActorIdentifier, _) = _gameObjectService.GetTrueActorForSpecialTypeActor(kvPair.Key);
+
+            if (armatureActorIdentifier.IsValid && armatureActorIdentifier.Matches(armatureActorIdentifier))
                 yield return kvPair.Value;
         }
     }

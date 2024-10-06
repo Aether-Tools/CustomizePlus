@@ -46,7 +46,7 @@ public partial class CustomizePlusIpc
             .Select(x =>
             {
                 string path = _profileFileSystem.FindLeaf(x, out var leaf) ? leaf.FullName() : x.Name.Text;
-                return (x.UniqueId, x.Name.Text, path, x.CharacterName.Text, x.Enabled);
+                return (x.UniqueId, x.Name.Text, path, x.Character.ToNameWithoutOwnerName(), x.Enabled); //todo: proper update to v5
             })
             .ToList();
     }
@@ -134,7 +134,7 @@ public partial class CustomizePlusIpc
         if (actor == null || !actor.Value.Valid || !actor.Value.IsCharacter)
             return ((int)ErrorCode.InvalidCharacter, null);
 
-        var profile = _profileManager.GetProfileByCharacterName(actor.Value.Utf8Name.ToString(), true);
+        var profile = _profileManager.GetProfileByActor(actor.Value, true);
 
         if (profile == null)
             return ((int)ErrorCode.ProfileNotFound, null);

@@ -1,5 +1,6 @@
 ﻿using CustomizePlus.Configuration.Data.Version3;
 using CustomizePlus.Core.Data;
+using CustomizePlus.GameData.Extensions;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Templates.Data;
 using System;
@@ -23,7 +24,7 @@ public class IPCCharacterProfile
     {
         var ipcProfile = new IPCCharacterProfile
         {
-            CharacterName = profile.CharacterName,
+            CharacterName = profile.Character.ToNameWithoutOwnerName(), //todo: proper update to v5
             Bones = new Dictionary<string, IPCBoneTransform>()
         };
 
@@ -48,7 +49,7 @@ public class IPCCharacterProfile
         var fullProfile = new Profile
         {
             Name = $"{profile.CharacterName}'s IPC profile",
-            CharacterName = profile.CharacterName,
+           // CharacterName = profile.CharacterName,  //todo: proper update to v5
             CreationDate = DateTimeOffset.UtcNow,
             ModifiedDate = DateTimeOffset.UtcNow,
             Enabled = true,

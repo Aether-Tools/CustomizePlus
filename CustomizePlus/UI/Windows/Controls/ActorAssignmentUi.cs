@@ -1,39 +1,67 @@
-﻿using Dalamud.Game.ClientState.Objects.Enums;
-using ImGuiNET;
-using OtterGui.Custom;
-using Penumbra.GameData.Actors;
-using Penumbra.GameData.Enums;
-using Penumbra.GameData.Gui;
-using Penumbra.GameData.Interop;
-using System;
+﻿using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
+using ImGuiNET;
+using Lumina.Excel.GeneratedSheets;
+using OtterGui.Custom;
+using OtterGui.Log;
+using Penumbra.GameData.Actors;
+using Penumbra.GameData.Data;
+using Penumbra.GameData.DataContainers.Bases;
+using Penumbra.GameData.Gui;
+using Penumbra.GameData.Structs;
+using Penumbra.String;
 
 namespace CustomizePlus.UI.Windows.Controls;
 
-public class ActorAssignmentUi : IDisposable
+public class ActorAssignmentUi
 {
     private readonly ActorManager _actorManager;
+    private readonly DictBNpcENpc _dictBnpcEnpc;
 
     private WorldCombo _worldCombo = null!;
-    private NpcCombo _mountCombo = null!;
-    private NpcCombo _companionCombo = null!;
-    private NpcCombo _ornamentCombo = null!;
-    private NpcCombo _bnpcCombo = null!;
-    private NpcCombo _enpcCombo = null!;
+    private Penumbra.GameData.Gui.NpcCombo _mountCombo = null!;
+    private Penumbra.GameData.Gui.NpcCombo _companionCombo = null!;
+    //private BattleEventNpcCombo _npcCombo = null!;
+    private Penumbra.GameData.Gui.NpcCombo _npcCombo = null!;
 
     private bool _ready;
 
     private string _newCharacterName = string.Empty;
     private ObjectKind _newKind = ObjectKind.BattleNpc;
 
-    public ActorAssignmentUi(ActorManager actorManager)
+  /*  public string CharacterName { get => _newCharacterName; }
+    public WorldId SelectedWorld { get => _worldCombo.CurrentSelection.Key; }
+  */
+    public ActorIdentifier NpcIdentifier { get; private set; } = ActorIdentifier.Invalid;
+    public ActorIdentifier PlayerIdentifier { get; private set; } = ActorIdentifier.Invalid;
+    public ActorIdentifier RetainerIdentifier { get; private set; } = ActorIdentifier.Invalid;
+    public ActorIdentifier MannequinIdentifier { get; private set; } = ActorIdentifier.Invalid;
+
+    public bool CanSetPlayer
+        => PlayerIdentifier.IsValid;
+
+    public bool CanSetRetainer
+        => RetainerIdentifier.IsValid;
+
+    public bool CanSetMannequin
+        => MannequinIdentifier.IsValid;
+
+    public bool CanSetNpc
+        => NpcIdentifier.IsValid;
+
+    public ActorAssignmentUi(ActorManager actorManager, DictBNpcENpc dictBnpcEnpc)
     {
         _actorManager = actorManager;
+        _dictBnpcEnpc = dictBnpcEnpc;
 
-        _actorManager.Awaiter.ContinueWith(_ => SetupCombos(), TaskScheduler.Default);
+        _actorManager.Awaiter.ContinueWith(_ => dictBnpcEnpc.Awaiter.ContinueWith(_ => SetupCombos(), TaskScheduler.Default), TaskScheduler.Default);
     }
 
     public void DrawWorldCombo(float width)
@@ -64,6 +92,12 @@ public class ActorAssignmentUi : IDisposable
         if (!_ready)
             return;
 
+       /* if(_newKind == ObjectKind.BattleNpc || _newKind == ObjectKind.EventNpc)
+        {
+            if (_npcCombo.Draw(width))
+                UpdateIdentifiersInternal();
+        }*/
+
         var combo = GetNpcCombo(_newKind);
         if (combo.Draw(width))
             UpdateIdentifiersInternal();
@@ -75,17 +109,15 @@ public class ActorAssignmentUi : IDisposable
         ObjectKind.EventNpc,
         ObjectKind.Companion,
         ObjectKind.MountType,
-        ObjectKind.Ornament,
     };
 
-    private NpcCombo GetNpcCombo(ObjectKind kind)
+    private Penumbra.GameData.Gui.NpcCombo GetNpcCombo(ObjectKind kind)
         => kind switch
         {
-            ObjectKind.BattleNpc => _bnpcCombo,
-            ObjectKind.EventNpc => _enpcCombo,
+            ObjectKind.BattleNpc => _npcCombo,
+            ObjectKind.EventNpc => _npcCombo,
             ObjectKind.MountType => _mountCombo,
             ObjectKind.Companion => _companionCombo,
-            ObjectKind.Ornament => _ornamentCombo,
             _ => throw new NotImplementedException(),
         };
 
@@ -93,63 +125,57 @@ public class ActorAssignmentUi : IDisposable
     private void SetupCombos()
     {
         _worldCombo = new WorldCombo(_actorManager.Data.Worlds, Plugin.Logger);
-        _mountCombo = new NpcCombo("##mountCombo", _actorManager.Data.Mounts, Plugin.Logger);
-        _companionCombo = new NpcCombo("##companionCombo", _actorManager.Data.Companions, Plugin.Logger);
-        _ornamentCombo = new NpcCombo("##ornamentCombo", _actorManager.Data.Ornaments, Plugin.Logger);
-        _bnpcCombo = new NpcCombo("##bnpcCombo", _actorManager.Data.BNpcs, Plugin.Logger);
-        _enpcCombo = new NpcCombo("##enpcCombo", _actorManager.Data.ENpcs, Plugin.Logger);
+        _mountCombo = new Penumbra.GameData.Gui.NpcCombo("##mountCombo", _actorManager.Data.Mounts, Plugin.Logger);
+        _companionCombo = new Penumbra.GameData.Gui.NpcCombo("##companionCombo", _actorManager.Data.Companions, Plugin.Logger);
+        //_bnpcCombo = new Penumbra.GameData.Gui.NpcCombo("##bnpcCombo", _actorManager.Data.BNpcs, Plugin.Logger);
+        //_enpcCombo = new Penumbra.GameData.Gui.NpcCombo("##enpcCombo", _actorManager.Data.ENpcs, Plugin.Logger);
+        _npcCombo = new Penumbra.GameData.Gui.NpcCombo("##npcCombo", _dictBnpcEnpc, Plugin.Logger);
         _ready = true;
     }
 
     private void UpdateIdentifiersInternal()
     {
-       /* var combo = GetNpcCombo(_newKind);
-        PlayerTooltip = _collectionManager.Active.Individuals.CanAdd(IdentifierType.Player, _newCharacterName,
-                _worldCombo.CurrentSelection.Key, ObjectKind.None, [], out _playerIdentifiers) switch
+        if (ByteString.FromString(_newCharacterName, out var byteName))
         {
-            _ when _newCharacterName.Length == 0 => NewPlayerTooltipEmpty,
-            IndividualCollections.AddResult.Invalid => NewPlayerTooltipInvalid,
-            IndividualCollections.AddResult.AlreadySet => AlreadyAssigned,
-            _ => string.Empty,
-        };
-        RetainerTooltip =
-            _collectionManager.Active.Individuals.CanAdd(IdentifierType.Retainer, _newCharacterName, 0, ObjectKind.None, [],
-                    out _retainerIdentifiers) switch
-            {
-                _ when _newCharacterName.Length == 0 => NewRetainerTooltipEmpty,
-                IndividualCollections.AddResult.Invalid => NewRetainerTooltipInvalid,
-                IndividualCollections.AddResult.AlreadySet => AlreadyAssigned,
-                _ => string.Empty,
-            };
-        if (combo.CurrentSelection.Ids != null)
-        {
-            NpcTooltip = _collectionManager.Active.Individuals.CanAdd(IdentifierType.Npc, string.Empty, ushort.MaxValue, _newKind,
-                    combo.CurrentSelection.Ids, out _npcIdentifiers) switch
-            {
-                IndividualCollections.AddResult.AlreadySet => AlreadyAssigned,
-                _ => string.Empty,
-            };
-            OwnedTooltip = _collectionManager.Active.Individuals.CanAdd(IdentifierType.Owned, _newCharacterName,
-                    _worldCombo.CurrentSelection.Key, _newKind,
-                    combo.CurrentSelection.Ids, out _ownedIdentifiers) switch
-            {
-                _ when _newCharacterName.Length == 0 => NewPlayerTooltipEmpty,
-                IndividualCollections.AddResult.Invalid => NewPlayerTooltipInvalid,
-                IndividualCollections.AddResult.AlreadySet => AlreadyAssigned,
-                _ => string.Empty,
-            };
+            PlayerIdentifier = _actorManager.CreatePlayer(byteName, _worldCombo.CurrentSelection.Key);
+            RetainerIdentifier = _actorManager.CreateRetainer(byteName, ActorIdentifier.RetainerType.Bell);
+            MannequinIdentifier = _actorManager.CreateRetainer(byteName, ActorIdentifier.RetainerType.Mannequin);
         }
-        else
-        {
-            NpcTooltip = NewNpcTooltipEmpty;
-            OwnedTooltip = NewNpcTooltipEmpty;
-            _npcIdentifiers = [];
-            _ownedIdentifiers = [];
-        }*/
-    }
-
-    public void Dispose()
-    {
-        //throw new NotImplementedException();
     }
 }
+
+//Todo: Temp
+/// <summary> A dictionary that matches BNpcNameId to names. </summary>
+public sealed class DictBNpcENpc(IDalamudPluginInterface pluginInterface, Logger log, IDataManager gameData)
+    : NameDictionary(pluginInterface, log, gameData, "BNpcsENpcs", 7, () => CreateData(gameData))
+{
+    /// <summary> Create the data. </summary>
+    private static IReadOnlyDictionary<uint, string> CreateData(IDataManager gameData)
+    {
+
+        var sheet = gameData.GetExcelSheet<BNpcName>(gameData.Language)!;
+        var sheet2 = gameData.GetExcelSheet<ENpcResident>(gameData.Language)!;
+
+        var dict = new Dictionary<uint, string>((int)sheet.RowCount + (int)sheet2.RowCount);
+
+        foreach (var n in sheet.Where(n => n.Singular.RawData.Length > 0))
+            dict.TryAdd(n.RowId, DataUtility.ToTitleCaseExtended(n.Singular, n.Article));
+        foreach (var n in sheet2.Where(e => e.Singular.RawData.Length > 0))
+            dict.TryAdd(n.RowId, DataUtility.ToTitleCaseExtended(n.Singular, n.Article));
+
+        return dict.ToFrozenDictionary();
+    }
+
+    /// <inheritdoc cref="NameDictionary.ContainsKey"/>
+    public bool ContainsKey(BNpcNameId key)
+        => Value.ContainsKey(key.Id);
+
+    /// <inheritdoc cref="NameDictionary.TryGetValue"/>
+    public bool TryGetValue(BNpcNameId key, [NotNullWhen(true)] out string? value)
+        => Value.TryGetValue(key.Id, out value);
+
+    /// <inheritdoc cref="NameDictionary.this"/>
+    public string this[BNpcNameId key]
+        => Value[key.Id];
+}
+

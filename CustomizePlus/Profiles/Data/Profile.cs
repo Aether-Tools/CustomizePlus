@@ -21,7 +21,7 @@ namespace CustomizePlus.Profiles.Data;
 /// </summary>
 public sealed class Profile : ISavable
 {
-    public const int Version = 4;
+    public const int Version = 5;
 
     private static int _nextGlobalId;
 
@@ -29,10 +29,11 @@ public sealed class Profile : ISavable
 
     public List<Armature> Armatures = new();
 
-    [Obsolete("To be removed")]
+    [Obsolete("To be removed in the future versions")]
     public LowerString CharacterName { get; set; } = LowerString.Empty;
 
     public ActorIdentifier Character { get; set; } = ActorIdentifier.Invalid;
+    public bool ApplyToCurrentlyActiveCharacter { get; set; }
 
     public LowerString Name { get; set; } = LowerString.Empty;
 
@@ -59,10 +60,10 @@ public sealed class Profile : ISavable
     /// </summary>
     public bool IsTemporary => ProfileType == ProfileType.Temporary;
 
-    /// <summary>
+   /* /// <summary>
     /// Identificator specifying specific actor this profile applies to, only works for temporary profiles
     /// </summary>
-    public ActorIdentifier TemporaryActor { get; set; } = ActorIdentifier.Invalid;
+    public ActorIdentifier TemporaryActor { get; set; } = ActorIdentifier.Invalid;*/
 
     public string Incognito
         => UniqueId.ToString()[..8];
@@ -78,8 +79,9 @@ public sealed class Profile : ISavable
     /// <param name="original"></param>
     public Profile(Profile original) : this()
     {
-        CharacterName = original.CharacterName;
+        Character = original.Character;
         LimitLookupToOwnedObjects = original.LimitLookupToOwnedObjects;
+        ApplyToCurrentlyActiveCharacter = original.ApplyToCurrentlyActiveCharacter;
 
         foreach (var template in original.Templates)
         {
@@ -89,7 +91,7 @@ public sealed class Profile : ISavable
 
     public override string ToString()
     {
-        return $"Profile '{Name.Text.Incognify()}' on {CharacterName.Text.Incognify()} [{UniqueId}]";
+        return $"Profile '{Name.Text.Incognify()}' on {Character.Incognito(null)} [{UniqueId}]";
     }
 
     #region Serialization
@@ -103,7 +105,8 @@ public sealed class Profile : ISavable
             ["CreationDate"] = CreationDate,
             ["ModifiedDate"] = ModifiedDate,
             ["CharacterName"] = CharacterName.Text,
-            //["Character"] = Character.ToJson(),
+            ["Character"] = Character.ToJson(),
+            ["ApplyToCurrentlyActiveCharacter"] = ApplyToCurrentlyActiveCharacter,
             ["Name"] = Name.Text,
             ["LimitLookupToOwnedObjects"] = LimitLookupToOwnedObjects,
             ["Enabled"] = Enabled,

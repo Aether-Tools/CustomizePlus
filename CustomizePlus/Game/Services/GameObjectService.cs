@@ -31,6 +31,11 @@ public class GameObjectService
         _configuration = configuration;
     }
 
+    public ActorIdentifier GetCurrentPlayerActorIdentifier()
+    {
+        return _objectManager.PlayerData.Identifier;
+    }
+
     public string GetCurrentPlayerName()
     {
         return _objectManager.PlayerData.Identifier.ToName();

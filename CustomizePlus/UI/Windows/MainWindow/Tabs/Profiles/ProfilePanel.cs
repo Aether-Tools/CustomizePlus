@@ -142,9 +142,15 @@ public class ProfilePanel
             return;
 
         DrawEnabledSetting();
+
+        ImGui.Separator();
+
         using (var disabled = ImRaii.Disabled(_selector.Selected?.IsWriteProtected ?? true))
         {
             DrawBasicSettings();
+
+            ImGui.Separator();
+
             DrawTemplateArea();
         }
     }

@@ -163,25 +163,6 @@ public class ProfilePanel
                 ImGuiUtil.LabeledHelpMarker("Enabled",
                     "Whether the templates in this profile should be applied at all. Only one profile can be enabled for a character at the same time.");
             }
-
-            ImGui.SameLine();
-            var isDefault = _manager.DefaultProfile == _selector.Selected;
-            var isDefaultOrCurrentProfilesEnabled = _manager.DefaultProfile?.Enabled ?? false || enabled;
-            using (ImRaii.Disabled(isDefaultOrCurrentProfilesEnabled))
-            {
-                if (ImGui.Checkbox("##DefaultProfile", ref isDefault))
-                    _manager.SetDefaultProfile(isDefault ? _selector.Selected! : null);
-                ImGuiUtil.LabeledHelpMarker("Apply to all players and retainers",
-                    "Whether the templates in this profile are applied to all players and retainers without a specific profile. This setting cannot be applied to multiple profiles.");
-            }
-            if(isDefaultOrCurrentProfilesEnabled)
-            {
-                ImGui.SameLine();
-                ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Warning);
-                ImGuiUtil.PrintIcon(FontAwesomeIcon.ExclamationTriangle);
-                ImGui.PopStyleColor();
-                ImGuiUtil.HoverTooltip("Can only be changed when both currently selected and profile where this checkbox is checked are disabled.");
-            }
         }
     }
 
@@ -226,26 +207,27 @@ public class ProfilePanel
                 //name = _newCharacterName ?? _selector.Selected!.CharacterName;
                 ImGui.SetNextItemWidth(width.X);
 
-                if(_manager.DefaultProfile != _selector.Selected)
+                if (!_selector.IncognitoMode)
                 {
-                    if (!_selector.IncognitoMode)
+                    bool showMultipleMessage = false;
+                    if (_manager.DefaultProfile != _selector.Selected)
                     {
-                        if(!_selector.Selected!.ApplyToCurrentlyActiveCharacter)
+                        if (!_selector.Selected!.ApplyToCurrentlyActiveCharacter)
                         {
-                           /* if (ImGui.InputText("##CharacterName", ref name, 128))
-                            {
-                                _newCharacterName = name;
-                                _changedProfile = _selector.Selected;
-                            }
+                            /* if (ImGui.InputText("##CharacterName", ref name, 128))
+                             {
+                                 _newCharacterName = name;
+                                 _changedProfile = _selector.Selected;
+                             }
 
-                            if (ImGui.IsItemDeactivatedAfterEdit() && _changedProfile != null)
-                            {
-                                _manager.ChangeCharacterName(_changedProfile, name);
-                                _newCharacterName = null;
-                                _changedProfile = null;
-                            }
-                            ImGui.Separator();*/
-                            ImGui.Text(_selector.Selected!.Character.IsValid ? _selector.Selected?.Character.ToString() : "No valid character selected for the profile");
+                             if (ImGui.IsItemDeactivatedAfterEdit() && _changedProfile != null)
+                             {
+                                 _manager.ChangeCharacterName(_changedProfile, name);
+                                 _newCharacterName = null;
+                                 _changedProfile = null;
+                             }
+                             ImGui.Separator();*/
+                            ImGui.Text(_selector.Selected!.Character.IsValid ? $"Applies to {_selector.Selected?.Character.ToString()}" : "No valid character selected for the profile");
                             ImGui.Text($"Legacy: {_selector.Selected!.CharacterName.Text ?? "None"}");
                             ImGui.Separator();
 
@@ -284,28 +266,49 @@ public class ProfilePanel
                             }
                         }
                         else
-                        {
-                            ImGui.TextUnformatted("Any character you are logged in with");
-                        }
+                            showMultipleMessage = true;
                     }
                     else
-                        ImGui.TextUnformatted("Incognito active");
+                        showMultipleMessage = true;
 
-                    var anyActiveCharaBool = _selector.Selected?.ApplyToCurrentlyActiveCharacter ?? false;
-                    if (ImGui.Checkbox("##ApplyToCurrentlyActiveCharacter", ref anyActiveCharaBool))
-                        _manager.SetApplyToCurrentlyActiveCharacter(_selector.Selected!, anyActiveCharaBool);
-                    ImGuiUtil.LabeledHelpMarker("Apply to any character you are logged in with",
-                        "When enabled applies this profile to any character you are currently logged in with.");
-
-                    //ImGui.SameLine();
-                    var enabled = _selector.Selected?.LimitLookupToOwnedObjects ?? false;
-                    if (ImGui.Checkbox("##LimitLookupToOwnedObjects", ref enabled))
-                        _manager.SetLimitLookupToOwned(_selector.Selected!, enabled);
-                    ImGuiUtil.LabeledHelpMarker("Limit to my creatures",
-                        "When enabled limits the character search to only your own summons, mounts and minions.\nUseful when there is possibility there will be another character with that name owned by another player.\n* For battle chocobo use \"Chocobo\" as character name.");
+                    if(showMultipleMessage)
+                        ImGui.TextUnformatted("Applies to multiple targets");
                 }
                 else
-                    ImGui.TextUnformatted("All players and retainers");
+                    ImGui.TextUnformatted("Incognito active");
+
+                ImGui.Separator();
+
+                var anyActiveCharaBool = _selector.Selected?.ApplyToCurrentlyActiveCharacter ?? false;
+                if (ImGui.Checkbox("##ApplyToCurrentlyActiveCharacter", ref anyActiveCharaBool))
+                    _manager.SetApplyToCurrentlyActiveCharacter(_selector.Selected!, anyActiveCharaBool);
+                ImGuiUtil.LabeledHelpMarker("Apply to any character you are logged in with",
+                    "Whether the templates in this profile should be applied to any character you are currently logged in with.");
+
+                var isDefault = _manager.DefaultProfile == _selector.Selected;
+                var isDefaultOrCurrentProfilesEnabled = (_manager.DefaultProfile?.Enabled ?? false) || (_selector.Selected?.Enabled ?? false);
+                using (ImRaii.Disabled(isDefaultOrCurrentProfilesEnabled))
+                {
+                    if (ImGui.Checkbox("##DefaultProfile", ref isDefault))
+                        _manager.SetDefaultProfile(isDefault ? _selector.Selected! : null);
+                    ImGuiUtil.LabeledHelpMarker("Apply to all players and retainers",
+                        "Whether the templates in this profile are applied to all players and retainers without a specific profile. This setting cannot be applied to multiple profiles.");
+                }
+                if (isDefaultOrCurrentProfilesEnabled)
+                {
+                    ImGui.SameLine();
+                    ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Warning);
+                    ImGuiUtil.PrintIcon(FontAwesomeIcon.ExclamationTriangle);
+                    ImGui.PopStyleColor();
+                    ImGuiUtil.HoverTooltip("Can only be changed when both currently selected and profile where this checkbox is checked are disabled.");
+                }
+
+                //ImGui.SameLine();
+                var enabled = _selector.Selected?.LimitLookupToOwnedObjects ?? false;
+                if (ImGui.Checkbox("##LimitLookupToOwnedObjects", ref enabled))
+                    _manager.SetLimitLookupToOwned(_selector.Selected!, enabled);
+                ImGuiUtil.LabeledHelpMarker("Limit to my creatures",
+                    "When enabled limits the character search to only your own summons, mounts and minions.\nUseful when there is possibility there will be another character with that name owned by another player.\n* For battle chocobo use \"Chocobo\" as character name.");
             }
         }
     }

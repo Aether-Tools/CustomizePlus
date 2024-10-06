@@ -207,7 +207,7 @@ public static class ServiceManagerBuilder
             .AddSingleton<GameEventManager>()
             .AddSingleton(p => new CutsceneResolver(idx => (short)p.GetRequiredService<CutsceneService>().GetParentIndex(idx)))
             .AddSingleton<ObjectManager>()
-            .AddSingleton< DictBNpcENpc>();
+            .AddSingleton<DictBNpcENpc>();
 
         return services;
     }

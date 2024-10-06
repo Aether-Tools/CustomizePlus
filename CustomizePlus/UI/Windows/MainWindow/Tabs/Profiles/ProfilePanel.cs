@@ -245,7 +245,8 @@ public class ProfilePanel
                                 _changedProfile = null;
                             }
                             ImGui.Separator();*/
-                            ImGui.Text($"Character: {(_selector.Selected?.Character.ToString() ?? "Character field empty")}");
+                            ImGui.Text(_selector.Selected!.Character.IsValid ? _selector.Selected?.Character.ToString() : "No valid character selected for the profile");
+                            ImGui.Text($"Legacy: {_selector.Selected!.CharacterName.Text ?? "None"}");
                             ImGui.Separator();
 
                             _actorAssignmentUi.DrawWorldCombo(width.X / 2);
@@ -266,6 +267,10 @@ public class ProfilePanel
 
                             if (ImGuiUtil.DrawDisabledButton("Apply to mannequin", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetMannequin))
                                 _manager.ChangeCharacter(_selector.Selected!, _actorAssignmentUi.MannequinIdentifier);
+
+                            var currentPlayer = _actorManager.GetCurrentPlayer();
+                            if (ImGuiUtil.DrawDisabledButton("Apply to current character", buttonWidth, string.Empty, !currentPlayer.IsValid))
+                                _manager.ChangeCharacter(_selector.Selected!, currentPlayer);
 
                             ImGui.Separator();
 

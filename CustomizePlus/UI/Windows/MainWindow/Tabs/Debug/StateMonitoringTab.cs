@@ -149,7 +149,6 @@ public class StateMonitoringTab
         ImGui.Text($"ID: {profile.UniqueId}");
         ImGui.Text($"Enabled: {(profile.Enabled ? "Enabled" : "Disabled")}");
         ImGui.Text($"State : {(profile.IsTemporary ? "Temporary" : "Permanent")}");
-        ImGui.Text($"Lookup: {(profile.LimitLookupToOwnedObjects ? "Limited lookup" : "Global lookup")}");
         var showTemplates = ImGui.CollapsingHeader($"Templates###{prefix}-profile-{profile.UniqueId}-templates");
 
         if (showTemplates)

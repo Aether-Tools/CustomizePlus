@@ -18,7 +18,6 @@ internal static class V3ProfileToV4Converter
             CreationDate = v3Profile.CreationDate,
             ModifiedDate = DateTimeOffset.UtcNow,
             Enabled = v3Profile.Enabled,
-            LimitLookupToOwnedObjects = v3Profile.OwnedOnly,
             UniqueId = Guid.NewGuid(),
             Templates = new List<Template>(1)
         };

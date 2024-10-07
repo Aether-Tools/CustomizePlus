@@ -22,7 +22,6 @@ public sealed class ProfileChanged() : EventWrapper<ProfileChanged.Type, Profile
         ChangedTemplate,
         ReloadedAll,
         WriteProtection,
-        LimitLookupToOwnedChanged,
         ApplyToCurrentlyActiveCharacterChanged,
         ChangedDefaultProfile,
         TemporaryProfileAdded,

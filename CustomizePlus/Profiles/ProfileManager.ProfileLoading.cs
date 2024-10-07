@@ -119,7 +119,6 @@ public partial class ProfileManager : IDisposable
             CreationDate = creationDate,
             UniqueId = obj["UniqueId"]?.ToObject<Guid>() ?? throw new ArgumentNullException("UniqueId"),
             Name = new LowerString(obj["Name"]?.ToObject<string>()?.Trim() ?? throw new ArgumentNullException("Name")),
-            LimitLookupToOwnedObjects = obj["LimitLookupToOwnedObjects"]?.ToObject<bool>() ?? throw new ArgumentNullException("LimitLookupToOwnedObjects"),
             Enabled = obj["Enabled"]?.ToObject<bool>() ?? throw new ArgumentNullException("Enabled"),
             ModifiedDate = obj["ModifiedDate"]?.ToObject<DateTimeOffset>() ?? creationDate,
             IsWriteProtected = obj["IsWriteProtected"]?.ToObject<bool>() ?? false,

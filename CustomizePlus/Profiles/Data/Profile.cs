@@ -40,7 +40,7 @@ public sealed class Profile : ISavable
     /// <summary>
     /// Whether to search only through local player owned characters or all characters when searching for game object by name
     /// </summary>
-    public bool LimitLookupToOwnedObjects { get; set; } = false;
+    //public bool LimitLookupToOwnedObjects { get; set; } = false;
 
     public bool Enabled { get; set; }
     public DateTimeOffset CreationDate { get; set; } = DateTime.UtcNow;
@@ -80,7 +80,6 @@ public sealed class Profile : ISavable
     public Profile(Profile original) : this()
     {
         Character = original.Character;
-        LimitLookupToOwnedObjects = original.LimitLookupToOwnedObjects;
         ApplyToCurrentlyActiveCharacter = original.ApplyToCurrentlyActiveCharacter;
 
         foreach (var template in original.Templates)
@@ -108,7 +107,6 @@ public sealed class Profile : ISavable
             ["Character"] = Character.ToJson(),
             ["ApplyToCurrentlyActiveCharacter"] = ApplyToCurrentlyActiveCharacter,
             ["Name"] = Name.Text,
-            ["LimitLookupToOwnedObjects"] = LimitLookupToOwnedObjects,
             ["Enabled"] = Enabled,
             ["IsWriteProtected"] = IsWriteProtected,
             ["Templates"] = SerializeTemplates()

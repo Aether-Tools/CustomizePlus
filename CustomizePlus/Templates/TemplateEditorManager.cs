@@ -194,18 +194,6 @@ public class TemplateEditorManager : IDisposable
         return true;
     }
 
-    public bool SetLimitLookupToOwned(bool value)
-    {
-        if (!IsEditorActive || IsEditorPaused || value == EditorProfile.LimitLookupToOwnedObjects)
-            return false;
-
-        //_profileManager.SetLimitLookupToOwned(EditorProfile, value);
-        EditorProfile.LimitLookupToOwnedObjects = value;
-        _event.Invoke(TemplateChanged.Type.EditorLimitLookupToOwnedChanged, CurrentlyEditedTemplate, EditorProfile);
-
-        return true;
-    }
-
     /// <summary>
     /// Resets changes in currently edited template to default values
     /// </summary>

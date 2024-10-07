@@ -29,6 +29,35 @@ public static class ActorIdentifierExtensions
     }
 
     /// <summary>
+    /// Compares two actor identifiers while ignoring ownership for owned objects. For all other identifier types will use Matches() method.
+    /// </summary>
+    public static bool CompareIgnoringOwnership(this ActorIdentifier identifier, ActorIdentifier other)
+    {
+        if (identifier.Type != other.Type)
+            return false;
+
+        return identifier.Type switch
+        {
+            IdentifierType.Owned => PenumbraExtensions.Manager.DataIdEquals(identifier, other),
+            _ => identifier.Matches(other)
+        };
+    }
+
+    /// <summary>
+    /// Check if owned actor is owned by local player. Will return false if Type is not Owned.
+    /// </summary>
+    public static bool IsOwnedByLocalPlayer(this ActorIdentifier identifier)
+    {
+        if (identifier.Type != IdentifierType.Owned)
+            return false;
+
+        if (PenumbraExtensions.Manager == null)
+            return false;
+
+        return identifier.PlayerName == PenumbraExtensions.Manager.GetCurrentPlayer().PlayerName;
+    }
+
+    /// <summary>
     /// Wrapper around Incognito which returns non-incognito name in debug builds
     /// </summary>
     /// <param name="identifier"></param>

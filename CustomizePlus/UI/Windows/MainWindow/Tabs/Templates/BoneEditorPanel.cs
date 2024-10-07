@@ -65,7 +65,7 @@ public class BoneEditorPanel
     {
         if (_editorManager.EnableEditor(template))
         {
-            _editorManager.SetLimitLookupToOwned(_configuration.EditorConfiguration.LimitLookupToOwnedObjects);
+            //_editorManager.SetLimitLookupToOwned(_configuration.EditorConfiguration.LimitLookupToOwnedObjects);
 
             return true;
         }
@@ -96,53 +96,48 @@ public class BoneEditorPanel
 
         using (var style = ImRaii.PushStyle(ImGuiStyleVar.ButtonTextAlign, new Vector2(0, 0.5f)))
         {
-            using (var table = ImRaii.Table("BasicSettings", 2))
-            {
-                ImGui.TableSetupColumn("BasicCol1", ImGuiTableColumnFlags.WidthFixed, ImGui.CalcTextSize("Show editor preview on").X);
+            //using (var table = ImRaii.Table("BasicSettings", 2))
+            //{
+             /*   ImGui.TableSetupColumn("BasicCol1", ImGuiTableColumnFlags.WidthFixed, ImGui.CalcTextSize("Show editor preview on").X);
                 ImGui.TableSetupColumn("BasicCol2", ImGuiTableColumnFlags.WidthStretch);
                 ImGui.TableNextRow();
-
+             
                 ImGuiUtil.DrawFrameColumn("Show editor preview on");
-                ImGui.TableNextColumn();
+                ImGui.TableNextColumn();*/
                 var width = new Vector2(ImGui.GetContentRegionAvail().X - ImGui.CalcTextSize("Limit to my creatures").X - 68, 0);
                 var name = _newCharacterName ?? _editorManager.CharacterName;
-                ImGui.SetNextItemWidth(width.X);
+                //ImGui.SetNextItemWidth(width.X);
 
-                using (var disabled = ImRaii.Disabled(!IsEditorActive || IsEditorPaused))
+                var isShouldDraw = ImGui.CollapsingHeader("Preview settings");
+
+                if (isShouldDraw)
                 {
-                    if (!_templateFileSystemSelector.IncognitoMode)
+                    using (var disabled = ImRaii.Disabled(!IsEditorActive || IsEditorPaused))
                     {
-                        if (ImGui.InputText("##PreviewCharacterName", ref name, 128))
+                        if (!_templateFileSystemSelector.IncognitoMode)
                         {
-                            _newCharacterName = name;
+                            if (ImGui.InputText("##PreviewCharacterName", ref name, 128))
+                            {
+                                _newCharacterName = name;
+                            }
+
+                            if (ImGui.IsItemDeactivatedAfterEdit())
+                            {
+                                if (string.IsNullOrWhiteSpace(_newCharacterName))
+                                    _newCharacterName = _gameObjectService.GetCurrentPlayerName();
+
+                                _editorManager.ChangeEditorCharacter(_newCharacterName);
+
+                                _newCharacterName = null;
+                            }
                         }
-
-                        if (ImGui.IsItemDeactivatedAfterEdit())
-                        {
-                            if (string.IsNullOrWhiteSpace(_newCharacterName))
-                                _newCharacterName = _gameObjectService.GetCurrentPlayerName();
-
-                            _editorManager.ChangeEditorCharacter(_newCharacterName);
-
-                            _newCharacterName = null;
-                        }
+                        else
+                            ImGui.TextUnformatted("Incognito active");
                     }
-                    else
-                        ImGui.TextUnformatted("Incognito active");
 
-                    ImGui.SameLine();
-                    var enabled = _editorManager.EditorProfile.LimitLookupToOwnedObjects;
-                    if (ImGui.Checkbox("##LimitLookupToOwnedObjects", ref enabled))
-                    {
-                        _editorManager.SetLimitLookupToOwned(enabled);
-
-                        _configuration.EditorConfiguration.LimitLookupToOwnedObjects = enabled;
-                        _configuration.Save();
-                    }
-                    ImGuiUtil.LabeledHelpMarker("Limit to my creatures",
-                        "When enabled limits the character search to only your own summons, mounts and minions.\nUseful when there is possibility there will be another character with that name owned by another player.\n* For battle chocobo use \"Chocobo\" as character name.");
                 }
-            }
+            //}
+            ImGui.Separator();
 
             using (var table = ImRaii.Table("BoneEditorMenu", 2))
             {

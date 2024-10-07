@@ -172,7 +172,7 @@ public partial class ProfileManager : IDisposable
     /// </summary>
     public void ChangeCharacter(Profile profile, ActorIdentifier actorIdentifier)
     {
-        if (!actorIdentifier.IsValid || actorIdentifier.Matches(profile.Character))
+        if (!actorIdentifier.IsValid || actorIdentifier.CompareIgnoringOwnership(profile.Character))
             return;
 
         var oldCharacter = profile.Character;
@@ -227,7 +227,7 @@ public partial class ProfileManager : IDisposable
             _logger.Debug($"Setting {profile} as enabled...");
 
             foreach (var otherProfile in Profiles
-                         .Where(x => x.Character.Matches(profile.Character) && x != profile && x.Enabled && !x.IsTemporary))
+                         .Where(x => x.Character.CompareIgnoringOwnership(profile.Character) && x != profile && x.Enabled && !x.IsTemporary))
             {
                 _logger.Debug($"\t-> {otherProfile} disabled");
                 SetEnabled(otherProfile, false);
@@ -253,17 +253,6 @@ public partial class ProfileManager : IDisposable
         }
         else
             throw new ProfileNotFoundException();
-    }
-    public void SetLimitLookupToOwned(Profile profile, bool value)
-    {
-        if (profile.LimitLookupToOwnedObjects != value)
-        {
-            profile.LimitLookupToOwnedObjects = value;
-
-            SaveProfile(profile);
-
-            _event.Invoke(ProfileChanged.Type.LimitLookupToOwnedChanged, profile, value);
-        }
     }
 
     public void SetApplyToCurrentlyActiveCharacter(Profile profile, bool value)
@@ -361,9 +350,8 @@ public partial class ProfileManager : IDisposable
         profile.Enabled = true;
         profile.ProfileType = ProfileType.Temporary;
         profile.Character = identifier;
-        profile.LimitLookupToOwnedObjects = false;
 
-        var existingProfile = Profiles.FirstOrDefault(x => x.Character.Matches(profile.Character) && x.IsTemporary);
+        var existingProfile = Profiles.FirstOrDefault(x => x.Character.CompareIgnoringOwnership(profile.Character) && x.IsTemporary);
         if (existingProfile != null)
         {
             _logger.Debug($"Temporary profile for {existingProfile.Character.Incognito(null)} already exists, removing...");
@@ -421,11 +409,19 @@ public partial class ProfileManager : IDisposable
         if (!actorIdentifier.IsValid)
             return null;
 
-        var query = Profiles.Where(x => x.Character.Matches(actorIdentifier) && !x.IsTemporary);
+        var query = Profiles.Where(x => x.Character.CompareIgnoringOwnership(actorIdentifier) && !x.IsTemporary);
         if (enabledOnly)
             query = query.Where(x => x.Enabled);
 
-        return query.FirstOrDefault();
+        var profile = query.FirstOrDefault();
+
+        if (profile == null)
+            return null;
+
+        if (actorIdentifier.Type == IdentifierType.Owned && !actorIdentifier.IsOwnedByLocalPlayer())
+            return null;
+
+        return profile;
     }
 
     //todo: replace with dictionary
@@ -462,13 +458,13 @@ public partial class ProfileManager : IDisposable
                     return true;
 
                 var currentPlayer = _actorManager.GetCurrentPlayer();
-                return currentPlayer.IsValid && _actorManager.GetCurrentPlayer().Matches(actorIdentifier);
+                return currentPlayer.IsValid && _actorManager.GetCurrentPlayer().CompareIgnoringOwnership(actorIdentifier);
             }
 
-            return (profile.CharacterName.Text == name || profile.Character.Matches(actorIdentifier)) &&
-                (!profile.LimitLookupToOwnedObjects ||
-                    (actorIdentifier.Type == IdentifierType.Owned &&
-                    actorIdentifier.PlayerName == _actorManager.GetCurrentPlayer().PlayerName));
+            if (actorIdentifier.Type == IdentifierType.Owned && !actorIdentifier.IsOwnedByLocalPlayer())
+                return false;
+
+            return profile.CharacterName.Text == name || profile.Character.CompareIgnoringOwnership(actorIdentifier);
         }
 
         if (_templateEditorManager.IsEditorActive && _templateEditorManager.EditorProfile.Enabled && IsProfileAppliesToCurrentActor(_templateEditorManager.EditorProfile))
@@ -479,6 +475,7 @@ public partial class ProfileManager : IDisposable
             if(IsProfileAppliesToCurrentActor(profile))
             {
                 //todo: temp for migrations to v5
+                //todo: make sure this works for minions and stuff
                 if (!profile.Character.IsValid)
                 {
                     _logger.Warning($"No character for profile {profile}, but character has been found as: {actorIdentifier}, will set.");

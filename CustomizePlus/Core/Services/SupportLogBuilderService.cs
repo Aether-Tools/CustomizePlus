@@ -74,7 +74,6 @@ public class SupportLogBuilderService
             sb.Append($">   > **`Name:                       `** {profile.Name.Text.Incognify()}\n");
             sb.Append($">   > **`Type:                       `** {profile.ProfileType} \n");
             sb.Append($">   > **`Character name:             `** {profile.CharacterName.Text.Incognify()}\n");
-            sb.Append($">   > **`Limit to my creatures:      `** {profile.LimitLookupToOwnedObjects}\n");
             sb.Append($">   > **`Templates:`**\n");
             sb.Append($">   >   > **`Count:                  `** {profile.Templates.Count}\n");
             foreach (var template in profile.Templates)

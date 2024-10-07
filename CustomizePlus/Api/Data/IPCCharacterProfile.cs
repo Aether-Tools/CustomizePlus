@@ -53,7 +53,6 @@ public class IPCCharacterProfile
             CreationDate = DateTimeOffset.UtcNow,
             ModifiedDate = DateTimeOffset.UtcNow,
             Enabled = true,
-            LimitLookupToOwnedObjects = false,
             UniqueId = Guid.NewGuid(),
             Templates = new List<Template>(1),
             ProfileType = isTemporary ? Profiles.Enums.ProfileType.Temporary : Profiles.Enums.ProfileType.Normal

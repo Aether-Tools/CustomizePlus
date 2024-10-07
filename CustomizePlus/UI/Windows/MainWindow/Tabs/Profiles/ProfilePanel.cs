@@ -16,6 +16,7 @@ using CustomizePlus.Templates.Events;
 using Penumbra.GameData.Actors;
 using Penumbra.String;
 using static FFXIVClientStructs.FFXIV.Client.LayoutEngine.ILayoutInstance;
+using CustomizePlus.GameData.Extensions;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 
@@ -216,68 +217,46 @@ public class ProfilePanel
                 if (!_selector.IncognitoMode)
                 {
                     bool showMultipleMessage = false;
-                    if (_manager.DefaultProfile != _selector.Selected)
+                    if (_manager.DefaultProfile != _selector.Selected && !_selector.Selected!.ApplyToCurrentlyActiveCharacter)
                     {
-                        if (!_selector.Selected!.ApplyToCurrentlyActiveCharacter)
-                        {
-                            /* if (ImGui.InputText("##CharacterName", ref name, 128))
-                             {
-                                 _newCharacterName = name;
-                                 _changedProfile = _selector.Selected;
-                             }
+                        ImGui.Text(_selector.Selected!.Character.IsValid ? $"Applies to {_selector.Selected?.Character.ToNameWithoutOwnerName()}" : "No valid character selected for the profile");
+                        ImGui.Text($"Legacy: {_selector.Selected!.CharacterName.Text ?? "None"}");
+                        ImGui.Separator();
 
-                             if (ImGui.IsItemDeactivatedAfterEdit() && _changedProfile != null)
-                             {
-                                 _manager.ChangeCharacterName(_changedProfile, name);
-                                 _newCharacterName = null;
-                                 _changedProfile = null;
-                             }
-                             ImGui.Separator();*/
-                            ImGui.Text(_selector.Selected!.Character.IsValid ? $"Applies to {_selector.Selected?.Character.ToString()}" : "No valid character selected for the profile");
-                            ImGui.Text($"Legacy: {_selector.Selected!.CharacterName.Text ?? "None"}");
-                            ImGui.Separator();
+                        _actorAssignmentUi.DrawWorldCombo(width.X / 2);
+                        ImGui.SameLine();
+                        _actorAssignmentUi.DrawPlayerInput(width.X / 2);
 
-                            _actorAssignmentUi.DrawWorldCombo(width.X / 2);
-                            ImGui.SameLine();
-                            _actorAssignmentUi.DrawPlayerInput(width.X / 2);
+                        var buttonWidth = new Vector2(165 * ImGuiHelpers.GlobalScale - ImGui.GetStyle().ItemSpacing.X / 2, 0);
 
-                            var buttonWidth = new Vector2(165 * ImGuiHelpers.GlobalScale - ImGui.GetStyle().ItemSpacing.X / 2, 0);
+                        if (ImGuiUtil.DrawDisabledButton("Apply to player character", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetPlayer))
+                            _manager.ChangeCharacter(_selector.Selected!, _actorAssignmentUi.PlayerIdentifier);
 
-                            if (ImGuiUtil.DrawDisabledButton("Apply to player character", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetPlayer))
-                                _manager.ChangeCharacter(_selector.Selected!, _actorAssignmentUi.PlayerIdentifier);
+                        ImGui.SameLine();
 
-                            ImGui.SameLine();
+                        if (ImGuiUtil.DrawDisabledButton("Apply to retainer", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetRetainer))
+                            _manager.ChangeCharacter(_selector.Selected!, _actorAssignmentUi.RetainerIdentifier);
 
-                            if (ImGuiUtil.DrawDisabledButton("Apply to retainer", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetRetainer))
-                                _manager.ChangeCharacter(_selector.Selected!, _actorAssignmentUi.RetainerIdentifier);
+                        ImGui.SameLine();
 
-                            ImGui.SameLine();
+                        if (ImGuiUtil.DrawDisabledButton("Apply to mannequin", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetMannequin))
+                            _manager.ChangeCharacter(_selector.Selected!, _actorAssignmentUi.MannequinIdentifier);
 
-                            if (ImGuiUtil.DrawDisabledButton("Apply to mannequin", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetMannequin))
-                                _manager.ChangeCharacter(_selector.Selected!, _actorAssignmentUi.MannequinIdentifier);
+                        var currentPlayer = _actorManager.GetCurrentPlayer();
+                        if (ImGuiUtil.DrawDisabledButton("Apply to current character", buttonWidth, string.Empty, !currentPlayer.IsValid))
+                            _manager.ChangeCharacter(_selector.Selected!, currentPlayer);
 
-                            var currentPlayer = _actorManager.GetCurrentPlayer();
-                            if (ImGuiUtil.DrawDisabledButton("Apply to current character", buttonWidth, string.Empty, !currentPlayer.IsValid))
-                                _manager.ChangeCharacter(_selector.Selected!, currentPlayer);
+                        ImGui.Separator();
 
-                            ImGui.Separator();
+                        _actorAssignmentUi.DrawObjectKindCombo(width.X / 2);
+                        ImGui.SameLine();
+                        _actorAssignmentUi.DrawNpcInput(width.X / 2);
 
-                            _actorAssignmentUi.DrawObjectKindCombo(width.X / 2);
-                            ImGui.SameLine();
-                            _actorAssignmentUi.DrawNpcInput(width.X / 2);
+                        if (ImGuiUtil.DrawDisabledButton("Apply to selected NPC", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetNpc))
+                            _manager.ChangeCharacter(_selector.Selected!, _actorAssignmentUi.NpcIdentifier);
 
-                            if (ImGui.Button("Apply to selected non-player character"))
-                            {
-
-                            }
-                        }
-                        else
-                            showMultipleMessage = true;
                     }
                     else
-                        showMultipleMessage = true;
-
-                    if(showMultipleMessage)
                         ImGui.TextUnformatted("Applies to multiple targets");
                 }
                 else
@@ -308,13 +287,6 @@ public class ProfilePanel
                     ImGui.PopStyleColor();
                     ImGuiUtil.HoverTooltip("Can only be changed when both currently selected and profile where this checkbox is checked are disabled.");
                 }
-
-                //ImGui.SameLine();
-                var enabled = _selector.Selected?.LimitLookupToOwnedObjects ?? false;
-                if (ImGui.Checkbox("##LimitLookupToOwnedObjects", ref enabled))
-                    _manager.SetLimitLookupToOwned(_selector.Selected!, enabled);
-                ImGuiUtil.LabeledHelpMarker("Limit to my creatures",
-                    "When enabled limits the character search to only your own summons, mounts and minions.\nUseful when there is possibility there will be another character with that name owned by another player.\n* For battle chocobo use \"Chocobo\" as character name.");
             }
         }
     }

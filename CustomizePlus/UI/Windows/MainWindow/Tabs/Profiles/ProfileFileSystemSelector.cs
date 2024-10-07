@@ -16,6 +16,7 @@ using CustomizePlus.Configuration.Data;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Game.Services;
 using CustomizePlus.Profiles.Events;
+using CustomizePlus.GameData.Extensions;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 
@@ -239,9 +240,9 @@ public class ProfileFileSystemSelector : FileSystemSelector<Profile, ProfileStat
         }
 
         if (leaf.Value.Enabled)
-            state.Color = leaf.Value.Character.Matches(_gameObjectService.GetCurrentPlayerActorIdentifier()) ? ColorId.LocalCharacterEnabledProfile : ColorId.EnabledProfile;
+            state.Color = leaf.Value.Character.CompareIgnoringOwnership(_gameObjectService.GetCurrentPlayerActorIdentifier()) ? ColorId.LocalCharacterEnabledProfile : ColorId.EnabledProfile;
         else
-            state.Color = leaf.Value.Character.Matches(_gameObjectService.GetCurrentPlayerActorIdentifier()) ? ColorId.LocalCharacterDisabledProfile : ColorId.DisabledProfile;
+            state.Color = leaf.Value.Character.CompareIgnoringOwnership(_gameObjectService.GetCurrentPlayerActorIdentifier()) ? ColorId.LocalCharacterDisabledProfile : ColorId.DisabledProfile;
 
         return ApplyStringFilters(leaf, leaf.Value);
     }

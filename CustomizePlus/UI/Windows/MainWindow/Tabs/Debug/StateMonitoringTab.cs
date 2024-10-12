@@ -213,10 +213,27 @@ public class StateMonitoringTab
         //ImGui.Text("Profile:");
         //DrawSingleProfile($"armature-{armature.GetHashCode()}", armature.Profile);
 
-        ImGui.Text($"Bone template bindings:");
-        foreach (var kvPair in armature.BoneTemplateBinding)
+        var bindingsShow = ImGui.CollapsingHeader($"Bone template bindings ({armature.BoneTemplateBinding.Count})###{prefix}-armature-{armature.GetHashCode()}-bindings");
+
+        if (bindingsShow)
         {
-            ImGui.Text($"{BoneData.GetBoneDisplayName(kvPair.Key)} ({kvPair.Key}) -> {kvPair.Value.Name.Text.Incognify()} ({kvPair.Value.UniqueId})");
+            foreach (var kvPair in armature.BoneTemplateBinding)
+            {
+                ImGui.Text($"{BoneData.GetBoneDisplayName(kvPair.Key)} ({kvPair.Key}) -> {kvPair.Value.Name.Text.Incognify()} ({kvPair.Value.UniqueId})");
+            }
+        }
+
+        var bonesShow = ImGui.CollapsingHeader($"Armature bones###{prefix}-armature-{armature.GetHashCode()}-bones");
+
+        if (!bonesShow)
+            return;
+
+        var bones = armature.GetAllBones().ToList();
+        ImGui.Text($"{bones.Count} bones");
+
+        foreach (var bone in bones)
+        {
+            ImGui.Text($"{(bone.IsActive ? "[A] " : "")}{BoneData.GetBoneDisplayName(bone.BoneName)} [{bone.BoneName}] ({bone.PartialSkeletonIndex}-{bone.BoneIndex})");
         }
     }
 }

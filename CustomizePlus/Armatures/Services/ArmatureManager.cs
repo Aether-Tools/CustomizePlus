@@ -184,7 +184,7 @@ public unsafe sealed class ArmatureManager : IDisposable
             }
 
             //Needed because skeleton sometimes appears to be not ready when armature is created
-            //and also because we want to augment armature with new bones if they are available
+            //and also because we want to keep armature up to date with any character skeleton changes
             TryLinkSkeleton(armature);
         }
     }
@@ -207,38 +207,22 @@ public unsafe sealed class ArmatureManager : IDisposable
     /// Returns whether or not a link can be established between the armature and an in-game object.
     /// If unbuilt, the armature will be rebuilded.
     /// </summary>
-    private bool TryLinkSkeleton(Armature armature, bool forceRebuild = false)
+    private bool TryLinkSkeleton(Armature armature)
     {
         _objectManager.Update();
 
-        try
+        if (!_objectManager.Identifiers.ContainsKey(armature.ActorIdentifier))
+            return false;
+
+        var actor = _objectManager[armature.ActorIdentifier].Objects[0];
+
+        if (!armature.IsBuilt || armature.IsSkeletonUpdated(actor.Model.AsCharacterBase))
         {
-            if (!_objectManager.Identifiers.ContainsKey(armature.ActorIdentifier))
-                return false;
-
-            var actor = _objectManager[armature.ActorIdentifier].Objects[0];
-
-            if (!armature.IsBuilt || forceRebuild)
-            {
-                armature.RebuildSkeleton(actor.Model.AsCharacterBase);
-            }
-            else if (armature.NewBonesAvailable(actor.Model.AsCharacterBase))
-            {
-                armature.AugmentSkeleton(actor.Model.AsCharacterBase);
-            }
-
-            return true;
+            _logger.Debug($"Skeleton for actor #{actor.AsObject->ObjectIndex} tied to \"{armature}\" has changed");
+            armature.RebuildSkeleton(actor.Model.AsCharacterBase);
         }
-        catch (Exception ex)
-        {
-            // This is on wait until isse #191 on Github responds. Keeping it in code, delete it if I forget and this is longer then a month ago.
 
-            // Disabling this if its any Default Profile due to Log spam. A bit crazy but hey, if its for me id Remove Default profiles all together so this is as much as ill do for now! :)
-            //if(!(Profile.CharacterName.Equals(Constants.DefaultProfileCharacterName) || Profile.CharacterName.Equals("DefaultCutscene"))) {
-            _logger.Error($"Error occured while attempting to link skeleton: {armature}");
-            throw;
-            //}
-        }
+        return true;
     }
 
     /// <summary>

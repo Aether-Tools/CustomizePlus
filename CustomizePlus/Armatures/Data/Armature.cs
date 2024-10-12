@@ -162,26 +162,21 @@ public unsafe class Armature
             : $"Armature (#{_localId}) on {ActorIdentifier.IncognitoDebug()} ({Profile}) with no skeleton reference";
     }
 
-    public bool NewBonesAvailable(CharacterBase* cBase)
+    public bool IsSkeletonUpdated(CharacterBase* cBase)
     {
         if (cBase == null)
-        {
             return false;
-        }
-        else if (cBase->Skeleton->PartialSkeletonCount > _partialSkeletons.Length)
-        {
+        else if (cBase->Skeleton->PartialSkeletonCount != _partialSkeletons.Length)
             return true;
-        }
         else
         {
             for (var i = 0; i < cBase->Skeleton->PartialSkeletonCount; ++i)
             {
                 var newPose = cBase->Skeleton->PartialSkeletons[i].GetHavokPose(Constants.TruePoseIndex);
+
                 if (newPose != null
-                    && newPose->Skeleton->Bones.Length > _partialSkeletons[i].Length)
-                {
+                    && newPose->Skeleton->Bones.Length != _partialSkeletons[i].Length)
                     return true;
-                }
             }
         }
 
@@ -203,43 +198,6 @@ public unsafe class Armature
         RebuildBoneTemplateBinding(); //todo: intentionally not calling ArmatureChanged.Type.Updated because this is pending rewrite
 
         Plugin.Logger.Debug($"Rebuilt {this}");
-    }
-
-    public void AugmentSkeleton(CharacterBase* cBase)
-    {
-        if (cBase == null)
-            return;
-
-        var oldPartials = _partialSkeletons.Select(x => x.ToList()).ToList();
-        var newPartials = ParseBonesFromObject(this, cBase);
-
-        //for each of the new partial skeletons discovered...
-        for (var i = 0; i < newPartials.Count; ++i)
-        {
-            //if the old skeleton doesn't contain the new partial at all, add the whole thing
-            if (i > oldPartials.Count)
-            {
-                oldPartials.Add(newPartials[i]);
-            }
-            //otherwise, add every model bone the new partial has that the old one doesn't
-            else
-            {
-                //Case: get carbuncle, enable profile for it, turn carbuncle into human via glamourer
-                if (oldPartials.Count <= i)
-                    oldPartials.Add(new List<ModelBone>());
-
-                for (var j = oldPartials[i].Count; j < newPartials[i].Count; ++j)
-                {
-                    oldPartials[i].Add(newPartials[i][j]);
-                }
-            }
-        }
-
-        _partialSkeletons = oldPartials.Select(x => x.ToArray()).ToArray();
-
-        RebuildBoneTemplateBinding(); //todo: intentionally not calling ArmatureChanged.Type.Updated because this is pending rewrite
-
-        Plugin.Logger.Debug($"Augmented {this} with new bones");
     }
 
     public BoneTransform? GetAppliedBoneTransform(string boneName)

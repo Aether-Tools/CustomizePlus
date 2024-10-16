@@ -470,10 +470,27 @@ public unsafe sealed class ArmatureManager : IDisposable
 
         if (type == ProfileChanged.Type.TemporaryProfileAdded)
         {
-            if (!profile.Character.IsValid || !Armatures.ContainsKey(profile.Character)) //todo: any world support
+            if (!profile.Character.IsValid || !Armatures.ContainsKey(profile.Character)) //temporary profiles are never using AnyWorld identifiers so we should be fine here
                 return;
 
+            //todo: remove this later
+            /*Armature? armature = null;
+            foreach(var kvPair in Armatures)
+            {
+                //todo: check mount/companion
+                if(kvPair.Key.CompareIgnoringOwnership(profile.Character) &&
+                    (kvPair.Key.Type != IdentifierType.Owned || kvPair.Key.IsOwnedByLocalPlayer()))
+                {
+                    armature = kvPair.Value;
+                    break;
+                }
+            }
+
+            if (armature == null)
+                return;*/
+
             var armature = Armatures[profile.Character];
+
             if (armature.Profile == profile)
                 return;
 

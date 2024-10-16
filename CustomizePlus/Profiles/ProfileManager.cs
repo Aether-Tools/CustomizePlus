@@ -342,14 +342,14 @@ public partial class ProfileManager : IDisposable
     }
 
     //warn: temporary profile system does not support any world identifiers
-    public void AddTemporaryProfile(Profile profile, Actor actor/*, Template template*/)
+    public void AddTemporaryProfile(Profile profile, Actor actor)
     {
         if (!actor.Identifier(_actorManager, out var identifier))
             throw new ActorNotFoundException();
 
         profile.Enabled = true;
         profile.ProfileType = ProfileType.Temporary;
-        profile.Character = identifier;
+        profile.Character = identifier; //warn: identifier must not be AnyWorld or stuff will break!
 
         var existingProfile = Profiles.FirstOrDefault(x => x.Character.CompareIgnoringOwnership(profile.Character) && x.IsTemporary);
         if (existingProfile != null)
@@ -458,7 +458,7 @@ public partial class ProfileManager : IDisposable
                     return true;
 
                 var currentPlayer = _actorManager.GetCurrentPlayer();
-                return currentPlayer.IsValid && _actorManager.GetCurrentPlayer().CompareIgnoringOwnership(actorIdentifier);
+                return currentPlayer.IsValid && currentPlayer.CompareIgnoringOwnership(actorIdentifier);
             }
 
             if (actorIdentifier.Type == IdentifierType.Owned && !actorIdentifier.IsOwnedByLocalPlayer())

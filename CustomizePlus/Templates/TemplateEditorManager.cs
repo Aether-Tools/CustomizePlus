@@ -2,6 +2,7 @@
 using CustomizePlus.Core.Data;
 using CustomizePlus.Game.Events;
 using CustomizePlus.Game.Services;
+using CustomizePlus.GameData.Extensions;
 using CustomizePlus.Profiles;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Profiles.Enums;
@@ -76,7 +77,7 @@ public class TemplateEditorManager : IDisposable
             //todo: check with mounts/companions
             var playerName = _gameObjectService.GetCurrentPlayerName();
             return _gameObjectService.FindActorsByIdentifier(Character)
-                .Where(x => x.Item1.Type != Penumbra.GameData.Enums.IdentifierType.Owned || x.Item1.PlayerName.ToString() == playerName)
+                .Where(x => x.Item1.Type != Penumbra.GameData.Enums.IdentifierType.Owned || x.Item1.IsOwnedByLocalPlayer())
                 .Any();
         } 
     }

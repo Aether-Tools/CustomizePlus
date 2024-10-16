@@ -133,19 +133,25 @@ public class ActorAssignmentUi
         }
 
         var npcCombo = GetNpcCombo(_newKind);
-        switch(_newKind)
+
+        if (npcCombo.CurrentSelection.Ids == null || npcCombo.CurrentSelection.Ids.Length == 0)
+            NpcIdentifier = ActorIdentifier.Invalid;
+        else
         {
-            case ObjectKind.BattleNpc:
-            case ObjectKind.EventNpc:
-                NpcIdentifier = _actorManager.CreateNpc(_newKind, npcCombo.CurrentSelection.Ids[0]);
-                break;
-            case ObjectKind.MountType:
-            case ObjectKind.Companion:
-                var currentPlayer = _actorManager.GetCurrentPlayer();
-                NpcIdentifier = _actorManager.CreateOwned(currentPlayer.PlayerName, currentPlayer.HomeWorld, _newKind, npcCombo.CurrentSelection.Ids[0]);
-                break;
-            default:
-                throw new NotImplementedException();
+            switch (_newKind)
+            {
+                case ObjectKind.BattleNpc:
+                case ObjectKind.EventNpc:
+                    NpcIdentifier = _actorManager.CreateNpc(_newKind, npcCombo.CurrentSelection.Ids[0]);
+                    break;
+                case ObjectKind.MountType:
+                case ObjectKind.Companion:
+                    var currentPlayer = _actorManager.GetCurrentPlayer();
+                    NpcIdentifier = _actorManager.CreateOwned(currentPlayer.PlayerName, currentPlayer.HomeWorld, _newKind, npcCombo.CurrentSelection.Ids[0]);
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
         }
     }
 }

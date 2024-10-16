@@ -32,7 +32,6 @@ public class ProfilePanel
     private readonly TemplateEditorEvent _templateEditorEvent;
 
     private string? _newName;
-    //private string? _newCharacterName;
     private Profile? _changedProfile;
 
     private Action? _endAction;
@@ -219,7 +218,8 @@ public class ProfilePanel
                     bool showMultipleMessage = false;
                     if (_manager.DefaultProfile != _selector.Selected && !_selector.Selected!.ApplyToCurrentlyActiveCharacter)
                     {
-                        ImGui.Text(_selector.Selected!.Character.IsValid ? $"Applies to {_selector.Selected?.Character.ToNameWithoutOwnerName()}" : "No valid character selected for the profile");
+                        ImGui.Text(_selector.Selected!.Character.IsValid ? $"Applies to {(_selector.Selected?.Character.Type == Penumbra.GameData.Enums.IdentifierType.Owned ?
+                            _selector.Selected?.Character.ToNameWithoutOwnerName() : _selector.Selected?.Character.ToString())}" : "No valid character selected for the profile");
                         ImGui.Text($"Legacy: {_selector.Selected!.CharacterName.Text ?? "None"}");
                         ImGui.Separator();
 

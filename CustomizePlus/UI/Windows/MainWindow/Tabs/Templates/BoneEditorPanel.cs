@@ -15,6 +15,10 @@ using CustomizePlus.Core.Helpers;
 using CustomizePlus.Templates;
 using CustomizePlus.Game.Services;
 using CustomizePlus.Templates.Data;
+using CustomizePlus.UI.Windows.Controls;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Render;
+using Penumbra.GameData.Actors;
+using CustomizePlus.GameData.Extensions;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 
@@ -24,14 +28,13 @@ public class BoneEditorPanel
     private readonly TemplateEditorManager _editorManager;
     private readonly PluginConfiguration _configuration;
     private readonly GameObjectService _gameObjectService;
+    private readonly ActorAssignmentUi _actorAssignmentUi;
 
     private BoneAttribute _editingAttribute;
     private int _precision;
 
     private bool _isShowLiveBones;
     private bool _isMirrorModeEnabled;
-
-    private string? _newCharacterName;
 
     private Dictionary<BoneData.BoneFamily, bool> _groupExpandedState = new();
 
@@ -48,12 +51,14 @@ public class BoneEditorPanel
         TemplateFileSystemSelector templateFileSystemSelector,
         TemplateEditorManager editorManager,
         PluginConfiguration configuration,
-        GameObjectService gameObjectService)
+        GameObjectService gameObjectService,
+        ActorAssignmentUi actorAssignmentUi)
     {
         _templateFileSystemSelector = templateFileSystemSelector;
         _editorManager = editorManager;
         _configuration = configuration;
         _gameObjectService = gameObjectService;
+        _actorAssignmentUi = actorAssignmentUi;
 
         _isShowLiveBones = configuration.EditorConfiguration.ShowLiveBones;
         _isMirrorModeEnabled = configuration.EditorConfiguration.BoneMirroringEnabled;
@@ -96,47 +101,57 @@ public class BoneEditorPanel
 
         using (var style = ImRaii.PushStyle(ImGuiStyleVar.ButtonTextAlign, new Vector2(0, 0.5f)))
         {
-            //using (var table = ImRaii.Table("BasicSettings", 2))
-            //{
-             /*   ImGui.TableSetupColumn("BasicCol1", ImGuiTableColumnFlags.WidthFixed, ImGui.CalcTextSize("Show editor preview on").X);
-                ImGui.TableSetupColumn("BasicCol2", ImGuiTableColumnFlags.WidthStretch);
-                ImGui.TableNextRow();
-             
-                ImGuiUtil.DrawFrameColumn("Show editor preview on");
-                ImGui.TableNextColumn();*/
+            var isShouldDraw = ImGui.CollapsingHeader("Preview settings");
+
+            if (isShouldDraw)
+            {
                 var width = new Vector2(ImGui.GetContentRegionAvail().X - ImGui.CalcTextSize("Limit to my creatures").X - 68, 0);
-                var name = _newCharacterName ?? _editorManager.CharacterName;
-                //ImGui.SetNextItemWidth(width.X);
 
-                var isShouldDraw = ImGui.CollapsingHeader("Preview settings");
-
-                if (isShouldDraw)
+                using (var disabled = ImRaii.Disabled(!IsEditorActive || IsEditorPaused))
                 {
-                    using (var disabled = ImRaii.Disabled(!IsEditorActive || IsEditorPaused))
+                    if (!_templateFileSystemSelector.IncognitoMode)
                     {
-                        if (!_templateFileSystemSelector.IncognitoMode)
-                        {
-                            if (ImGui.InputText("##PreviewCharacterName", ref name, 128))
-                            {
-                                _newCharacterName = name;
-                            }
+                        ImGui.Text(_editorManager.Character.IsValid ? $"Applies to {(_editorManager.Character.Type == Penumbra.GameData.Enums.IdentifierType.Owned ? 
+                            _editorManager.Character.ToNameWithoutOwnerName() : _editorManager.Character.ToString())}" : "No valid character selected");
+                        ImGui.Separator();
 
-                            if (ImGui.IsItemDeactivatedAfterEdit())
-                            {
-                                if (string.IsNullOrWhiteSpace(_newCharacterName))
-                                    _newCharacterName = _gameObjectService.GetCurrentPlayerName();
+                        _actorAssignmentUi.DrawWorldCombo(width.X / 2);
+                        ImGui.SameLine();
+                        _actorAssignmentUi.DrawPlayerInput(width.X / 2);
 
-                                _editorManager.ChangeEditorCharacter(_newCharacterName);
+                        var buttonWidth = new Vector2(165 * ImGuiHelpers.GlobalScale - ImGui.GetStyle().ItemSpacing.X / 2, 0);
 
-                                _newCharacterName = null;
-                            }
-                        }
-                        else
-                            ImGui.TextUnformatted("Incognito active");
+                        if (ImGuiUtil.DrawDisabledButton("Apply to player character", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetPlayer))
+                            _editorManager.ChangeEditorCharacter(_actorAssignmentUi.PlayerIdentifier);
+
+                        ImGui.SameLine();
+
+                        if (ImGuiUtil.DrawDisabledButton("Apply to retainer", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetRetainer))
+                            _editorManager.ChangeEditorCharacter(_actorAssignmentUi.RetainerIdentifier);
+
+                        ImGui.SameLine();
+
+                        if (ImGuiUtil.DrawDisabledButton("Apply to mannequin", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetMannequin))
+                            _editorManager.ChangeEditorCharacter(_actorAssignmentUi.MannequinIdentifier);
+
+                        var currentPlayer = _gameObjectService.GetCurrentPlayerActorIdentifier();
+                        if (ImGuiUtil.DrawDisabledButton("Apply to current character", buttonWidth, string.Empty, !currentPlayer.IsValid))
+                            _editorManager.ChangeEditorCharacter(currentPlayer);
+
+                        ImGui.Separator();
+
+                        _actorAssignmentUi.DrawObjectKindCombo(width.X / 2);
+                        ImGui.SameLine();
+                        _actorAssignmentUi.DrawNpcInput(width.X / 2);
+
+                        if (ImGuiUtil.DrawDisabledButton("Apply to selected NPC", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetNpc))
+                            _editorManager.ChangeEditorCharacter(_actorAssignmentUi.NpcIdentifier);
                     }
-
+                    else
+                        ImGui.TextUnformatted("Incognito active");
                 }
-            //}
+            }
+
             ImGui.Separator();
 
             using (var table = ImRaii.Table("BoneEditorMenu", 2))

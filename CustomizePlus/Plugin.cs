@@ -21,6 +21,7 @@ using CustomizePlus.Core.Extensions;
 using CustomizePlus.Templates;
 using CustomizePlus.Profiles;
 using CustomizePlus.Armatures.Services;
+using Penumbra.GameData.Actors;
 
 namespace CustomizePlus;
 
@@ -43,6 +44,8 @@ public sealed class Plugin : IDalamudPlugin
             ECommonsMain.Init(pluginInterface, this);
 
             _services = ServiceManagerBuilder.CreateProvider(pluginInterface, Logger);
+
+            _services.GetService<ActorManager>(); //needs to be initialized early for config to be read properly
 
             //temporary
             var v3ConfigFixer = _services.GetService<Version3ConfigFixer>();

@@ -11,6 +11,7 @@ using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using OtterGui.Classes;
 using OtterGui.Log;
+using Penumbra.GameData.Actors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,12 +64,22 @@ public class TemplateEditorManager : IDisposable
     /// <summary>
     /// Name of the preview character for the editor
     /// </summary>
-    public string CharacterName => EditorProfile.CharacterName;
+    public ActorIdentifier Character => EditorProfile.Character;
 
     /// <summary>
     /// Checks if preview character exists at the time of call
     /// </summary>
-    public bool IsCharacterFound => _gameObjectService.FindActorsByName(CharacterName).Count() > 0;
+    public bool IsCharacterFound
+    { 
+        get
+        {
+            //todo: check with mounts/companions
+            var playerName = _gameObjectService.GetCurrentPlayerName();
+            return _gameObjectService.FindActorsByIdentifier(Character)
+                .Where(x => x.Item1.Type != Penumbra.GameData.Enums.IdentifierType.Owned || x.Item1.PlayerName.ToString() == playerName)
+                .Any();
+        } 
+    }
 
     public bool IsKeepOnlyEditorProfileActive { get; set; } //todo
 
@@ -89,13 +100,13 @@ public class TemplateEditorManager : IDisposable
 
         _clientState.Login += OnLogin;
 
-        EditorProfile = new Profile() 
-        { 
+        EditorProfile = new Profile()
+        {
             Templates = new List<Template>(),
             Enabled = false,
             Name = "Template editor profile",
             ProfileType = ProfileType.Editor,
-            CharacterName = configuration.EditorConfiguration.PreviewCharacterName ?? LowerString.Empty
+            Character = configuration.EditorConfiguration.PreviewCharacter
         };
     }
 
@@ -112,7 +123,7 @@ public class TemplateEditorManager : IDisposable
         if (IsEditorActive || IsEditorPaused)
             return false;
 
-        _logger.Debug($"Enabling editor profile for {template.Name} via character {CharacterName}");
+        _logger.Debug($"Enabling editor profile for {template.Name} via character {Character.Incognito(null)}");
 
         CurrentlyEditedTemplateId = template.UniqueId;
         _currentlyEditedTemplateOriginal = template;
@@ -124,8 +135,8 @@ public class TemplateEditorManager : IDisposable
             Name = "Template editor temporary template"
         };
 
-        if (string.IsNullOrWhiteSpace(CharacterName)) //safeguard
-            ChangeEditorCharacterInternal(_gameObjectService.GetCurrentPlayerName()); //will set EditorProfile.CharacterName
+        if (!Character.IsValid) //safeguard
+            ChangeEditorCharacterInternal(_gameObjectService.GetCurrentPlayerActorIdentifier()); //will set EditorProfile.Character
 
         EditorProfile.Templates.Clear(); //safeguard
         EditorProfile.Templates.Add(CurrentlyEditedTemplate);
@@ -133,7 +144,7 @@ public class TemplateEditorManager : IDisposable
         HasChanges = false;
         IsEditorActive = true;
 
-        _event.Invoke(TemplateChanged.Type.EditorEnabled, template, CharacterName);
+        _event.Invoke(TemplateChanged.Type.EditorEnabled, template, Character);
 
         return true;
     }
@@ -155,7 +166,7 @@ public class TemplateEditorManager : IDisposable
         IsEditorActive = false;
         HasChanges = false;
 
-        _event.Invoke(TemplateChanged.Type.EditorDisabled, null, CharacterName);
+        _event.Invoke(TemplateChanged.Type.EditorDisabled, null, Character);
 
         return true;
     }
@@ -172,24 +183,24 @@ public class TemplateEditorManager : IDisposable
         _templateManager.ApplyBoneChangesAndSave(targetTemplate, CurrentlyEditedTemplate!);
     }
 
-    public bool ChangeEditorCharacter(string characterName)
+    public bool ChangeEditorCharacter(ActorIdentifier character)
     {
-        if (!IsEditorActive || CharacterName == characterName || IsEditorPaused || string.IsNullOrWhiteSpace(characterName))
+        if (!IsEditorActive || Character == character || IsEditorPaused || !character.IsValid)
             return false;
 
-        return ChangeEditorCharacterInternal(characterName);
+        return ChangeEditorCharacterInternal(character);
     }
 
-    private bool ChangeEditorCharacterInternal(string characterName)
+    private bool ChangeEditorCharacterInternal(ActorIdentifier character)
     {
-        _logger.Debug($"Changing character name for editor profile from {EditorProfile.CharacterName} to {characterName}");
+        _logger.Debug($"Changing character name for editor profile from {EditorProfile.Character.Incognito(null)} to {character.Incognito(null)}");
 
-        EditorProfile.CharacterName = characterName;
+        EditorProfile.Character = character;
 
-        _configuration.EditorConfiguration.PreviewCharacterName = CharacterName;
+        _configuration.EditorConfiguration.PreviewCharacter = character;
         _configuration.Save();
 
-        _event.Invoke(TemplateChanged.Type.EditorCharacterChanged, CurrentlyEditedTemplate, (characterName, EditorProfile));
+        _event.Invoke(TemplateChanged.Type.EditorCharacterChanged, CurrentlyEditedTemplate, (character, EditorProfile));
 
         return true;
     }
@@ -294,19 +305,19 @@ public class TemplateEditorManager : IDisposable
     private void OnLogin()
     {
         if (_configuration.EditorConfiguration.SetPreviewToCurrentCharacterOnLogin ||
-            string.IsNullOrWhiteSpace(_configuration.EditorConfiguration.PreviewCharacterName))
+            !_configuration.EditorConfiguration.PreviewCharacter.IsValid)
         {
-            var localPlayerName = _gameObjectService.GetCurrentPlayerName();
-            if(string.IsNullOrWhiteSpace(localPlayerName))
+            var localPlayer = _gameObjectService.GetCurrentPlayerActorIdentifier();
+            if(!localPlayer.IsValid)
             {
-                _logger.Warning("Can't retrieve local player name on login");
+                _logger.Warning("Can't retrieve local player on login");
                 return;
             }
 
-            if (_configuration.EditorConfiguration.PreviewCharacterName != localPlayerName)
+            if (_configuration.EditorConfiguration.PreviewCharacter != localPlayer)
             {
                 _logger.Debug("Resetting editor character because automatic condition triggered in OnLogin");
-                ChangeEditorCharacterInternal(localPlayerName);
+                ChangeEditorCharacterInternal(localPlayer);
             }
         }
     }

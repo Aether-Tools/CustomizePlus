@@ -9,6 +9,7 @@ using ObjectManager = CustomizePlus.GameData.Services.ObjectManager;
 using DalamudGameObject = Dalamud.Game.ClientState.Objects.Types.IGameObject;
 using CustomizePlus.Configuration.Data;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using Penumbra.GameData.Files.ShaderStructs;
 
 namespace CustomizePlus.Game.Services;
 
@@ -59,8 +60,6 @@ public class GameObjectService
     /// <summary>
     /// Case sensitive
     /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
     public IEnumerable<(ActorIdentifier, Actor)> FindActorsByName(string name)
     {
         _objectManager.Update();
@@ -75,6 +74,36 @@ public class GameObjectService
                 continue;
 
             if (identifier.ToNameWithoutOwnerName() == name)
+            {
+                if (kvPair.Value.Objects.Count > 1) //in gpose we can have more than a single object for one actor
+                    foreach (var obj in kvPair.Value.Objects)
+                        yield return (kvPair.Key.CreatePermanent(), obj);
+                else
+                    yield return (kvPair.Key.CreatePermanent(), kvPair.Value.Objects[0]);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Searches using CompareIgnoringOwnership
+    /// </summary>
+    public IEnumerable<(ActorIdentifier, Actor)> FindActorsByIdentifier(ActorIdentifier identifier)
+    {
+        if (!identifier.IsValid)
+            yield break;
+
+        _objectManager.Update();
+
+        foreach (var kvPair in _objectManager.Identifiers)
+        {
+            var objectIdentifier = kvPair.Key;
+
+            (objectIdentifier, _) = GetTrueActorForSpecialTypeActor(objectIdentifier);
+
+            if (!objectIdentifier.IsValid)
+                continue;
+
+            if (identifier.CompareIgnoringOwnership(objectIdentifier))
             {
                 if (kvPair.Value.Objects.Count > 1) //in gpose we can have more than a single object for one actor
                     foreach (var obj in kvPair.Value.Objects)

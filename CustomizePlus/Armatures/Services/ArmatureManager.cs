@@ -368,9 +368,9 @@ public unsafe sealed class ArmatureManager : IDisposable
 
         if (type == TemplateChanged.Type.EditorCharacterChanged)
         {
-            (var characterName, var profile) = ((string, Profile))arg3;
+            (var character, var profile) = ((ActorIdentifier, Profile))arg3;
 
-            foreach (var armature in GetArmaturesForCharacterName(characterName))
+            foreach (var armature in GetArmaturesForCharacter(character))
             {
                 armature.IsPendingProfileRebind = true;
                 _logger.Debug($"ArmatureManager.OnTemplateChange Editor profile character name changed, armature rebind scheduled: {type}, {armature}");
@@ -383,7 +383,7 @@ public unsafe sealed class ArmatureManager : IDisposable
             foreach (var armature in profile.Armatures)
                 armature.IsPendingProfileRebind = true;
 
-            _logger.Debug($"ArmatureManager.OnTemplateChange Editor profile character name changed, armature rebind scheduled: {type}, profile: {profile.Name.Text.Incognify()}->{profile.Enabled}, new name: {characterName.Incognify()}");
+            _logger.Debug($"ArmatureManager.OnTemplateChange Editor profile character name changed, armature rebind scheduled: {type}, profile: {profile.Name.Text.Incognify()}->{profile.Enabled}, new name: {character.Incognito(null)}");
 
             return;
         }
@@ -391,7 +391,7 @@ public unsafe sealed class ArmatureManager : IDisposable
         if (type == TemplateChanged.Type.EditorEnabled ||
             type == TemplateChanged.Type.EditorDisabled)
         {
-            foreach (var armature in GetArmaturesForCharacterName((string)arg3!))
+            foreach (var armature in GetArmaturesForCharacter((ActorIdentifier)arg3!))
             {
                 armature.IsPendingProfileRebind = true;
                 _logger.Debug($"ArmatureManager.OnTemplateChange template editor enabled/disabled: {type}, pending profile set for {armature}");
@@ -514,17 +514,6 @@ public unsafe sealed class ArmatureManager : IDisposable
         _logger.Debug($"ArmatureManager.OnProfileChange Added/Deleted/Moved/Changed template: {type}, data payload: {arg3?.ToString()}, profile: {profile.Name}->{profile.Enabled}->{profile.Armatures.Count} armatures");
 
         profile!.Armatures.ForEach(x => x.IsPendingProfileRebind = true);
-    }
-
-    private IEnumerable<Armature> GetArmaturesForCharacterName(string characterName)
-    {
-        foreach(var kvPair in Armatures)
-        {
-            (var actorIdentifier, _) = _gameObjectService.GetTrueActorForSpecialTypeActor(kvPair.Key);
-
-            if(actorIdentifier.ToNameWithoutOwnerName() == characterName)
-                yield return kvPair.Value;
-        }
     }
 
     private IEnumerable<Armature> GetArmaturesForCharacter(ActorIdentifier actorIdentifier)

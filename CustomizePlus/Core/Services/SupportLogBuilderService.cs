@@ -46,8 +46,7 @@ public class SupportLogBuilderService
         sb.Append($"> **`Commit Hash:                    `** {ThisAssembly.Git.Commit}+{ThisAssembly.Git.Sha}\n");
         sb.Append($"> **`Plugin enabled:                 `** {_configuration.PluginEnabled}\n");
         sb.AppendLine("**Settings -> Editor Settings**");
-        sb.Append($"> **`Limit to my creatures (editor): `** {_configuration.EditorConfiguration.LimitLookupToOwnedObjects}\n");
-        sb.Append($"> **`Preview character (editor):     `** {_configuration.EditorConfiguration.PreviewCharacterName?.Incognify() ?? "Not set"}\n");
+        sb.Append($"> **`Preview character (editor):     `** {_configuration.EditorConfiguration.PreviewCharacter.Incognito(null)}\n");
         sb.Append($"> **`Set preview character on login: `** {_configuration.EditorConfiguration.SetPreviewToCurrentCharacterOnLogin}\n");
         sb.Append($"> **`Root editing:                   `** {_configuration.EditorConfiguration.RootPositionEditingEnabled}\n");
         sb.AppendLine("**Settings -> Profile application**");

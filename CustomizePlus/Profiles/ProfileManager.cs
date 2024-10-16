@@ -349,7 +349,7 @@ public partial class ProfileManager : IDisposable
 
         profile.Enabled = true;
         profile.ProfileType = ProfileType.Temporary;
-        profile.Character = identifier; //warn: identifier must not be AnyWorld or stuff will break!
+        profile.Character = identifier.CreatePermanent(); //warn: identifier must not be AnyWorld or stuff will break!
 
         var existingProfile = Profiles.FirstOrDefault(x => x.Character.CompareIgnoringOwnership(profile.Character) && x.IsTemporary);
         if (existingProfile != null)
@@ -364,7 +364,7 @@ public partial class ProfileManager : IDisposable
         //Make sure temporary profiles come first, so they are returned by all other methods first
         Profiles.Sort((x, y) => y.IsTemporary.CompareTo(x.IsTemporary));
 
-        _logger.Debug($"Added temporary profile for {identifier}");
+        _logger.Debug($"Added temporary profile for {profile.Character}");
         _event.Invoke(ProfileChanged.Type.TemporaryProfileAdded, profile, null);
     }
 

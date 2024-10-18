@@ -85,9 +85,9 @@ public class GameObjectService
     }
 
     /// <summary>
-    /// Searches using CompareIgnoringOwnership
+    /// Searches using MatchesIgnoringOwnership
     /// </summary>
-    public IEnumerable<(ActorIdentifier, Actor)> FindActorsByIdentifier(ActorIdentifier identifier)
+    public IEnumerable<(ActorIdentifier, Actor)> FindActorsByIdentifierIgnoringOwnership(ActorIdentifier identifier)
     {
         if (!identifier.IsValid)
             yield break;
@@ -103,7 +103,7 @@ public class GameObjectService
             if (!objectIdentifier.IsValid)
                 continue;
 
-            if (identifier.CompareIgnoringOwnership(objectIdentifier))
+            if (identifier.MatchesIgnoringOwnership(objectIdentifier))
             {
                 if (kvPair.Value.Objects.Count > 1) //in gpose we can have more than a single object for one actor
                     foreach (var obj in kvPair.Value.Objects)

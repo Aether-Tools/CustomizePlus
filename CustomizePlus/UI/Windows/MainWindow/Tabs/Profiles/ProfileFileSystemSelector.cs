@@ -240,9 +240,9 @@ public class ProfileFileSystemSelector : FileSystemSelector<Profile, ProfileStat
         }
 
         if (leaf.Value.Enabled)
-            state.Color = leaf.Value.Character.CompareIgnoringOwnership(_gameObjectService.GetCurrentPlayerActorIdentifier()) ? ColorId.LocalCharacterEnabledProfile : ColorId.EnabledProfile;
+            state.Color = leaf.Value.Character.MatchesIgnoringOwnership(_gameObjectService.GetCurrentPlayerActorIdentifier()) ? ColorId.LocalCharacterEnabledProfile : ColorId.EnabledProfile;
         else
-            state.Color = leaf.Value.Character.CompareIgnoringOwnership(_gameObjectService.GetCurrentPlayerActorIdentifier()) ? ColorId.LocalCharacterDisabledProfile : ColorId.DisabledProfile;
+            state.Color = leaf.Value.Character.MatchesIgnoringOwnership(_gameObjectService.GetCurrentPlayerActorIdentifier()) ? ColorId.LocalCharacterDisabledProfile : ColorId.DisabledProfile;
 
         return ApplyStringFilters(leaf, leaf.Value);
     }

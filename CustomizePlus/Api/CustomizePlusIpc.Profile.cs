@@ -261,7 +261,7 @@ public partial class CustomizePlusIpc
     //warn: intended limitation - ignores default profiles because why you would use default profile on your own character
     private void OnArmatureChanged(ArmatureChanged.Type type, Armature armature, object? arg3)
     {
-        if (!armature.ActorIdentifier.CompareIgnoringOwnership(_gameObjectService.GetCurrentPlayerActorIdentifier()))
+        if (armature.ActorIdentifier != _gameObjectService.GetCurrentPlayerActorIdentifier())
             return;
 
         if (armature.ActorIdentifier.HomeWorld == WorldId.AnyWorld) //Only Cutscene/GPose actors have world set to AnyWorld

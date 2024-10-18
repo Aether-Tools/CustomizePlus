@@ -172,7 +172,7 @@ public partial class ProfileManager : IDisposable
     /// </summary>
     public void ChangeCharacter(Profile profile, ActorIdentifier actorIdentifier)
     {
-        if (!actorIdentifier.IsValid || actorIdentifier.CompareIgnoringOwnership(profile.Character))
+        if (!actorIdentifier.IsValid || actorIdentifier.MatchesIgnoringOwnership(profile.Character))
             return;
 
         var oldCharacter = profile.Character;
@@ -227,7 +227,7 @@ public partial class ProfileManager : IDisposable
             _logger.Debug($"Setting {profile} as enabled...");
 
             foreach (var otherProfile in Profiles
-                         .Where(x => x.Character.CompareIgnoringOwnership(profile.Character) && x != profile && x.Enabled && !x.IsTemporary))
+                         .Where(x => x.Character.MatchesIgnoringOwnership(profile.Character) && x != profile && x.Enabled && !x.IsTemporary))
             {
                 _logger.Debug($"\t-> {otherProfile} disabled");
                 SetEnabled(otherProfile, false);
@@ -257,6 +257,7 @@ public partial class ProfileManager : IDisposable
 
     public void SetApplyToCurrentlyActiveCharacter(Profile profile, bool value)
     {
+        //todo: only one profile is allowed to be active for that setting
         if (profile.ApplyToCurrentlyActiveCharacter != value)
         {
             profile.ApplyToCurrentlyActiveCharacter = value;
@@ -351,7 +352,7 @@ public partial class ProfileManager : IDisposable
         profile.ProfileType = ProfileType.Temporary;
         profile.Character = identifier.CreatePermanent(); //warn: identifier must not be AnyWorld or stuff will break!
 
-        var existingProfile = Profiles.FirstOrDefault(x => x.Character.CompareIgnoringOwnership(profile.Character) && x.IsTemporary);
+        var existingProfile = Profiles.FirstOrDefault(x => x.Character.MatchesIgnoringOwnership(profile.Character) && x.IsTemporary);
         if (existingProfile != null)
         {
             _logger.Debug($"Temporary profile for {existingProfile.Character.Incognito(null)} already exists, removing...");
@@ -409,7 +410,7 @@ public partial class ProfileManager : IDisposable
         if (!actorIdentifier.IsValid)
             return null;
 
-        var query = Profiles.Where(x => x.Character.CompareIgnoringOwnership(actorIdentifier) && !x.IsTemporary);
+        var query = Profiles.Where(x => x.Character.MatchesIgnoringOwnership(actorIdentifier) && !x.IsTemporary);
         if (enabledOnly)
             query = query.Where(x => x.Enabled);
 
@@ -458,13 +459,13 @@ public partial class ProfileManager : IDisposable
                     return true;
 
                 var currentPlayer = _actorManager.GetCurrentPlayer();
-                return currentPlayer.IsValid && currentPlayer.CompareIgnoringOwnership(actorIdentifier);
+                return currentPlayer.IsValid && currentPlayer.MatchesIgnoringOwnership(actorIdentifier);
             }
 
             if (actorIdentifier.Type == IdentifierType.Owned && !actorIdentifier.IsOwnedByLocalPlayer())
                 return false;
 
-            return profile.CharacterName.Text == name || profile.Character.CompareIgnoringOwnership(actorIdentifier);
+            return profile.CharacterName.Text == name || profile.Character.MatchesIgnoringOwnership(actorIdentifier);
         }
 
         if (_templateEditorManager.IsEditorActive && _templateEditorManager.EditorProfile.Enabled && IsProfileAppliesToCurrentActor(_templateEditorManager.EditorProfile))

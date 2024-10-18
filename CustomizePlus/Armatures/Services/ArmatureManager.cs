@@ -539,7 +539,7 @@ public unsafe sealed class ArmatureManager : IDisposable
         {
             (var armatureActorIdentifier, _) = _gameObjectService.GetTrueActorForSpecialTypeActor(kvPair.Key);
 
-            if (actorIdentifier.IsValid && armatureActorIdentifier.CompareIgnoringOwnership(actorIdentifier) &&
+            if (actorIdentifier.IsValid && armatureActorIdentifier.MatchesIgnoringOwnership(actorIdentifier) &&
                 (armatureActorIdentifier.Type != IdentifierType.Owned || armatureActorIdentifier.IsOwnedByLocalPlayer()))
                 yield return kvPair.Value;
         }

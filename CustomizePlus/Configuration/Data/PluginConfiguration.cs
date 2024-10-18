@@ -32,6 +32,11 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
     /// </summary>
     public Guid DefaultProfile { get; set; } = Guid.Empty;
 
+    /// <summary>
+    /// Id of the profile applied to any character user logins with. Can be set to Empty to disable this feature.
+    /// </summary>
+    public Guid DefaultLocalPlayerProfile { get; set; } = Guid.Empty;
+
     [Serializable]
     public class ChangelogSettingsEntries
     {

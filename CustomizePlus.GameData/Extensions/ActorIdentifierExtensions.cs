@@ -29,9 +29,9 @@ public static class ActorIdentifierExtensions
     }
 
     /// <summary>
-    /// Compares two actor identifiers while ignoring ownership for owned objects. For all other identifier types will use Matches() method.
+    /// Matches() method but ignoring ownership for owned objects.
     /// </summary>
-    public static bool CompareIgnoringOwnership(this ActorIdentifier identifier, ActorIdentifier other)
+    public static bool MatchesIgnoringOwnership(this ActorIdentifier identifier, ActorIdentifier other)
     {
         if (identifier.Type != other.Type)
             return false;

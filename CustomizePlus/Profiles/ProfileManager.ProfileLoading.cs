@@ -99,9 +99,8 @@ public partial class ProfileManager : IDisposable
             return profile;
 
         var nameWordsCnt = characterName.Split(' ').Length;
-        if (nameWordsCnt == 2)
-            profile.Character = _actorManager.CreatePlayer(ByteString.FromStringUnsafe(characterName, false), WorldId.AnyWorld);
-        else if (_reverseNameDicts.TryGetID(ObjectKind.EventNpc, characterName, out var id))
+
+        if (_reverseNameDicts.TryGetID(ObjectKind.EventNpc, characterName, out var id))
             profile.Character = _actorManager.CreateNpc(ObjectKind.EventNpc, new NpcId(id));
         else if (_reverseNameDicts.TryGetID(ObjectKind.BattleNpc, characterName, out id))
             profile.Character = _actorManager.CreateNpc(ObjectKind.BattleNpc, new NpcId(id));
@@ -115,6 +114,8 @@ public partial class ProfileManager : IDisposable
             var currentPlayer = _actorManager.GetCurrentPlayer();
             profile.Character = _actorManager.CreateOwned(currentPlayer.PlayerName, currentPlayer.HomeWorld, ObjectKind.Companion, new NpcId(id));
         }
+        else if (nameWordsCnt == 2)
+            profile.Character = _actorManager.CreatePlayer(ByteString.FromStringUnsafe(characterName, false), WorldId.AnyWorld);
         else
         {
             _logger.Warning($"Unable to automatically migrate \"{profile.Name}\" to V5, unknown character name: {characterName}");

@@ -1,26 +1,12 @@
 ﻿using System;
-using System.Reflection;
-using Dalamud.Plugin;
-using OtterGui.Log;
+using CustomizePlus.Api;
+using CustomizePlus.Core;
 using CustomizePlus.Core.Services;
 using CustomizePlus.UI;
-using CustomizePlus.Core;
-using CustomizePlus.Configuration.Services.Temporary;
-using OtterGui.Services;
-using CustomizePlus.Api;
+using Dalamud.Plugin;
 using ECommons;
-using ECommons.Commands;
-using ECommons.Configuration;
-using OtterGui;
-using System.IO;
-using System.Security.Cryptography;
-using System.Text;
-using System.Linq;
-using CustomizePlus.Configuration.Data;
-using CustomizePlus.Core.Extensions;
-using CustomizePlus.Templates;
-using CustomizePlus.Profiles;
-using CustomizePlus.Armatures.Services;
+using OtterGui.Log;
+using OtterGui.Services;
 using Penumbra.GameData.Actors;
 
 namespace CustomizePlus;
@@ -46,10 +32,6 @@ public sealed class Plugin : IDalamudPlugin
             _services = ServiceManagerBuilder.CreateProvider(pluginInterface, Logger);
 
             _services.GetService<ActorManager>(); //needs to be initialized early for config to be read properly
-
-            //temporary
-            var v3ConfigFixer = _services.GetService<Version3ConfigFixer>();
-            v3ConfigFixer.FixV3ConfigIfNeeded();
 
             _services.GetService<CustomizePlusIpc>();
             _services.GetService<CPlusWindowSystem>();

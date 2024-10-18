@@ -411,7 +411,8 @@ public unsafe sealed class ArmatureManager : IDisposable
             type is not ProfileChanged.Type.Deleted &&
             type is not ProfileChanged.Type.TemporaryProfileAdded &&
             type is not ProfileChanged.Type.TemporaryProfileDeleted &&
-            type is not ProfileChanged.Type.ChangedCharacter &&
+            type is not ProfileChanged.Type.AddedCharacter &&
+            type is not ProfileChanged.Type.RemovedCharacter &&
             type is not ProfileChanged.Type.ChangedDefaultProfile &&
             type is not ProfileChanged.Type.ChangedDefaultLocalPlayerProfile)
             return;
@@ -456,13 +457,16 @@ public unsafe sealed class ArmatureManager : IDisposable
                 return;
             }
 
-            if (!profile.Character.IsValid)
-                return;
-
-            foreach (var armature in GetArmaturesForCharacter(profile.Character))
+            foreach(var character in profile.Characters)
             {
-                armature.IsPendingProfileRebind = true;
-                _logger.Debug($"ArmatureManager.OnProfileChange profile {profile} toggled, planning rebind for armature {armature}");
+                if (!character.IsValid)
+                    continue;
+
+                foreach (var armature in GetArmaturesForCharacter(character))
+                {
+                    armature.IsPendingProfileRebind = true;
+                    _logger.Debug($"ArmatureManager.OnProfileChange profile {profile} toggled, planning rebind for armature {armature}");
+                }
             }
 
             return;
@@ -470,9 +474,6 @@ public unsafe sealed class ArmatureManager : IDisposable
 
         if (type == ProfileChanged.Type.TemporaryProfileAdded)
         {
-            if (!profile.Character.IsValid || !Armatures.ContainsKey(profile.Character)) //temporary profiles are never using AnyWorld identifiers so we should be fine here
-                return;
-
             //todo: remove this later
             /*Armature? armature = null;
             foreach(var kvPair in Armatures)
@@ -489,21 +490,28 @@ public unsafe sealed class ArmatureManager : IDisposable
             if (armature == null)
                 return;*/
 
-            var armature = Armatures[profile.Character];
+            foreach(var character in profile.Characters)
+            {
+                if (!character.IsValid || !Armatures.ContainsKey(character))
+                    continue;
 
-            if (armature.Profile == profile)
-                return;
+                var armature = Armatures[character];
 
-            armature.UpdateLastSeen();
+                if (armature.Profile == profile)
+                    return;
 
-            armature.IsPendingProfileRebind = true;
+                armature.UpdateLastSeen();
+
+                armature.IsPendingProfileRebind = true;
+            }
 
             _logger.Debug($"ArmatureManager.OnProfileChange TemporaryProfileAdded, calling rebind for existing armature: {type}, data payload: {arg3?.ToString()}, profile: {profile.Name.Text.Incognify()}->{profile.Enabled}");
 
             return;
         }
 
-        if (type == ProfileChanged.Type.ChangedCharacter ||
+        if (type == ProfileChanged.Type.AddedCharacter ||
+            type == ProfileChanged.Type.RemovedCharacter ||
             type == ProfileChanged.Type.Deleted ||
             type == ProfileChanged.Type.TemporaryProfileDeleted)
         {
@@ -518,7 +526,7 @@ public unsafe sealed class ArmatureManager : IDisposable
                 armature.IsPendingProfileRebind = true;
             }
 
-            _logger.Debug($"ArmatureManager.OnProfileChange CC/DEL/TPD/ATCACC, armature rebind scheduled: {type}, data payload: {arg3?.ToString()?.Incognify()}, profile: {profile.Name.Text.Incognify()}->{profile.Enabled}");
+            _logger.Debug($"ArmatureManager.OnProfileChange AC/RC/DEL/TPD/ATCACC, armature rebind scheduled: {type}, data payload: {arg3?.ToString()?.Incognify()}, profile: {profile.Name.Text.Incognify()}->{profile.Enabled}");
 
             return;
         }

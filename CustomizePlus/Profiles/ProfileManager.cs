@@ -177,15 +177,14 @@ public partial class ProfileManager : IDisposable
     }
 
     /// <summary>
-    /// Change character associated with profile
+    /// Add character to profile
     /// </summary>
-    public void ChangeCharacter(Profile profile, ActorIdentifier actorIdentifier)
+    public void AddCharacter(Profile profile, ActorIdentifier actorIdentifier)
     {
-        if (!actorIdentifier.IsValid || actorIdentifier.MatchesIgnoringOwnership(profile.Character))
+        if (!actorIdentifier.IsValid || profile.Characters.Any(x => actorIdentifier.MatchesIgnoringOwnership(x)) || profile.IsTemporary)
             return;
 
-        var oldCharacter = profile.Character;
-        profile.Character = actorIdentifier;
+        profile.Characters.Add(actorIdentifier);
 
         //Called so all other active profiles for new character name get disabled
         //saving is performed there
@@ -193,8 +192,28 @@ public partial class ProfileManager : IDisposable
 
         SaveProfile(profile);
 
-        _logger.Debug($"Changed character for profile {profile.UniqueId}.");
-        _event.Invoke(ProfileChanged.Type.ChangedCharacter, profile, oldCharacter);
+        _logger.Debug($"Add character for profile {profile.UniqueId}.");
+        _event.Invoke(ProfileChanged.Type.AddedCharacter, profile, actorIdentifier);
+    }
+
+    /// <summary>
+    /// Delete character from profile
+    /// </summary>
+    public void DeleteCharacter(Profile profile, ActorIdentifier actorIdentifier)
+    {
+        if (!actorIdentifier.IsValid || !profile.Characters.Any(x => actorIdentifier.MatchesIgnoringOwnership(x)) || profile.IsTemporary)
+            return;
+
+        profile.Characters.Remove(actorIdentifier);
+
+        //Called so all other active profiles for new character name get disabled
+        //saving is performed there
+        //SetEnabled(profile, profile.Enabled, true); //todo
+
+        SaveProfile(profile);
+
+        _logger.Debug($"Removed character from profile {profile.UniqueId}.");
+        _event.Invoke(ProfileChanged.Type.RemovedCharacter, profile, actorIdentifier);
     }
 
     /// <summary>
@@ -235,11 +254,34 @@ public partial class ProfileManager : IDisposable
         {
             _logger.Debug($"Setting {profile} as enabled...");
 
-            foreach (var otherProfile in Profiles
-                         .Where(x => x.Character.MatchesIgnoringOwnership(profile.Character) && x != profile && x.Enabled && !x.IsTemporary))
+            foreach (var otherProfile in Profiles)
             {
-                _logger.Debug($"\t-> {otherProfile} disabled");
-                SetEnabled(otherProfile, false);
+                if (otherProfile == profile || !otherProfile.Enabled || otherProfile.IsTemporary)
+                    continue;
+
+                bool shouldDisable = false;
+
+                //my god this is ugly
+                foreach(var otherCharacter in otherProfile.Characters)
+                {
+                    foreach(var currentCharacter in profile.Characters)
+                    {
+                        if(otherCharacter.MatchesIgnoringOwnership(currentCharacter))
+                        {
+                            shouldDisable = true;
+                            break;
+                        }
+                    }
+
+                    if (shouldDisable)
+                        break;
+                }
+
+                if(shouldDisable)
+                {
+                    _logger.Debug($"\t-> {otherProfile} disabled");
+                    SetEnabled(otherProfile, false);
+                }
             }
         }
 
@@ -366,12 +408,15 @@ public partial class ProfileManager : IDisposable
 
         profile.Enabled = true;
         profile.ProfileType = ProfileType.Temporary;
-        profile.Character = identifier.CreatePermanent(); //warn: identifier must not be AnyWorld or stuff will break!
 
-        var existingProfile = Profiles.FirstOrDefault(x => x.Character.MatchesIgnoringOwnership(profile.Character) && x.IsTemporary);
+        var permanentIdentifier = identifier.CreatePermanent();
+        profile.Characters.Clear();
+        profile.Characters.Add(permanentIdentifier); //warn: identifier must not be AnyWorld or stuff will break!
+
+        var existingProfile = Profiles.FirstOrDefault(p => p.Characters.Count == 1 && p.Characters[0].MatchesIgnoringOwnership(permanentIdentifier) && p.IsTemporary);
         if (existingProfile != null)
         {
-            _logger.Debug($"Temporary profile for {existingProfile.Character.Incognito(null)} already exists, removing...");
+            _logger.Debug($"Temporary profile for {permanentIdentifier.Incognito(null)} already exists, removing...");
             Profiles.Remove(existingProfile);
             _event.Invoke(ProfileChanged.Type.TemporaryProfileDeleted, existingProfile, null);
         }
@@ -381,16 +426,19 @@ public partial class ProfileManager : IDisposable
         //Make sure temporary profiles come first, so they are returned by all other methods first
         Profiles.Sort((x, y) => y.IsTemporary.CompareTo(x.IsTemporary));
 
-        _logger.Debug($"Added temporary profile for {profile.Character}");
+        _logger.Debug($"Added temporary profile for {permanentIdentifier}");
         _event.Invoke(ProfileChanged.Type.TemporaryProfileAdded, profile, null);
     }
 
     public void RemoveTemporaryProfile(Profile profile)
     {
+        if (!profile.IsTemporary)
+            return;
+
         if (!Profiles.Remove(profile))
             throw new ProfileNotFoundException();
 
-        _logger.Debug($"Removed temporary profile for {profile.Character.Incognito(null)}");
+        _logger.Debug($"Removed temporary profile for {profile.Characters[0].Incognito(null)}");
 
         _event.Invoke(ProfileChanged.Type.TemporaryProfileDeleted, profile, null);
     }
@@ -409,7 +457,7 @@ public partial class ProfileManager : IDisposable
         if (!actor.Identifier(_actorManager, out var identifier))
             throw new ActorNotFoundException();
 
-        var profile = Profiles.FirstOrDefault(x => x.Character == identifier && x.IsTemporary);
+        var profile = Profiles.FirstOrDefault(x => x.Characters[0] == identifier && x.IsTemporary);
         if (profile == null)
             throw new ProfileNotFoundException();
 
@@ -426,7 +474,7 @@ public partial class ProfileManager : IDisposable
         if (!actorIdentifier.IsValid)
             return null;
 
-        var query = Profiles.Where(x => x.Character.MatchesIgnoringOwnership(actorIdentifier) && !x.IsTemporary);
+        var query = Profiles.Where(p => p.Characters.Any(x => x.MatchesIgnoringOwnership(actorIdentifier)) && !p.IsTemporary);
         if (enabledOnly)
             query = query.Where(x => x.Enabled);
 
@@ -475,7 +523,7 @@ public partial class ProfileManager : IDisposable
             if (actorIdentifier.Type == IdentifierType.Owned && !actorIdentifier.IsOwnedByLocalPlayer())
                 return false;
 
-            return profile.Character.MatchesIgnoringOwnership(actorIdentifier);
+            return profile.Characters.Any(x => x.MatchesIgnoringOwnership(actorIdentifier));
         }
 
         if (_templateEditorManager.IsEditorActive && _templateEditorManager.EditorProfile.Enabled && IsProfileAppliesToCurrentActor(_templateEditorManager.EditorProfile))
@@ -585,7 +633,7 @@ public partial class ProfileManager : IDisposable
             if (!Profiles.Remove(profile))
                 return;
 
-            _logger.Debug($"ProfileManager.OnArmatureChange: Removed unused temporary profile for {profile.Character.Incognito(null)}");
+            _logger.Debug($"ProfileManager.OnArmatureChange: Removed unused temporary profile for {profile.Characters[0].Incognito(null)}");
 
             _event.Invoke(ProfileChanged.Type.TemporaryProfileDeleted, profile, null);
         }

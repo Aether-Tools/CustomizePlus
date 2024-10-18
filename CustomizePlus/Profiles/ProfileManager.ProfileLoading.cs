@@ -101,30 +101,30 @@ public partial class ProfileManager : IDisposable
         var nameWordsCnt = characterName.Split(' ').Length;
 
         if (_reverseNameDicts.TryGetID(ObjectKind.EventNpc, characterName, out var id))
-            profile.Character = _actorManager.CreateNpc(ObjectKind.EventNpc, new NpcId(id));
+            profile.Characters.Add(_actorManager.CreateNpc(ObjectKind.EventNpc, new NpcId(id)));
         else if (_reverseNameDicts.TryGetID(ObjectKind.BattleNpc, characterName, out id))
-            profile.Character = _actorManager.CreateNpc(ObjectKind.BattleNpc, new NpcId(id));
+            profile.Characters.Add(_actorManager.CreateNpc(ObjectKind.BattleNpc, new NpcId(id)));
         else if (_reverseNameDicts.TryGetID(ObjectKind.MountType, characterName, out id))
         {
             var currentPlayer = _actorManager.GetCurrentPlayer();
-            profile.Character = _actorManager.CreateOwned(currentPlayer.PlayerName, currentPlayer.HomeWorld, ObjectKind.MountType, new NpcId(id));
+            profile.Characters.Add(_actorManager.CreateOwned(currentPlayer.PlayerName, currentPlayer.HomeWorld, ObjectKind.MountType, new NpcId(id)));
         }
         else if (_reverseNameDicts.TryGetID(ObjectKind.Companion, characterName, out id))
         {
             var currentPlayer = _actorManager.GetCurrentPlayer();
-            profile.Character = _actorManager.CreateOwned(currentPlayer.PlayerName, currentPlayer.HomeWorld, ObjectKind.Companion, new NpcId(id));
+            profile.Characters.Add(_actorManager.CreateOwned(currentPlayer.PlayerName, currentPlayer.HomeWorld, ObjectKind.Companion, new NpcId(id)));
         }
         else if (nameWordsCnt == 2)
-            profile.Character = _actorManager.CreatePlayer(ByteString.FromStringUnsafe(characterName, false), WorldId.AnyWorld);
+            profile.Characters.Add(_actorManager.CreatePlayer(ByteString.FromStringUnsafe(characterName, false), WorldId.AnyWorld));
         else
         {
             _logger.Warning($"Unable to automatically migrate \"{profile.Name}\" to V5, unknown character name: {characterName}");
             _messageService.NotificationMessage($"Unable to detect character type for profile \"{profile.Name}\", please set character for this profile manually.", Dalamud.Interface.ImGuiNotification.NotificationType.Error);
         }
 
-        if (profile.Character.IsValid)
+        if (profile.Characters.Count > 0)
         {
-            _logger.Debug($"Upgraded profile \"{profile.Name}\" to V5: {characterName} -> {profile.Character}. Save queued.");
+            _logger.Debug($"Upgraded profile \"{profile.Name}\" to V5: {characterName} -> {profile.Characters[0]}. Save queued.");
             _saveService.QueueSave(profile);
         }
 
@@ -135,14 +135,32 @@ public partial class ProfileManager : IDisposable
     {
         var profile = LoadProfileV4V5(obj);
 
-        var character = _actorManager.FromJson(obj["Character"] as JObject);
+        if (obj["Characters"] is not JArray characterArray)
+            return profile;
 
-        profile.Character = character;
+        foreach(var characterObj in characterArray)
+        {
+            if (characterObj is not JObject characterObjCast)
+            {
+                //todo: warning
+                continue;
+            }
+
+            var character = _actorManager.FromJson(characterObjCast);
+
+            if(!character.IsValid)
+            {
+                //todo: warning
+                continue;
+            }
+
+            profile.Characters.Add(character);
+        }
 
         return profile;
     }
 
-    //V4 and V5 are mostly not different, so common loading logic is here
+    //V4 and V5 are mostly the same, so common loading logic is here
     private Profile LoadProfileV4V5(JObject obj)
     {
         var creationDate = obj["CreationDate"]?.ToObject<DateTimeOffset>() ?? throw new ArgumentNullException("CreationDate");

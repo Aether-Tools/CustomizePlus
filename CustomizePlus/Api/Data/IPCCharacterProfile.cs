@@ -29,7 +29,7 @@ public class IPCCharacterProfile
     {
         var ipcProfile = new IPCCharacterProfile
         {
-            CharacterName = profile.Character.ToNameWithoutOwnerName(),
+            CharacterName = profile.Characters.FirstOrDefault().ToNameWithoutOwnerName(),
             Bones = new Dictionary<string, IPCBoneTransform>()
         };
 

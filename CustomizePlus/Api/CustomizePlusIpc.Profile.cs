@@ -46,7 +46,7 @@ public partial class CustomizePlusIpc
             .Select(x =>
             {
                 string path = _profileFileSystem.FindLeaf(x, out var leaf) ? leaf.FullName() : x.Name.Text;
-                return (x.UniqueId, x.Name.Text, path, x.Character.ToNameWithoutOwnerName(), x.Enabled); //todo: proper update to v5
+                return (x.UniqueId, x.Name.Text, path, x.Characters[0].ToNameWithoutOwnerName(), x.Enabled); //todo: proper update to v5
             })
             .ToList();
     }

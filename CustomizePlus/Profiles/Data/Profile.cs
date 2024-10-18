@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CustomizePlus.Armatures.Data;
 using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Extensions;
@@ -32,7 +33,8 @@ public sealed class Profile : ISavable
    /* [Obsolete("To be removed in the future versions")]
     public LowerString CharacterName { get; set; } = LowerString.Empty;*/
 
-    public ActorIdentifier Character { get; set; } = ActorIdentifier.Invalid;
+    //public ActorIdentifier Character { get; set; } = ActorIdentifier.Invalid;
+    public List<ActorIdentifier> Characters { get; set; } = new();
 
     public LowerString Name { get; set; } = LowerString.Empty;
 
@@ -78,7 +80,7 @@ public sealed class Profile : ISavable
     /// <param name="original"></param>
     public Profile(Profile original) : this()
     {
-        Character = original.Character;
+        Characters = original.Characters.ToList();
 
         foreach (var template in original.Templates)
         {
@@ -88,7 +90,7 @@ public sealed class Profile : ISavable
 
     public override string ToString()
     {
-        return $"Profile '{Name.Text.Incognify()}' on {Character.Incognito(null)} [{UniqueId}]";
+        return $"Profile '{Name.Text.Incognify()}' on {string.Join(',', Characters.Select(x => x.Incognito(null)))} [{UniqueId}]";
     }
 
     #region Serialization
@@ -101,7 +103,7 @@ public sealed class Profile : ISavable
             ["UniqueId"] = UniqueId,
             ["CreationDate"] = CreationDate,
             ["ModifiedDate"] = ModifiedDate,
-            ["Character"] = Character.ToJson(),
+            ["Characters"] = SerializeCharacters(),
             ["Name"] = Name.Text,
             ["Enabled"] = Enabled,
             ["IsWriteProtected"] = IsWriteProtected,
@@ -120,6 +122,16 @@ public sealed class Profile : ISavable
             {
                 ["TemplateId"] = template.UniqueId
             });
+        }
+        return ret;
+    }
+
+    private JArray SerializeCharacters()
+    {
+        var ret = new JArray();
+        foreach (var character in Characters)
+        {
+            ret.Add(character.ToJson());
         }
         return ret;
     }

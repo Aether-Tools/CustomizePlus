@@ -65,7 +65,7 @@ public class TemplateEditorManager : IDisposable
     /// <summary>
     /// Name of the preview character for the editor
     /// </summary>
-    public ActorIdentifier Character => EditorProfile.Character;
+    public ActorIdentifier Character => EditorProfile.Characters[0];
 
     /// <summary>
     /// Checks if preview character exists at the time of call
@@ -107,8 +107,9 @@ public class TemplateEditorManager : IDisposable
             Enabled = false,
             Name = "Template editor profile",
             ProfileType = ProfileType.Editor,
-            Character = configuration.EditorConfiguration.PreviewCharacter
         };
+
+        EditorProfile.Characters.Add(configuration.EditorConfiguration.PreviewCharacter);
     }
 
     public void Dispose()
@@ -194,9 +195,10 @@ public class TemplateEditorManager : IDisposable
 
     private bool ChangeEditorCharacterInternal(ActorIdentifier character)
     {
-        _logger.Debug($"Changing character name for editor profile from {EditorProfile.Character.Incognito(null)} to {character.Incognito(null)}");
+        _logger.Debug($"Changing character name for editor profile from {EditorProfile.Characters.FirstOrDefault().Incognito(null)} to {character.Incognito(null)}");
 
-        EditorProfile.Character = character;
+        EditorProfile.Characters.Clear();
+        EditorProfile.Characters.Add(character);
 
         _configuration.EditorConfiguration.PreviewCharacter = character;
         _configuration.Save();

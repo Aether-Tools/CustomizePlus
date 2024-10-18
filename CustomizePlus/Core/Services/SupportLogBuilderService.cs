@@ -68,7 +68,7 @@ public class SupportLogBuilderService
             sb.Append($">   > **`{profile.ToString(),-32}`*\n");
             sb.Append($">   > **`Name:                       `** {profile.Name.Text.Incognify()}\n");
             sb.Append($">   > **`Type:                       `** {profile.ProfileType} \n");
-            sb.Append($">   > **`Character name:             `** {profile.Character.Incognito(null)}\n");
+            sb.Append($">   > **`Characters:             `** {string.Join(',', profile.Characters.Select(x => x.Incognito(null)))}\n");
             sb.Append($">   > **`Templates:`**\n");
             sb.Append($">   >   > **`Count:                  `** {profile.Templates.Count}\n");
             foreach (var template in profile.Templates)

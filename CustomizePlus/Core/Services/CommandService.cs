@@ -183,10 +183,10 @@ public class CommandService : IDisposable
             if (!isTurningOffAllProfiles)
             {
                 profileName = subArgumentList[1].Trim();
-                targetProfile = _profileManager.Profiles.FirstOrDefault(x => x.Name == profileName && x.Character.ToNameWithoutOwnerName() == characterName);
+                targetProfile = _profileManager.Profiles.FirstOrDefault(x => x.Name == profileName && x.Characters.Any(x => x.ToNameWithoutOwnerName() == characterName));
             }
             else
-                targetProfile = _profileManager.Profiles.FirstOrDefault(x => x.Character.ToNameWithoutOwnerName() == characterName && x.Enabled);
+                targetProfile = _profileManager.Profiles.FirstOrDefault(x => x.Characters.Any(x => x.ToNameWithoutOwnerName() == characterName) && x.Enabled);
 
             if (targetProfile == null)
             {
@@ -225,7 +225,7 @@ public class CommandService : IDisposable
                     .AddText(" was successfully ")
                     .AddBlue(state != null ? ((bool)state ? "enabled" : "disabled") : "toggled")
                     .AddText(" for ")
-                    .AddRed(targetProfile.Character.ToNameWithoutOwnerName()).BuiltString);
+                    .AddRed(string.Join(',', targetProfile.Characters.Select(x => x.ToNameWithoutOwnerName()))).BuiltString);
         }
         catch (Exception e)
         {

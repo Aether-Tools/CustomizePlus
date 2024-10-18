@@ -134,12 +134,11 @@ public class StateMonitoringTab
     private void DrawSingleProfile(string prefix, Profile profile)
     {
         string name = profile.Name;
-        string characterName = profile.Character.Type == Penumbra.GameData.Enums.IdentifierType.Owned ?
-                                profile.Character.ToNameWithoutOwnerName() : profile.Character.ToString();
+        string characterName = string.Join(',', profile.Characters.Select(x => x.ToNameWithoutOwnerName().Incognify()));
 
 #if INCOGNIFY_STRINGS
         name = name.Incognify();
-        characterName = characterName.Incognify();
+        //characterName = characterName.Incognify();
 #endif
 
         var show = ImGui.CollapsingHeader($"[{(profile.Enabled ? "E" : "D")}] {name} on {characterName} [{profile.ProfileType}] [{profile.UniqueId}]###{prefix}-profile-{profile.UniqueId}");

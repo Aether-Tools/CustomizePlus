@@ -85,6 +85,23 @@ public static class ActorIdentifierExtensions
         }
     }
 
+    public static string TypeToString(this ActorIdentifier identifier)
+    {
+        return identifier.Type switch
+        {
+            IdentifierType.Player => $" ({PenumbraExtensions.Manager?.Data.ToWorldName(identifier.HomeWorld) ?? "Unknown"})",
+            IdentifierType.Retainer => $"{identifier.Retainer switch
+            {
+                ActorIdentifier.RetainerType.Bell => " (Bell)",
+                ActorIdentifier.RetainerType.Mannequin => " (Mannequin)",
+                _ => " (Retainer)",
+            }}",
+            IdentifierType.Owned => " (Companion/Mount)",
+            IdentifierType.Npc => " (NPC)",
+            _ => "",
+        };
+    }
+
     /// <summary>
     /// For now used to determine if root scaling should be allowed or not
     /// </summary>

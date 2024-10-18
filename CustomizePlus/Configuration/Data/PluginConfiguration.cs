@@ -53,7 +53,13 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
 
         public bool FoldersDefaultOpen { get; set; } = true;
 
+        public bool OpenWindowAtStart { get; set; } = false;
+
         public bool HideWindowInCutscene { get; set; } = true;
+
+        public bool HideWindowWhenUiHidden { get; set; } = true;
+
+        public bool HideWindowInGPose { get; set; } = false;
 
         public bool IncognitoMode { get; set; } = false;
 

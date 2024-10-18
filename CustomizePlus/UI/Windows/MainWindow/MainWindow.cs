@@ -78,14 +78,13 @@ public class MainWindow : Window, IDisposable
 
         _templateEditorEvent.Subscribe(OnTemplateEditorEvent, TemplateEditorEvent.Priority.MainWindow);
 
-        pluginInterface.UiBuilder.DisableGposeUiHide = true;
         SizeConstraints = new WindowSizeConstraints()
         {
             MinimumSize = new Vector2(700, 675),
             MaximumSize = ImGui.GetIO().DisplaySize,
         };
 
-        IsOpen = pluginInterface.IsDevMenuOpen && configuration.DebuggingModeEnabled;
+        IsOpen = configuration.UISettings.OpenWindowAtStart;
     }
 
     public void Dispose()

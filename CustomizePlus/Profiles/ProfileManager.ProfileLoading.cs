@@ -11,6 +11,8 @@ using System.IO;
 using System.Linq;
 using Penumbra.String;
 using Penumbra.GameData.Structs;
+using Dalamud.Game.ClientState.Objects.Enums;
+using Penumbra.GameData.Gui;
 
 namespace CustomizePlus.Profiles;
 
@@ -91,7 +93,39 @@ public partial class ProfileManager : IDisposable
     {
         var profile = LoadProfileV4V5(obj);
 
-        profile.CharacterName = new LowerString(obj["CharacterName"]?.ToObject<string>()?.Trim() ?? throw new ArgumentNullException("CharacterName"));
+        var characterName = obj["CharacterName"]?.ToObject<string>()?.Trim() ?? throw new ArgumentNullException("CharacterName");
+
+        if (string.IsNullOrWhiteSpace(characterName))
+            return profile;
+
+        var nameWordsCnt = characterName.Split(' ').Length;
+        if (nameWordsCnt == 2)
+            profile.Character = _actorManager.CreatePlayer(ByteString.FromStringUnsafe(characterName, false), WorldId.AnyWorld);
+        else if (_reverseNameDicts.TryGetID(ObjectKind.EventNpc, characterName, out var id))
+            profile.Character = _actorManager.CreateNpc(ObjectKind.EventNpc, new NpcId(id));
+        else if (_reverseNameDicts.TryGetID(ObjectKind.BattleNpc, characterName, out id))
+            profile.Character = _actorManager.CreateNpc(ObjectKind.BattleNpc, new NpcId(id));
+        else if (_reverseNameDicts.TryGetID(ObjectKind.MountType, characterName, out id))
+        {
+            var currentPlayer = _actorManager.GetCurrentPlayer();
+            profile.Character = _actorManager.CreateOwned(currentPlayer.PlayerName, currentPlayer.HomeWorld, ObjectKind.MountType, new NpcId(id));
+        }
+        else if (_reverseNameDicts.TryGetID(ObjectKind.Companion, characterName, out id))
+        {
+            var currentPlayer = _actorManager.GetCurrentPlayer();
+            profile.Character = _actorManager.CreateOwned(currentPlayer.PlayerName, currentPlayer.HomeWorld, ObjectKind.Companion, new NpcId(id));
+        }
+        else
+        {
+            _logger.Warning($"Unable to automatically migrate \"{profile.Name}\" to V5, unknown character name: {characterName}");
+            _messageService.NotificationMessage($"Unable to detect character type for profile \"{profile.Name}\", please set character for this profile manually.", Dalamud.Interface.ImGuiNotification.NotificationType.Error);
+        }
+
+        if (profile.Character.IsValid)
+        {
+            _logger.Debug($"Upgraded profile \"{profile.Name}\" to V5: {characterName} -> {profile.Character}. Save queued.");
+            _saveService.QueueSave(profile);
+        }
 
         return profile;
     }
@@ -103,7 +137,6 @@ public partial class ProfileManager : IDisposable
         var character = _actorManager.FromJson(obj["Character"] as JObject);
 
         profile.Character = character;
-        profile.CharacterName = new LowerString(obj["CharacterName"]?.ToObject<string>()?.Trim() ?? throw new ArgumentNullException("CharacterName")); //temp
 
         return profile;
     }

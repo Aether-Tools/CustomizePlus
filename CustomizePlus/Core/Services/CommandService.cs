@@ -13,6 +13,7 @@ using static System.Windows.Forms.AxHost;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Configuration.Data;
 using Dalamud.Interface.ImGuiNotification;
+using CustomizePlus.GameData.Extensions;
 
 namespace CustomizePlus.Core.Services;
 
@@ -182,10 +183,10 @@ public class CommandService : IDisposable
             if (!isTurningOffAllProfiles)
             {
                 profileName = subArgumentList[1].Trim();
-                targetProfile = _profileManager.Profiles.FirstOrDefault(x => x.Name == profileName && x.CharacterName == characterName);
+                targetProfile = _profileManager.Profiles.FirstOrDefault(x => x.Name == profileName && x.Character.ToNameWithoutOwnerName() == characterName);
             }
             else
-                targetProfile = _profileManager.Profiles.FirstOrDefault(x => x.CharacterName == characterName && x.Enabled);
+                targetProfile = _profileManager.Profiles.FirstOrDefault(x => x.Character.ToNameWithoutOwnerName() == characterName && x.Enabled);
 
             if (targetProfile == null)
             {
@@ -224,7 +225,7 @@ public class CommandService : IDisposable
                     .AddText(" was successfully ")
                     .AddBlue(state != null ? ((bool)state ? "enabled" : "disabled") : "toggled")
                     .AddText(" for ")
-                    .AddRed(targetProfile.CharacterName).BuiltString);
+                    .AddRed(targetProfile.Character.ToNameWithoutOwnerName()).BuiltString);
         }
         catch (Exception e)
         {

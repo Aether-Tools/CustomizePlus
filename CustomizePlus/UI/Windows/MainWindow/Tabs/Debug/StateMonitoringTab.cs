@@ -134,7 +134,8 @@ public class StateMonitoringTab
     private void DrawSingleProfile(string prefix, Profile profile)
     {
         string name = profile.Name;
-        string characterName = profile.CharacterName;
+        string characterName = profile.Character.Type == Penumbra.GameData.Enums.IdentifierType.Owned ?
+                                profile.Character.ToNameWithoutOwnerName() : profile.Character.ToString();
 
 #if INCOGNIFY_STRINGS
         name = name.Incognify();

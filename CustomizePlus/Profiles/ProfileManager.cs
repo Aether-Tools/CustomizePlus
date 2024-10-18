@@ -28,6 +28,8 @@ using Penumbra.GameData.Interop;
 using System.Runtime.Serialization;
 using CustomizePlus.Game.Services;
 using ObjectManager = CustomizePlus.GameData.Services.ObjectManager;
+using System.Threading.Tasks;
+using OtterGui.Classes;
 
 namespace CustomizePlus.Profiles;
 
@@ -44,6 +46,8 @@ public partial class ProfileManager : IDisposable
     private readonly ActorManager _actorManager;
     private readonly GameObjectService _gameObjectService;
     private readonly ObjectManager _objectManager;
+    private readonly ReverseNameDicts _reverseNameDicts;
+    private readonly MessageService _messageService;
     private readonly ProfileChanged _event;
     private readonly TemplateChanged _templateChangedEvent;
     private readonly ReloadEvent _reloadEvent;
@@ -63,6 +67,8 @@ public partial class ProfileManager : IDisposable
         ActorManager actorManager,
         GameObjectService gameObjectService,
         ObjectManager objectManager,
+        ReverseNameDicts reverseNameDicts,
+        MessageService messageService,
         ProfileChanged @event,
         TemplateChanged templateChangedEvent,
         ReloadEvent reloadEvent,
@@ -76,6 +82,8 @@ public partial class ProfileManager : IDisposable
         _actorManager = actorManager;
         _gameObjectService = gameObjectService;
         _objectManager = objectManager;
+        _reverseNameDicts = reverseNameDicts;
+        _messageService = messageService;
         _event = @event;
         _templateChangedEvent = templateChangedEvent;
         _templateChangedEvent.Subscribe(OnTemplateChange, TemplateChanged.Priority.ProfileManager);
@@ -86,7 +94,7 @@ public partial class ProfileManager : IDisposable
 
         CreateProfileFolder(saveService);
 
-        LoadProfiles();
+        _reverseNameDicts.Awaiter.ContinueWith(_ => LoadProfiles(), TaskScheduler.Default);
     }
 
     public void Dispose()
@@ -467,7 +475,7 @@ public partial class ProfileManager : IDisposable
             if (actorIdentifier.Type == IdentifierType.Owned && !actorIdentifier.IsOwnedByLocalPlayer())
                 return false;
 
-            return profile.CharacterName.Text == name || profile.Character.MatchesIgnoringOwnership(actorIdentifier);
+            return profile.Character.MatchesIgnoringOwnership(actorIdentifier);
         }
 
         if (_templateEditorManager.IsEditorActive && _templateEditorManager.EditorProfile.Enabled && IsProfileAppliesToCurrentActor(_templateEditorManager.EditorProfile))
@@ -475,20 +483,8 @@ public partial class ProfileManager : IDisposable
 
         foreach (var profile in Profiles)
         {
-            if(IsProfileAppliesToCurrentActor(profile))
-            {
-                //todo: temp for migrations to v5
-                //todo: make sure this works for minions and stuff
-                if (!profile.Character.IsValid)
-                {
-                    _logger.Warning($"No character for profile {profile}, but character has been found as: {actorIdentifier}, will set.");
-                    profile.Character = actorIdentifier;
-                    _saveService.QueueSave(profile);
-                }
-
-                if (profile.Enabled)
-                    yield return profile;
-            }
+            if(profile.Enabled && IsProfileAppliesToCurrentActor(profile))
+                yield return profile;
         }
 
         if (DefaultLocalPlayerProfile != null && DefaultLocalPlayerProfile.Enabled)

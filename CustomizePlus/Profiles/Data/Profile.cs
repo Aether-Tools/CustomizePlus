@@ -29,8 +29,8 @@ public sealed class Profile : ISavable
 
     public List<Armature> Armatures = new();
 
-    [Obsolete("To be removed in the future versions")]
-    public LowerString CharacterName { get; set; } = LowerString.Empty;
+   /* [Obsolete("To be removed in the future versions")]
+    public LowerString CharacterName { get; set; } = LowerString.Empty;*/
 
     public ActorIdentifier Character { get; set; } = ActorIdentifier.Invalid;
 
@@ -101,7 +101,6 @@ public sealed class Profile : ISavable
             ["UniqueId"] = UniqueId,
             ["CreationDate"] = CreationDate,
             ["ModifiedDate"] = ModifiedDate,
-            ["CharacterName"] = CharacterName.Text,
             ["Character"] = Character.ToJson(),
             ["Name"] = Name.Text,
             ["Enabled"] = Enabled,

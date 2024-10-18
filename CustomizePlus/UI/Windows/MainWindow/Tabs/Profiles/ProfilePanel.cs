@@ -210,7 +210,7 @@ public class ProfilePanel
                 ImGuiUtil.DrawFrameColumn("Character");
                 ImGui.TableNextColumn();
                 width = new Vector2(ImGui.GetContentRegionAvail().X - ImGui.CalcTextSize("Limit to my creatures").X - 68, 0);
-                //name = _newCharacterName ?? _selector.Selected!.CharacterName;
+
                 ImGui.SetNextItemWidth(width.X);
 
                 if (!_selector.IncognitoMode)
@@ -220,7 +220,7 @@ public class ProfilePanel
                     {
                         ImGui.Text(_selector.Selected!.Character.IsValid ? $"Applies to {(_selector.Selected?.Character.Type == Penumbra.GameData.Enums.IdentifierType.Owned ?
                             _selector.Selected?.Character.ToNameWithoutOwnerName() : _selector.Selected?.Character.ToString())}" : "No valid character selected for the profile");
-                        ImGui.Text($"Legacy: {_selector.Selected!.CharacterName.Text ?? "None"}");
+
                         ImGui.Separator();
 
                         _actorAssignmentUi.DrawWorldCombo(width.X / 2);

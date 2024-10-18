@@ -1,17 +1,13 @@
-﻿using CustomizePlus.Armatures.Services;
+﻿using System;
+using System.Linq;
+using System.Text;
+using CustomizePlus.Armatures.Services;
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Extensions;
 using CustomizePlus.Profiles;
 using CustomizePlus.Templates;
 using Dalamud.Plugin;
-using OtterGui.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CustomizePlus.Core.Services;
 
@@ -72,7 +68,7 @@ public class SupportLogBuilderService
             sb.Append($">   > **`{profile.ToString(),-32}`*\n");
             sb.Append($">   > **`Name:                       `** {profile.Name.Text.Incognify()}\n");
             sb.Append($">   > **`Type:                       `** {profile.ProfileType} \n");
-            sb.Append($">   > **`Character name:             `** {profile.CharacterName.Text.Incognify()}\n");
+            sb.Append($">   > **`Character name:             `** {profile.Character.Incognito(null)}\n");
             sb.Append($">   > **`Templates:`**\n");
             sb.Append($">   >   > **`Count:                  `** {profile.Templates.Count}\n");
             foreach (var template in profile.Templates)

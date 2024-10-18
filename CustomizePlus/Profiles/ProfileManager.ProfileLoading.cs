@@ -103,7 +103,6 @@ public partial class ProfileManager : IDisposable
         var character = _actorManager.FromJson(obj["Character"] as JObject);
 
         profile.Character = character;
-        profile.ApplyToCurrentlyActiveCharacter = obj["ApplyToCurrentlyActiveCharacter"]?.ToObject<bool>() ?? false;
         profile.CharacterName = new LowerString(obj["CharacterName"]?.ToObject<string>()?.Trim() ?? throw new ArgumentNullException("CharacterName")); //temp
 
         return profile;

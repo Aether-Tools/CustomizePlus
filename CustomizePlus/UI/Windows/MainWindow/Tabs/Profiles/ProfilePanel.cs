@@ -216,7 +216,7 @@ public class ProfilePanel
                 if (!_selector.IncognitoMode)
                 {
                     bool showMultipleMessage = false;
-                    if (_manager.DefaultProfile != _selector.Selected && !_selector.Selected!.ApplyToCurrentlyActiveCharacter)
+                    if (_manager.DefaultProfile != _selector.Selected && _manager.DefaultLocalPlayerProfile != _selector.Selected)
                     {
                         ImGui.Text(_selector.Selected!.Character.IsValid ? $"Applies to {(_selector.Selected?.Character.Type == Penumbra.GameData.Enums.IdentifierType.Owned ?
                             _selector.Selected?.Character.ToNameWithoutOwnerName() : _selector.Selected?.Character.ToString())}" : "No valid character selected for the profile");
@@ -264,11 +264,23 @@ public class ProfilePanel
 
                 ImGui.Separator();
 
-                var anyActiveCharaBool = _selector.Selected?.ApplyToCurrentlyActiveCharacter ?? false;
-                if (ImGui.Checkbox("##ApplyToCurrentlyActiveCharacter", ref anyActiveCharaBool))
-                    _manager.SetApplyToCurrentlyActiveCharacter(_selector.Selected!, anyActiveCharaBool);
-                ImGuiUtil.LabeledHelpMarker("Apply to any character you are logged in with",
-                    "Whether the templates in this profile should be applied to any character you are currently logged in with.");
+                var isDefaultLP = _manager.DefaultLocalPlayerProfile == _selector.Selected;
+                var isDefaultLPOrCurrentProfilesEnabled = (_manager.DefaultLocalPlayerProfile?.Enabled ?? false) || (_selector.Selected?.Enabled ?? false);
+                using (ImRaii.Disabled(isDefaultLPOrCurrentProfilesEnabled))
+                {
+                    if (ImGui.Checkbox("##DefaultLocalPlayerProfile", ref isDefaultLP))
+                        _manager.SetDefaultLocalPlayerProfile(isDefaultLP ? _selector.Selected! : null);
+                    ImGuiUtil.LabeledHelpMarker("Apply to any character you are logged in with",
+                        "Whether the templates in this profile should be applied to any character you are currently logged in with.\r\nTakes priority over the next option for said character.\r\nThis setting cannot be applied to multiple profiles.");
+                }
+                if (isDefaultLPOrCurrentProfilesEnabled)
+                {
+                    ImGui.SameLine();
+                    ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Warning);
+                    ImGuiUtil.PrintIcon(FontAwesomeIcon.ExclamationTriangle);
+                    ImGui.PopStyleColor();
+                    ImGuiUtil.HoverTooltip("Can only be changed when both currently selected and profile where this checkbox is checked are disabled.");
+                }
 
                 var isDefault = _manager.DefaultProfile == _selector.Selected;
                 var isDefaultOrCurrentProfilesEnabled = (_manager.DefaultProfile?.Enabled ?? false) || (_selector.Selected?.Enabled ?? false);
@@ -277,7 +289,7 @@ public class ProfilePanel
                     if (ImGui.Checkbox("##DefaultProfile", ref isDefault))
                         _manager.SetDefaultProfile(isDefault ? _selector.Selected! : null);
                     ImGuiUtil.LabeledHelpMarker("Apply to all players and retainers",
-                        "Whether the templates in this profile are applied to all players and retainers without a specific profile. This setting cannot be applied to multiple profiles.");
+                        "Whether the templates in this profile are applied to all players and retainers without a specific profile.\r\nThis setting cannot be applied to multiple profiles.");
                 }
                 if (isDefaultOrCurrentProfilesEnabled)
                 {

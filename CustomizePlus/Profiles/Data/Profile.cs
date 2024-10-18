@@ -33,7 +33,6 @@ public sealed class Profile : ISavable
     public LowerString CharacterName { get; set; } = LowerString.Empty;
 
     public ActorIdentifier Character { get; set; } = ActorIdentifier.Invalid;
-    public bool ApplyToCurrentlyActiveCharacter { get; set; }
 
     public LowerString Name { get; set; } = LowerString.Empty;
 
@@ -80,7 +79,6 @@ public sealed class Profile : ISavable
     public Profile(Profile original) : this()
     {
         Character = original.Character;
-        ApplyToCurrentlyActiveCharacter = original.ApplyToCurrentlyActiveCharacter;
 
         foreach (var template in original.Templates)
         {
@@ -105,7 +103,6 @@ public sealed class Profile : ISavable
             ["ModifiedDate"] = ModifiedDate,
             ["CharacterName"] = CharacterName.Text,
             ["Character"] = Character.ToJson(),
-            ["ApplyToCurrentlyActiveCharacter"] = ApplyToCurrentlyActiveCharacter,
             ["Name"] = Name.Text,
             ["Enabled"] = Enabled,
             ["IsWriteProtected"] = IsWriteProtected,

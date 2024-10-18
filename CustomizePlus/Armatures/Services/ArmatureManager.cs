@@ -413,10 +413,10 @@ public unsafe sealed class ArmatureManager : IDisposable
             type is not ProfileChanged.Type.TemporaryProfileDeleted &&
             type is not ProfileChanged.Type.ChangedCharacter &&
             type is not ProfileChanged.Type.ChangedDefaultProfile &&
-            type is not ProfileChanged.Type.ApplyToCurrentlyActiveCharacterChanged)
+            type is not ProfileChanged.Type.ChangedDefaultLocalPlayerProfile)
             return;
 
-        if (type == ProfileChanged.Type.ChangedDefaultProfile)
+        if (type == ProfileChanged.Type.ChangedDefaultProfile || type == ProfileChanged.Type.ChangedDefaultLocalPlayerProfile)
         {
             var oldProfile = (Profile?)arg3;
 
@@ -426,7 +426,7 @@ public unsafe sealed class ArmatureManager : IDisposable
             foreach (var armature in oldProfile.Armatures)
                 armature.IsPendingProfileRebind = true;
 
-            _logger.Debug($"ArmatureManager.OnProfileChange Profile no longer default, armatures rebind scheduled: {type}, old profile: {oldProfile.Name.Text.Incognify()}->{oldProfile.Enabled}");
+            _logger.Debug($"ArmatureManager.OnProfileChange Profile no longer default/default for local player, armatures rebind scheduled: {type}, old profile: {oldProfile.Name.Text.Incognify()}->{oldProfile.Enabled}");
 
             return;
         }
@@ -505,8 +505,7 @@ public unsafe sealed class ArmatureManager : IDisposable
 
         if (type == ProfileChanged.Type.ChangedCharacter ||
             type == ProfileChanged.Type.Deleted ||
-            type == ProfileChanged.Type.TemporaryProfileDeleted ||
-            type == ProfileChanged.Type.ApplyToCurrentlyActiveCharacterChanged)
+            type == ProfileChanged.Type.TemporaryProfileDeleted)
         {
             if (profile.Armatures.Count == 0)
                 return;

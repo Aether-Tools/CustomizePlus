@@ -52,6 +52,7 @@ public partial class ProfileManager : IDisposable
     public readonly List<Profile> Profiles = new();
 
     public Profile? DefaultProfile { get; private set; }
+    public Profile? DefaultLocalPlayerProfile { get; private set; }
 
     public ProfileManager(
         TemplateManager templateManager,
@@ -255,19 +256,6 @@ public partial class ProfileManager : IDisposable
             throw new ProfileNotFoundException();
     }
 
-    public void SetApplyToCurrentlyActiveCharacter(Profile profile, bool value)
-    {
-        //todo: only one profile is allowed to be active for that setting
-        if (profile.ApplyToCurrentlyActiveCharacter != value)
-        {
-            profile.ApplyToCurrentlyActiveCharacter = value;
-
-            SaveProfile(profile);
-
-            _event.Invoke(ProfileChanged.Type.ApplyToCurrentlyActiveCharacterChanged, profile, value);
-        }
-    }
-
     public void DeleteTemplate(Profile profile, int templateIndex)
     {
         _logger.Debug($"Deleting template #{templateIndex} from {profile}...");
@@ -340,6 +328,26 @@ public partial class ProfileManager : IDisposable
 
         _logger.Debug($"Set profile {profile?.Incognito ?? "no profile"} as default");
         _event.Invoke(ProfileChanged.Type.ChangedDefaultProfile, profile, previousProfile);
+    }
+
+    public void SetDefaultLocalPlayerProfile(Profile? profile)
+    {
+        if (profile == null)
+        {
+            if (DefaultLocalPlayerProfile == null)
+                return;
+        }
+        else if (!Profiles.Contains(profile))
+            return;
+
+        var previousProfile = DefaultLocalPlayerProfile;
+
+        DefaultLocalPlayerProfile = profile;
+        _configuration.DefaultLocalPlayerProfile = profile?.UniqueId ?? Guid.Empty;
+        _configuration.Save();
+
+        _logger.Debug($"Set profile {profile?.Incognito ?? "no profile"} as default local player profile");
+        _event.Invoke(ProfileChanged.Type.ChangedDefaultLocalPlayerProfile, profile, previousProfile);
     }
 
     //warn: temporary profile system does not support any world identifiers
@@ -453,14 +461,8 @@ public partial class ProfileManager : IDisposable
             if (profile == DefaultProfile)
                 return false;
 
-            if (profile.ApplyToCurrentlyActiveCharacter)
-            {
-                if (_objectManager.IsInLobby)
-                    return true;
-
-                var currentPlayer = _actorManager.GetCurrentPlayer();
-                return currentPlayer.IsValid && currentPlayer.MatchesIgnoringOwnership(actorIdentifier);
-            }
+            if (profile == DefaultLocalPlayerProfile)
+                return false;
 
             if (actorIdentifier.Type == IdentifierType.Owned && !actorIdentifier.IsOwnedByLocalPlayer())
                 return false;
@@ -487,6 +489,13 @@ public partial class ProfileManager : IDisposable
                 if (profile.Enabled)
                     yield return profile;
             }
+        }
+
+        if (DefaultLocalPlayerProfile != null && DefaultLocalPlayerProfile.Enabled)
+        {
+            var currentPlayer = _actorManager.GetCurrentPlayer();
+            if(_objectManager.IsInLobby || (currentPlayer.IsValid && currentPlayer.Matches(actorIdentifier)))
+                yield return DefaultLocalPlayerProfile;
         }
 
         if (DefaultProfile != null &&

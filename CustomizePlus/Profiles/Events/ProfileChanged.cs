@@ -15,6 +15,7 @@ public sealed class ProfileChanged() : EventWrapper<ProfileChanged.Type, Profile
         Deleted,
         Renamed,
         Toggled,
+        PriorityChanged,
         AddedCharacter,
         RemovedCharacter,
         //ChangedCharacter,

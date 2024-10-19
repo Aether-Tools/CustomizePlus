@@ -18,6 +18,7 @@ using Penumbra.String;
 using static FFXIVClientStructs.FFXIV.Client.LayoutEngine.ILayoutInstance;
 using CustomizePlus.GameData.Extensions;
 using CustomizePlus.Core.Extensions;
+using Dalamud.Interface.Components;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 
@@ -33,6 +34,7 @@ public class ProfilePanel
     private readonly TemplateEditorEvent _templateEditorEvent;
 
     private string? _newName;
+    private int? _newPriority;
     private Profile? _changedProfile;
 
     private Action? _endAction;
@@ -212,6 +214,30 @@ public class ProfilePanel
                 }
                 else
                     ImGui.TextUnformatted(_selector.Selected!.Incognito);
+
+                ImGui.TableNextRow();
+
+                ImGuiUtil.DrawFrameColumn("Priority");
+                ImGui.TableNextColumn();
+
+                var priority = _newPriority ?? _selector.Selected!.Priority;
+
+                ImGui.SetNextItemWidth(50);
+                if (ImGui.InputInt("##Priority", ref priority, 0, 0))
+                {
+                    _newPriority = priority;
+                    _changedProfile = _selector.Selected;
+                }
+
+                if (ImGui.IsItemDeactivatedAfterEdit() && _changedProfile != null)
+                {
+                    _manager.SetPriority(_changedProfile, priority);
+                    _newPriority = null;
+                    _changedProfile = null;
+                }
+
+                ImGuiComponents.HelpMarker("Profiles with a higher number here take precedence before profiles with a lower number.\n" +
+                    "That means if two or more profiles affect same character, profile with higher priority will be applied to that character.");
             }
         }
     }
@@ -345,6 +371,36 @@ public class ProfilePanel
                 ImGui.TableNextColumn();
                 ImGui.AlignTextToFramePadding();
                 ImGui.TextUnformatted(!_selector.IncognitoMode ? $"{character.ToNameWithoutOwnerName()}{character.TypeToString()}" : "Incognito");
+
+                var profiles = _manager.GetEnabledProfilesByActor(character).ToList();
+                if (profiles.Count > 1)
+                {
+                    //todo: make helper
+                    ImGui.SameLine();
+                    if(profiles.Any(x => x.IsTemporary))
+                    {
+                        ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Error);
+                        ImGuiUtil.PrintIcon(FontAwesomeIcon.Lock);
+                    }
+                    else if (profiles[0] != _selector.Selected!)
+                    {
+                        ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Warning);
+                        ImGuiUtil.PrintIcon(FontAwesomeIcon.ExclamationTriangle);
+                    }
+                    else
+                    {
+                        ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Info);
+                        ImGuiUtil.PrintIcon(FontAwesomeIcon.Star);
+                    }
+
+                    ImGui.PopStyleColor();
+
+                    if (profiles.Any(x => x.IsTemporary))
+                        ImGuiUtil.HoverTooltip("This character is being affected by temporary profile set by external plugin. This profile will not be applied!");
+                    else
+                        ImGuiUtil.HoverTooltip(profiles[0] != _selector.Selected! ? "Several profiles are trying to affect this character. This profile will not be applied!" :
+                            "Several profiles are trying to affect this character. This profile is being applied.");
+                }
             }
         }
 

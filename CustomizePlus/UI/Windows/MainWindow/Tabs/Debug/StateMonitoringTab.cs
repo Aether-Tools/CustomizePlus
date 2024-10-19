@@ -63,7 +63,7 @@ public class StateMonitoringTab
 
     private void DrawProfiles()
     {
-        foreach (var profile in _profileManager.Profiles.OrderByDescending(x => x.Enabled))
+        foreach (var profile in _profileManager.Profiles.OrderByDescending(x => x.Enabled).ThenByDescending(x => x.Priority))
         {
             DrawSingleProfile("root", profile);
             ImGui.Spacing();
@@ -141,7 +141,7 @@ public class StateMonitoringTab
         //characterName = characterName.Incognify();
 #endif
 
-        var show = ImGui.CollapsingHeader($"[{(profile.Enabled ? "E" : "D")}] {name} on {characterName} [{profile.ProfileType}] [{profile.UniqueId}]###{prefix}-profile-{profile.UniqueId}");
+        var show = ImGui.CollapsingHeader($"[{(profile.Enabled ? "E" : "D")}] [P:{profile.Priority}] {name} on {characterName} [{profile.ProfileType}] [{profile.UniqueId}]###{prefix}-profile-{profile.UniqueId}");
 
         if (!show)
             return;

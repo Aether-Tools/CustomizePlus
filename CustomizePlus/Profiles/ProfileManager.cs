@@ -248,51 +248,11 @@ public partial class ProfileManager : IDisposable
         if (profile.Enabled == value && !force)
             return;
 
-        var oldValue = profile.Enabled;
+        profile.Enabled = value;
 
-        if (value)
-        {
-            _logger.Debug($"Setting {profile} as enabled...");
+        SaveProfile(profile);
 
-            foreach (var otherProfile in Profiles)
-            {
-                if (otherProfile == profile || !otherProfile.Enabled || otherProfile.IsTemporary)
-                    continue;
-
-                bool shouldDisable = false;
-
-                //my god this is ugly
-                foreach(var otherCharacter in otherProfile.Characters)
-                {
-                    foreach(var currentCharacter in profile.Characters)
-                    {
-                        if(otherCharacter.MatchesIgnoringOwnership(currentCharacter))
-                        {
-                            shouldDisable = true;
-                            break;
-                        }
-                    }
-
-                    if (shouldDisable)
-                        break;
-                }
-
-                if(shouldDisable)
-                {
-                    _logger.Debug($"\t-> {otherProfile} disabled");
-                    SetEnabled(otherProfile, false);
-                }
-            }
-        }
-
-        if (oldValue != value)
-        {
-            profile.Enabled = value;
-
-            SaveProfile(profile);
-
-            _event.Invoke(ProfileChanged.Type.Toggled, profile, value);
-        }
+        _event.Invoke(ProfileChanged.Type.Toggled, profile, value);
     }
     
     public void SetEnabled(Guid guid, bool value)
@@ -304,6 +264,21 @@ public partial class ProfileManager : IDisposable
         }
         else
             throw new ProfileNotFoundException();
+    }
+
+    public void SetPriority(Profile profile, int value)
+    {
+        if (profile.Priority == value)
+            return;
+
+        if (value > int.MaxValue || value < int.MinValue)
+            return;
+
+        profile.Priority = value;
+
+        SaveProfile(profile);
+
+        _event.Invoke(ProfileChanged.Type.PriorityChanged, profile, value);
     }
 
     public void DeleteTemplate(Profile profile, int templateIndex)
@@ -408,6 +383,7 @@ public partial class ProfileManager : IDisposable
 
         profile.Enabled = true;
         profile.ProfileType = ProfileType.Temporary;
+        profile.Priority = int.MaxValue; //Make sure temporary profile is always at max priority
 
         var permanentIdentifier = identifier.CreatePermanent();
         profile.Characters.Clear();
@@ -422,9 +398,6 @@ public partial class ProfileManager : IDisposable
         }
 
         Profiles.Add(profile);
-
-        //Make sure temporary profiles come first, so they are returned by all other methods first
-        Profiles.Sort((x, y) => y.IsTemporary.CompareTo(x.IsTemporary));
 
         _logger.Debug($"Added temporary profile for {permanentIdentifier}");
         _event.Invoke(ProfileChanged.Type.TemporaryProfileAdded, profile, null);
@@ -457,7 +430,7 @@ public partial class ProfileManager : IDisposable
         if (!actor.Identifier(_actorManager, out var identifier))
             throw new ActorNotFoundException();
 
-        var profile = Profiles.FirstOrDefault(x => x.Characters[0] == identifier && x.IsTemporary);
+        var profile = Profiles.FirstOrDefault(x => x.Characters.Count == 1 && x.Characters[0] == identifier && x.IsTemporary);
         if (profile == null)
             throw new ProfileNotFoundException();
 
@@ -478,7 +451,7 @@ public partial class ProfileManager : IDisposable
         if (enabledOnly)
             query = query.Where(x => x.Enabled);
 
-        var profile = query.FirstOrDefault();
+        var profile = query.OrderByDescending(x => x.Priority).FirstOrDefault();
 
         if (profile == null)
             return null;
@@ -529,7 +502,7 @@ public partial class ProfileManager : IDisposable
         if (_templateEditorManager.IsEditorActive && _templateEditorManager.EditorProfile.Enabled && IsProfileAppliesToCurrentActor(_templateEditorManager.EditorProfile))
             yield return _templateEditorManager.EditorProfile;
 
-        foreach (var profile in Profiles)
+        foreach (var profile in Profiles.OrderByDescending(x => x.Priority))
         {
             if(profile.Enabled && IsProfileAppliesToCurrentActor(profile))
                 yield return profile;
@@ -553,7 +526,7 @@ public partial class ProfileManager : IDisposable
         if (template == null)
             yield break;
 
-        foreach (var profile in Profiles)
+        foreach (var profile in Profiles.OrderByDescending(x => x.Priority))
             if (profile.Templates.Contains(template))
                 yield return profile;
 

@@ -56,6 +56,11 @@ public sealed class Profile : ISavable
     public ProfileType ProfileType { get; set; }
 
     /// <summary>
+    /// Profile priority when there are several profiles affecting same character
+    /// </summary>
+    public int Priority { get; set; }
+
+    /// <summary>
     /// Tells us if this profile is not persistent (ex. was made via IPC calls) and should have specific treatement like not being shown in UI, etc.
     /// WARNING, TEMPLATES FOR TEMPORARY PROFILES *ARE NOT* STORED IN TemplateManager
     /// </summary>
@@ -107,6 +112,7 @@ public sealed class Profile : ISavable
             ["Name"] = Name.Text,
             ["Enabled"] = Enabled,
             ["IsWriteProtected"] = IsWriteProtected,
+            ["Priority"] = Priority,
             ["Templates"] = SerializeTemplates()
         };
 

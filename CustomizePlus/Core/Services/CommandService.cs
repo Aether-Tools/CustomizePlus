@@ -168,6 +168,7 @@ public class CommandService : IDisposable
                     break;
             }
 
+            //todo: support for multiple profiles
             Profile? targetProfile = null;
 
             characterName = subArgumentList[0].Trim();

@@ -413,6 +413,7 @@ public unsafe sealed class ArmatureManager : IDisposable
             type is not ProfileChanged.Type.TemporaryProfileDeleted &&
             type is not ProfileChanged.Type.AddedCharacter &&
             type is not ProfileChanged.Type.RemovedCharacter &&
+            type is not ProfileChanged.Type.PriorityChanged &&
             type is not ProfileChanged.Type.ChangedDefaultProfile &&
             type is not ProfileChanged.Type.ChangedDefaultLocalPlayerProfile)
             return;
@@ -435,6 +436,26 @@ public unsafe sealed class ArmatureManager : IDisposable
         if (profile == null)
         {
             _logger.Error($"ArmatureManager.OnProfileChange Invalid input for event: {type}, profile is null.");
+            return;
+        }
+
+        if(type == ProfileChanged.Type.PriorityChanged)
+        {
+            if (!profile.Enabled)
+                return;
+
+            foreach (var character in profile.Characters)
+            {
+                if (!character.IsValid)
+                    continue;
+
+                foreach (var armature in GetArmaturesForCharacter(character))
+                {
+                    armature.IsPendingProfileRebind = true;
+                    _logger.Debug($"ArmatureManager.OnProfileChange profile {profile} priority changed, planning rebind for armature {armature}");
+                }
+            }
+
             return;
         }
 

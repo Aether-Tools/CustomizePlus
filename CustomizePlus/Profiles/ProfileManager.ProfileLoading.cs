@@ -13,6 +13,7 @@ using Penumbra.String;
 using Penumbra.GameData.Structs;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Penumbra.GameData.Gui;
+using System.Xml;
 
 namespace CustomizePlus.Profiles;
 
@@ -53,20 +54,16 @@ public partial class ProfileManager : IDisposable
 
         foreach (var profile in Profiles)
         {
-            //This will solve any issues if file on disk was manually edited and we have more than a single active profile
-            if (profile.Enabled)
-                SetEnabled(profile, true, true);
-
             if (_configuration.DefaultProfile == profile.UniqueId)
                 DefaultProfile = profile;
+
+            if (_configuration.DefaultLocalPlayerProfile == profile.UniqueId)
+                DefaultLocalPlayerProfile = profile;
         }
 
         //insert temp profiles back into profile list
         if (temporaryProfiles.Count > 0)
-        {
             Profiles.AddRange(temporaryProfiles);
-            Profiles.Sort((x, y) => y.IsTemporary.CompareTo(x.IsTemporary));
-        }
 
         var failed = MoveInvalidNames(invalidNames);
         if (invalidNames.Count > 0)
@@ -134,6 +131,8 @@ public partial class ProfileManager : IDisposable
     private Profile LoadV5(JObject obj)
     {
         var profile = LoadProfileV4V5(obj);
+
+        profile.Priority = obj["Priority"]?.ToObject<int>() ?? throw new ArgumentNullException("Priority");
 
         if (obj["Characters"] is not JArray characterArray)
             return profile;

@@ -241,6 +241,7 @@ public class ProfileFileSystemSelector : FileSystemSelector<Profile, ProfileStat
             return false;
         }
 
+        //todo: priority check
         var identifier = _gameObjectService.GetCurrentPlayerActorIdentifier();
         if (leaf.Value.Enabled)
             state.Color = leaf.Value.Characters.Any(x => x.MatchesIgnoringOwnership(identifier)) ? ColorId.LocalCharacterEnabledProfile : ColorId.EnabledProfile;

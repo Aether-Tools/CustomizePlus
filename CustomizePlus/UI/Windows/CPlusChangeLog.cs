@@ -24,6 +24,7 @@ public class CPlusChangeLog
         Add2_0_5_0(Changelog);
         Add2_0_6_0(Changelog);
         Add2_0_6_3(Changelog);
+        Add2_0_7_0(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -35,6 +36,38 @@ public class CPlusChangeLog
         _config.ChangelogSettings.ChangeLogDisplayType = type;
         _config.Save();
     }
+
+    private static void Add2_0_7_0(Changelog log)
+        => log.NextVersion("Version 2.0.7.0")
+        .RegisterImportant("THIS IS A PRELIMINARY CHANGELOG FOR TESTING BUILD OF VERSION 2.0.7.0.")
+        .RegisterImportant("Some parts of Customize+ have been considerably rewritten in this update. If you encounter any issues please report them.")
+
+        .RegisterHighlight("Character management has been rewritten.")
+        .RegisterImportant("Customize+ will do its best to automatically migrate your profiles to new system but in some rare cases it is possible that you will have to add characters again for some of your profiles.", 1)
+        .RegisterEntry("New character selection user interface has been added.", 1)
+        .RegisterEntry("It is now possible to assign several characters to a single profile.", 2)
+        .RegisterEntry("The way console commands work has not changed. This means that the commands will affect profiles the same way as before, even if profile affects multiple characters.", 3)
+        .RegisterEntry("\"Limit to my creatures\" option has been removed as it is now obsolete.", 2)
+        .RegisterEntry("It is now possible to choose profile which will be applied to any character you login with.", 2)
+
+        .RegisterHighlight("Added profile priority system.")
+        .RegisterEntry("When several active profiles affect the same character, profile priority will be used to determine which profile will be applied to said character.", 1)
+
+        .RegisterEntry("Added additional options to configure how Customize+ window behaves.")
+        .RegisterEntry("Added option to configure if Customize+ windows will be hidden when you hide game UI or not.", 1)
+        .RegisterEntry("Added option to configure if Customize+ windows will be hidden when you enter GPose or not.", 1)
+        .RegisterEntry("Added option to configure if Customize+ main window will be automatically opened when you launch the game or not.", 1)
+
+        .RegisterImportant("IPC notes, developers only.")
+        .RegisterEntry("IPC version is now 5.2.", 1)
+        .RegisterEntry("I did not want to bump major version for IPC and break other plugins, so all IPC endpoints are acting as if there is still only one character per profile. This is open for discussion over at support discord.", 1)
+        .RegisterEntry("Profile.OnUpdate event is now being triggered for profiles with \"Apply to all players and retainers\" and \"Apply to any character you are logged in with\" options enabled.", 1)
+
+        .RegisterHighlight("Fixed issue when Customize+ did not detect changes in character skeleton. This mostly happened when altering character appearance via Glamourer and other plugins/tools.")
+
+        .RegisterEntry("Dropped support for upgrading from Customize+ 1.0. Clipboard copies are not affected by this change.")
+
+        .RegisterEntry("Source code maintenance - external libraries update.");
 
     private static void Add2_0_6_3(Changelog log)
         => log.NextVersion("Version 2.0.6.3")

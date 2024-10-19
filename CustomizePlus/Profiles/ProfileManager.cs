@@ -28,13 +28,15 @@ using Penumbra.GameData.Interop;
 using System.Runtime.Serialization;
 using CustomizePlus.Game.Services;
 using ObjectManager = CustomizePlus.GameData.Services.ObjectManager;
+using System.Threading.Tasks;
+using OtterGui.Classes;
 
 namespace CustomizePlus.Profiles;
 
 /// <summary>
 ///     Container class for administrating <see cref="Profile" />s during runtime.
 /// </summary>
-public class ProfileManager : IDisposable
+public partial class ProfileManager : IDisposable
 {
     private readonly TemplateManager _templateManager;
     private readonly TemplateEditorManager _templateEditorManager;
@@ -44,6 +46,8 @@ public class ProfileManager : IDisposable
     private readonly ActorManager _actorManager;
     private readonly GameObjectService _gameObjectService;
     private readonly ObjectManager _objectManager;
+    private readonly ReverseNameDicts _reverseNameDicts;
+    private readonly MessageService _messageService;
     private readonly ProfileChanged _event;
     private readonly TemplateChanged _templateChangedEvent;
     private readonly ReloadEvent _reloadEvent;
@@ -52,6 +56,7 @@ public class ProfileManager : IDisposable
     public readonly List<Profile> Profiles = new();
 
     public Profile? DefaultProfile { get; private set; }
+    public Profile? DefaultLocalPlayerProfile { get; private set; }
 
     public ProfileManager(
         TemplateManager templateManager,
@@ -62,6 +67,8 @@ public class ProfileManager : IDisposable
         ActorManager actorManager,
         GameObjectService gameObjectService,
         ObjectManager objectManager,
+        ReverseNameDicts reverseNameDicts,
+        MessageService messageService,
         ProfileChanged @event,
         TemplateChanged templateChangedEvent,
         ReloadEvent reloadEvent,
@@ -75,6 +82,8 @@ public class ProfileManager : IDisposable
         _actorManager = actorManager;
         _gameObjectService = gameObjectService;
         _objectManager = objectManager;
+        _reverseNameDicts = reverseNameDicts;
+        _messageService = messageService;
         _event = @event;
         _templateChangedEvent = templateChangedEvent;
         _templateChangedEvent.Subscribe(OnTemplateChange, TemplateChanged.Priority.ProfileManager);
@@ -85,71 +94,12 @@ public class ProfileManager : IDisposable
 
         CreateProfileFolder(saveService);
 
-        LoadProfiles();
+        _reverseNameDicts.Awaiter.ContinueWith(_ => LoadProfiles(), TaskScheduler.Default);
     }
 
     public void Dispose()
     {
         _templateChangedEvent.Unsubscribe(OnTemplateChange);
-    }
-
-    public void LoadProfiles()
-    {
-        _logger.Information("Loading profiles...");
-
-        //todo: hot reload was not tested
-        //save temp profiles
-        var temporaryProfiles = Profiles.Where(x => x.IsTemporary).ToList();
-
-        Profiles.Clear();
-        List<(Profile, string)> invalidNames = new();
-        foreach (var file in _saveService.FileNames.Profiles())
-        {
-            _logger.Debug($"Reading profile {file.FullName}");
-
-            try
-            {
-                var text = File.ReadAllText(file.FullName);
-                var data = JObject.Parse(text);
-                var profile = Profile.Load(_templateManager, data);
-                if (profile.UniqueId.ToString() != Path.GetFileNameWithoutExtension(file.Name))
-                    invalidNames.Add((profile, file.FullName));
-                if (Profiles.Any(f => f.UniqueId == profile.UniqueId))
-                    throw new Exception($"ID {profile.UniqueId} was not unique.");
-
-                Profiles.Add(profile);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"Could not load profile, skipped:\n{ex}");
-                //++skipped;
-            }
-        }
-
-        foreach (var profile in Profiles)
-        {
-            //This will solve any issues if file on disk was manually edited and we have more than a single active profile
-            if (profile.Enabled)
-                SetEnabled(profile, true, true);
-
-            if (_configuration.DefaultProfile == profile.UniqueId)
-                DefaultProfile = profile;
-        }
-
-        //insert temp profiles back into profile list
-        if (temporaryProfiles.Count > 0)
-        {
-            Profiles.AddRange(temporaryProfiles);
-            Profiles.Sort((x, y) => y.IsTemporary.CompareTo(x.IsTemporary));
-        }
-
-        var failed = MoveInvalidNames(invalidNames);
-        if (invalidNames.Count > 0)
-            _logger.Information(
-                $"Moved {invalidNames.Count - failed} profiles to correct names.{(failed > 0 ? $" Failed to move {failed} profiles to correct names." : string.Empty)}");
-
-        _logger.Information("Profiles load complete");
-        _event.Invoke(ProfileChanged.Type.ReloadedAll, null, null);
     }
 
     /// <summary>
@@ -227,26 +177,35 @@ public class ProfileManager : IDisposable
     }
 
     /// <summary>
-    /// Change character name for profile
+    /// Add character to profile
     /// </summary>
-    public void ChangeCharacterName(Profile profile, string newName)
+    public void AddCharacter(Profile profile, ActorIdentifier actorIdentifier)
     {
-        newName = newName.Trim();
-
-        var oldName = profile.CharacterName.Text;
-        if (oldName == newName)
+        if (!actorIdentifier.IsValid || profile.Characters.Any(x => actorIdentifier.MatchesIgnoringOwnership(x)) || profile.IsTemporary)
             return;
 
-        profile.CharacterName = newName;
-
-        //Called so all other active profiles for new character name get disabled
-        //saving is performed there
-        SetEnabled(profile, profile.Enabled, true);
+        profile.Characters.Add(actorIdentifier);
 
         SaveProfile(profile);
 
-        _logger.Debug($"Changed character name for profile {profile.UniqueId}.");
-        _event.Invoke(ProfileChanged.Type.ChangedCharacterName, profile, oldName);
+        _logger.Debug($"Add character for profile {profile.UniqueId}.");
+        _event.Invoke(ProfileChanged.Type.AddedCharacter, profile, actorIdentifier);
+    }
+
+    /// <summary>
+    /// Delete character from profile
+    /// </summary>
+    public void DeleteCharacter(Profile profile, ActorIdentifier actorIdentifier)
+    {
+        if (!actorIdentifier.IsValid || !profile.Characters.Any(x => actorIdentifier.MatchesIgnoringOwnership(x)) || profile.IsTemporary)
+            return;
+
+        profile.Characters.Remove(actorIdentifier);
+
+        SaveProfile(profile);
+
+        _logger.Debug($"Removed character from profile {profile.UniqueId}.");
+        _event.Invoke(ProfileChanged.Type.RemovedCharacter, profile, actorIdentifier);
     }
 
     /// <summary>
@@ -281,28 +240,11 @@ public class ProfileManager : IDisposable
         if (profile.Enabled == value && !force)
             return;
 
-        var oldValue = profile.Enabled;
+        profile.Enabled = value;
 
-        if (value)
-        {
-            _logger.Debug($"Setting {profile} as enabled...");
+        SaveProfile(profile);
 
-            foreach (var otherProfile in Profiles
-                         .Where(x => x.CharacterName == profile.CharacterName && x != profile && x.Enabled && !x.IsTemporary))
-            {
-                _logger.Debug($"\t-> {otherProfile} disabled");
-                SetEnabled(otherProfile, false);
-            }
-        }
-
-        if (oldValue != value)
-        {
-            profile.Enabled = value;
-
-            SaveProfile(profile);
-
-            _event.Invoke(ProfileChanged.Type.Toggled, profile, value);
-        }
+        _event.Invoke(ProfileChanged.Type.Toggled, profile, value);
     }
     
     public void SetEnabled(Guid guid, bool value)
@@ -315,16 +257,20 @@ public class ProfileManager : IDisposable
         else
             throw new ProfileNotFoundException();
     }
-    public void SetLimitLookupToOwned(Profile profile, bool value)
+
+    public void SetPriority(Profile profile, int value)
     {
-        if (profile.LimitLookupToOwnedObjects != value)
-        {
-            profile.LimitLookupToOwnedObjects = value;
+        if (profile.Priority == value)
+            return;
 
-            SaveProfile(profile);
+        if (value > int.MaxValue || value < int.MinValue)
+            return;
 
-            _event.Invoke(ProfileChanged.Type.LimitLookupToOwnedChanged, profile, value);
-        }
+        profile.Priority = value;
+
+        SaveProfile(profile);
+
+        _event.Invoke(ProfileChanged.Type.PriorityChanged, profile, value);
     }
 
     public void DeleteTemplate(Profile profile, int templateIndex)
@@ -401,40 +347,63 @@ public class ProfileManager : IDisposable
         _event.Invoke(ProfileChanged.Type.ChangedDefaultProfile, profile, previousProfile);
     }
 
-    public void AddTemporaryProfile(Profile profile, Actor actor/*, Template template*/)
+    public void SetDefaultLocalPlayerProfile(Profile? profile)
+    {
+        if (profile == null)
+        {
+            if (DefaultLocalPlayerProfile == null)
+                return;
+        }
+        else if (!Profiles.Contains(profile))
+            return;
+
+        var previousProfile = DefaultLocalPlayerProfile;
+
+        DefaultLocalPlayerProfile = profile;
+        _configuration.DefaultLocalPlayerProfile = profile?.UniqueId ?? Guid.Empty;
+        _configuration.Save();
+
+        _logger.Debug($"Set profile {profile?.Incognito ?? "no profile"} as default local player profile");
+        _event.Invoke(ProfileChanged.Type.ChangedDefaultLocalPlayerProfile, profile, previousProfile);
+    }
+
+    //warn: temporary profile system does not support any world identifiers
+    public void AddTemporaryProfile(Profile profile, Actor actor)
     {
         if (!actor.Identifier(_actorManager, out var identifier))
             throw new ActorNotFoundException();
 
         profile.Enabled = true;
         profile.ProfileType = ProfileType.Temporary;
-        profile.TemporaryActor = identifier;
-        profile.CharacterName = identifier.ToNameWithoutOwnerName();
-        profile.LimitLookupToOwnedObjects = false;
+        profile.Priority = int.MaxValue; //Make sure temporary profile is always at max priority
 
-        var existingProfile = Profiles.FirstOrDefault(x => x.CharacterName.Lower == profile.CharacterName.Lower && x.IsTemporary);
+        var permanentIdentifier = identifier.CreatePermanent();
+        profile.Characters.Clear();
+        profile.Characters.Add(permanentIdentifier); //warn: identifier must not be AnyWorld or stuff will break!
+
+        var existingProfile = Profiles.FirstOrDefault(p => p.Characters.Count == 1 && p.Characters[0].MatchesIgnoringOwnership(permanentIdentifier) && p.IsTemporary);
         if (existingProfile != null)
         {
-            _logger.Debug($"Temporary profile for {existingProfile.CharacterName} already exists, removing...");
+            _logger.Debug($"Temporary profile for {permanentIdentifier.Incognito(null)} already exists, removing...");
             Profiles.Remove(existingProfile);
             _event.Invoke(ProfileChanged.Type.TemporaryProfileDeleted, existingProfile, null);
         }
 
         Profiles.Add(profile);
 
-        //Make sure temporary profiles come first, so they are returned by all other methods first
-        Profiles.Sort((x, y) => y.IsTemporary.CompareTo(x.IsTemporary));
-
-        _logger.Debug($"Added temporary profile for {identifier}");
+        _logger.Debug($"Added temporary profile for {permanentIdentifier}");
         _event.Invoke(ProfileChanged.Type.TemporaryProfileAdded, profile, null);
     }
 
     public void RemoveTemporaryProfile(Profile profile)
     {
+        if (!profile.IsTemporary)
+            return;
+
         if (!Profiles.Remove(profile))
             throw new ProfileNotFoundException();
 
-        _logger.Debug($"Removed temporary profile for {profile.CharacterName}");
+        _logger.Debug($"Removed temporary profile for {profile.Characters[0].Incognito(null)}");
 
         _event.Invoke(ProfileChanged.Type.TemporaryProfileDeleted, profile, null);
     }
@@ -453,7 +422,7 @@ public class ProfileManager : IDisposable
         if (!actor.Identifier(_actorManager, out var identifier))
             throw new ActorNotFoundException();
 
-        var profile = Profiles.FirstOrDefault(x => x.TemporaryActor == identifier && x.IsTemporary);
+        var profile = Profiles.FirstOrDefault(x => x.Characters.Count == 1 && x.Characters[0] == identifier && x.IsTemporary);
         if (profile == null)
             throw new ProfileNotFoundException();
 
@@ -461,21 +430,28 @@ public class ProfileManager : IDisposable
     }
 
     /// <summary>
-    /// Return profile by character name, does not return temporary profiles
+    /// Return profile by actor identifier, does not return temporary profiles.
     /// </summary>
-    /// <param name="name"></param>
-    /// <param name="enabledOnly"></param>
-    /// <returns></returns>
-    public Profile? GetProfileByCharacterName(string name, bool enabledOnly = false)
+    public Profile? GetProfileByActor(Actor actor, bool enabledOnly = false)
     {
-        if (string.IsNullOrWhiteSpace(name))
+        var actorIdentifier = actor.GetIdentifier(_actorManager);
+
+        if (!actorIdentifier.IsValid)
             return null;
 
-        var query = Profiles.Where(x => x.CharacterName == name);
+        var query = Profiles.Where(p => p.Characters.Any(x => x.MatchesIgnoringOwnership(actorIdentifier)) && !p.IsTemporary);
         if (enabledOnly)
             query = query.Where(x => x.Enabled);
 
-        return query.FirstOrDefault();
+        var profile = query.OrderByDescending(x => x.Priority).FirstOrDefault();
+
+        if (profile == null)
+            return null;
+
+        if (actorIdentifier.Type == IdentifierType.Owned && !actorIdentifier.IsOwnedByLocalPlayer())
+            return null;
+
+        return profile;
     }
 
     //todo: replace with dictionary
@@ -495,30 +471,35 @@ public class ProfileManager : IDisposable
         if (!actorIdentifier.IsValid)
             yield break;
 
-        var name = actorIdentifier.ToNameWithoutOwnerName();
-
-        if (name.IsNullOrWhitespace())
-            yield break;
-
         bool IsProfileAppliesToCurrentActor(Profile profile)
         {
             //default profile check is done later
             if (profile == DefaultProfile)
                 return false;
 
-            return profile.CharacterName.Text == name &&
-                (!profile.LimitLookupToOwnedObjects ||
-                    (actorIdentifier.Type == IdentifierType.Owned &&
-                    actorIdentifier.PlayerName == _actorManager.GetCurrentPlayer().PlayerName));
+            if (profile == DefaultLocalPlayerProfile)
+                return false;
+
+            if (actorIdentifier.Type == IdentifierType.Owned && !actorIdentifier.IsOwnedByLocalPlayer())
+                return false;
+
+            return profile.Characters.Any(x => x.MatchesIgnoringOwnership(actorIdentifier));
         }
 
         if (_templateEditorManager.IsEditorActive && _templateEditorManager.EditorProfile.Enabled && IsProfileAppliesToCurrentActor(_templateEditorManager.EditorProfile))
             yield return _templateEditorManager.EditorProfile;
 
-        foreach (var profile in Profiles)
+        foreach (var profile in Profiles.OrderByDescending(x => x.Priority))
         {
-            if (IsProfileAppliesToCurrentActor(profile) && profile.Enabled)
+            if(profile.Enabled && IsProfileAppliesToCurrentActor(profile))
                 yield return profile;
+        }
+
+        if (DefaultLocalPlayerProfile != null && DefaultLocalPlayerProfile.Enabled)
+        {
+            var currentPlayer = _actorManager.GetCurrentPlayer();
+            if(_objectManager.IsInLobby || (currentPlayer.IsValid && currentPlayer.Matches(actorIdentifier)))
+                yield return DefaultLocalPlayerProfile;
         }
 
         if (DefaultProfile != null &&
@@ -532,7 +513,7 @@ public class ProfileManager : IDisposable
         if (template == null)
             yield break;
 
-        foreach (var profile in Profiles)
+        foreach (var profile in Profiles.OrderByDescending(x => x.Priority))
             if (profile.Templates.Contains(template))
                 yield return profile;
 
@@ -612,7 +593,7 @@ public class ProfileManager : IDisposable
             if (!Profiles.Remove(profile))
                 return;
 
-            _logger.Debug($"ProfileManager.OnArmatureChange: Removed unused temporary profile for {profile.CharacterName}");
+            _logger.Debug($"ProfileManager.OnArmatureChange: Removed unused temporary profile for {profile.Characters[0].Incognito(null)}");
 
             _event.Invoke(ProfileChanged.Type.TemporaryProfileDeleted, profile, null);
         }

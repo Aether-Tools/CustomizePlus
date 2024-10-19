@@ -46,7 +46,7 @@ public partial class CustomizePlusIpc
             .Select(x =>
             {
                 string path = _profileFileSystem.FindLeaf(x, out var leaf) ? leaf.FullName() : x.Name.Text;
-                return (x.UniqueId, x.Name.Text, path, x.CharacterName.Text, x.Enabled);
+                return (x.UniqueId, x.Name.Text, path, x.Characters.Count > 0 ? x.Characters[0].ToNameWithoutOwnerName() : "", x.Enabled); //todo: proper update to v5
             })
             .ToList();
     }
@@ -134,7 +134,7 @@ public partial class CustomizePlusIpc
         if (actor == null || !actor.Value.Valid || !actor.Value.IsCharacter)
             return ((int)ErrorCode.InvalidCharacter, null);
 
-        var profile = _profileManager.GetProfileByCharacterName(actor.Value.Utf8Name.ToString(), true);
+        var profile = _profileManager.GetProfileByActor(actor.Value, true);
 
         if (profile == null)
             return ((int)ErrorCode.ProfileNotFound, null);
@@ -261,12 +261,10 @@ public partial class CustomizePlusIpc
     //warn: intended limitation - ignores default profiles because why you would use default profile on your own character
     private void OnArmatureChanged(ArmatureChanged.Type type, Armature armature, object? arg3)
     {
-        string currentPlayerName = _gameObjectService.GetCurrentPlayerName();
-
-        if (armature.ActorIdentifier.ToNameWithoutOwnerName() != currentPlayerName)
+        if (armature.ActorIdentifier != _gameObjectService.GetCurrentPlayerActorIdentifier())
             return;
 
-        if (armature.ActorIdentifier.HomeWorld == WorldId.AnyWorld) //Cutscene/GPose actors
+        if (armature.ActorIdentifier.HomeWorld == WorldId.AnyWorld) //Only Cutscene/GPose actors have world set to AnyWorld
             return;
 
         ICharacter? localPlayerCharacter = (ICharacter?)_gameObjectService.GetDalamudGameObjectFromActor(_gameObjectService.GetLocalPlayerActor());
@@ -285,24 +283,12 @@ public partial class CustomizePlusIpc
             else
                 (activeProfile, oldProfile) = ((Profile?, Profile?))arg3;
 
-            if (activeProfile != null)
-            {
-                if (activeProfile == _profileManager.DefaultProfile || activeProfile.ProfileType == ProfileType.Editor)
-                {
-                    //ignore any changes while player is in editor or if player changes between default profiles
-                    //also do not send event if there were no active profile before
-                    if (activeProfile == oldProfile || oldProfile == null)
-                        return;
+            //do not send event if we are entering editor
+            if (activeProfile != null && activeProfile.ProfileType == ProfileType.Editor)
+                return;
 
-                    OnProfileUpdateInternal(localPlayerCharacter, null); //send empty profile when player enters editor or turns on default profile
-                    return;
-                }
-            }
-
-            //do not send event if we are exiting editor or disabling default profile and don't have any active profile
-            if (oldProfile != null &&
-                (oldProfile == _profileManager.DefaultProfile || oldProfile.ProfileType == ProfileType.Editor) &&
-                activeProfile == null)
+            //do not send event if we are exiting editor
+            if (oldProfile != null && oldProfile.ProfileType == ProfileType.Editor)
                 return;
 
             OnProfileUpdateInternal(localPlayerCharacter, activeProfile);
@@ -311,8 +297,9 @@ public partial class CustomizePlusIpc
 
         if (type == ArmatureChanged.Type.Deleted)
         {
-            //Do not send event if default or editor profile was used
-            if (armature.Profile == _profileManager.DefaultProfile || armature.Profile.ProfileType == ProfileType.Editor) //todo: never send if ProfileType != normal?
+            //Do not send event if editor profile was used
+            //todo: never send if ProfileType != normal?
+            if (armature.Profile.ProfileType == ProfileType.Editor)
                 return;
 
             OnProfileUpdateInternal(localPlayerCharacter, null);

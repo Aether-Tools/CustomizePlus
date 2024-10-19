@@ -63,7 +63,7 @@ public class StateMonitoringTab
 
     private void DrawProfiles()
     {
-        foreach (var profile in _profileManager.Profiles.OrderByDescending(x => x.Enabled))
+        foreach (var profile in _profileManager.Profiles.OrderByDescending(x => x.Enabled).ThenByDescending(x => x.Priority))
         {
             DrawSingleProfile("root", profile);
             ImGui.Spacing();
@@ -134,14 +134,14 @@ public class StateMonitoringTab
     private void DrawSingleProfile(string prefix, Profile profile)
     {
         string name = profile.Name;
-        string characterName = profile.CharacterName;
+        string characterName = string.Join(',', profile.Characters.Select(x => x.ToNameWithoutOwnerName().Incognify()));
 
 #if INCOGNIFY_STRINGS
         name = name.Incognify();
-        characterName = characterName.Incognify();
+        //characterName = characterName.Incognify();
 #endif
 
-        var show = ImGui.CollapsingHeader($"[{(profile.Enabled ? "E" : "D")}] {name} on {characterName} [{profile.ProfileType}] [{profile.UniqueId}]###{prefix}-profile-{profile.UniqueId}");
+        var show = ImGui.CollapsingHeader($"[{(profile.Enabled ? "E" : "D")}] [P:{profile.Priority}] {name} on {characterName} [{profile.ProfileType}] [{profile.UniqueId}]###{prefix}-profile-{profile.UniqueId}");
 
         if (!show)
             return;
@@ -149,7 +149,6 @@ public class StateMonitoringTab
         ImGui.Text($"ID: {profile.UniqueId}");
         ImGui.Text($"Enabled: {(profile.Enabled ? "Enabled" : "Disabled")}");
         ImGui.Text($"State : {(profile.IsTemporary ? "Temporary" : "Permanent")}");
-        ImGui.Text($"Lookup: {(profile.LimitLookupToOwnedObjects ? "Limited lookup" : "Global lookup")}");
         var showTemplates = ImGui.CollapsingHeader($"Templates###{prefix}-profile-{profile.UniqueId}-templates");
 
         if (showTemplates)

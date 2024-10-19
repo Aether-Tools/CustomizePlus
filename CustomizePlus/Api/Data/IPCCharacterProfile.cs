@@ -1,5 +1,7 @@
 ﻿using CustomizePlus.Configuration.Data.Version3;
 using CustomizePlus.Core.Data;
+using CustomizePlus.Game.Services;
+using CustomizePlus.GameData.Extensions;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Templates.Data;
 using System;
@@ -16,14 +18,18 @@ namespace CustomizePlus.Api.Data;
 /// </summary>
 public class IPCCharacterProfile
 {
+    /// <summary>
+    /// Used only for display purposes
+    /// </summary>
     public string CharacterName { get; set; } = "Invalid";
+
     public Dictionary<string, IPCBoneTransform> Bones { get; init; } = new();
 
     public static IPCCharacterProfile FromFullProfile(Profile profile)
     {
         var ipcProfile = new IPCCharacterProfile
         {
-            CharacterName = profile.CharacterName,
+            CharacterName = profile.Characters.FirstOrDefault().ToNameWithoutOwnerName(),
             Bones = new Dictionary<string, IPCBoneTransform>()
         };
 
@@ -47,12 +53,11 @@ public class IPCCharacterProfile
     {
         var fullProfile = new Profile
         {
-            Name = $"{profile.CharacterName}'s IPC profile",
-            CharacterName = profile.CharacterName,
+            Name = $"IPC profile for {profile.CharacterName}",
+            //Character should be set manually
             CreationDate = DateTimeOffset.UtcNow,
             ModifiedDate = DateTimeOffset.UtcNow,
             Enabled = true,
-            LimitLookupToOwnedObjects = false,
             UniqueId = Guid.NewGuid(),
             Templates = new List<Template>(1),
             ProfileType = isTemporary ? Profiles.Enums.ProfileType.Temporary : Profiles.Enums.ProfileType.Normal

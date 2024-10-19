@@ -1,4 +1,7 @@
 ﻿using System;
+#if !DEBUG
+using System.Reflection;
+#endif
 using CustomizePlus.Api;
 using CustomizePlus.Core;
 using CustomizePlus.Core.Services;

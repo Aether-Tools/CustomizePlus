@@ -14,6 +14,8 @@ using CustomizePlus.Profiles.Data;
 using CustomizePlus.Configuration.Data;
 using Dalamud.Interface.ImGuiNotification;
 using CustomizePlus.GameData.Extensions;
+using System.Collections.Generic;
+using ECommons;
 
 namespace CustomizePlus.Core.Services;
 
@@ -168,8 +170,8 @@ public class CommandService : IDisposable
                     break;
             }
 
-            //todo: support for multiple profiles
             Profile? targetProfile = null;
+            List<Profile> profilesToDisable = new List<Profile>(_profileManager.Profiles.Count);
 
             characterName = subArgumentList[0].Trim();
             characterName = characterName switch
@@ -184,12 +186,24 @@ public class CommandService : IDisposable
             if (!isTurningOffAllProfiles)
             {
                 profileName = subArgumentList[1].Trim();
-                targetProfile = _profileManager.Profiles.FirstOrDefault(x => x.Name == profileName && x.Characters.Any(x => x.ToNameWithoutOwnerName() == characterName));
+                foreach(var profile in _profileManager.Profiles)
+                {
+                    if (!profile.Characters.Any(x => x.ToNameWithoutOwnerName() == characterName))
+                        continue;
+
+                    if (profile.Name != profileName)
+                    {
+                        profilesToDisable.Add(profile);
+                        continue;
+                    }
+
+                    targetProfile = profile;
+                }
             }
             else
-                targetProfile = _profileManager.Profiles.FirstOrDefault(x => x.Characters.Any(x => x.ToNameWithoutOwnerName() == characterName) && x.Enabled);
+                profilesToDisable = _profileManager.Profiles.Where(x => x.Characters.Any(x => x.ToNameWithoutOwnerName() == characterName) && x.Enabled).ToList();
 
-            if (targetProfile == null)
+            if (targetProfile == null || (isTurningOffAllProfiles && profilesToDisable.Count == 0))
             {
                 _chatService.PrintInChat(new SeStringBuilder()
                     .AddText("Cannot execute command because profile ")
@@ -218,6 +232,12 @@ public class CommandService : IDisposable
             }
             else
                 _profileManager.SetEnabled(targetProfile, !targetProfile.Enabled);
+
+            if(targetProfile.Enabled)
+            {
+                foreach (var profile in profilesToDisable)
+                    _profileManager.SetEnabled(profile, false);
+            }
 
             if (_pluginConfiguration.CommandSettings.PrintSuccessMessages)
                 _chatService.PrintInChat(new SeStringBuilder()

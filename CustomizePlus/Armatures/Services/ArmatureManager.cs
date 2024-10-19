@@ -464,15 +464,17 @@ public unsafe sealed class ArmatureManager : IDisposable
             if (!profile.Enabled && profile.Armatures.Count == 0)
                 return;
 
-            if (profile == _profileManager.DefaultProfile)
+            if (profile == _profileManager.DefaultProfile ||
+                profile == _profileManager.DefaultLocalPlayerProfile)
             {
                 foreach (var kvPair in Armatures)
                 {
                     var armature = kvPair.Value;
-                    if (armature.Profile == profile)
+                    if (armature.Profile == _profileManager.DefaultProfile || //not the best solution but w/e
+                        armature.Profile == _profileManager.DefaultLocalPlayerProfile)
                         armature.IsPendingProfileRebind = true;
 
-                    _logger.Debug($"ArmatureManager.OnProfileChange default profile toggled, planning rebind for armature {armature}");
+                    _logger.Debug($"ArmatureManager.OnProfileChange default/default local player profile toggled, planning rebind for armature {armature}");
                 }
 
                 return;

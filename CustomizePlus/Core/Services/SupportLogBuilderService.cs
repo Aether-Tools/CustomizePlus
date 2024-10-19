@@ -61,6 +61,7 @@ public class SupportLogBuilderService
         }
         sb.AppendLine("**Profiles**");
         sb.Append($"> **`Default profile:                `** {_profileManager.DefaultProfile?.ToString() ?? "None"}\n");
+        sb.Append($"> **`Default local player profile:   `** {_profileManager.DefaultLocalPlayerProfile?.ToString() ?? "None"}\n");
         sb.Append($"> **`Count:                          `** {_profileManager.Profiles.Count}\n");
         foreach (var profile in _profileManager.Profiles)
         {

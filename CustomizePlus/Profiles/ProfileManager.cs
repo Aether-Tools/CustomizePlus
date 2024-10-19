@@ -186,10 +186,6 @@ public partial class ProfileManager : IDisposable
 
         profile.Characters.Add(actorIdentifier);
 
-        //Called so all other active profiles for new character name get disabled
-        //saving is performed there
-        //SetEnabled(profile, profile.Enabled, true); //todo
-
         SaveProfile(profile);
 
         _logger.Debug($"Add character for profile {profile.UniqueId}.");
@@ -205,10 +201,6 @@ public partial class ProfileManager : IDisposable
             return;
 
         profile.Characters.Remove(actorIdentifier);
-
-        //Called so all other active profiles for new character name get disabled
-        //saving is performed there
-        //SetEnabled(profile, profile.Enabled, true); //todo
 
         SaveProfile(profile);
 
@@ -477,11 +469,6 @@ public partial class ProfileManager : IDisposable
         (actorIdentifier, _) = _gameObjectService.GetTrueActorForSpecialTypeActor(actorIdentifier);
 
         if (!actorIdentifier.IsValid)
-            yield break;
-
-        var name = actorIdentifier.ToNameWithoutOwnerName();
-
-        if (name.IsNullOrWhitespace())
             yield break;
 
         bool IsProfileAppliesToCurrentActor(Profile profile)

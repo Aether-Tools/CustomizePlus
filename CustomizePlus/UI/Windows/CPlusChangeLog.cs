@@ -49,6 +49,7 @@ public class CPlusChangeLog
         .RegisterEntry("The way console commands work has not changed. This means that the commands will affect profiles the same way as before, even if profile affects multiple characters.", 3)
         .RegisterEntry("\"Limit to my creatures\" option has been removed as it is now obsolete.", 2)
         .RegisterEntry("It is now possible to choose profile which will be applied to any character you login with.", 2)
+        .RegisterEntry("Minions should now correctly synchronize via Mare Synchronos.", 1)
 
         .RegisterHighlight("Added profile priority system.")
         .RegisterEntry("When several active profiles affect the same character, profile priority will be used to determine which profile will be applied to said character.", 1)
@@ -59,9 +60,11 @@ public class CPlusChangeLog
         .RegisterEntry("Added option to configure if Customize+ main window will be automatically opened when you launch the game or not.", 1)
 
         .RegisterImportant("IPC notes, developers only.")
-        .RegisterEntry("IPC version is now 5.2.", 1)
-        .RegisterEntry("I did not want to bump major version for IPC and break other plugins, so all IPC endpoints are acting as if there is still only one character per profile. This is open for discussion over at support discord.", 1)
+        .RegisterImportant("IPC version is now 6.0.", 1)
+        .RegisterEntry("Profile.GetList has been updated to include profile priority as well as list of characters with their metadata. Please refer to Customize+ IPC source code files for additional information.", 1)
         .RegisterEntry("Profile.OnUpdate event is now being triggered for profiles with \"Apply to all players and retainers\" and \"Apply to any character you are logged in with\" options enabled.", 1)
+        .RegisterEntry("Format of the profile json expected by Profile.SetTemporaryProfileOnCharacter has been updated: CharacterName field removed.", 1)
+        .RegisterEntry("Temporary profiles should now apply correctly to non-player characters like minions.", 1)
 
         .RegisterHighlight("Fixed issue when Customize+ did not detect changes in character skeleton. This mostly happened when altering character appearance via Glamourer and other plugins/tools.")
 

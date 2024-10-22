@@ -15,8 +15,6 @@ using ECommons.EzIpcManager;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
-using IPCProfileDataTuple = (System.Guid UniqueId, string Name, string VirtualPath, string CharacterName, bool IsEnabled);
 using OtterGui.Log;
 using CustomizePlus.Core.Extensions;
 using CustomizePlus.Configuration.Data;
@@ -215,7 +213,9 @@ public class IPCTestTab //: IDisposable
 
         if (ImGui.Button("Copy user profile list to clipboard"))
         {
-            ImGui.SetClipboardText(string.Join("\n", _getProfileListIpcFunc().Select(x => $"{x.UniqueId}, {x.Name}, {x.VirtualPath}, {x.CharacterName}, {x.IsEnabled}")));
+            ImGui.SetClipboardText(string.Join("\n", 
+                _getProfileListIpcFunc().Select(x => $"{x.UniqueId}, {x.Name}, {x.VirtualPath}," +
+                    $"|| {string.Join("|", x.Characters.Select(chr => $"{chr.Name}, {chr.WorldId}, {chr.CharacterType}, {chr.CharacterSubType}"))} ||, {x.Priority}, {x.IsEnabled}")));
             _popupSystem.ShowPopup(PopupSystem.Messages.IPCCopiedToClipboard);
         }
 

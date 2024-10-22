@@ -373,6 +373,12 @@ public partial class ProfileManager : IDisposable
         if (!actor.Identifier(_actorManager, out var identifier))
             throw new ActorNotFoundException();
 
+     /*   if (identifier.Type != IdentifierType.Player)
+        {
+            _logger.Warning($"Tried applying temporary profile to actor {identifier.Incognito(null)}. Temporary profiles can only be applied to players right now.");
+            return; //do not return error code as I plan to eventually fix this
+        }*/
+
         profile.Enabled = true;
         profile.ProfileType = ProfileType.Temporary;
         profile.Priority = int.MaxValue; //Make sure temporary profile is always at max priority
@@ -381,7 +387,7 @@ public partial class ProfileManager : IDisposable
         profile.Characters.Clear();
         profile.Characters.Add(permanentIdentifier); //warn: identifier must not be AnyWorld or stuff will break!
 
-        var existingProfile = Profiles.FirstOrDefault(p => p.Characters.Count == 1 && p.Characters[0].MatchesIgnoringOwnership(permanentIdentifier) && p.IsTemporary);
+        var existingProfile = Profiles.FirstOrDefault(p => p.Characters.Count == 1 && p.Characters[0].Matches(permanentIdentifier) && p.IsTemporary);
         if (existingProfile != null)
         {
             _logger.Debug($"Temporary profile for {permanentIdentifier.Incognito(null)} already exists, removing...");
@@ -439,6 +445,9 @@ public partial class ProfileManager : IDisposable
         if (!actorIdentifier.IsValid)
             return null;
 
+        if (actorIdentifier.Type == IdentifierType.Owned && !actorIdentifier.IsOwnedByLocalPlayer())
+            return null;
+
         var query = Profiles.Where(p => p.Characters.Any(x => x.MatchesIgnoringOwnership(actorIdentifier)) && !p.IsTemporary);
         if (enabledOnly)
             query = query.Where(x => x.Enabled);
@@ -446,9 +455,6 @@ public partial class ProfileManager : IDisposable
         var profile = query.OrderByDescending(x => x.Priority).FirstOrDefault();
 
         if (profile == null)
-            return null;
-
-        if (actorIdentifier.Type == IdentifierType.Owned && !actorIdentifier.IsOwnedByLocalPlayer())
             return null;
 
         return profile;
@@ -480,8 +486,13 @@ public partial class ProfileManager : IDisposable
             if (profile == DefaultLocalPlayerProfile)
                 return false;
 
-            if (actorIdentifier.Type == IdentifierType.Owned && !actorIdentifier.IsOwnedByLocalPlayer())
-                return false;
+            if (actorIdentifier.Type == IdentifierType.Owned)
+            {
+                if(profile.IsTemporary)
+                    return profile.Characters.Any(x => x.Matches(actorIdentifier));
+                else if(!actorIdentifier.IsOwnedByLocalPlayer())
+                    return false;
+            }
 
             return profile.Characters.Any(x => x.MatchesIgnoringOwnership(actorIdentifier));
         }

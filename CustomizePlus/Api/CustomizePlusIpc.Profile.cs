@@ -13,11 +13,8 @@ using CustomizePlus.Armatures.Data;
 using CustomizePlus.Armatures.Events;
 using CustomizePlus.GameData.Extensions;
 using Dalamud.Game.ClientState.Objects.Types;
-using Penumbra.GameData.Interop;
-
-//Virtual path is full path to the profile in the virtual folders created by user in the profile list UI
-using IPCProfileDataTuple = (System.Guid UniqueId, string Name, string VirtualPath, string CharacterName, bool IsEnabled);
 using Penumbra.GameData.Structs;
+using Penumbra.GameData.Enums;
 
 namespace CustomizePlus.Api;
 
@@ -46,7 +43,20 @@ public partial class CustomizePlusIpc
             .Select(x =>
             {
                 string path = _profileFileSystem.FindLeaf(x, out var leaf) ? leaf.FullName() : x.Name.Text;
-                return (x.UniqueId, x.Name.Text, path, x.Characters.Count > 0 ? x.Characters[0].ToNameWithoutOwnerName() : "", x.Enabled); //todo: proper update to v5
+                var charactersList = new List<IPCCharacterDataTuple>(x.Characters.Count);
+
+                foreach (var character in x.Characters)
+                {
+                    var tuple = new IPCCharacterDataTuple();
+                    tuple.Name = character.ToNameWithoutOwnerName();
+                    tuple.CharacterType = (byte)character.Type;
+                    tuple.WorldId = character.Type == IdentifierType.Player || character.Type == IdentifierType.Owned ? character.HomeWorld.Id : WorldId.AnyWorld.Id;
+                    tuple.CharacterSubType = character.Type == IdentifierType.Retainer ? (ushort)character.Retainer : (ushort)0;
+
+                    charactersList.Add(tuple);
+                }
+
+                return (x.UniqueId, x.Name.Text, path, charactersList, x.Priority, x.Enabled);
             })
             .ToList();
     }

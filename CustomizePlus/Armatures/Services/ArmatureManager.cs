@@ -563,12 +563,19 @@ public unsafe sealed class ArmatureManager : IDisposable
         profile!.Armatures.ForEach(x => x.IsPendingProfileRebind = true);
     }
 
+    /// <summary>
+    /// Warn: should not be used for temporary profiles as this limits search for Type = Owned to things owned by local player.
+    /// </summary>
     private IEnumerable<Armature> GetArmaturesForCharacter(ActorIdentifier actorIdentifier)
     {
         foreach (var kvPair in Armatures)
         {
             (var armatureActorIdentifier, _) = _gameObjectService.GetTrueActorForSpecialTypeActor(kvPair.Key);
 
+            //warn: side-effect: for Type = Owned will ignore owner.
+            //This isn't a particularly huge issue as this is only used for profile rebinding, but this probably should be handled better later.
+            /*if (actorIdentifier.IsValid && armatureActorIdentifier.MatchesIgnoringOwnership(actorIdentifier))
+                yield return kvPair.Value;*/
             if (actorIdentifier.IsValid && armatureActorIdentifier.MatchesIgnoringOwnership(actorIdentifier) &&
                 (armatureActorIdentifier.Type != IdentifierType.Owned || armatureActorIdentifier.IsOwnedByLocalPlayer()))
                 yield return kvPair.Value;

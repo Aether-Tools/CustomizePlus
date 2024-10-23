@@ -19,11 +19,14 @@ using OtterGui.Log;
 using CustomizePlus.Core.Extensions;
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Api.Data;
+using CustomizePlus.GameData.Extensions;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 
 public class IPCTestTab //: IDisposable
 {
+    private const string _ownedTesProfile = "{\"Bones\":{\"n_root\":{\"Translation\":{\"X\":0.0,\"Y\":0.0,\"Z\":0.0},\"Rotation\":{\"X\":0.0,\"Y\":0.0,\"Z\":0.0},\"Scaling\":{\"X\":2.0,\"Y\":2.0,\"Z\":2.0}}}}";
+
     private readonly IObjectTable _objectTable;
     private readonly ProfileManager _profileManager;
     private readonly PopupSystem _popupSystem;
@@ -124,6 +127,42 @@ public class IPCTestTab //: IDisposable
         {
             _validResult = _isValidIpcFunc();
             _lastValidCheckAt = DateTime.UtcNow;
+        }
+
+        ImGui.Separator();
+
+        if (ImGui.Button("Owned Actors Temporary Profile Test"))
+        {
+            bool found = false;
+            foreach(var obj  in _objectManager)
+            {
+                if (!obj.Identifier(_actorManager, out var ownedIdent) ||
+                    ownedIdent.Type != Penumbra.GameData.Enums.IdentifierType.Owned ||
+                    ownedIdent.IsOwnedByLocalPlayer())
+                    continue;
+
+                found = true;
+
+                (int result, Guid? profileGuid) = _setTemporaryProfileOnCharacterIpcFunc(obj.Index.Index, _ownedTesProfile);
+                if (result == 0)
+                {
+                    _popupSystem.ShowPopup(PopupSystem.Messages.IPCSetProfileToChrDone);
+                    _logger.Information($"Temporary profile id: {profileGuid} on {ownedIdent}");
+                }
+                else
+                {
+                    _logger.Error($"Error code {result} while calling SetTemporaryProfileOnCharacter");
+                    _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+                }
+
+                break;
+            }
+
+            if(!found)
+            {
+                _logger.Error($"No characters found for Owned Test");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
         }
 
         ImGui.Separator();

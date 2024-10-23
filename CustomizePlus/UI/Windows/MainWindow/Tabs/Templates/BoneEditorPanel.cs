@@ -101,7 +101,21 @@ public class BoneEditorPanel
 
         using (var style = ImRaii.PushStyle(ImGuiStyleVar.ButtonTextAlign, new Vector2(0, 0.5f)))
         {
-            var isShouldDraw = ImGui.CollapsingHeader("Preview settings");
+            string characterText = null!;
+
+            if (_templateFileSystemSelector.IncognitoMode)
+                characterText = "Previewing on: incognito active";
+            else
+                characterText = _editorManager.Character.IsValid ? $"Previewing on: {(_editorManager.Character.Type == Penumbra.GameData.Enums.IdentifierType.Owned ?
+                _editorManager.Character.ToNameWithoutOwnerName() : _editorManager.Character.ToString())}" : "No valid character selected";
+
+            ImGuiUtil.PrintIcon(FontAwesomeIcon.User);
+            ImGui.SameLine();
+            ImGui.Text(characterText);
+
+            ImGui.Separator();
+
+            var isShouldDraw = ImGui.CollapsingHeader("Change preview character");
 
             if (isShouldDraw)
             {
@@ -111,10 +125,6 @@ public class BoneEditorPanel
                 {
                     if (!_templateFileSystemSelector.IncognitoMode)
                     {
-                        ImGui.Text(_editorManager.Character.IsValid ? $"Applies to {(_editorManager.Character.Type == Penumbra.GameData.Enums.IdentifierType.Owned ? 
-                            _editorManager.Character.ToNameWithoutOwnerName() : _editorManager.Character.ToString())}" : "No valid character selected");
-                        ImGui.Separator();
-
                         _actorAssignmentUi.DrawWorldCombo(width.X / 2);
                         ImGui.SameLine();
                         _actorAssignmentUi.DrawPlayerInput(width.X / 2);

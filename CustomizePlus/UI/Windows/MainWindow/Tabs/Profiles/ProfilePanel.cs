@@ -154,10 +154,14 @@ public class ProfilePanel
 
             ImGui.Separator();
 
-            var isShouldDraw = ImGui.CollapsingHeader("Character settings");
+            var isShouldDraw = ImGui.CollapsingHeader("Add character");
 
             if (isShouldDraw)
-                DrawCharacterArea();
+                DrawAddCharactersArea();
+
+            ImGui.Separator();
+
+            DrawCharacterListArea();
 
             ImGui.Separator();
 
@@ -242,7 +246,7 @@ public class ProfilePanel
         }
     }
 
-    private void DrawCharacterArea()
+    private void DrawAddCharactersArea()
     {
         using (var style = ImRaii.PushStyle(ImGuiStyleVar.ButtonTextAlign, new Vector2(0, 0.5f)))
         {
@@ -285,122 +289,128 @@ public class ProfilePanel
                 if (ImGuiUtil.DrawDisabledButton("Apply to selected NPC", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetNpc))
                     _manager.AddCharacter(_selector.Selected!, _actorAssignmentUi.NpcIdentifier);
             }
+        }
+    }
 
-            ImGui.Separator();
+    private void DrawCharacterListArea()
+    {
+        var isDefaultLP = _manager.DefaultLocalPlayerProfile == _selector.Selected;
+        var isDefaultLPOrCurrentProfilesEnabled = (_manager.DefaultLocalPlayerProfile?.Enabled ?? false) || (_selector.Selected?.Enabled ?? false);
+        using (ImRaii.Disabled(isDefaultLPOrCurrentProfilesEnabled))
+        {
+            if (ImGui.Checkbox("##DefaultLocalPlayerProfile", ref isDefaultLP))
+                _manager.SetDefaultLocalPlayerProfile(isDefaultLP ? _selector.Selected! : null);
+            ImGuiUtil.LabeledHelpMarker("Apply to any character you are logged in with",
+                "Whether the templates in this profile should be applied to any character you are currently logged in with.\r\nTakes priority over the next option for said character.\r\nThis setting cannot be applied to multiple profiles.");
+        }
+        if (isDefaultLPOrCurrentProfilesEnabled)
+        {
+            ImGui.SameLine();
+            ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Warning);
+            ImGuiUtil.PrintIcon(FontAwesomeIcon.ExclamationTriangle);
+            ImGui.PopStyleColor();
+            ImGuiUtil.HoverTooltip("Can only be changed when both currently selected and profile where this checkbox is checked are disabled.");
+        }
 
-            var isDefaultLP = _manager.DefaultLocalPlayerProfile == _selector.Selected;
-            var isDefaultLPOrCurrentProfilesEnabled = (_manager.DefaultLocalPlayerProfile?.Enabled ?? false) || (_selector.Selected?.Enabled ?? false);
-            using (ImRaii.Disabled(isDefaultLPOrCurrentProfilesEnabled))
+        ImGui.SameLine();
+        using(ImRaii.Disabled(true))
+            ImGui.Button("##splitter", new Vector2(1, ImGui.GetFrameHeight()));
+        ImGui.SameLine();
+
+        var isDefault = _manager.DefaultProfile == _selector.Selected;
+        var isDefaultOrCurrentProfilesEnabled = (_manager.DefaultProfile?.Enabled ?? false) || (_selector.Selected?.Enabled ?? false);
+        using (ImRaii.Disabled(isDefaultOrCurrentProfilesEnabled))
+        {
+            if (ImGui.Checkbox("##DefaultProfile", ref isDefault))
+                _manager.SetDefaultProfile(isDefault ? _selector.Selected! : null);
+            ImGuiUtil.LabeledHelpMarker("Apply to all players and retainers",
+                "Whether the templates in this profile are applied to all players and retainers without a specific profile.\r\nThis setting cannot be applied to multiple profiles.");
+        }
+        if (isDefaultOrCurrentProfilesEnabled)
+        {
+            ImGui.SameLine();
+            ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Warning);
+            ImGuiUtil.PrintIcon(FontAwesomeIcon.ExclamationTriangle);
+            ImGui.PopStyleColor();
+            ImGuiUtil.HoverTooltip("Can only be changed when both currently selected and profile where this checkbox is checked are disabled.");
+        }
+        bool appliesToMultiple = _manager.DefaultProfile == _selector.Selected || _manager.DefaultLocalPlayerProfile == _selector.Selected;
+
+        ImGui.Separator();
+
+        using var dis = ImRaii.Disabled(appliesToMultiple);
+        using var table = ImRaii.Table("CharacterTable", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollX | ImGuiTableFlags.ScrollY, new Vector2(ImGui.GetContentRegionAvail().X, 200));
+        if (!table)
+            return;
+
+        ImGui.TableSetupColumn("##charaDel", ImGuiTableColumnFlags.WidthFixed, ImGui.GetFrameHeight());
+        ImGui.TableSetupColumn("Character", ImGuiTableColumnFlags.WidthFixed, 320 * ImGuiHelpers.GlobalScale);
+        ImGui.TableHeadersRow();
+
+        if (appliesToMultiple)
+        {
+            ImGui.TableNextColumn();
+            ImGui.TableNextColumn();
+            ImGui.AlignTextToFramePadding();
+            ImGui.TextUnformatted("Applies to multiple targets");
+            return;
+        }
+
+        //warn: .ToList() might be performance critical at some point
+        //the copying via ToList is done because manipulations with .Templates list result in "Collection was modified" exception here
+        var charas = _selector.Selected!.Characters.WithIndex().ToList();
+
+        if (charas.Count == 0)
+        {
+            ImGui.TableNextColumn();
+            ImGui.TableNextColumn();
+            ImGui.AlignTextToFramePadding();
+            ImGui.TextUnformatted("No characters are associated with this profile");
+        }
+
+        foreach (var (character, idx) in charas)
+        {
+            using var id = ImRaii.PushId(idx);
+            ImGui.TableNextColumn();
+            var keyValid = _configuration.UISettings.DeleteTemplateModifier.IsActive();
+            var tt = keyValid
+                ? "Remove this character from the profile."
+                : $"Remove this character from the profile.\nHold {_configuration.UISettings.DeleteTemplateModifier} to remove.";
+
+            if (ImGuiUtil.DrawDisabledButton(FontAwesomeIcon.Trash.ToIconString(), new Vector2(ImGui.GetFrameHeight()), tt, !keyValid, true))
+                _endAction = () => _manager.DeleteCharacter(_selector.Selected!, character);
+            ImGui.TableNextColumn();
+            ImGui.AlignTextToFramePadding();
+            ImGui.TextUnformatted(!_selector.IncognitoMode ? $"{character.ToNameWithoutOwnerName()}{character.TypeToString()}" : "Incognito");
+
+            var profiles = _manager.GetEnabledProfilesByActor(character).ToList();
+            if (profiles.Count > 1)
             {
-                if (ImGui.Checkbox("##DefaultLocalPlayerProfile", ref isDefaultLP))
-                    _manager.SetDefaultLocalPlayerProfile(isDefaultLP ? _selector.Selected! : null);
-                ImGuiUtil.LabeledHelpMarker("Apply to any character you are logged in with",
-                    "Whether the templates in this profile should be applied to any character you are currently logged in with.\r\nTakes priority over the next option for said character.\r\nThis setting cannot be applied to multiple profiles.");
-            }
-            if (isDefaultLPOrCurrentProfilesEnabled)
-            {
+                //todo: make helper
                 ImGui.SameLine();
-                ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Warning);
-                ImGuiUtil.PrintIcon(FontAwesomeIcon.ExclamationTriangle);
-                ImGui.PopStyleColor();
-                ImGuiUtil.HoverTooltip("Can only be changed when both currently selected and profile where this checkbox is checked are disabled.");
-            }
-
-            var isDefault = _manager.DefaultProfile == _selector.Selected;
-            var isDefaultOrCurrentProfilesEnabled = (_manager.DefaultProfile?.Enabled ?? false) || (_selector.Selected?.Enabled ?? false);
-            using (ImRaii.Disabled(isDefaultOrCurrentProfilesEnabled))
-            {
-                if (ImGui.Checkbox("##DefaultProfile", ref isDefault))
-                    _manager.SetDefaultProfile(isDefault ? _selector.Selected! : null);
-                ImGuiUtil.LabeledHelpMarker("Apply to all players and retainers",
-                    "Whether the templates in this profile are applied to all players and retainers without a specific profile.\r\nThis setting cannot be applied to multiple profiles.");
-            }
-            if (isDefaultOrCurrentProfilesEnabled)
-            {
-                ImGui.SameLine();
-                ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Warning);
-                ImGuiUtil.PrintIcon(FontAwesomeIcon.ExclamationTriangle);
-                ImGui.PopStyleColor();
-                ImGuiUtil.HoverTooltip("Can only be changed when both currently selected and profile where this checkbox is checked are disabled.");
-            }
-
-            ImGui.Separator();
-
-            using var dis = ImRaii.Disabled(appliesToMultiple);
-            using var table = ImRaii.Table("CharacterTable", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.ScrollX | ImGuiTableFlags.ScrollY, new Vector2(ImGui.GetContentRegionAvail().X, 150));
-            if (!table)
-                return;
-
-            ImGui.TableSetupColumn("##charaDel", ImGuiTableColumnFlags.WidthFixed, ImGui.GetFrameHeight());
-            ImGui.TableSetupColumn("Character", ImGuiTableColumnFlags.WidthFixed, 320 * ImGuiHelpers.GlobalScale);
-            ImGui.TableHeadersRow();
-
-            if(appliesToMultiple)
-            {
-                ImGui.TableNextColumn();
-                ImGui.TableNextColumn();
-                ImGui.AlignTextToFramePadding();
-                ImGui.TextUnformatted("Applies to multiple targets");
-                return;
-            }
-
-
-            //warn: .ToList() might be performance critical at some point
-            //the copying via ToList is done because manipulations with .Templates list result in "Collection was modified" exception here
-            var charas = _selector.Selected!.Characters.WithIndex().ToList();
-
-            if (charas.Count == 0)
-            {
-                ImGui.TableNextColumn();
-                ImGui.TableNextColumn();
-                ImGui.AlignTextToFramePadding();
-                ImGui.TextUnformatted("No characters are associated with this profile");
-            }
-
-            foreach (var (character, idx) in charas)
-            {
-                using var id = ImRaii.PushId(idx);
-                ImGui.TableNextColumn();
-                var keyValid = _configuration.UISettings.DeleteTemplateModifier.IsActive();
-                var tt = keyValid
-                    ? "Remove this character from the profile."
-                    : $"Remove this character from the profile.\nHold {_configuration.UISettings.DeleteTemplateModifier} to remove.";
-
-                if (ImGuiUtil.DrawDisabledButton(FontAwesomeIcon.Trash.ToIconString(), new Vector2(ImGui.GetFrameHeight()), tt, !keyValid, true))
-                    _endAction = () => _manager.DeleteCharacter(_selector.Selected!, character);
-                ImGui.TableNextColumn();
-                ImGui.AlignTextToFramePadding();
-                ImGui.TextUnformatted(!_selector.IncognitoMode ? $"{character.ToNameWithoutOwnerName()}{character.TypeToString()}" : "Incognito");
-
-                var profiles = _manager.GetEnabledProfilesByActor(character).ToList();
-                if (profiles.Count > 1)
+                if (profiles.Any(x => x.IsTemporary))
                 {
-                    //todo: make helper
-                    ImGui.SameLine();
-                    if(profiles.Any(x => x.IsTemporary))
-                    {
-                        ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Error);
-                        ImGuiUtil.PrintIcon(FontAwesomeIcon.Lock);
-                    }
-                    else if (profiles[0] != _selector.Selected!)
-                    {
-                        ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Warning);
-                        ImGuiUtil.PrintIcon(FontAwesomeIcon.ExclamationTriangle);
-                    }
-                    else
-                    {
-                        ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Info);
-                        ImGuiUtil.PrintIcon(FontAwesomeIcon.Star);
-                    }
-
-                    ImGui.PopStyleColor();
-
-                    if (profiles.Any(x => x.IsTemporary))
-                        ImGuiUtil.HoverTooltip("This character is being affected by temporary profile set by external plugin. This profile will not be applied!");
-                    else
-                        ImGuiUtil.HoverTooltip(profiles[0] != _selector.Selected! ? "Several profiles are trying to affect this character. This profile will not be applied!" :
-                            "Several profiles are trying to affect this character. This profile is being applied.");
+                    ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Error);
+                    ImGuiUtil.PrintIcon(FontAwesomeIcon.Lock);
                 }
+                else if (profiles[0] != _selector.Selected!)
+                {
+                    ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Warning);
+                    ImGuiUtil.PrintIcon(FontAwesomeIcon.ExclamationTriangle);
+                }
+                else
+                {
+                    ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Info);
+                    ImGuiUtil.PrintIcon(FontAwesomeIcon.Star);
+                }
+
+                ImGui.PopStyleColor();
+
+                if (profiles.Any(x => x.IsTemporary))
+                    ImGuiUtil.HoverTooltip("This character is being affected by temporary profile set by external plugin. This profile will not be applied!");
+                else
+                    ImGuiUtil.HoverTooltip(profiles[0] != _selector.Selected! ? "Several profiles are trying to affect this character. This profile will not be applied!" :
+                        "Several profiles are trying to affect this character. This profile is being applied.");
             }
         }
 

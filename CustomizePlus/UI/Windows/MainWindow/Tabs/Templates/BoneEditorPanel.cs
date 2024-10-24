@@ -307,7 +307,7 @@ public class BoneEditorPanel
                         ImGui.TableNextRow();
                         foreach (var erp in boneGroup.OrderBy(x => BoneData.GetBoneRanking(x.BoneCodeName)))
                         {
-                            CompleteBoneEditor(erp);
+                            CompleteBoneEditor(boneGroup.Key, erp);
                         }
                     }
 
@@ -447,7 +447,7 @@ public class BoneEditorPanel
         return false;
     }
 
-    private void CompleteBoneEditor(EditRowParams bone)
+    private void CompleteBoneEditor(BoneData.BoneFamily boneFamily, EditRowParams bone)
     {
         var codename = bone.BoneCodeName;
         var displayName = bone.BoneDisplayName;
@@ -499,6 +499,20 @@ public class BoneEditorPanel
 
         //----------------------------------
         ImGui.TableNextColumn();
+
+        if((BoneData.IsIVCSCompatibleBone(codename) || boneFamily == BoneData.BoneFamily.Unknown)
+            && !codename.StartsWith("j_f_"))
+        {
+            ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Warning);
+            ImGuiUtil.PrintIcon(FontAwesomeIcon.Wrench);
+            ImGui.PopStyleColor();
+            CtrlHelper.AddHoverText("This is a bone from modded skeleton." +
+                "\r\nIMPORTANT: The Customize+ team does not provide support for issues related to these bones." +
+                "\r\nThese bones need special clothing and body mods designed specifically for them." +
+                "\r\nEven if they are intended for these bones, not all clothing mods will support every bone." +
+                "\r\nIf you experience issues, try performing the same actions using posing tools.");
+            ImGui.SameLine();
+        }
         CtrlHelper.StaticLabel(displayName, CtrlHelper.TextAlignment.Left, BoneData.IsIVCSCompatibleBone(codename) ? $"(IVCS Compatible) {codename}" : codename);
 
         if (flagUpdate)

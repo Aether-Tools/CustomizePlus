@@ -59,6 +59,9 @@ public class CPlusChangeLog
         .RegisterEntry("Added option to configure if Customize+ windows will be hidden when you enter GPose or not.", 1)
         .RegisterEntry("Added option to configure if Customize+ main window will be automatically opened when you launch the game or not.", 1)
 
+        .RegisterImportant("Added warning for custom skeleton bones. If you custom skeleton installed - read it. Seriously. It's a wrench icon near those bones.")
+        .RegisterEntry("Added warning for testing builds.")
+
         .RegisterImportant("IPC notes, developers only.")
         .RegisterImportant("IPC version is now 6.0.", 1)
         .RegisterEntry("Profile.GetList has been updated to include profile priority as well as list of characters with their metadata. Please refer to Customize+ IPC source code files for additional information.", 1)

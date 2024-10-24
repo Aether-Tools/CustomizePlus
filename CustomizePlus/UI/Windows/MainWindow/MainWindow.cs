@@ -19,6 +19,7 @@ using Dalamud.Interface.Colors;
 using CustomizePlus.Templates.Events;
 using CustomizePlus.Templates.Data;
 using ECommons.Schedulers;
+using CustomizePlus.Core.Helpers;
 
 namespace CustomizePlus.UI.Windows.MainWindow;
 
@@ -59,7 +60,7 @@ public class MainWindow : Window, IDisposable
         PluginConfiguration configuration,
         HookingService hookingService,
         TemplateEditorEvent templateEditorEvent
-        ) : base($"Customize+ {Plugin.Version}###CPlusMainWindow")
+        ) : base($"Customize+ {VersionHelper.Version}###CPlusMainWindow")
     {
         _settingsTab = settingsTab;
         _templatesTab = templatesTab;

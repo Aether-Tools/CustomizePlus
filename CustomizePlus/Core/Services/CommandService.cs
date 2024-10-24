@@ -219,6 +219,7 @@ public class CommandService : IDisposable
             {
                 if (state != null)
                 {
+                    //todo: still check and disable other profiles in this case?
                     if (targetProfile!.Enabled == state)
                     {
                         _chatService.PrintInChat(new SeStringBuilder()

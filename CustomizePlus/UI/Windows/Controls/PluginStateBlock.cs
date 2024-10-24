@@ -38,6 +38,7 @@ public class PluginStateBlock
     {
         var severity = PluginStateSeverity.Normal;
         string? message = null;
+        string? hoverInfo = null;
 
         if(_hookingService.RenderHookFailed || _hookingService.MovementHookFailed)
         {
@@ -74,6 +75,12 @@ public class PluginStateBlock
             severity = PluginStateSeverity.Error;
             message = $"Detected failure in IPC. Integrations with other plugins will not function.";
         }
+        else if(VersionHelper.IsTesting)
+        {
+            severity = PluginStateSeverity.Warning;
+            message = $"You are running testing version of Customize+, hover for more information.";
+            hoverInfo = "This is a testing build of Customize+. Some features like integration with other plugins might not function correctly.";
+        }
 
         if (message != null)
         {
@@ -96,6 +103,8 @@ public class PluginStateBlock
             ImGui.PushStyleColor(ImGuiCol.Text, color);
             CtrlHelper.LabelWithIcon(icon, message, false);
             ImGui.PopStyleColor();
+            if (hoverInfo != null)
+                CtrlHelper.AddHoverText(hoverInfo);
         }
     }
 

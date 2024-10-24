@@ -5,6 +5,7 @@ using CustomizePlus.Armatures.Services;
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Extensions;
+using CustomizePlus.Core.Helpers;
 using CustomizePlus.Profiles;
 using CustomizePlus.Templates;
 using Dalamud.Plugin;
@@ -38,7 +39,7 @@ public class SupportLogBuilderService
     {
         var sb = new StringBuilder(102400); //it's fair to assume this will very often be quite large
         sb.AppendLine("**Settings**");
-        sb.Append($"> **`Plugin Version:                 `** {Plugin.Version}\n");
+        sb.Append($"> **`Plugin Version:                 `** {VersionHelper.Version}\n");
         sb.Append($"> **`Commit Hash:                    `** {ThisAssembly.Git.Commit}+{ThisAssembly.Git.Sha}\n");
         sb.Append($"> **`Plugin enabled:                 `** {_configuration.PluginEnabled}\n");
         sb.AppendLine("**Settings -> Editor Settings**");

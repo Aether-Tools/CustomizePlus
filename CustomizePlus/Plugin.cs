@@ -1,9 +1,7 @@
 ﻿using System;
-#if !DEBUG
-using System.Reflection;
-#endif
 using CustomizePlus.Api;
 using CustomizePlus.Core;
+using CustomizePlus.Core.Helpers;
 using CustomizePlus.Core.Services;
 using CustomizePlus.UI;
 using Dalamud.Plugin;
@@ -16,12 +14,6 @@ namespace CustomizePlus;
 
 public sealed class Plugin : IDalamudPlugin
 {
-#if DEBUG
-    public static readonly string Version = $"{ThisAssembly.Git.Commit}+{ThisAssembly.Git.Sha} [DEBUG]";
-#else
-    public static readonly string Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? string.Empty;
-#endif
-
     private readonly ServiceManager _services;
 
     public static readonly Logger Logger = new(); //for loggin in static classes/methods
@@ -40,7 +32,7 @@ public sealed class Plugin : IDalamudPlugin
             _services.GetService<CPlusWindowSystem>();
             _services.GetService<CommandService>();
 
-            Logger.Information($"Customize+ {Version} ({ThisAssembly.Git.Commit}+{ThisAssembly.Git.Sha}) [FantasiaPlus] started");
+            Logger.Information($"Customize+ {VersionHelper.Version} ({ThisAssembly.Git.Commit}+{ThisAssembly.Git.Sha}) [FantasiaPlus] started");
         }
         catch (Exception ex)
         {

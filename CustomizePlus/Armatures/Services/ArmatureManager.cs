@@ -534,8 +534,24 @@ public unsafe sealed class ArmatureManager : IDisposable
         }
 
         if (type == ProfileChanged.Type.AddedCharacter ||
-            type == ProfileChanged.Type.RemovedCharacter ||
-            type == ProfileChanged.Type.Deleted ||
+            type == ProfileChanged.Type.RemovedCharacter)
+        {
+            if (arg3 == null)
+                throw new InvalidOperationException("AddedCharacter/RemovedCharacter must supply actor identifier as an argument");
+
+            ActorIdentifier actorIdentifier = (ActorIdentifier)arg3;
+            if (!actorIdentifier.IsValid)
+                return;
+
+            foreach (var armature in GetArmaturesForCharacter(actorIdentifier))
+                armature.IsPendingProfileRebind = true;
+
+            _logger.Debug($"ArmatureManager.OnProfileChange AC/RC, armature rebind scheduled: {type}, data payload: {arg3?.ToString()?.Incognify()}, profile: {profile.Name.Text.Incognify()}->{profile.Enabled}");
+            
+            return;
+        }
+
+        if (type == ProfileChanged.Type.Deleted ||
             type == ProfileChanged.Type.TemporaryProfileDeleted)
         {
             if (profile.Armatures.Count == 0)
@@ -549,7 +565,7 @@ public unsafe sealed class ArmatureManager : IDisposable
                 armature.IsPendingProfileRebind = true;
             }
 
-            _logger.Debug($"ArmatureManager.OnProfileChange AC/RC/DEL/TPD/ATCACC, armature rebind scheduled: {type}, data payload: {arg3?.ToString()?.Incognify()}, profile: {profile.Name.Text.Incognify()}->{profile.Enabled}");
+            _logger.Debug($"ArmatureManager.OnProfileChange DEL/TPD, armature rebind scheduled: {type}, data payload: {arg3?.ToString()?.Incognify()}, profile: {profile.Name.Text.Incognify()}->{profile.Enabled}");
 
             return;
         }

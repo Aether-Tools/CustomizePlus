@@ -97,21 +97,22 @@ public partial class ProfileManager : IDisposable
 
         var nameWordsCnt = characterName.Split(' ').Length;
 
-        if (_reverseNameDicts.TryGetID(ObjectKind.EventNpc, characterName, out var id))
-            profile.Characters.Add(_actorManager.CreateNpc(ObjectKind.EventNpc, new NpcId(id)));
-        else if (_reverseNameDicts.TryGetID(ObjectKind.BattleNpc, characterName, out id))
-            profile.Characters.Add(_actorManager.CreateNpc(ObjectKind.BattleNpc, new NpcId(id)));
+        //companions come first because they seem to have duplicate entries in NPC dicts
+        if (_reverseNameDicts.TryGetID(ObjectKind.Companion, characterName, out var id))
+        {
+            var currentPlayer = _actorManager.GetCurrentPlayer();
+            profile.Characters.Add(_actorManager.CreateOwned(currentPlayer.PlayerName, currentPlayer.HomeWorld, ObjectKind.Companion, new NpcId(id)));
+        }
         else if (_reverseNameDicts.TryGetID(ObjectKind.MountType, characterName, out id))
         {
             var currentPlayer = _actorManager.GetCurrentPlayer();
             profile.Characters.Add(_actorManager.CreateOwned(currentPlayer.PlayerName, currentPlayer.HomeWorld, ObjectKind.MountType, new NpcId(id)));
         }
-        else if (_reverseNameDicts.TryGetID(ObjectKind.Companion, characterName, out id))
-        {
-            var currentPlayer = _actorManager.GetCurrentPlayer();
-            profile.Characters.Add(_actorManager.CreateOwned(currentPlayer.PlayerName, currentPlayer.HomeWorld, ObjectKind.Companion, new NpcId(id)));
-        }
-        else if (nameWordsCnt == 2)
+        else if (_reverseNameDicts.TryGetID(ObjectKind.EventNpc, characterName, out id))
+            profile.Characters.Add(_actorManager.CreateNpc(ObjectKind.EventNpc, new NpcId(id)));
+        else if (_reverseNameDicts.TryGetID(ObjectKind.BattleNpc, characterName, out id))
+            profile.Characters.Add(_actorManager.CreateNpc(ObjectKind.BattleNpc, new NpcId(id)));
+        else if (nameWordsCnt == 2) //players come last
             profile.Characters.Add(_actorManager.CreatePlayer(ByteString.FromStringUnsafe(characterName, false), WorldId.AnyWorld));
         else
         {

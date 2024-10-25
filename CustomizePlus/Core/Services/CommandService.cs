@@ -16,6 +16,7 @@ using Dalamud.Interface.ImGuiNotification;
 using CustomizePlus.GameData.Extensions;
 using System.Collections.Generic;
 using ECommons;
+using CustomizePlus.Core.Helpers;
 
 namespace CustomizePlus.Core.Services;
 
@@ -58,9 +59,6 @@ public class CommandService : IDisposable
         {
             _commandManager.AddHandler(command, new CommandInfo(OnMainCommand) { HelpMessage = "Toggles main plugin window if no commands passed. Use \"/customize help\" for list of available commands." });
         }
-
-        if (_pluginConfiguration.CommandSettings.PrintSuccessMessages)
-            chatService.PrintInChat($"Started!"); //safe to assume at this point we have successfully initialized
     }
 
     public void Dispose()

@@ -49,6 +49,7 @@ public class CPlusChangeLog
         .RegisterEntry("\"Limit to my creatures\" option has been removed as it is now obsolete.", 2)
         .RegisterEntry("It is now possible to choose profile which will be applied to any character you login with.", 2)
         .RegisterEntry("Player-owned NPCs (minions, mounts) should now correctly synchronize via Mare Synchronos.", 1)
+        .RegisterEntry("It is possible that non-english character names are now working properly. Please note that this is a side effect and CN/KR clients are still not officially supported.", 1)
 
         .RegisterHighlight("Added profile priority system.")
         .RegisterEntry("When several active profiles affect the same character, profile priority will be used to determine which profile will be applied to said character.", 1)

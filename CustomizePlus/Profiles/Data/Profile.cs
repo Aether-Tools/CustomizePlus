@@ -30,18 +30,9 @@ public sealed class Profile : ISavable
 
     public List<Armature> Armatures = new();
 
-   /* [Obsolete("To be removed in the future versions")]
-    public LowerString CharacterName { get; set; } = LowerString.Empty;*/
-
-    //public ActorIdentifier Character { get; set; } = ActorIdentifier.Invalid;
     public List<ActorIdentifier> Characters { get; set; } = new();
 
     public LowerString Name { get; set; } = LowerString.Empty;
-
-    /// <summary>
-    /// Whether to search only through local player owned characters or all characters when searching for game object by name
-    /// </summary>
-    //public bool LimitLookupToOwnedObjects { get; set; } = false;
 
     public bool Enabled { get; set; }
     public DateTimeOffset CreationDate { get; set; } = DateTime.UtcNow;
@@ -65,11 +56,6 @@ public sealed class Profile : ISavable
     /// WARNING, TEMPLATES FOR TEMPORARY PROFILES *ARE NOT* STORED IN TemplateManager
     /// </summary>
     public bool IsTemporary => ProfileType == ProfileType.Temporary;
-
-   /* /// <summary>
-    /// Identificator specifying specific actor this profile applies to, only works for temporary profiles
-    /// </summary>
-    public ActorIdentifier TemporaryActor { get; set; } = ActorIdentifier.Invalid;*/
 
     public string Incognito
         => UniqueId.ToString()[..8];

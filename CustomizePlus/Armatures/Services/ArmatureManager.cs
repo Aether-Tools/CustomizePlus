@@ -497,22 +497,6 @@ public unsafe sealed class ArmatureManager : IDisposable
 
         if (type == ProfileChanged.Type.TemporaryProfileAdded)
         {
-            //todo: remove this later
-            /*Armature? armature = null;
-            foreach(var kvPair in Armatures)
-            {
-                //todo: check mount/companion
-                if(kvPair.Key.CompareIgnoringOwnership(profile.Character) &&
-                    (kvPair.Key.Type != IdentifierType.Owned || kvPair.Key.IsOwnedByLocalPlayer()))
-                {
-                    armature = kvPair.Value;
-                    break;
-                }
-            }
-
-            if (armature == null)
-                return;*/
-
             foreach(var character in profile.Characters)
             {
                 if (!character.IsValid || !Armatures.ContainsKey(character))
@@ -588,10 +572,6 @@ public unsafe sealed class ArmatureManager : IDisposable
         {
             (var armatureActorIdentifier, _) = _gameObjectService.GetTrueActorForSpecialTypeActor(kvPair.Key);
 
-            //warn: side-effect: for Type = Owned will ignore owner.
-            //This isn't a particularly huge issue as this is only used for profile rebinding, but this probably should be handled better later.
-            /*if (actorIdentifier.IsValid && armatureActorIdentifier.MatchesIgnoringOwnership(actorIdentifier))
-                yield return kvPair.Value;*/
             if (actorIdentifier.IsValid && armatureActorIdentifier.MatchesIgnoringOwnership(actorIdentifier) &&
                 (armatureActorIdentifier.Type != IdentifierType.Owned || armatureActorIdentifier.IsOwnedByLocalPlayer()))
                 yield return kvPair.Value;

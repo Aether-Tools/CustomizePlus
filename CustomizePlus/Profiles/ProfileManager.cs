@@ -373,12 +373,6 @@ public partial class ProfileManager : IDisposable
         if (!actor.Identifier(_actorManager, out var identifier))
             throw new ActorNotFoundException();
 
-     /*   if (identifier.Type != IdentifierType.Player)
-        {
-            _logger.Warning($"Tried applying temporary profile to actor {identifier.Incognito(null)}. Temporary profiles can only be applied to players right now.");
-            return; //do not return error code as I plan to eventually fix this
-        }*/
-
         profile.Enabled = true;
         profile.ProfileType = ProfileType.Temporary;
         profile.Priority = int.MaxValue; //Make sure temporary profile is always at max priority

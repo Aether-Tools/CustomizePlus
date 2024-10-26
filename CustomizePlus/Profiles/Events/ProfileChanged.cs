@@ -18,7 +18,6 @@ public sealed class ProfileChanged() : EventWrapper<ProfileChanged.Type, Profile
         PriorityChanged,
         AddedCharacter,
         RemovedCharacter,
-        //ChangedCharacter,
         AddedTemplate,
         RemovedTemplate,
         MovedTemplate,
@@ -28,13 +27,7 @@ public sealed class ProfileChanged() : EventWrapper<ProfileChanged.Type, Profile
         ChangedDefaultProfile,
         ChangedDefaultLocalPlayerProfile,
         TemporaryProfileAdded,
-        TemporaryProfileDeleted,
-        /*
-        ToggledProfile,
-        AddedTemplate,
-        RemovedTemplate,
-        MovedTemplate,
-        ChangedTemplate*/
+        TemporaryProfileDeleted
     }
 
     public enum Priority

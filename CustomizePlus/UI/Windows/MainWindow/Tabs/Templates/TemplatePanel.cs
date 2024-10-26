@@ -117,7 +117,7 @@ public class TemplatePanel : IDisposable
 
     private void DrawHeader()
         => HeaderDrawer.Draw(SelectionName, 0, ImGui.GetColorU32(ImGuiCol.FrameBg),
-            1, /*SetFromClipboardButton(),*/ ExportToClipboardButton(), LockButton(),
+            1, ExportToClipboardButton(), LockButton(),
             HeaderDrawer.Button.IncognitoButton(_selector.IncognitoMode, v => _selector.IncognitoMode = v));
 
     private void DrawMultiSelection()

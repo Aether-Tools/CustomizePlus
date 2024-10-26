@@ -74,7 +74,6 @@ public class TemplateEditorManager : IDisposable
     { 
         get
         {
-            //todo: check with mounts/companions
             var playerName = _gameObjectService.GetCurrentPlayerName();
             return _gameObjectService.FindActorsByIdentifierIgnoringOwnership(Character)
                 .Where(x => x.Item1.Type != Penumbra.GameData.Enums.IdentifierType.Owned || x.Item1.IsOwnedByLocalPlayer())

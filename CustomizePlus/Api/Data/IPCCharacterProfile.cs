@@ -20,24 +20,11 @@ namespace CustomizePlus.Api.Data;
 /// </summary>
 public class IPCCharacterProfile
 {
-   // public List<IPCCharacter> Characters { get; set; } = new(); 
-
     public Dictionary<string, IPCBoneTransform> Bones { get; init; } = new();
 
     public static IPCCharacterProfile FromFullProfile(Profile profile)
     {
         var ipcProfile = new IPCCharacterProfile();
-
-    /*    foreach (var character in profile.Characters)
-        {
-            //todo: unify with tuple?
-            var ipcCharacter = new IPCCharacter();
-            ipcCharacter.Name = character.ToNameWithoutOwnerName();
-            ipcCharacter.CharacterType = (byte)character.Type;
-            ipcCharacter.WorldId = character.Type == IdentifierType.Player || character.Type == IdentifierType.Owned ? character.HomeWorld.Id : WorldId.AnyWorld.Id;
-            ipcCharacter.CharacterSubType = character.Type == IdentifierType.Retainer ? (ushort)character.Retainer : (ushort)0;
-            ipcProfile.Characters.Add(ipcCharacter);
-        }*/
 
         foreach (var template in profile.Templates)
         {
@@ -113,6 +100,21 @@ public class IPCBoneTransform
     }
 
     /// <summary>
+    /// Reserved for future use
+    /// </summary>
+    public bool PropagateTranslation { get; set; }
+
+    /// <summary>
+    /// Reserved for future use
+    /// </summary>
+    public bool PropagateRotation { get; set; }
+
+    /// <summary>
+    /// Reserved for future use
+    /// </summary>
+    public bool PropagateScale { get; set; }
+
+    /// <summary>
     /// Clamp all vector values to be within allowed limits.
     /// </summary>
     private Vector3 ClampVector(Vector3 vector)
@@ -144,11 +146,3 @@ public class IPCBoneTransform
         return rotVec;
     }
 }
-/*
-public class IPCCharacter
-{
-    public string Name { get; set; }
-    public ushort WorldId { get; set; }
-    public byte CharacterType { get; set; }
-    public ushort CharacterSubType { get; set; }
-}*/

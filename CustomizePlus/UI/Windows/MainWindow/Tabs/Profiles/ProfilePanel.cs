@@ -181,7 +181,7 @@ public class ProfilePanel
                 if (ImGui.Checkbox("##Enabled", ref enabled))
                     _manager.SetEnabled(_selector.Selected!, enabled);
                 ImGuiUtil.LabeledHelpMarker("Enabled",
-                    "Whether the templates in this profile should be applied at all. Only one profile can be enabled for a character at the same time.");
+                    "Whether the templates in this profile should be applied at all.");
             }
         }
     }

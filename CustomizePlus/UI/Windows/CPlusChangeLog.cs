@@ -39,12 +39,11 @@ public class CPlusChangeLog
 
     private static void Add2_0_7_0(Changelog log)
         => log.NextVersion("Version 2.0.7.0")
-        .RegisterImportant("THIS IS A PRELIMINARY CHANGELOG FOR TESTING BUILD OF VERSION 2.0.7.0.")
         .RegisterImportant("Some parts of Customize+ have been considerably rewritten in this update. If you encounter any issues please report them.")
 
         .RegisterHighlight("Character management has been rewritten.")
         .RegisterImportant("Customize+ will do its best to automatically migrate your profiles to new system but in some rare cases it is possible that you will have to add characters again for some of your profiles.", 1)
-        .RegisterEntry("New character selection user interface has been added.", 1)
+        .RegisterEntry("Character selection user interface has been redesigned.", 1)
         .RegisterEntry("It is now possible to assign several characters to a single profile.", 2)
         .RegisterEntry("The way console commands work has not changed. This means that the commands will affect profiles the same way as before, even if profile affects multiple characters.", 3)
         .RegisterEntry("\"Limit to my creatures\" option has been removed as it is now obsolete.", 2)
@@ -60,18 +59,20 @@ public class CPlusChangeLog
         .RegisterEntry("Added option to configure if Customize+ main window will be automatically opened when you launch the game or not.", 1)
 
         .RegisterImportant("Added warning for custom skeleton bones. If you have custom skeleton installed - read it. Seriously. It's a wrench icon near the name of those bones.")
-        .RegisterEntry("Added warnings for testing builds in various places.")
-
-        .RegisterImportant("IPC notes, developers only.")
-        .RegisterImportant("IPC version is now 6.0.", 1)
-        .RegisterEntry("Profile.GetList has been updated to include profile priority as well as list of characters with their metadata. Please refer to Customize+ IPC source code files for additional information.", 1)
-        .RegisterEntry("Profile.OnUpdate event is now being triggered for profiles with \"Apply to all players and retainers\" and \"Apply to any character you are logged in with\" options enabled.", 1)
-        .RegisterEntry("Format of the profile json expected by Profile.SetTemporaryProfileOnCharacter has been updated: CharacterName field removed.", 1)
-        .RegisterEntry("Temporary profiles should now apply correctly to owned characters like minions.", 1)
+        .RegisterEntry("Added several warnings when testing build of Customize+ is being used.")
 
         .RegisterHighlight("Fixed issue when Customize+ did not detect changes in character skeleton. This mostly happened when altering character appearance via Glamourer and other plugins/tools.")
 
         .RegisterEntry("Dropped support for upgrading from Customize+ 1.0. Clipboard copies are not affected by this change.")
+
+        .RegisterEntry("IPC notes, developers only.")
+        .RegisterImportant("IPC version is now 6.0.", 1)
+        .RegisterEntry("Profile.GetList has been updated to include profile priority as well as list of characters with their metadata. Please refer to Customize+ IPC source code files for additional information.", 1)
+        .RegisterEntry("Profile.OnUpdate event is now being triggered for profiles with \"Apply to all players and retainers\" and \"Apply to any character you are logged in with\" options enabled.", 1)
+        .RegisterEntry("Format of the profile json expected by Profile.SetTemporaryProfileOnCharacter has been updated.", 1)
+        .RegisterEntry("CharacterName field removed.", 2)
+        .RegisterEntry("Added few fields reserved for the future functionality.", 2)
+        .RegisterEntry("Temporary profiles should now apply correctly to owned characters like minions.", 1)
 
         .RegisterEntry("Source code maintenance - external libraries update.");
 

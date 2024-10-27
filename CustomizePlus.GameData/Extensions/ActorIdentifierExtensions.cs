@@ -29,10 +29,15 @@ public static class ActorIdentifierExtensions
     }
 
     /// <summary>
-    /// Matches() method but ignoring ownership for owned objects.
+    /// Matches() method but ignoring ownership for owned objects or if one of identifiers is NPC while the other one is Owned.
     /// </summary>
     public static bool MatchesIgnoringOwnership(this ActorIdentifier identifier, ActorIdentifier other)
     {
+        //carbuncles and other battle minions
+        if ((identifier.Type == IdentifierType.Npc && other.Type == IdentifierType.Owned) ||
+            (identifier.Type == IdentifierType.Owned && other.Type == IdentifierType.Npc))
+            return PenumbraExtensions.Manager.DataIdEquals(identifier, other);
+
         if (identifier.Type != other.Type)
             return false;
 

@@ -13,6 +13,10 @@ using static System.Windows.Forms.AxHost;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Configuration.Data;
 using Dalamud.Interface.ImGuiNotification;
+using CustomizePlus.GameData.Extensions;
+using System.Collections.Generic;
+using ECommons;
+using CustomizePlus.Core.Helpers;
 
 namespace CustomizePlus.Core.Services;
 
@@ -55,9 +59,6 @@ public class CommandService : IDisposable
         {
             _commandManager.AddHandler(command, new CommandInfo(OnMainCommand) { HelpMessage = "Toggles main plugin window if no commands passed. Use \"/customize help\" for list of available commands." });
         }
-
-        if (_pluginConfiguration.CommandSettings.PrintSuccessMessages)
-            chatService.PrintInChat($"Started!"); //safe to assume at this point we have successfully initialized
     }
 
     public void Dispose()
@@ -168,6 +169,7 @@ public class CommandService : IDisposable
             }
 
             Profile? targetProfile = null;
+            List<Profile> profilesToDisable = new List<Profile>(_profileManager.Profiles.Count);
 
             characterName = subArgumentList[0].Trim();
             characterName = characterName switch
@@ -182,12 +184,25 @@ public class CommandService : IDisposable
             if (!isTurningOffAllProfiles)
             {
                 profileName = subArgumentList[1].Trim();
-                targetProfile = _profileManager.Profiles.FirstOrDefault(x => x.Name == profileName && x.CharacterName == characterName);
+                foreach (var profile in _profileManager.Profiles)
+                {
+                    if (!profile.Characters.Any(x => x.ToNameWithoutOwnerName() == characterName))
+                        continue;
+
+                    if (profile.Name != profileName)
+                    {
+                        if(profile.Enabled)
+                            profilesToDisable.Add(profile);
+                        continue;
+                    }
+
+                    targetProfile = profile;
+                }
             }
             else
-                targetProfile = _profileManager.Profiles.FirstOrDefault(x => x.CharacterName == characterName && x.Enabled);
+                profilesToDisable = _profileManager.Profiles.Where(x => x.Characters.Any(x => x.ToNameWithoutOwnerName() == characterName) && x.Enabled).ToList();
 
-            if (targetProfile == null)
+            if((!isTurningOffAllProfiles && targetProfile == null) || (isTurningOffAllProfiles && profilesToDisable.Count == 0))
             {
                 _chatService.PrintInChat(new SeStringBuilder()
                     .AddText("Cannot execute command because profile ")
@@ -198,33 +213,57 @@ public class CommandService : IDisposable
                 return;
             }
 
-            if (state != null)
+            if(!isTurningOffAllProfiles)
             {
-                if(targetProfile.Enabled == state)
+                if (state != null)
                 {
-                    _chatService.PrintInChat(new SeStringBuilder()
-                        .AddText("Profile ")
-                        .AddYellow(targetProfile.Name)
-                        .AddText(" for ")
-                        .AddBlue(characterName)
-                        .AddText(" is already ")
-                        .AddGreen((bool)state ? "enabled" : "disabled").BuiltString);
-                    return;
-                }
+                    //todo: still check and disable other profiles in this case?
+                    if (targetProfile!.Enabled == state)
+                    {
+                        _chatService.PrintInChat(new SeStringBuilder()
+                            .AddText("Profile ")
+                            .AddYellow(targetProfile.Name)
+                            .AddText(" for ")
+                            .AddBlue(characterName)
+                            .AddText(" is already ")
+                            .AddGreen((bool)state ? "enabled" : "disabled").BuiltString);
+                        return;
+                    }
 
-                _profileManager.SetEnabled(targetProfile, (bool)state);
+                    _profileManager.SetEnabled(targetProfile, (bool)state);
+                }
+                else
+                    _profileManager.SetEnabled(targetProfile!, !targetProfile!.Enabled);
             }
-            else
-                _profileManager.SetEnabled(targetProfile, !targetProfile.Enabled);
+            
+            if (isTurningOffAllProfiles || targetProfile!.Enabled)
+            {
+                foreach (var profile in profilesToDisable)
+                    _profileManager.SetEnabled(profile, false);
+            }
 
             if (_pluginConfiguration.CommandSettings.PrintSuccessMessages)
-                _chatService.PrintInChat(new SeStringBuilder()
-                    .AddText("Profile ")
-                    .AddYellow(targetProfile.Name)
-                    .AddText(" was successfully ")
-                    .AddBlue(state != null ? ((bool)state ? "enabled" : "disabled") : "toggled")
-                    .AddText(" for ")
-                    .AddRed(targetProfile.CharacterName).BuiltString);
+            {
+                if (isTurningOffAllProfiles)
+                    _chatService.PrintInChat(new SeStringBuilder()
+                        .AddYellow($"{profilesToDisable.Count} profile(s)")
+                        .AddText(" successfully ")
+                        .AddBlue("disabled")
+                        .AddText(" for ")
+                        .AddRed(characterName).BuiltString);
+                else
+                    _chatService.PrintInChat(new SeStringBuilder()
+                        .AddText("Profile ")
+                        .AddYellow(targetProfile!.Name)
+                        .AddText(" was successfully ")
+                        .AddBlue(state != null ? ((bool)state ? "enabled" : "disabled") : "toggled")
+                        .AddText(" for ")
+                        .AddRed(string.Join(',', targetProfile.Characters.Select(x => x.ToNameWithoutOwnerName())))
+                        .AddText(". ")
+                        .AddItalics($"({profilesToDisable.Count} profile(s) disabled)")
+                        .BuiltString);
+            }
+
         }
         catch (Exception e)
         {

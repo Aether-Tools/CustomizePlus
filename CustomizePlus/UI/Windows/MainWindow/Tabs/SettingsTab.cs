@@ -14,6 +14,7 @@ using CustomizePlus.Templates;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.Armatures.Services;
 using Dalamud.Interface.ImGuiNotification;
+using Dalamud.Plugin;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs;
 
@@ -21,6 +22,7 @@ public class SettingsTab
 {
     private const uint DiscordColor = 0xFFDA8972;
 
+    private readonly IDalamudPluginInterface _pluginInterface;
     private readonly PluginConfiguration _configuration;
     private readonly ArmatureManager _armatureManager;
     private readonly HookingService _hookingService;
@@ -30,6 +32,7 @@ public class SettingsTab
     private readonly SupportLogBuilderService _supportLogBuilderService;
 
     public SettingsTab(
+        IDalamudPluginInterface pluginInterface,
         PluginConfiguration configuration,
         ArmatureManager armatureManager,
         HookingService hookingService,
@@ -38,6 +41,7 @@ public class SettingsTab
         MessageService messageService,
         SupportLogBuilderService supportLogBuilderService)
     {
+        _pluginInterface = pluginInterface;
         _configuration = configuration;
         _armatureManager = armatureManager;
         _hookingService = hookingService;
@@ -49,6 +53,7 @@ public class SettingsTab
 
     public void Draw()
     {
+        UiHelpers.SetupCommonSizes();
         using var child = ImRaii.Child("MainWindowChild");
         if (!child)
             return;
@@ -209,14 +214,38 @@ public class SettingsTab
         if (!isShouldDraw)
             return;
 
+        DrawOpenWindowAtStart();
         DrawHideWindowInCutscene();
+        DrawHideWindowWhenUiHidden();
+        DrawHideWindowInGPose();
+
+        UiHelpers.DefaultLineSpace();
+
         DrawFoldersDefaultOpen();
+
+        UiHelpers.DefaultLineSpace();
+
         DrawSetPreviewToCurrentCharacterOnLogin();
+
+        UiHelpers.DefaultLineSpace();
 
         if (Widget.DoubleModifierSelector("Template Deletion Modifier",
             "A modifier you need to hold while clicking the Delete Template button for it to take effect.", 100 * ImGuiHelpers.GlobalScale,
             _configuration.UISettings.DeleteTemplateModifier, v => _configuration.UISettings.DeleteTemplateModifier = v))
             _configuration.Save();
+    }
+
+    private void DrawOpenWindowAtStart()
+    {
+        var isChecked = _configuration.UISettings.OpenWindowAtStart;
+
+        if (CtrlHelper.CheckboxWithTextAndHelp("##openwindowatstart", "Open Customize+ Window at Game Start",
+                "Controls whether main Customize+ window will be opened when you launch the game or not.", ref isChecked))
+        {
+            _configuration.UISettings.OpenWindowAtStart = isChecked;
+
+            _configuration.Save();
+        }
     }
 
     private void DrawHideWindowInCutscene()
@@ -226,7 +255,35 @@ public class SettingsTab
         if (CtrlHelper.CheckboxWithTextAndHelp("##hidewindowincutscene", "Hide Plugin Windows in Cutscenes",
                 "Controls whether any Customize+ windows are hidden during cutscenes or not.", ref isChecked))
         {
+            _pluginInterface.UiBuilder.DisableCutsceneUiHide = !isChecked;
             _configuration.UISettings.HideWindowInCutscene = isChecked;
+
+            _configuration.Save();
+        }
+    }
+
+    private void DrawHideWindowWhenUiHidden()
+    {
+        var isChecked = _configuration.UISettings.HideWindowWhenUiHidden;
+
+        if (CtrlHelper.CheckboxWithTextAndHelp("##hidewindowwhenuihidden", "Hide Plugin Windows when UI is Hidden",
+                "Controls whether any Customize+ windows are hidden when you manually hide the in-game user interface.", ref isChecked))
+        {
+            _pluginInterface.UiBuilder.DisableUserUiHide = !isChecked;
+            _configuration.UISettings.HideWindowWhenUiHidden = isChecked;
+            _configuration.Save();
+        }
+    }
+
+    private void DrawHideWindowInGPose()
+    {
+        var isChecked = _configuration.UISettings.HideWindowInGPose;
+
+        if (CtrlHelper.CheckboxWithTextAndHelp("##hidewindowingpose", "Hide Plugin Windows in GPose",
+                "Controls whether any Customize+ windows are hidden when you enter GPose.", ref isChecked))
+        {
+            _pluginInterface.UiBuilder.DisableGposeUiHide = !isChecked;
+            _configuration.UISettings.HideWindowInGPose = isChecked;
             _configuration.Save();
         }
     }

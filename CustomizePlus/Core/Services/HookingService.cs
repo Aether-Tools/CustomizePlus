@@ -11,6 +11,8 @@ using CustomizePlus.Profiles;
 using CustomizePlus.Armatures.Services;
 using CustomizePlus.GameData.Data;
 using Penumbra.GameData.Interop;
+using Dalamud.Plugin;
+using CustomizePlus.Core.Helpers;
 
 namespace CustomizePlus.Core.Services;
 
@@ -53,6 +55,15 @@ public class HookingService : IDisposable
         _logger = logger;
 
         ReloadHooks();
+    }
+
+    public void Dispose()
+    {
+        _gameObjectMovementHook?.Disable();
+        _gameObjectMovementHook?.Dispose();
+
+        _renderManagerHook?.Disable();
+        _renderManagerHook?.Dispose();
     }
 
     public void ReloadHooks()
@@ -149,14 +160,5 @@ public class HookingService : IDisposable
             _logger.Error($"Exception in Customize+ movement hook: {ex}");
             _gameObjectMovementHook?.Disable();
         }
-    }
-
-    public void Dispose()
-    {
-        _gameObjectMovementHook?.Disable();
-        _gameObjectMovementHook?.Dispose();
-
-        _renderManagerHook?.Disable();
-        _renderManagerHook?.Dispose();
     }
 }

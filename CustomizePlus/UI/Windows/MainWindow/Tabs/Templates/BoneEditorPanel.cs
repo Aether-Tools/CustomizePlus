@@ -15,6 +15,10 @@ using CustomizePlus.Core.Helpers;
 using CustomizePlus.Templates;
 using CustomizePlus.Game.Services;
 using CustomizePlus.Templates.Data;
+using CustomizePlus.UI.Windows.Controls;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Render;
+using Penumbra.GameData.Actors;
+using CustomizePlus.GameData.Extensions;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 
@@ -24,14 +28,13 @@ public class BoneEditorPanel
     private readonly TemplateEditorManager _editorManager;
     private readonly PluginConfiguration _configuration;
     private readonly GameObjectService _gameObjectService;
+    private readonly ActorAssignmentUi _actorAssignmentUi;
 
     private BoneAttribute _editingAttribute;
     private int _precision;
 
     private bool _isShowLiveBones;
     private bool _isMirrorModeEnabled;
-
-    private string? _newCharacterName;
 
     private Dictionary<BoneData.BoneFamily, bool> _groupExpandedState = new();
 
@@ -48,12 +51,14 @@ public class BoneEditorPanel
         TemplateFileSystemSelector templateFileSystemSelector,
         TemplateEditorManager editorManager,
         PluginConfiguration configuration,
-        GameObjectService gameObjectService)
+        GameObjectService gameObjectService,
+        ActorAssignmentUi actorAssignmentUi)
     {
         _templateFileSystemSelector = templateFileSystemSelector;
         _editorManager = editorManager;
         _configuration = configuration;
         _gameObjectService = gameObjectService;
+        _actorAssignmentUi = actorAssignmentUi;
 
         _isShowLiveBones = configuration.EditorConfiguration.ShowLiveBones;
         _isMirrorModeEnabled = configuration.EditorConfiguration.BoneMirroringEnabled;
@@ -65,7 +70,7 @@ public class BoneEditorPanel
     {
         if (_editorManager.EnableEditor(template))
         {
-            _editorManager.SetLimitLookupToOwned(_configuration.EditorConfiguration.LimitLookupToOwnedObjects);
+            //_editorManager.SetLimitLookupToOwned(_configuration.EditorConfiguration.LimitLookupToOwnedObjects);
 
             return true;
         }
@@ -96,53 +101,68 @@ public class BoneEditorPanel
 
         using (var style = ImRaii.PushStyle(ImGuiStyleVar.ButtonTextAlign, new Vector2(0, 0.5f)))
         {
-            using (var table = ImRaii.Table("BasicSettings", 2))
-            {
-                ImGui.TableSetupColumn("BasicCol1", ImGuiTableColumnFlags.WidthFixed, ImGui.CalcTextSize("Show editor preview on").X);
-                ImGui.TableSetupColumn("BasicCol2", ImGuiTableColumnFlags.WidthStretch);
-                ImGui.TableNextRow();
+            string characterText = null!;
 
-                ImGuiUtil.DrawFrameColumn("Show editor preview on");
-                ImGui.TableNextColumn();
+            if (_templateFileSystemSelector.IncognitoMode)
+                characterText = "Previewing on: incognito active";
+            else
+                characterText = _editorManager.Character.IsValid ? $"Previewing on: {(_editorManager.Character.Type == Penumbra.GameData.Enums.IdentifierType.Owned ?
+                _editorManager.Character.ToNameWithoutOwnerName() : _editorManager.Character.ToString())}" : "No valid character selected";
+
+            ImGuiUtil.PrintIcon(FontAwesomeIcon.User);
+            ImGui.SameLine();
+            ImGui.Text(characterText);
+
+            ImGui.Separator();
+
+            var isShouldDraw = ImGui.CollapsingHeader("Change preview character");
+
+            if (isShouldDraw)
+            {
                 var width = new Vector2(ImGui.GetContentRegionAvail().X - ImGui.CalcTextSize("Limit to my creatures").X - 68, 0);
-                var name = _newCharacterName ?? _editorManager.CharacterName;
-                ImGui.SetNextItemWidth(width.X);
 
                 using (var disabled = ImRaii.Disabled(!IsEditorActive || IsEditorPaused))
                 {
                     if (!_templateFileSystemSelector.IncognitoMode)
                     {
-                        if (ImGui.InputText("##PreviewCharacterName", ref name, 128))
-                        {
-                            _newCharacterName = name;
-                        }
+                        _actorAssignmentUi.DrawWorldCombo(width.X / 2);
+                        ImGui.SameLine();
+                        _actorAssignmentUi.DrawPlayerInput(width.X / 2);
 
-                        if (ImGui.IsItemDeactivatedAfterEdit())
-                        {
-                            if (string.IsNullOrWhiteSpace(_newCharacterName))
-                                _newCharacterName = _gameObjectService.GetCurrentPlayerName();
+                        var buttonWidth = new Vector2(165 * ImGuiHelpers.GlobalScale - ImGui.GetStyle().ItemSpacing.X / 2, 0);
 
-                            _editorManager.ChangeEditorCharacter(_newCharacterName);
+                        if (ImGuiUtil.DrawDisabledButton("Apply to player character", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetPlayer))
+                            _editorManager.ChangeEditorCharacter(_actorAssignmentUi.PlayerIdentifier);
 
-                            _newCharacterName = null;
-                        }
+                        ImGui.SameLine();
+
+                        if (ImGuiUtil.DrawDisabledButton("Apply to retainer", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetRetainer))
+                            _editorManager.ChangeEditorCharacter(_actorAssignmentUi.RetainerIdentifier);
+
+                        ImGui.SameLine();
+
+                        if (ImGuiUtil.DrawDisabledButton("Apply to mannequin", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetMannequin))
+                            _editorManager.ChangeEditorCharacter(_actorAssignmentUi.MannequinIdentifier);
+
+                        var currentPlayer = _gameObjectService.GetCurrentPlayerActorIdentifier();
+                        if (ImGuiUtil.DrawDisabledButton("Apply to current character", buttonWidth, string.Empty, !currentPlayer.IsValid))
+                            _editorManager.ChangeEditorCharacter(currentPlayer);
+
+                        ImGui.Separator();
+
+                        _actorAssignmentUi.DrawObjectKindCombo(width.X / 2);
+                        ImGui.SameLine();
+                        _actorAssignmentUi.DrawNpcInput(width.X / 2);
+
+                        if (ImGuiUtil.DrawDisabledButton("Apply to selected NPC", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetNpc))
+                            _editorManager.ChangeEditorCharacter(_actorAssignmentUi.NpcIdentifier);
                     }
                     else
                         ImGui.TextUnformatted("Incognito active");
-
-                    ImGui.SameLine();
-                    var enabled = _editorManager.EditorProfile.LimitLookupToOwnedObjects;
-                    if (ImGui.Checkbox("##LimitLookupToOwnedObjects", ref enabled))
-                    {
-                        _editorManager.SetLimitLookupToOwned(enabled);
-
-                        _configuration.EditorConfiguration.LimitLookupToOwnedObjects = enabled;
-                        _configuration.Save();
-                    }
-                    ImGuiUtil.LabeledHelpMarker("Limit to my creatures",
-                        "When enabled limits the character search to only your own summons, mounts and minions.\nUseful when there is possibility there will be another character with that name owned by another player.\n* For battle chocobo use \"Chocobo\" as character name.");
                 }
             }
+
+            ImGui.Separator();
 
             using (var table = ImRaii.Table("BoneEditorMenu", 2))
             {
@@ -287,7 +307,7 @@ public class BoneEditorPanel
                         ImGui.TableNextRow();
                         foreach (var erp in boneGroup.OrderBy(x => BoneData.GetBoneRanking(x.BoneCodeName)))
                         {
-                            CompleteBoneEditor(erp);
+                            CompleteBoneEditor(boneGroup.Key, erp);
                         }
                     }
 
@@ -436,7 +456,7 @@ public class BoneEditorPanel
         return false;
     }
 
-    private void CompleteBoneEditor(EditRowParams bone)
+    private void CompleteBoneEditor(BoneData.BoneFamily boneFamily, EditRowParams bone)
     {
         var codename = bone.BoneCodeName;
         var displayName = bone.BoneDisplayName;
@@ -497,6 +517,20 @@ public class BoneEditorPanel
 
         //----------------------------------
         ImGui.TableNextColumn();
+
+        if((BoneData.IsIVCSCompatibleBone(codename) || boneFamily == BoneData.BoneFamily.Unknown)
+            && !codename.StartsWith("j_f_"))
+        {
+            ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Warning);
+            ImGuiUtil.PrintIcon(FontAwesomeIcon.Wrench);
+            ImGui.PopStyleColor();
+            CtrlHelper.AddHoverText("This is a bone from modded skeleton." +
+                "\r\nIMPORTANT: The Customize+ team does not provide support for issues related to these bones." +
+                "\r\nThese bones need special clothing and body mods designed specifically for them." +
+                "\r\nEven if they are intended for these bones, not all clothing mods will support every bone." +
+                "\r\nIf you experience issues, try performing the same actions using posing tools.");
+            ImGui.SameLine();
+        }
         CtrlHelper.StaticLabel(displayName, CtrlHelper.TextAlignment.Left, BoneData.IsIVCSCompatibleBone(codename) ? $"(IVCS Compatible) {codename}" : codename);
 
         if (flagUpdate)

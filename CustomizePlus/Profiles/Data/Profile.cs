@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CustomizePlus.Armatures.Data;
 using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Extensions;
@@ -21,21 +22,17 @@ namespace CustomizePlus.Profiles.Data;
 /// </summary>
 public sealed class Profile : ISavable
 {
+    public const int Version = 5;
+
     private static int _nextGlobalId;
 
     private readonly int _localId;
 
     public List<Armature> Armatures = new();
 
-    public LowerString CharacterName { get; set; } = LowerString.Empty;
+    public List<ActorIdentifier> Characters { get; set; } = new();
+
     public LowerString Name { get; set; } = LowerString.Empty;
-
-    /// <summary>
-    /// Whether to search only through local player owned characters or all characters when searching for game object by name
-    /// </summary>
-    public bool LimitLookupToOwnedObjects { get; set; } = false;
-
-    public int Version { get; set; } = Constants.ConfigurationVersion;
 
     public bool Enabled { get; set; }
     public DateTimeOffset CreationDate { get; set; } = DateTime.UtcNow;
@@ -50,15 +47,15 @@ public sealed class Profile : ISavable
     public ProfileType ProfileType { get; set; }
 
     /// <summary>
+    /// Profile priority when there are several profiles affecting same character
+    /// </summary>
+    public int Priority { get; set; }
+
+    /// <summary>
     /// Tells us if this profile is not persistent (ex. was made via IPC calls) and should have specific treatement like not being shown in UI, etc.
     /// WARNING, TEMPLATES FOR TEMPORARY PROFILES *ARE NOT* STORED IN TemplateManager
     /// </summary>
     public bool IsTemporary => ProfileType == ProfileType.Temporary;
-
-    /// <summary>
-    /// Identificator specifying specific actor this profile applies to, only works for temporary profiles
-    /// </summary>
-    public ActorIdentifier TemporaryActor { get; set; } = ActorIdentifier.Invalid;
 
     public string Incognito
         => UniqueId.ToString()[..8];
@@ -74,8 +71,7 @@ public sealed class Profile : ISavable
     /// <param name="original"></param>
     public Profile(Profile original) : this()
     {
-        CharacterName = original.CharacterName;
-        LimitLookupToOwnedObjects = original.LimitLookupToOwnedObjects;
+        Characters = original.Characters.ToList();
 
         foreach (var template in original.Templates)
         {
@@ -85,7 +81,7 @@ public sealed class Profile : ISavable
 
     public override string ToString()
     {
-        return $"Profile '{Name.Text.Incognify()}' on {CharacterName.Text.Incognify()} [{UniqueId}]";
+        return $"Profile '{Name.Text.Incognify()}' on {string.Join(',', Characters.Select(x => x.Incognito(null)))} [{UniqueId}]";
     }
 
     #region Serialization
@@ -98,11 +94,11 @@ public sealed class Profile : ISavable
             ["UniqueId"] = UniqueId,
             ["CreationDate"] = CreationDate,
             ["ModifiedDate"] = ModifiedDate,
-            ["CharacterName"] = CharacterName.Text,
+            ["Characters"] = SerializeCharacters(),
             ["Name"] = Name.Text,
-            ["LimitLookupToOwnedObjects"] = LimitLookupToOwnedObjects,
             ["Enabled"] = Enabled,
             ["IsWriteProtected"] = IsWriteProtected,
+            ["Priority"] = Priority,
             ["Templates"] = SerializeTemplates()
         };
 
@@ -122,64 +118,19 @@ public sealed class Profile : ISavable
         return ret;
     }
 
-    #endregion
-
-    #region Deserialization
-
-    public static Profile Load(TemplateManager templateManager, JObject obj)
+    private JArray SerializeCharacters()
     {
-        var version = obj["Version"]?.ToObject<int>() ?? 0;
-        return version switch
+        var ret = new JArray();
+        foreach (var character in Characters)
         {
-            //Ignore everything below v4 for now
-            4 => LoadV4(templateManager, obj),
-            _ => throw new Exception("The design to be loaded has no valid Version."),
-        };
-    }
-
-    private static Profile LoadV4(TemplateManager templateManager, JObject obj)
-    {
-        var creationDate = obj["CreationDate"]?.ToObject<DateTimeOffset>() ?? throw new ArgumentNullException("CreationDate");
-
-        var profile = new Profile()
-        {
-            CreationDate = creationDate,
-            UniqueId = obj["UniqueId"]?.ToObject<Guid>() ?? throw new ArgumentNullException("UniqueId"),
-            Name = new LowerString(obj["Name"]?.ToObject<string>()?.Trim() ?? throw new ArgumentNullException("Name")),
-            CharacterName = new LowerString(obj["CharacterName"]?.ToObject<string>()?.Trim() ?? throw new ArgumentNullException("CharacterName")),
-            LimitLookupToOwnedObjects = obj["LimitLookupToOwnedObjects"]?.ToObject<bool>() ?? throw new ArgumentNullException("LimitLookupToOwnedObjects"),
-            Enabled = obj["Enabled"]?.ToObject<bool>() ?? throw new ArgumentNullException("Enabled"),
-            ModifiedDate = obj["ModifiedDate"]?.ToObject<DateTimeOffset>() ?? creationDate,
-            IsWriteProtected = obj["IsWriteProtected"]?.ToObject<bool>() ?? false,
-            Templates = new List<Template>()
-        };
-        if (profile.ModifiedDate < creationDate)
-            profile.ModifiedDate = creationDate;
-
-        if (obj["Templates"] is not JArray templateArray)
-            return profile;
-
-        foreach (var templateObj in templateArray)
-        {
-            if (templateObj is not JObject templateObjCast)
-            {
-                //todo: warning
-                continue;
-            }
-
-            var templateId = templateObjCast["TemplateId"]?.ToObject<Guid>();
-            if (templateId == null)
-                continue; //todo: error
-
-            var template = templateManager.GetTemplate((Guid)templateId);
-            if (template != null)
-                profile.Templates.Add(template);
+            ret.Add(character.ToJson());
         }
-
-        return profile;
+        return ret;
     }
 
     #endregion
+
+    //Loading is in ProfileManager
 
     #region ISavable
 

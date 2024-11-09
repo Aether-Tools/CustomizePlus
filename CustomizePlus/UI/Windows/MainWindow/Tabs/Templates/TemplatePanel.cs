@@ -105,17 +105,6 @@ public class TemplatePanel : IDisposable
                     Disabled = _boneEditor.IsEditorActive
                 };
 
-    /*private HeaderDrawer.Button SetFromClipboardButton()
-        => new()
-        {
-            Description =
-                "Try to apply a template from your clipboard over this template.",
-            Icon = FontAwesomeIcon.Clipboard,
-            OnClick = SetFromClipboard,
-            Visible = _selector.Selected != null,
-            Disabled = (_selector.Selected?.IsWriteProtected ?? true) || _boneEditor.IsEditorActive,
-        };*/
-
     private HeaderDrawer.Button ExportToClipboardButton()
         => new()
         {
@@ -128,7 +117,7 @@ public class TemplatePanel : IDisposable
 
     private void DrawHeader()
         => HeaderDrawer.Draw(SelectionName, 0, ImGui.GetColorU32(ImGuiCol.FrameBg),
-            1, /*SetFromClipboardButton(),*/ ExportToClipboardButton(), LockButton(),
+            1, ExportToClipboardButton(), LockButton(),
             HeaderDrawer.Button.IncognitoButton(_selector.IncognitoMode, v => _selector.IncognitoMode = v));
 
     private void DrawMultiSelection()

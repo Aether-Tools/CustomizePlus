@@ -14,11 +14,10 @@ internal static class V3ProfileToV4Converter
         var profile = new Profile
         {
             Name = $"{v3Profile.ProfileName} - {v3Profile.CharacterName}",
-            CharacterName = v3Profile.CharacterName,
+            //CharacterName = v3Profile.CharacterName, //no longer supported
             CreationDate = v3Profile.CreationDate,
             ModifiedDate = DateTimeOffset.UtcNow,
             Enabled = v3Profile.Enabled,
-            LimitLookupToOwnedObjects = v3Profile.OwnedOnly,
             UniqueId = Guid.NewGuid(),
             Templates = new List<Template>(1)
         };

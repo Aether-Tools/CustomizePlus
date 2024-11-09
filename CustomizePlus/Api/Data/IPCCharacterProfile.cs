@@ -1,7 +1,11 @@
 ﻿using CustomizePlus.Configuration.Data.Version3;
 using CustomizePlus.Core.Data;
+using CustomizePlus.Game.Services;
+using CustomizePlus.GameData.Extensions;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Templates.Data;
+using Penumbra.GameData.Enums;
+using Penumbra.GameData.Structs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,16 +20,11 @@ namespace CustomizePlus.Api.Data;
 /// </summary>
 public class IPCCharacterProfile
 {
-    public string CharacterName { get; set; } = "Invalid";
     public Dictionary<string, IPCBoneTransform> Bones { get; init; } = new();
 
     public static IPCCharacterProfile FromFullProfile(Profile profile)
     {
-        var ipcProfile = new IPCCharacterProfile
-        {
-            CharacterName = profile.CharacterName,
-            Bones = new Dictionary<string, IPCBoneTransform>()
-        };
+        var ipcProfile = new IPCCharacterProfile();
 
         foreach (var template in profile.Templates)
         {
@@ -47,20 +46,20 @@ public class IPCCharacterProfile
     {
         var fullProfile = new Profile
         {
-            Name = $"{profile.CharacterName}'s IPC profile",
-            CharacterName = profile.CharacterName,
+            //Character should be set manually
             CreationDate = DateTimeOffset.UtcNow,
             ModifiedDate = DateTimeOffset.UtcNow,
             Enabled = true,
-            LimitLookupToOwnedObjects = false,
             UniqueId = Guid.NewGuid(),
             Templates = new List<Template>(1),
             ProfileType = isTemporary ? Profiles.Enums.ProfileType.Temporary : Profiles.Enums.ProfileType.Normal
         };
 
+        fullProfile.Name = $"IPC Profile {fullProfile.UniqueId}";
+
         var template = new Template
         {
-            Name = $"{fullProfile.Name}'s template",
+            Name = $"{fullProfile.Name} - template",
             CreationDate = fullProfile.CreationDate,
             ModifiedDate = fullProfile.ModifiedDate,
             UniqueId = Guid.NewGuid(),
@@ -99,6 +98,21 @@ public class IPCBoneTransform
         get => _scaling;
         set => _scaling = ClampVector(value);
     }
+
+    /// <summary>
+    /// Reserved for future use
+    /// </summary>
+    public bool PropagateTranslation { get; set; }
+
+    /// <summary>
+    /// Reserved for future use
+    /// </summary>
+    public bool PropagateRotation { get; set; }
+
+    /// <summary>
+    /// Reserved for future use
+    /// </summary>
+    public bool PropagateScale { get; set; }
 
     /// <summary>
     /// Clamp all vector values to be within allowed limits.

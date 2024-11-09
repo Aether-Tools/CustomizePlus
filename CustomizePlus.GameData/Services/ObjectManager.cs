@@ -44,7 +44,7 @@ public class ObjectManager(
             return false;
 
         _identifierUpdate = LastUpdate;
-        World = (ushort)(this[0].Valid ? this[0].HomeWorld : 0);
+        World = (ushort)(Player.Valid ? Player.HomeWorld : 0);
         _identifiers.Clear();
         _allWorldIdentifiers.Clear();
         _nonOwnedIdentifiers.Clear();
@@ -84,7 +84,7 @@ public class ObjectManager(
         IsInGPose = gPose.Utf8Name.Length > 0;
 
         //C+ custom
-        IsInLobby = AddLobbyCharacter();
+        IsInLobby = AddLobbyCharacters();
 
         return true;
     }
@@ -135,10 +135,6 @@ public class ObjectManager(
             }
         }
     }
-
-    //c+ custom
-    public Actor LobbyActor
-        => IsInLobby ? this[200] : nint.Zero;
 
     public Actor GPosePlayer
         => this[(int)ScreenActor.GPosePlayer];
@@ -218,22 +214,35 @@ public class ObjectManager(
     }
 
     //c+ custom
-    private unsafe bool AddLobbyCharacter()
+    private unsafe bool AddLobbyCharacters()
     {
+        if (clientState.IsLoggedIn)
+            return false;
+
         var agent = AgentLobby.Instance();
-        if (agent == null || agent->LobbyData.CharaSelectEntries.LongCount() == 0)
+        if (agent == null)
             return false;
 
-        var chara = agent->LobbyData.CharaSelectEntries[(long)agent->SelectedCharacterContentId].Value;
-        if (chara == null)
-            return false;
+        var span = agent->LobbyData.CharaSelectEntries.AsSpan();
 
-        var actor = CutsceneCharacters.FirstOrDefault();
+        // The lobby uses the first 8 cutscene actors.
+        int cnt = 0;
+        foreach (var actor in CutsceneCharacters.Take(8))
+        {
+            if (!actor.Valid) //shouldn't happen so should be safe to break?
+                break;
 
-        if (!actor.Valid)
-            return false;
+            if (cnt >= span.Length)
+                break;
 
-        HandleIdentifier(actors.CreatePlayer(new ByteString(chara->Name), chara->HomeWorldId), actor);
+            if (span[cnt].Value == null) //should mean the end of valid actors so should be safe to break?
+                break;
+
+            var chara = span[cnt].Value;
+            HandleIdentifier(actors.CreatePlayer(new ByteString(chara->Name), chara->HomeWorldId), actor);
+
+            cnt++;
+        }
 
         return true;
     }

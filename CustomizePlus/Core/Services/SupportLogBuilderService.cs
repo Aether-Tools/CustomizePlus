@@ -1,17 +1,14 @@
-﻿using CustomizePlus.Armatures.Services;
+﻿using System;
+using System.Linq;
+using System.Text;
+using CustomizePlus.Armatures.Services;
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Extensions;
+using CustomizePlus.Core.Helpers;
 using CustomizePlus.Profiles;
 using CustomizePlus.Templates;
 using Dalamud.Plugin;
-using OtterGui.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CustomizePlus.Core.Services;
 
@@ -42,12 +39,11 @@ public class SupportLogBuilderService
     {
         var sb = new StringBuilder(102400); //it's fair to assume this will very often be quite large
         sb.AppendLine("**Settings**");
-        sb.Append($"> **`Plugin Version:                 `** {Plugin.Version}\n");
+        sb.Append($"> **`Plugin Version:                 `** {VersionHelper.Version}\n");
         sb.Append($"> **`Commit Hash:                    `** {ThisAssembly.Git.Commit}+{ThisAssembly.Git.Sha}\n");
         sb.Append($"> **`Plugin enabled:                 `** {_configuration.PluginEnabled}\n");
         sb.AppendLine("**Settings -> Editor Settings**");
-        sb.Append($"> **`Limit to my creatures (editor): `** {_configuration.EditorConfiguration.LimitLookupToOwnedObjects}\n");
-        sb.Append($"> **`Preview character (editor):     `** {_configuration.EditorConfiguration.PreviewCharacterName?.Incognify() ?? "Not set"}\n");
+        sb.Append($"> **`Preview character (editor):     `** {_configuration.EditorConfiguration.PreviewCharacter.Incognito(null)}\n");
         sb.Append($"> **`Set preview character on login: `** {_configuration.EditorConfiguration.SetPreviewToCurrentCharacterOnLogin}\n");
         sb.Append($"> **`Root editing:                   `** {_configuration.EditorConfiguration.RootPositionEditingEnabled}\n");
         sb.AppendLine("**Settings -> Profile application**");
@@ -66,6 +62,7 @@ public class SupportLogBuilderService
         }
         sb.AppendLine("**Profiles**");
         sb.Append($"> **`Default profile:                `** {_profileManager.DefaultProfile?.ToString() ?? "None"}\n");
+        sb.Append($"> **`Default local player profile:   `** {_profileManager.DefaultLocalPlayerProfile?.ToString() ?? "None"}\n");
         sb.Append($"> **`Count:                          `** {_profileManager.Profiles.Count}\n");
         foreach (var profile in _profileManager.Profiles)
         {
@@ -73,8 +70,7 @@ public class SupportLogBuilderService
             sb.Append($">   > **`{profile.ToString(),-32}`*\n");
             sb.Append($">   > **`Name:                       `** {profile.Name.Text.Incognify()}\n");
             sb.Append($">   > **`Type:                       `** {profile.ProfileType} \n");
-            sb.Append($">   > **`Character name:             `** {profile.CharacterName.Text.Incognify()}\n");
-            sb.Append($">   > **`Limit to my creatures:      `** {profile.LimitLookupToOwnedObjects}\n");
+            sb.Append($">   > **`Characters:             `** {string.Join(',', profile.Characters.Select(x => x.Incognito(null)))}\n");
             sb.Append($">   > **`Templates:`**\n");
             sb.Append($">   >   > **`Count:                  `** {profile.Templates.Count}\n");
             foreach (var template in profile.Templates)

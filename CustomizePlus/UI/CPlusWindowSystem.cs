@@ -30,8 +30,9 @@ public class CPlusWindowSystem : IDisposable
         _uiBuilder.Draw += OnDraw;
         _uiBuilder.OpenConfigUi += _mainWindow.Toggle;
 
-        _uiBuilder.DisableGposeUiHide = true;
+        _uiBuilder.DisableGposeUiHide = !configuration.UISettings.HideWindowInGPose; //seems to be broken as of 2024/10/18
         _uiBuilder.DisableCutsceneUiHide = !configuration.UISettings.HideWindowInCutscene;
+        _uiBuilder.DisableUserUiHide = !configuration.UISettings.HideWindowWhenUiHidden;
     }
 
     private void OnDraw()

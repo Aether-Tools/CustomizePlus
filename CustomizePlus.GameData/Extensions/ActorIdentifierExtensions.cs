@@ -29,6 +29,40 @@ public static class ActorIdentifierExtensions
     }
 
     /// <summary>
+    /// Matches() method but ignoring ownership for owned objects or if one of identifiers is NPC while the other one is Owned.
+    /// </summary>
+    public static bool MatchesIgnoringOwnership(this ActorIdentifier identifier, ActorIdentifier other)
+    {
+        //carbuncles and other battle minions
+        if ((identifier.Type == IdentifierType.Npc && other.Type == IdentifierType.Owned) ||
+            (identifier.Type == IdentifierType.Owned && other.Type == IdentifierType.Npc))
+            return PenumbraExtensions.Manager.DataIdEquals(identifier, other);
+
+        if (identifier.Type != other.Type)
+            return false;
+
+        return identifier.Type switch
+        {
+            IdentifierType.Owned => PenumbraExtensions.Manager.DataIdEquals(identifier, other),
+            _ => identifier.Matches(other)
+        };
+    }
+
+    /// <summary>
+    /// Check if owned actor is owned by local player. Will return false if Type is not Owned.
+    /// </summary>
+    public static bool IsOwnedByLocalPlayer(this ActorIdentifier identifier)
+    {
+        if (identifier.Type != IdentifierType.Owned)
+            return false;
+
+        if (PenumbraExtensions.Manager == null)
+            return false;
+
+        return identifier.PlayerName == PenumbraExtensions.Manager.GetCurrentPlayer().PlayerName;
+    }
+
+    /// <summary>
     /// Wrapper around Incognito which returns non-incognito name in debug builds
     /// </summary>
     /// <param name="identifier"></param>
@@ -54,6 +88,23 @@ public static class ActorIdentifierExtensions
             return "Unknown";
 #endif
         }
+    }
+
+    public static string TypeToString(this ActorIdentifier identifier)
+    {
+        return identifier.Type switch
+        {
+            IdentifierType.Player => $" ({PenumbraExtensions.Manager?.Data.ToWorldName(identifier.HomeWorld) ?? "Unknown"})",
+            IdentifierType.Retainer => $"{identifier.Retainer switch
+            {
+                ActorIdentifier.RetainerType.Bell => " (Bell)",
+                ActorIdentifier.RetainerType.Mannequin => " (Mannequin)",
+                _ => " (Retainer)",
+            }}",
+            IdentifierType.Owned => " (Companion/Mount)",
+            IdentifierType.Npc => " (NPC)",
+            _ => "",
+        };
     }
 
     /// <summary>

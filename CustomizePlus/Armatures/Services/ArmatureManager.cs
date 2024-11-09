@@ -122,7 +122,7 @@ public unsafe sealed class ArmatureManager : IDisposable
             var armature = kvPair.Value;
             //Only remove armatures which haven't been seen for a while
             //But remove armatures of special actors (like examine screen) right away
-            if (!_objectManager.ContainsKey(kvPair.Value.ActorIdentifier) &&
+            if (!_objectManager.Identifiers.ContainsKey(kvPair.Value.ActorIdentifier) &&
                 (armature.LastSeen <= armatureExpirationDateTime || armature.ActorIdentifier.Type == IdentifierType.Special))
             {
                 _logger.Debug($"Removing armature {armature} because {kvPair.Key.IncognitoDebug()} is gone");
@@ -184,7 +184,7 @@ public unsafe sealed class ArmatureManager : IDisposable
             }
 
             //Needed because skeleton sometimes appears to be not ready when armature is created
-            //and also because we want to augment armature with new bones if they are available
+            //and also because we want to keep armature up to date with any character skeleton changes
             TryLinkSkeleton(armature);
         }
     }
@@ -194,9 +194,10 @@ public unsafe sealed class ArmatureManager : IDisposable
         foreach (var kvPair in Armatures)
         {
             var armature = kvPair.Value;
-            if (armature.IsBuilt && armature.IsVisible && _objectManager.ContainsKey(armature.ActorIdentifier))
+
+            if (armature.IsBuilt && armature.IsVisible && _objectManager.TryGetValue(armature.ActorIdentifier, out var actorData))
             {
-                foreach (var actor in _objectManager[armature.ActorIdentifier].Objects)
+                foreach (var actor in actorData.Objects)
                     ApplyPiecewiseTransformation(armature, actor, armature.ActorIdentifier);
             }
         }
@@ -206,38 +207,22 @@ public unsafe sealed class ArmatureManager : IDisposable
     /// Returns whether or not a link can be established between the armature and an in-game object.
     /// If unbuilt, the armature will be rebuilded.
     /// </summary>
-    private bool TryLinkSkeleton(Armature armature, bool forceRebuild = false)
+    private bool TryLinkSkeleton(Armature armature)
     {
         _objectManager.Update();
 
-        try
+        if (!_objectManager.Identifiers.ContainsKey(armature.ActorIdentifier))
+            return false;
+
+        var actor = _objectManager[armature.ActorIdentifier].Objects[0];
+
+        if (!armature.IsBuilt || armature.IsSkeletonUpdated(actor.Model.AsCharacterBase))
         {
-            if (!_objectManager.ContainsKey(armature.ActorIdentifier))
-                return false;
-
-            var actor = _objectManager[armature.ActorIdentifier].Objects[0];
-
-            if (!armature.IsBuilt || forceRebuild)
-            {
-                armature.RebuildSkeleton(actor.Model.AsCharacterBase);
-            }
-            else if (armature.NewBonesAvailable(actor.Model.AsCharacterBase))
-            {
-                armature.AugmentSkeleton(actor.Model.AsCharacterBase);
-            }
-
-            return true;
+            _logger.Debug($"Skeleton for actor #{actor.AsObject->ObjectIndex} tied to \"{armature}\" has changed");
+            armature.RebuildSkeleton(actor.Model.AsCharacterBase);
         }
-        catch (Exception ex)
-        {
-            // This is on wait until isse #191 on Github responds. Keeping it in code, delete it if I forget and this is longer then a month ago.
 
-            // Disabling this if its any Default Profile due to Log spam. A bit crazy but hey, if its for me id Remove Default profiles all together so this is as much as ill do for now! :)
-            //if(!(Profile.CharacterName.Equals(Constants.DefaultProfileCharacterName) || Profile.CharacterName.Equals("DefaultCutscene"))) {
-            _logger.Error($"Error occured while attempting to link skeleton: {armature}");
-            throw;
-            //}
-        }
+        return true;
     }
 
     /// <summary>
@@ -358,7 +343,6 @@ public unsafe sealed class ArmatureManager : IDisposable
         if (type is not TemplateChanged.Type.NewBone &&
             type is not TemplateChanged.Type.DeletedBone &&
             type is not TemplateChanged.Type.EditorCharacterChanged &&
-            type is not TemplateChanged.Type.EditorLimitLookupToOwnedChanged &&
             type is not TemplateChanged.Type.EditorEnabled &&
             type is not TemplateChanged.Type.EditorDisabled)
             return;
@@ -384,9 +368,9 @@ public unsafe sealed class ArmatureManager : IDisposable
 
         if (type == TemplateChanged.Type.EditorCharacterChanged)
         {
-            (var characterName, var profile) = ((string, Profile))arg3;
+            (var character, var profile) = ((ActorIdentifier, Profile))arg3;
 
-            foreach (var armature in GetArmaturesForCharacterName(characterName))
+            foreach (var armature in GetArmaturesForCharacter(character))
             {
                 armature.IsPendingProfileRebind = true;
                 _logger.Debug($"ArmatureManager.OnTemplateChange Editor profile character name changed, armature rebind scheduled: {type}, {armature}");
@@ -399,22 +383,7 @@ public unsafe sealed class ArmatureManager : IDisposable
             foreach (var armature in profile.Armatures)
                 armature.IsPendingProfileRebind = true;
 
-            _logger.Debug($"ArmatureManager.OnTemplateChange Editor profile character name changed, armature rebind scheduled: {type}, profile: {profile.Name.Text.Incognify()}->{profile.Enabled}, new name: {characterName.Incognify()}");
-
-            return;
-        }
-
-        if(type == TemplateChanged.Type.EditorLimitLookupToOwnedChanged)
-        {
-            var profile = (Profile)arg3!;
-
-            if (profile.Armatures.Count == 0)
-                return;
-
-            foreach (var armature in profile.Armatures)
-                armature.IsPendingProfileRebind = true;
-
-            _logger.Debug($"ArmatureManager.OnTemplateChange Editor profile limit lookup setting changed, armature rebind scheduled: {type}, profile: {profile.Name.Text.Incognify()}->{profile.Enabled}");
+            _logger.Debug($"ArmatureManager.OnTemplateChange Editor profile character name changed, armature rebind scheduled: {type}, profile: {profile.Name.Text.Incognify()}->{profile.Enabled}, new name: {character.Incognito(null)}");
 
             return;
         }
@@ -422,7 +391,7 @@ public unsafe sealed class ArmatureManager : IDisposable
         if (type == TemplateChanged.Type.EditorEnabled ||
             type == TemplateChanged.Type.EditorDisabled)
         {
-            foreach (var armature in GetArmaturesForCharacterName((string)arg3!))
+            foreach (var armature in GetArmaturesForCharacter((ActorIdentifier)arg3!))
             {
                 armature.IsPendingProfileRebind = true;
                 _logger.Debug($"ArmatureManager.OnTemplateChange template editor enabled/disabled: {type}, pending profile set for {armature}");
@@ -442,12 +411,14 @@ public unsafe sealed class ArmatureManager : IDisposable
             type is not ProfileChanged.Type.Deleted &&
             type is not ProfileChanged.Type.TemporaryProfileAdded &&
             type is not ProfileChanged.Type.TemporaryProfileDeleted &&
-            type is not ProfileChanged.Type.ChangedCharacterName &&
+            type is not ProfileChanged.Type.AddedCharacter &&
+            type is not ProfileChanged.Type.RemovedCharacter &&
+            type is not ProfileChanged.Type.PriorityChanged &&
             type is not ProfileChanged.Type.ChangedDefaultProfile &&
-            type is not ProfileChanged.Type.LimitLookupToOwnedChanged)
+            type is not ProfileChanged.Type.ChangedDefaultLocalPlayerProfile)
             return;
 
-        if (type == ProfileChanged.Type.ChangedDefaultProfile)
+        if (type == ProfileChanged.Type.ChangedDefaultProfile || type == ProfileChanged.Type.ChangedDefaultLocalPlayerProfile)
         {
             var oldProfile = (Profile?)arg3;
 
@@ -457,7 +428,7 @@ public unsafe sealed class ArmatureManager : IDisposable
             foreach (var armature in oldProfile.Armatures)
                 armature.IsPendingProfileRebind = true;
 
-            _logger.Debug($"ArmatureManager.OnProfileChange Profile no longer default, armatures rebind scheduled: {type}, old profile: {oldProfile.Name.Text.Incognify()}->{oldProfile.Enabled}");
+            _logger.Debug($"ArmatureManager.OnProfileChange Profile no longer default/default for local player, armatures rebind scheduled: {type}, old profile: {oldProfile.Name.Text.Incognify()}->{oldProfile.Enabled}");
 
             return;
         }
@@ -468,32 +439,57 @@ public unsafe sealed class ArmatureManager : IDisposable
             return;
         }
 
+        if(type == ProfileChanged.Type.PriorityChanged)
+        {
+            if (!profile.Enabled)
+                return;
+
+            foreach (var character in profile.Characters)
+            {
+                if (!character.IsValid)
+                    continue;
+
+                foreach (var armature in GetArmaturesForCharacter(character))
+                {
+                    armature.IsPendingProfileRebind = true;
+                    _logger.Debug($"ArmatureManager.OnProfileChange profile {profile} priority changed, planning rebind for armature {armature}");
+                }
+            }
+
+            return;
+        }
+
         if (type == ProfileChanged.Type.Toggled)
         {
             if (!profile.Enabled && profile.Armatures.Count == 0)
                 return;
 
-            if (profile == _profileManager.DefaultProfile)
+            if (profile == _profileManager.DefaultProfile ||
+                profile == _profileManager.DefaultLocalPlayerProfile)
             {
                 foreach (var kvPair in Armatures)
                 {
                     var armature = kvPair.Value;
-                    if (armature.Profile == profile)
+                    if (armature.Profile == _profileManager.DefaultProfile || //not the best solution but w/e
+                        armature.Profile == _profileManager.DefaultLocalPlayerProfile)
                         armature.IsPendingProfileRebind = true;
 
-                    _logger.Debug($"ArmatureManager.OnProfileChange default profile toggled, planning rebind for armature {armature}");
+                    _logger.Debug($"ArmatureManager.OnProfileChange default/default local player profile toggled, planning rebind for armature {armature}");
                 }
 
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(profile.CharacterName))
-                return;
-
-            foreach (var armature in GetArmaturesForCharacterName(profile.CharacterName))
+            foreach(var character in profile.Characters)
             {
-                armature.IsPendingProfileRebind = true;
-                _logger.Debug($"ArmatureManager.OnProfileChange profile {profile} toggled, planning rebind for armature {armature}");
+                if (!character.IsValid)
+                    continue;
+
+                foreach (var armature in GetArmaturesForCharacter(character))
+                {
+                    armature.IsPendingProfileRebind = true;
+                    _logger.Debug($"ArmatureManager.OnProfileChange profile {profile} toggled, planning rebind for armature {armature}");
+                }
             }
 
             return;
@@ -501,26 +497,46 @@ public unsafe sealed class ArmatureManager : IDisposable
 
         if (type == ProfileChanged.Type.TemporaryProfileAdded)
         {
-            if (!profile.TemporaryActor.IsValid || !Armatures.ContainsKey(profile.TemporaryActor))
-                return;
+            foreach(var character in profile.Characters)
+            {
+                if (!character.IsValid || !Armatures.ContainsKey(character))
+                    continue;
 
-            var armature = Armatures[profile.TemporaryActor];
-            if (armature.Profile == profile)
-                return;
+                var armature = Armatures[character];
 
-            armature.UpdateLastSeen();
+                if (armature.Profile == profile)
+                    return;
 
-            armature.IsPendingProfileRebind = true;
+                armature.UpdateLastSeen();
+
+                armature.IsPendingProfileRebind = true;
+            }
 
             _logger.Debug($"ArmatureManager.OnProfileChange TemporaryProfileAdded, calling rebind for existing armature: {type}, data payload: {arg3?.ToString()}, profile: {profile.Name.Text.Incognify()}->{profile.Enabled}");
 
             return;
         }
 
-        if (type == ProfileChanged.Type.ChangedCharacterName ||
-            type == ProfileChanged.Type.Deleted ||
-            type == ProfileChanged.Type.TemporaryProfileDeleted ||
-            type == ProfileChanged.Type.LimitLookupToOwnedChanged)
+        if (type == ProfileChanged.Type.AddedCharacter ||
+            type == ProfileChanged.Type.RemovedCharacter)
+        {
+            if (arg3 == null)
+                throw new InvalidOperationException("AddedCharacter/RemovedCharacter must supply actor identifier as an argument");
+
+            ActorIdentifier actorIdentifier = (ActorIdentifier)arg3;
+            if (!actorIdentifier.IsValid)
+                return;
+
+            foreach (var armature in GetArmaturesForCharacter(actorIdentifier))
+                armature.IsPendingProfileRebind = true;
+
+            _logger.Debug($"ArmatureManager.OnProfileChange AC/RC, armature rebind scheduled: {type}, data payload: {arg3?.ToString()?.Incognify()}, profile: {profile.Name.Text.Incognify()}->{profile.Enabled}");
+            
+            return;
+        }
+
+        if (type == ProfileChanged.Type.Deleted ||
+            type == ProfileChanged.Type.TemporaryProfileDeleted)
         {
             if (profile.Armatures.Count == 0)
                 return;
@@ -533,7 +549,7 @@ public unsafe sealed class ArmatureManager : IDisposable
                 armature.IsPendingProfileRebind = true;
             }
 
-            _logger.Debug($"ArmatureManager.OnProfileChange CCN/DEL/TPD/LLTOC, armature rebind scheduled: {type}, data payload: {arg3?.ToString()?.Incognify()}, profile: {profile.Name.Text.Incognify()}->{profile.Enabled}");
+            _logger.Debug($"ArmatureManager.OnProfileChange DEL/TPD, armature rebind scheduled: {type}, data payload: {arg3?.ToString()?.Incognify()}, profile: {profile.Name.Text.Incognify()}->{profile.Enabled}");
 
             return;
         }
@@ -547,13 +563,17 @@ public unsafe sealed class ArmatureManager : IDisposable
         profile!.Armatures.ForEach(x => x.IsPendingProfileRebind = true);
     }
 
-    private IEnumerable<Armature> GetArmaturesForCharacterName(string characterName)
+    /// <summary>
+    /// Warn: should not be used for temporary profiles as this limits search for Type = Owned to things owned by local player.
+    /// </summary>
+    private IEnumerable<Armature> GetArmaturesForCharacter(ActorIdentifier actorIdentifier)
     {
-        foreach(var kvPair in Armatures)
+        foreach (var kvPair in Armatures)
         {
-            (var actorIdentifier, _) = _gameObjectService.GetTrueActorForSpecialTypeActor(kvPair.Key);
+            (var armatureActorIdentifier, _) = _gameObjectService.GetTrueActorForSpecialTypeActor(kvPair.Key);
 
-            if(actorIdentifier.ToNameWithoutOwnerName() == characterName)
+            if (actorIdentifier.IsValid && armatureActorIdentifier.MatchesIgnoringOwnership(actorIdentifier) &&
+                (armatureActorIdentifier.Type != IdentifierType.Owned || armatureActorIdentifier.IsOwnedByLocalPlayer()))
                 yield return kvPair.Value;
         }
     }

@@ -1,37 +1,36 @@
-﻿using Dalamud.Plugin;
-using Microsoft.Extensions.DependencyInjection;
-using OtterGui.Classes;
-using OtterGui.Log;
-using CustomizePlus.Profiles;
-using CustomizePlus.Core.Services;
-using CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
-using CustomizePlus.Game.Services;
-using CustomizePlus.Configuration.Services;
-using CustomizePlus.Templates;
-using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
+﻿using CustomizePlus.Anamnesis;
+using CustomizePlus.Api;
 using CustomizePlus.Armatures.Events;
-using CustomizePlus.Configuration.Data;
-using CustomizePlus.Core.Events;
-using CustomizePlus.UI;
-using CustomizePlus.UI.Windows.Controls;
-using CustomizePlus.Anamnesis;
 using CustomizePlus.Armatures.Services;
-using CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
-using CustomizePlus.UI.Windows.MainWindow;
+using CustomizePlus.Configuration.Data;
+using CustomizePlus.Configuration.Services;
+using CustomizePlus.Core.Events;
+using CustomizePlus.Core.Services;
 using CustomizePlus.Game.Events;
-using CustomizePlus.UI.Windows;
-using CustomizePlus.UI.Windows.MainWindow.Tabs;
-using CustomizePlus.Templates.Events;
-using CustomizePlus.Profiles.Events;
+using CustomizePlus.Game.Services;
 using CustomizePlus.Game.Services.GPose;
 using CustomizePlus.Game.Services.GPose.ExternalTools;
 using CustomizePlus.GameData.Services;
-using CustomizePlus.Configuration.Services.Temporary;
+using CustomizePlus.Profiles;
+using CustomizePlus.Profiles.Events;
+using CustomizePlus.Templates;
+using CustomizePlus.Templates.Events;
+using CustomizePlus.UI;
+using CustomizePlus.UI.Windows;
+using CustomizePlus.UI.Windows.Controls;
+using CustomizePlus.UI.Windows.MainWindow;
+using CustomizePlus.UI.Windows.MainWindow.Tabs;
+using CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
+using CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
+using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
+using Dalamud.Plugin;
+using Microsoft.Extensions.DependencyInjection;
+using OtterGui.Classes;
+using OtterGui.Log;
+using OtterGui.Raii;
 using OtterGui.Services;
 using Penumbra.GameData.Actors;
 using Penumbra.GameData.Structs;
-using OtterGui.Raii;
-using CustomizePlus.Api;
 
 namespace CustomizePlus.Core;
 
@@ -89,6 +88,7 @@ public static class ServiceManagerBuilder
         services
             .AddSingleton<TemplateCombo>()
             .AddSingleton<PluginStateBlock>()
+            .AddSingleton<ActorAssignmentUi>()
             .AddSingleton<SettingsTab>()
             // template
             .AddSingleton<TemplatesTab>()
@@ -138,7 +138,8 @@ public static class ServiceManagerBuilder
             .AddSingleton<FilenameService>()
             .AddSingleton<BackupService>()
             .AddSingleton<FrameworkManager>()
-            .AddSingleton<SupportLogBuilderService>();
+            .AddSingleton<SupportLogBuilderService>()
+            .AddSingleton<TestingVersionNotifierService>();
 
         return services;
     }
@@ -163,8 +164,7 @@ public static class ServiceManagerBuilder
     {
         services
             .AddSingleton<PluginConfiguration>()
-            .AddSingleton<ConfigurationMigrator>()
-            .AddSingleton<Version3ConfigFixer>();
+            .AddSingleton<ConfigurationMigrator>();
 
         return services;
     }

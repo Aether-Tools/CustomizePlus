@@ -15,6 +15,7 @@ public partial class PopupSystem
         public const string IPCSetProfileToChrDone = "ipc_set_profile_to_character_done";
         public const string IPCRevertDone = "ipc_revert_done";
         public const string IPCCopiedToClipboard = "ipc_copied_to clipboard";
+        public const string IPCSuccessfullyExecuted = "ipc_successfully_executed";
         public const string IPCEnableProfileByIdDone = "ipc_enable_profile_by_id_done";
         public const string IPCDisableProfileByIdDone = "ipc_disable_profile_by_id_done";
 
@@ -35,6 +36,7 @@ public partial class PopupSystem
         RegisterPopup(Messages.IPCSetProfileToChrDone, "SetProfileToCharacter has been called with data from memory, profile id printed to log");
         RegisterPopup(Messages.IPCRevertDone, "DeleteTemporaryProfileByUniqueId has been called");
         RegisterPopup(Messages.IPCCopiedToClipboard, "Copied into clipboard");
+        RegisterPopup(Messages.IPCSuccessfullyExecuted, "Successfully executed");
         RegisterPopup(Messages.IPCEnableProfileByIdDone, "Enable profile by id has been called");
         RegisterPopup(Messages.IPCDisableProfileByIdDone, "Disable profile by id has been called");
 

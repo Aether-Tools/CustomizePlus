@@ -15,17 +15,18 @@ using ECommons.EzIpcManager;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
-using IPCProfileDataTuple = (System.Guid UniqueId, string Name, string VirtualPath, string CharacterName, bool IsEnabled);
 using OtterGui.Log;
 using CustomizePlus.Core.Extensions;
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Api.Data;
+using CustomizePlus.GameData.Extensions;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 
 public class IPCTestTab //: IDisposable
 {
+    private const string _ownedTesProfile = "{\"Bones\":{\"n_root\":{\"Translation\":{\"X\":0.0,\"Y\":0.0,\"Z\":0.0},\"Rotation\":{\"X\":0.0,\"Y\":0.0,\"Z\":0.0},\"Scaling\":{\"X\":2.0,\"Y\":2.0,\"Z\":2.0}}}}";
+
     private readonly IObjectTable _objectTable;
     private readonly ProfileManager _profileManager;
     private readonly PopupSystem _popupSystem;
@@ -64,6 +65,12 @@ public class IPCTestTab //: IDisposable
     [EzIPC("Profile.GetByUniqueId")]
     private readonly Func<Guid, (int, string?)> _getProfileByIdIpcFunc;
 
+    [EzIPC("GameState.GetCutsceneParentIndex")]
+    private readonly Func<int, int> _getCutsceneParentIdxIpcFunc;
+
+    [EzIPC("GameState.SetCutsceneParentIndex")]
+    private readonly Func<int, int, int> _setCutsceneParentIdxIpcFunc;
+
     private string? _rememberedProfileJson;
 
     private (int, int) _apiVersion;
@@ -73,6 +80,10 @@ public class IPCTestTab //: IDisposable
     private string? _targetCharacterName;
 
     private string _targetProfileId = "";
+
+    private int _cutsceneActorIdx;
+    private int _cutsceneActorParentIdx;
+
 
     public IPCTestTab(
         IDalamudPluginInterface pluginInterface,
@@ -116,6 +127,42 @@ public class IPCTestTab //: IDisposable
         {
             _validResult = _isValidIpcFunc();
             _lastValidCheckAt = DateTime.UtcNow;
+        }
+
+        ImGui.Separator();
+
+        if (ImGui.Button("Owned Actors Temporary Profile Test"))
+        {
+            bool found = false;
+            foreach(var obj  in _objectManager)
+            {
+                if (!obj.Identifier(_actorManager, out var ownedIdent) ||
+                    ownedIdent.Type != Penumbra.GameData.Enums.IdentifierType.Owned ||
+                    ownedIdent.IsOwnedByLocalPlayer())
+                    continue;
+
+                found = true;
+
+                (int result, Guid? profileGuid) = _setTemporaryProfileOnCharacterIpcFunc(obj.Index.Index, _ownedTesProfile);
+                if (result == 0)
+                {
+                    _popupSystem.ShowPopup(PopupSystem.Messages.IPCSetProfileToChrDone);
+                    _logger.Information($"Temporary profile id: {profileGuid} on {ownedIdent}");
+                }
+                else
+                {
+                    _logger.Error($"Error code {result} while calling SetTemporaryProfileOnCharacter");
+                    _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+                }
+
+                break;
+            }
+
+            if(!found)
+            {
+                _logger.Error($"No characters found for Owned Test");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
         }
 
         ImGui.Separator();
@@ -205,7 +252,9 @@ public class IPCTestTab //: IDisposable
 
         if (ImGui.Button("Copy user profile list to clipboard"))
         {
-            ImGui.SetClipboardText(string.Join("\n", _getProfileListIpcFunc().Select(x => $"{x.UniqueId}, {x.Name}, {x.VirtualPath}, {x.CharacterName}, {x.IsEnabled}")));
+            ImGui.SetClipboardText(string.Join("\n", 
+                _getProfileListIpcFunc().Select(x => $"{x.UniqueId}, {x.Name}, {x.VirtualPath}," +
+                    $"|| {string.Join("|", x.Characters.Select(chr => $"{chr.Name}, {chr.WorldId}, {chr.CharacterType}, {chr.CharacterSubType}"))} ||, {x.Priority}, {x.IsEnabled}")));
             _popupSystem.ShowPopup(PopupSystem.Messages.IPCCopiedToClipboard);
         }
 
@@ -283,6 +332,44 @@ public class IPCTestTab //: IDisposable
             else
             {
                 _logger.Error($"Error code {result} while calling DeleteTemporaryProfileByUniqueId");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
+        }
+
+        ImGui.Text("Cutscene actor index:");
+        ImGui.SameLine();
+        ImGui.InputInt("##cutsceneactoridx", ref _cutsceneActorIdx);
+
+        ImGui.Text("Cutscene actor parent index:");
+        ImGui.SameLine();
+        ImGui.InputInt("##cutsceneactorparentidx", ref _cutsceneActorParentIdx);
+
+        if (ImGui.Button("GameState.GetCutsceneParentIndex"))
+        {
+            int result = _getCutsceneParentIdxIpcFunc(_cutsceneActorIdx);
+            if (result > -1)
+            {
+                _cutsceneActorParentIdx = result;
+                _popupSystem.ShowPopup(PopupSystem.Messages.IPCSuccessfullyExecuted);
+            }
+            else
+            {
+                _logger.Error($"No parent for actor or actor not found while caling GetCutsceneParentIndex");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
+        }
+
+        if (ImGui.Button("GameState.SetCutsceneParentIndex"))
+        {
+            int result = _setCutsceneParentIdxIpcFunc(_cutsceneActorIdx, _cutsceneActorParentIdx);
+            if (result == 0)
+            {
+                _cutsceneActorParentIdx = result;
+                _popupSystem.ShowPopup(PopupSystem.Messages.IPCSuccessfullyExecuted);
+            }
+            else
+            {
+                _logger.Error($"Error code {result} while calling GameState.SetCutsceneParentIndex");
                 _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
             }
         }

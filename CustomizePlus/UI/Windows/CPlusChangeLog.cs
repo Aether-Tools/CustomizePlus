@@ -23,6 +23,8 @@ public class CPlusChangeLog
         Add2_0_4_4(Changelog);
         Add2_0_5_0(Changelog);
         Add2_0_6_0(Changelog);
+        Add2_0_6_3(Changelog);
+        Add2_0_7_0(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -35,8 +37,58 @@ public class CPlusChangeLog
         _config.Save();
     }
 
+    private static void Add2_0_7_0(Changelog log)
+        => log.NextVersion("Version 2.0.7.0")
+        .RegisterImportant("Some parts of Customize+ have been considerably rewritten in this update. If you encounter any issues please report them.")
+
+        .RegisterHighlight("Character management has been rewritten.")
+        .RegisterImportant("Customize+ will do its best to automatically migrate your profiles to new system but in some rare cases it is possible that you will have to add characters again for some of your profiles.", 1)
+        .RegisterEntry("Character selection user interface has been redesigned.", 1)
+        .RegisterEntry("It is now possible to assign several characters to a single profile.", 2)
+        .RegisterEntry("The way console commands work has not changed. This means that the commands will affect profiles the same way as before, even if profile affects multiple characters.", 3)
+        .RegisterEntry("\"Limit to my creatures\" option has been removed as it is now obsolete.", 2)
+        .RegisterEntry("It is now possible to choose profile which will be applied to any character you login with.", 2)
+        .RegisterEntry("Player-owned NPCs (minions, mounts) should now correctly synchronize via Mare Synchronos.", 1)
+        .RegisterEntry("It is possible that non-english character names are now working properly. Please note that this is a side effect and CN/KR clients are still not officially supported.", 1)
+
+        .RegisterHighlight("Added profile priority system.")
+        .RegisterEntry("When several active profiles affect the same character, profile priority will be used to determine which profile will be applied to said character.", 1)
+
+        .RegisterEntry("Added additional options to configure how Customize+ window behaves.")
+        .RegisterEntry("Added option to configure if Customize+ windows will be hidden when you hide game UI or not.", 1)
+        .RegisterEntry("Added option to configure if Customize+ windows will be hidden when you enter GPose or not.", 1)
+        .RegisterEntry("Added option to configure if Customize+ main window will be automatically opened when you launch the game or not.", 1)
+
+        .RegisterImportant("Added warning for custom skeleton bones. If you have custom skeleton installed - read it. Seriously. It's a wrench icon near the name of those bones.")
+        .RegisterEntry("Added several warnings when testing build of Customize+ is being used.")
+
+        .RegisterHighlight("Fixed issue when Customize+ did not detect changes in character skeleton. This mostly happened when altering character appearance via Glamourer and other plugins/tools.")
+
+        .RegisterEntry("Dropped support for upgrading from Customize+ 1.0. Clipboard copies are not affected by this change.")
+
+        .RegisterEntry("IPC notes, developers only.")
+        .RegisterImportant("IPC version is now 6.0.", 1)
+        .RegisterEntry("Profile.GetList has been updated to include profile priority as well as list of characters with their metadata. Please refer to Customize+ IPC source code files for additional information.", 1)
+        .RegisterEntry("Profile.OnUpdate event is now being triggered for profiles with \"Apply to all players and retainers\" and \"Apply to any character you are logged in with\" options enabled.", 1)
+        .RegisterEntry("Format of the profile json expected by Profile.SetTemporaryProfileOnCharacter has been updated.", 1)
+        .RegisterEntry("CharacterName field removed.", 2)
+        .RegisterEntry("Added few fields reserved for the future functionality.", 2)
+        .RegisterEntry("Temporary profiles should now apply correctly to owned characters like minions.", 1)
+
+        .RegisterEntry("Source code maintenance - external libraries update.");
+
+    private static void Add2_0_6_3(Changelog log)
+        => log.NextVersion("Version 2.0.6.3")
+            .RegisterEntry("Added new IPC methods: GameState.GetCutsceneParentIndex, GameState.SetCutsceneParentIndex.")
+            .RegisterImportant("Those methods were requested by Ktisis developer. Other developers are advised to not use them unless absolutely sure what they are doing.", 1)
+            .RegisterEntry("Improved support logs. (2.0.6.2)")
+            .RegisterEntry("Tweaked logging a bit to be less spammy in \"Debug+\" mode.")
+            .RegisterEntry("Made Character Select Screen handling more reliable. (2.0.6.1, 2.0.6.3)")
+            .RegisterEntry("Fixed incorrect handling of GPose actors.")
+            .RegisterEntry("Source code maintenance - external libraries update.");
+
     private static void Add2_0_6_0(Changelog log)
-    => log.NextVersion("Version 2.0.6.0")
+        => log.NextVersion("Version 2.0.6.0")
         .RegisterHighlight("IPC has been re-enabled.")
         .RegisterImportant("If you are regular user you have to wait until other plugins implement necessary changes. Please ask developers of those plugins for further information.", 1)
         .RegisterImportant("Breaking change: IPC version has been bumped to 5.0", 1)
@@ -47,7 +99,7 @@ public class CPlusChangeLog
         .RegisterEntry("Fixed issues caused by opening Adventurer Plate window.");
 
     private static void Add2_0_5_0(Changelog log)
-    => log.NextVersion("Version 2.0.5.0")
+        => log.NextVersion("Version 2.0.5.0")
         .RegisterHighlight("Customize+ has been updated to support Dawntrail.")
         .RegisterImportant("If you edited any facial bones it is possible that you will have to make adjustments to your edits.", 1)
         .RegisterImportant("Known issues:", 1)
@@ -59,7 +111,7 @@ public class CPlusChangeLog
         .RegisterEntry("Improved UI behavior when \"Apply to all players and retainers\" is enabled. (2.0.4.5)");
 
     private static void Add2_0_4_4(Changelog log)
-    => log.NextVersion("Version 2.0.4.4")
+        => log.NextVersion("Version 2.0.4.4")
         .RegisterHighlight("Added edit button to the template selector in the profile editor which allows to quickly begin editing associated template.")
         .RegisterEntry("Fixed \"Limit to my creatures\" setting not working correctly. (2.0.4.2)")
         .RegisterEntry("Added additional logging. (2.0.4.2)");

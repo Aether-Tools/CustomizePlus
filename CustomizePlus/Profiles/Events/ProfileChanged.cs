@@ -15,23 +15,19 @@ public sealed class ProfileChanged() : EventWrapper<ProfileChanged.Type, Profile
         Deleted,
         Renamed,
         Toggled,
-        ChangedCharacterName,
+        PriorityChanged,
+        AddedCharacter,
+        RemovedCharacter,
         AddedTemplate,
         RemovedTemplate,
         MovedTemplate,
         ChangedTemplate,
         ReloadedAll,
         WriteProtection,
-        LimitLookupToOwnedChanged,
         ChangedDefaultProfile,
+        ChangedDefaultLocalPlayerProfile,
         TemporaryProfileAdded,
-        TemporaryProfileDeleted,
-        /*
-        ToggledProfile,
-        AddedTemplate,
-        RemovedTemplate,
-        MovedTemplate,
-        ChangedTemplate*/
+        TemporaryProfileDeleted
     }
 
     public enum Priority

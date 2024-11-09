@@ -16,6 +16,8 @@ using CustomizePlus.Configuration.Data;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Game.Services;
 using CustomizePlus.Profiles.Events;
+using CustomizePlus.GameData.Extensions;
+using System.Linq;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 
@@ -132,7 +134,8 @@ public class ProfileFileSystemSelector : FileSystemSelector<Profile, ProfileStat
             case ProfileChanged.Type.Deleted:
             case ProfileChanged.Type.Renamed:
             case ProfileChanged.Type.Toggled:
-            case ProfileChanged.Type.ChangedCharacterName:
+            case ProfileChanged.Type.AddedCharacter:
+            case ProfileChanged.Type.RemovedCharacter:
             case ProfileChanged.Type.ReloadedAll:
                 SetFilterDirty();
                 break;
@@ -238,10 +241,14 @@ public class ProfileFileSystemSelector : FileSystemSelector<Profile, ProfileStat
             return false;
         }
 
+        //todo: priority check
+        var identifier = _gameObjectService.GetCurrentPlayerActorIdentifier();
         if (leaf.Value.Enabled)
-            state.Color = leaf.Value.CharacterName == _gameObjectService.GetCurrentPlayerName() ? ColorId.LocalCharacterEnabledProfile : ColorId.EnabledProfile;
+            state.Color = leaf.Value.Characters.Any(x => x.MatchesIgnoringOwnership(identifier)) ? ColorId.LocalCharacterEnabledProfile : ColorId.EnabledProfile;
         else
-            state.Color = leaf.Value.CharacterName == _gameObjectService.GetCurrentPlayerName() ? ColorId.LocalCharacterDisabledProfile : ColorId.DisabledProfile;
+            state.Color = leaf.Value.Characters.Any(x => x.MatchesIgnoringOwnership(identifier)) ? ColorId.LocalCharacterDisabledProfile : ColorId.DisabledProfile;
+
+        //todo: missing actor color
 
         return ApplyStringFilters(leaf, leaf.Value);
     }

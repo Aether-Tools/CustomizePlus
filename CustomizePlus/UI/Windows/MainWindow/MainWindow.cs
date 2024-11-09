@@ -19,6 +19,7 @@ using Dalamud.Interface.Colors;
 using CustomizePlus.Templates.Events;
 using CustomizePlus.Templates.Data;
 using ECommons.Schedulers;
+using CustomizePlus.Core.Helpers;
 
 namespace CustomizePlus.UI.Windows.MainWindow;
 
@@ -59,7 +60,7 @@ public class MainWindow : Window, IDisposable
         PluginConfiguration configuration,
         HookingService hookingService,
         TemplateEditorEvent templateEditorEvent
-        ) : base($"Customize+ {Plugin.Version}###CPlusMainWindow")
+        ) : base($"Customize+ {VersionHelper.Version}###CPlusMainWindow")
     {
         _settingsTab = settingsTab;
         _templatesTab = templatesTab;
@@ -78,14 +79,13 @@ public class MainWindow : Window, IDisposable
 
         _templateEditorEvent.Subscribe(OnTemplateEditorEvent, TemplateEditorEvent.Priority.MainWindow);
 
-        pluginInterface.UiBuilder.DisableGposeUiHide = true;
         SizeConstraints = new WindowSizeConstraints()
         {
             MinimumSize = new Vector2(700, 675),
             MaximumSize = ImGui.GetIO().DisplaySize,
         };
 
-        IsOpen = pluginInterface.IsDevMenuOpen && configuration.DebuggingModeEnabled;
+        IsOpen = configuration.UISettings.OpenWindowAtStart;
     }
 
     public void Dispose()

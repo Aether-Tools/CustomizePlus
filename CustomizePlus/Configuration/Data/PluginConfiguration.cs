@@ -11,6 +11,8 @@ using CustomizePlus.Core.Data;
 using CustomizePlus.Configuration.Services;
 using CustomizePlus.UI.Windows;
 using Dalamud.Interface.ImGuiNotification;
+using Penumbra.GameData.Actors;
+using CustomizePlus.Core.Helpers;
 
 namespace CustomizePlus.Configuration.Data;
 
@@ -30,6 +32,11 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
     /// </summary>
     public Guid DefaultProfile { get; set; } = Guid.Empty;
 
+    /// <summary>
+    /// Id of the profile applied to any character user logins with. Can be set to Empty to disable this feature.
+    /// </summary>
+    public Guid DefaultLocalPlayerProfile { get; set; } = Guid.Empty;
+
     [Serializable]
     public class ChangelogSettingsEntries
     {
@@ -46,7 +53,13 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
 
         public bool FoldersDefaultOpen { get; set; } = true;
 
+        public bool OpenWindowAtStart { get; set; } = false;
+
         public bool HideWindowInCutscene { get; set; } = true;
+
+        public bool HideWindowWhenUiHidden { get; set; } = true;
+
+        public bool HideWindowInGPose { get; set; } = false;
 
         public bool IncognitoMode { get; set; } = false;
 
@@ -66,9 +79,8 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
         public bool ShowLiveBones { get; set; } = true;
 
         public bool BoneMirroringEnabled { get; set; } = false;
-        public bool LimitLookupToOwnedObjects { get; set; } = false;
 
-        public string? PreviewCharacterName { get; set; } = null;
+        public ActorIdentifier PreviewCharacter { get; set; } = ActorIdentifier.Invalid;
 
         public int EditorValuesPrecision { get; set; } = 3;
 
@@ -134,6 +146,7 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
             JsonConvert.PopulateObject(text, this, new JsonSerializerSettings
             {
                 Error = HandleDeserializationError,
+                Converters = new List<JsonConverter> { new ActorIdentifierJsonConverter() }
             });
         }
         catch (Exception ex)
@@ -153,6 +166,7 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
     {
         using var jWriter = new JsonTextWriter(writer) { Formatting = Formatting.Indented };
         var serializer = new JsonSerializer { Formatting = Formatting.Indented };
+        serializer.Converters.Add(new ActorIdentifierJsonConverter());
         serializer.Serialize(jWriter, this);
     }
 

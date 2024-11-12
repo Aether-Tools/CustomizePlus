@@ -175,7 +175,7 @@ public unsafe class Armature
                 var newPose = cBase->Skeleton->PartialSkeletons[i].GetHavokPose(Constants.TruePoseIndex);
 
                 if (newPose != null
-                    && newPose->Skeleton->Bones.Length != _partialSkeletons[i].Length)
+                    && newPose->Skeleton->Bones.Length != _partialSkeletons[i].Length) //todo: same length but different bone names (fucking hair)
                     return true;
             }
         }

@@ -244,7 +244,7 @@ public class BoneEditorPanel
                 var col3Label = _editingAttribute == BoneAttribute.Rotation ? "Yaw" : "Z";
                 var col4Label = _editingAttribute == BoneAttribute.Scale ? "All" : "N/A";
 
-                ImGui.TableSetupColumn("Bones", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthFixed, 3 * CtrlHelper.IconButtonWidth);
+                ImGui.TableSetupColumn("Bones", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthFixed, 4 * CtrlHelper.IconButtonWidth);
 
                 ImGui.TableSetupColumn($"{col1Label}", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthStretch);
                 ImGui.TableSetupColumn($"{col2Label}", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthStretch);
@@ -405,6 +405,15 @@ public class BoneEditorPanel
         return output;
     }
 
+    private bool PropagateCheckbox(EditRowParams bone, ref bool enabled)
+    {
+        var output = ImGui.Checkbox("##PropagateTransform", ref enabled);
+        CtrlHelper.AddHoverText(
+            $"Apply '{BoneData.GetBoneDisplayName(bone.BoneCodeName)}' transformations to its children");
+
+        return output;
+    }
+
     private bool FullBoneSlider(string label, ref Vector3 value)
     {
         var velocity = _editingAttribute == BoneAttribute.Rotation ? 0.1f : 0.001f;
@@ -462,6 +471,13 @@ public class BoneEditorPanel
             _ => transform.Scaling
         };
 
+        var propagationEnabled = _editingAttribute switch
+        {
+            BoneAttribute.Position => transform.propagateTranslation,
+            BoneAttribute.Rotation => transform.propagateRotation,
+            _ => transform.propagateScale
+        };
+
         using var id = ImRaii.PushId(codename);
         ImGui.TableNextColumn();
         using (var disabled = ImRaii.Disabled(!_isUnlocked))
@@ -472,6 +488,8 @@ public class BoneEditorPanel
             ResetBoneButton(bone);
             ImGui.SameLine();
             RevertBoneButton(bone);
+            ImGui.SameLine();
+            flagUpdate |= PropagateCheckbox(bone, ref propagationEnabled);
 
             //----------------------------------
             ImGui.TableNextColumn();
@@ -517,7 +535,7 @@ public class BoneEditorPanel
 
         if (flagUpdate)
         {
-            transform.UpdateAttribute(_editingAttribute, newVector);
+            transform.UpdateAttribute(_editingAttribute, newVector, propagationEnabled);
 
             _editorManager.ModifyBoneTransform(codename, transform);
             if (_isMirrorModeEnabled && bone.Basis?.TwinBone != null) //todo: put it inside manager

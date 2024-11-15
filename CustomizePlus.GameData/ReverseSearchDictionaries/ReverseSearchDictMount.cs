@@ -4,9 +4,9 @@ using OtterGui.Log;
 using Penumbra.GameData.Data;
 using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
-using Lumina.Excel.GeneratedSheets;
 using CustomizePlus.GameData.ReverseSearchDictionaries.Bases;
 using Dalamud.Utility;
+using Lumina.Excel.Sheets;
 
 namespace CustomizePlus.GameData.ReverseSearchDictionaries;
 
@@ -18,7 +18,7 @@ public sealed class ReverseSearchDictMount(IDalamudPluginInterface pluginInterfa
     private static IReadOnlyDictionary<string, uint> CreateMountData(IDataManager gameData)
     {
         var sheet = gameData.GetExcelSheet<Mount>(gameData.Language)!;
-        var dict = new Dictionary<string, uint>((int)sheet.RowCount);
+        var dict = new Dictionary<string, uint>((int)sheet.Count);
         // Add some custom data.
         dict.TryAdd("Falcon (Porter)", 119);
         dict.TryAdd("Hippo Cart (Quest)", 295);
@@ -27,14 +27,14 @@ public sealed class ReverseSearchDictMount(IDalamudPluginInterface pluginInterfa
         dict.TryAdd("Moon-hopper (Quest)", 309);
         foreach (var m in sheet)
         {
-            if (m.Singular.RawData.Length > 0 && m.Order >= 0)
+            if (m.Singular.ByteLength > 0 && m.Order >= 0)
             {
                 dict.TryAdd(DataUtility.ToTitleCaseExtended(m.Singular, m.Article), m.RowId);
             }
-            else if (m.Unknown18.RawData.Length > 0)
+            else if (m.Unknown1.ByteLength > 0)
             {
                 // Try to transform some file names into category names.
-                var whistle = m.Unknown18.ToDalamudString().ToString();
+                var whistle = m.Unknown18.ToString();
                 whistle = whistle.Replace("SE_Bt_Etc_", string.Empty)
                     .Replace("Mount_", string.Empty)
                     .Replace("_call", string.Empty)

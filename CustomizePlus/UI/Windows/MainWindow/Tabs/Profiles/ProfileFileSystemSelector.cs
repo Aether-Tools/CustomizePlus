@@ -66,8 +66,8 @@ public class ProfileFileSystemSelector : FileSystemSelector<Profile, ProfileStat
 
         _event.Subscribe(OnProfileChange, ProfileChanged.Priority.ProfileFileSystemSelector);
 
-        _clientState.Login += OnLoginLogout;
-        _clientState.Logout += OnLoginLogout;
+        _clientState.Login += OnLogin;
+        _clientState.Logout += OnLogout;
 
         AddButton(NewButton, 0);
         AddButton(CloneButton, 20);
@@ -79,8 +79,8 @@ public class ProfileFileSystemSelector : FileSystemSelector<Profile, ProfileStat
     {
         base.Dispose();
         _event.Unsubscribe(OnProfileChange);
-        _clientState.Login -= OnLoginLogout;
-        _clientState.Logout -= OnLoginLogout;
+        _clientState.Login -= OnLogin;
+        _clientState.Logout -= OnLogout;
     }
 
     protected override uint ExpandedFolderColor
@@ -142,7 +142,12 @@ public class ProfileFileSystemSelector : FileSystemSelector<Profile, ProfileStat
         }
     }
 
-    private void OnLoginLogout()
+    private void OnLogin()
+    {
+        SetFilterDirty();
+    }
+
+    private void OnLogout(int type, int code)
     {
         SetFilterDirty();
     }

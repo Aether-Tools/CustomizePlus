@@ -4,8 +4,8 @@ using OtterGui.Log;
 using Penumbra.GameData.Data;
 using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
-using Lumina.Excel.GeneratedSheets;
 using CustomizePlus.GameData.ReverseSearchDictionaries.Bases;
+using Lumina.Excel.Sheets;
 
 namespace CustomizePlus.GameData.ReverseSearchDictionaries;
 
@@ -17,8 +17,8 @@ public sealed class ReverseSearchDictCompanion(IDalamudPluginInterface pluginInt
     private static IReadOnlyDictionary<string, uint> CreateCompanionData(IDataManager gameData)
     {
         var sheet = gameData.GetExcelSheet<Companion>(gameData.Language)!;
-        var dict = new Dictionary<string, uint>((int)sheet.RowCount);
-        foreach (var c in sheet.Where(c => c.Singular.RawData.Length > 0 && c.Order < ushort.MaxValue))
+        var dict = new Dictionary<string, uint>((int)sheet.Count);
+        foreach (var c in sheet.Where(c => c.Singular.ByteLength > 0 && c.Order < ushort.MaxValue))
             dict.TryAdd(DataUtility.ToTitleCaseExtended(c.Singular, c.Article), c.RowId);
         return dict.ToFrozenDictionary();
     }

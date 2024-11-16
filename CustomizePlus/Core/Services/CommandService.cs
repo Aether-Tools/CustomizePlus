@@ -15,7 +15,7 @@ using CustomizePlus.Configuration.Data;
 using Dalamud.Interface.ImGuiNotification;
 using CustomizePlus.GameData.Extensions;
 using System.Collections.Generic;
-using ECommons;
+using ECommonsLite;
 using CustomizePlus.Core.Helpers;
 
 namespace CustomizePlus.Core.Services;

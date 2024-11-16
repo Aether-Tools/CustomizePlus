@@ -5,7 +5,7 @@ using CustomizePlus.GameData.Services;
 using CustomizePlus.Profiles;
 using CustomizePlus.Profiles.Events;
 using Dalamud.Plugin;
-using ECommons.EzIpcManager;
+using ECommonsLite.EzIpcManager;
 using OtterGui.Log;
 using System;
 

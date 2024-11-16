@@ -13,12 +13,12 @@ using CustomizePlus.UI.Windows.Controls;
 using CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 using CustomizePlus.UI.Windows.MainWindow.Tabs;
 using CustomizePlus.Templates;
-using ECommons.ImGuiMethods;
+using ECommonsLite.ImGuiMethods;
 using static System.Windows.Forms.AxHost;
 using Dalamud.Interface.Colors;
 using CustomizePlus.Templates.Events;
 using CustomizePlus.Templates.Data;
-using ECommons.Schedulers;
+using ECommonsLite.Schedulers;
 using CustomizePlus.Core.Helpers;
 
 namespace CustomizePlus.UI.Windows.MainWindow;

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ECommons.EzIpcManager;
+using ECommonsLite.EzIpcManager;
 using Newtonsoft.Json;
 using CustomizePlus.Api.Data;
 using CustomizePlus.Api.Enums;

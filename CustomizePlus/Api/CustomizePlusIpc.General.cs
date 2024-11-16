@@ -1,4 +1,4 @@
-﻿using ECommons.EzIpcManager;
+﻿using ECommonsLite.EzIpcManager;
 
 namespace CustomizePlus.Api;
 

@@ -11,7 +11,7 @@ using CustomizePlus.Configuration.Helpers;
 using CustomizePlus.Game.Services;
 using CustomizePlus.GameData.Services;
 using Penumbra.GameData.Actors;
-using ECommons.EzIpcManager;
+using ECommonsLite.EzIpcManager;
 using System;
 using System.Collections;
 using System.Collections.Generic;

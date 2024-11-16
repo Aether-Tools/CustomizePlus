@@ -9,6 +9,7 @@ using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.Api;
 using CustomizePlus.Core.Data;
+using CustomizePlus.Core.Services.Dalamud;
 
 namespace CustomizePlus.UI.Windows.Controls;
 
@@ -19,19 +20,22 @@ public class PluginStateBlock
     private readonly GameStateService _gameStateService;
     private readonly HookingService _hookingService;
     private readonly CustomizePlusIpc _ipcService;
+    private readonly DalamudBranchService _dalamudBranchService;
 
     public PluginStateBlock(
         BoneEditorPanel boneEditorPanel,
         PluginConfiguration configuration,
         GameStateService gameStateService,
         HookingService hookingService,
-        CustomizePlusIpc ipcService)
+        CustomizePlusIpc ipcService,
+        DalamudBranchService dalamudBranchService)
     {
         _boneEditorPanel = boneEditorPanel;
         _configuration = configuration;
         _gameStateService = gameStateService;
         _hookingService = hookingService;
         _ipcService = ipcService;
+        _dalamudBranchService = dalamudBranchService;
     }
 
     public void Draw(float yPos)
@@ -43,7 +47,7 @@ public class PluginStateBlock
         if(_hookingService.RenderHookFailed || _hookingService.MovementHookFailed)
         {
             severity = PluginStateSeverity.Error;
-            message = $"Detected failure in game hooks. Customize+ disabled.";
+            message = "Detected failure in game hooks. Customize+ disabled.";
         }
         else if (!_configuration.PluginEnabled)
         {
@@ -68,17 +72,23 @@ public class PluginStateBlock
         else if (_gameStateService.GameInPosingMode())
         {
             severity = PluginStateSeverity.Warning;
-            message = $"GPose active. Compatibility with posing tools is limited.";
+            message = "GPose active. Compatibility with posing tools is limited.";
         }
         else if (_ipcService.IPCFailed) //this is a low priority error
         {
             severity = PluginStateSeverity.Error;
-            message = $"Detected failure in IPC. Integrations with other plugins will not function.";
+            message = "Detected failure in IPC. Integrations with other plugins will not function.";
+        }
+        else if (_dalamudBranchService.CurrentBranch != DalamudBranchService.DalamudBranch.Release)
+        {
+            severity = PluginStateSeverity.Error;
+            message = "You are running unsupported version of Dalamud, hover for more information.";
+            hoverInfo = "Regular users are not supposed to run Customize+ on development or testing versions of Dalamud.\nThis is not supported and might be actively prevented in the future.";
         }
         else if(VersionHelper.IsTesting)
         {
             severity = PluginStateSeverity.Warning;
-            message = $"You are running testing version of Customize+, hover for more information.";
+            message = "You are running testing version of Customize+, hover for more information.";
             hoverInfo = "This is a testing build of Customize+. Some features like integration with other plugins might not function correctly.";
         }
 

@@ -28,7 +28,7 @@ public sealed class Plugin : IDalamudPlugin
 
             _services.GetService<ActorManager>(); //needs to be initialized early for config to be read properly
 
-            _services.GetService<TestingVersionNotifierService>();
+            _services.GetService<UserNotifierService>();
             _services.GetService<CustomizePlusIpc>();
             _services.GetService<CPlusWindowSystem>();
             _services.GetService<CommandService>();

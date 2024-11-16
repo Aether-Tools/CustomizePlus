@@ -6,7 +6,7 @@ using Dalamud.Plugin.Services;
 using Microsoft.Extensions.DependencyInjection;
 using OtterGui.Services;
 
-namespace CustomizePlus.Core.Services;
+namespace CustomizePlus.Core.Services.Dalamud;
 
 public class DalamudServices
 {

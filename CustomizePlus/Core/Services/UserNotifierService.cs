@@ -54,8 +54,8 @@ public class UserNotifierService : IDisposable
 
             if (displayOptionalMessages)
             {
-                UIGlobals.PlayChatSoundEffect(11);
-                _popupSystem.ShowPopup(PopupSystem.Messages.PluginDisabledNonReleaseDalamud);
+                if(_popupSystem.ShowPopup(PopupSystem.Messages.PluginDisabledNonReleaseDalamud))
+                    UIGlobals.PlayChatSoundEffect(11);
             }
         }
     }

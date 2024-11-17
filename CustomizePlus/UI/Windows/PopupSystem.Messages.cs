@@ -47,7 +47,7 @@ public partial class PopupSystem
         RegisterPopup(Messages.ClipboardDataUnsupported, "Clipboard data you are trying to use cannot be used in this version of Customize+.");
 
         RegisterPopup(Messages.ClipboardDataNotLongTerm, "Warning: clipboard data is not designed to be used as long-term way of storing your templates.\nCompatibility of copied data between different Customize+ versions is not guaranteed.", true, new Vector2(5, 10));
-        
-        RegisterPopup(Messages.PluginDisabledNonReleaseDalamud, DalamudBranchService.PluginDisabledMessage, false, new Vector2(5, 8));
+
+        RegisterPopup(Messages.PluginDisabledNonReleaseDalamud, DalamudBranchService.PluginDisabledMessage + "\nThis window will not be shown again.", true, new Vector2(5, 8));
     }
 }

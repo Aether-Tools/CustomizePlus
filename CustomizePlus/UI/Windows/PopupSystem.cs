@@ -38,7 +38,10 @@ public partial class PopupSystem
         _logger.Debug($"Popup \"{name}\" registered");
     }
 
-    public void ShowPopup(string name)
+    /// <summary>
+    /// Show popup. Returns false if popup will not be shown for some reason. (can only be shown once or awaiting to be shown)
+    /// </summary>
+    public bool ShowPopup(string name)
     {
         name = name.ToLowerInvariant();
 
@@ -47,12 +50,14 @@ public partial class PopupSystem
 
         var popup = _popups[name];
 
-        if (popup.DisplayRequested || _configuration.UISettings.ViewedMessageWindows.Contains(name))
-            return;
+        if (popup.DisplayRequested || (popup.DisplayOnce && _configuration.UISettings.ViewedMessageWindows.Contains(name)))
+            return false;
 
         popup.DisplayRequested = true;
 
         //_logger.Debug($"Popup \"{name}\" set as requested to be displayed");
+
+        return true;
     }
 
     public void Draw()

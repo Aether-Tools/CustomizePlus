@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Configurations>Debug;Release</Configurations>
+    <Configurations>Debug;Release;ReleaseValidate</Configurations>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -49,8 +49,12 @@
     <DefineConstants>INCOGNIFY_STRINGS</DefineConstants>
   </PropertyGroup>-->
 
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+  <PropertyGroup Condition="'$(Configuration)'=='Release' Or '$(Configuration)'=='ReleaseValidate'">
     <DefineConstants>INCOGNIFY_STRINGS</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='ReleaseValidate'">
+    <DefineConstants>VALIDATE_BUILD</DefineConstants>
   </PropertyGroup>
   
 </Project>

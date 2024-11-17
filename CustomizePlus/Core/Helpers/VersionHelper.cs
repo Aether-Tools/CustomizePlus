@@ -12,6 +12,8 @@ internal static class VersionHelper
 
     public static bool IsDebug { get; private set; } = false;
 
+    public static bool IsValidate { get; private set; } = false;
+
     static VersionHelper()
     {
         #if DEBUG
@@ -24,7 +26,14 @@ internal static class VersionHelper
         if (ThisAssembly.Git.BaseTag.ToLowerInvariant().Contains("testing"))
             IsTesting = true;
 
+        #if VALIDATE_BUILD
+        IsValidate = true;
+        #endif
+
         if (IsTesting)
             Version += " [TESTING BUILD]";
+
+        if (IsValidate)
+            Version += " [VALIDATE BUILD]";
     }
 }

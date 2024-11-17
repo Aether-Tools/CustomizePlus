@@ -79,11 +79,11 @@ public class PluginStateBlock
             severity = PluginStateSeverity.Error;
             message = "Detected failure in IPC. Integrations with other plugins will not function.";
         }
-        else if (_dalamudBranchService.CurrentBranch != DalamudBranchService.DalamudBranch.Release)
+        else if (!_dalamudBranchService.AllowPluginToRun)
         {
             severity = PluginStateSeverity.Error;
             message = "You are running unsupported version of Dalamud, hover for more information.";
-            hoverInfo = "Regular users are not supposed to run Customize+ on development or testing versions of Dalamud.\nThis is not supported and might be actively prevented in the future.";
+            hoverInfo = "Regular users are not supposed to run Customize+ on development or testing versions of Dalamud.\nThis is not supported and therefore Customize+ has disabled itself.";
         }
         else if(VersionHelper.IsTesting)
         {

@@ -9,7 +9,7 @@
     <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/Aether-Tools/CustomizePlus</PackageProjectUrl>
     <UseWindowsForms>true</UseWindowsForms>
-    <Configurations>Debug;Release</Configurations>
+    <Configurations>Debug;Release;ReleaseValidate</Configurations>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -90,8 +90,16 @@
     <DefineConstants>INCOGNIFY_STRINGS</DefineConstants>
   </PropertyGroup>-->
 
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+  <PropertyGroup Condition="'$(Configuration)'=='Release' Or '$(Configuration)'=='ReleaseValidate'">
     <DefineConstants>INCOGNIFY_STRINGS</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DefineConstants>CHECK_DALAMUD_BRANCH</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='ReleaseValidate'">
+    <DefineConstants>VALIDATE_BUILD</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup>

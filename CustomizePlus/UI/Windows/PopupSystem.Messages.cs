@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using CustomizePlus.Core.Services.Dalamud;
+using System.Numerics;
 
 namespace CustomizePlus.UI.Windows;
 
@@ -23,6 +24,8 @@ public partial class PopupSystem
         public const string ClipboardDataUnsupported = "clipboard_data_unsupported_version";
 
         public const string ClipboardDataNotLongTerm = "clipboard_data_not_longterm";
+
+        public const string PluginDisabledNonReleaseDalamud = "non_release_dalamud";
     }
 
     private void RegisterMessages()
@@ -44,5 +47,7 @@ public partial class PopupSystem
         RegisterPopup(Messages.ClipboardDataUnsupported, "Clipboard data you are trying to use cannot be used in this version of Customize+.");
 
         RegisterPopup(Messages.ClipboardDataNotLongTerm, "Warning: clipboard data is not designed to be used as long-term way of storing your templates.\nCompatibility of copied data between different Customize+ versions is not guaranteed.", true, new Vector2(5, 10));
+        
+        RegisterPopup(Messages.PluginDisabledNonReleaseDalamud, DalamudBranchService.PluginDisabledMessage, false, new Vector2(5, 8));
     }
 }

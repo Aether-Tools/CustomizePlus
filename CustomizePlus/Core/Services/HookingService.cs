@@ -25,7 +25,7 @@ public class HookingService : IDisposable
     private readonly ProfileManager _profileManager;
     private readonly ArmatureManager _armatureManager;
     private readonly GameStateService _gameStateService;
-    //private readonly DalamudBranchService _dalamudBranchService;
+    private readonly DalamudBranchService _dalamudBranchService;
     private readonly Logger _logger;
 
     private Hook<RenderDelegate>? _renderManagerHook;
@@ -46,7 +46,7 @@ public class HookingService : IDisposable
         ProfileManager profileManager,
         ArmatureManager armatureManager,
         GameStateService gameStateService,
-        //DalamudBranchService dalamudBranchService,
+        DalamudBranchService dalamudBranchService,
         Logger logger)
     {
         _configuration = configuration;
@@ -55,7 +55,7 @@ public class HookingService : IDisposable
         _profileManager = profileManager;
         _armatureManager = armatureManager;
         _gameStateService = gameStateService;
-        //_dalamudBranchService = dalamudBranchService;
+        _dalamudBranchService = dalamudBranchService;
         _logger = logger;
 
         ReloadHooks();
@@ -75,8 +75,11 @@ public class HookingService : IDisposable
         RenderHookFailed = false;
         MovementHookFailed = false;
 
-        /*if(_dalamudBranchService.CurrentBranch != DalamudBranchService.DalamudBranch.Release)
-            return;*/
+        if(!_dalamudBranchService.AllowPluginToRun)
+        {
+            _logger.Error("Not reloading hooks because the plugin is not allowed to run. (Branch Service)");
+            return;
+        }
 
         try
         {

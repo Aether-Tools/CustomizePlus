@@ -9,7 +9,7 @@ public class DalamudBranchService : IService
     /// Message used in various places to tell user why the plugin is disabled
     /// </summary>
     public const string PluginDisabledMessage = "You are running development or testing version of Dalamud.\n" +
-        "Regular users are not supposed to run Customize+ on non-release versions of Dalamud therefore Customize+ has disabled itself until you go back to stable version.";
+        "Regular users are not supposed to run Customize+ on non-release versions of Dalamud therefore Customize+ has disabled itself until you go back to stable version.\n\nYou can go back to stable version by typing /xlbranch, clicking \"release\" and then \"Pick & Restart\".";
 
     /// <summary>
     /// Current Dalamud branch

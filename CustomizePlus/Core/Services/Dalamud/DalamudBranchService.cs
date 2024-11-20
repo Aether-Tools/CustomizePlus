@@ -27,7 +27,7 @@ public class DalamudBranchService : IService
     public bool AllowPluginToRun { get; private set; } = true;
 
     public DalamudBranchService(DalamudConfigService dalamudConfigService, Logger logger)
-    {
+    {/*
         dalamudConfigService.GetDalamudConfig<string>(DalamudConfigService.BetaKindOption, out var betaOption);
 
         CurrentBranchName = betaOption?.ToLowerInvariant() ?? "release";
@@ -48,7 +48,10 @@ public class DalamudBranchService : IService
         AllowPluginToRun = CurrentBranch == DalamudBranch.Release;
     #endif
 
-        logger.Information($"Current Dalamud branch is: {CurrentBranchName} ({CurrentBranch}). Plugin allowed to run: {AllowPluginToRun}");
+        logger.Information($"Current Dalamud branch is: {CurrentBranchName} ({CurrentBranch}). Plugin allowed to run: {AllowPluginToRun}");*/
+        CurrentBranchName = "release";
+        CurrentBranch = DalamudBranch.Release;
+        AllowPluginToRun = true;
     }
 
     public enum DalamudBranch

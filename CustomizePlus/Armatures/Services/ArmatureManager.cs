@@ -7,6 +7,7 @@ using CustomizePlus.Armatures.Events;
 using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Extensions;
 using CustomizePlus.Game.Services;
+using CustomizePlus.GameData.Data;
 using CustomizePlus.GameData.Extensions;
 using CustomizePlus.GameData.Services;
 using CustomizePlus.Profiles;
@@ -138,9 +139,12 @@ public unsafe sealed class ArmatureManager : IDisposable
                 _logger.Debug($"Removing armature {armature} because {kvPair.Key.IncognitoDebug()} is gone");
                 RemoveArmature(armature, ArmatureChanged.DeletionReason.Gone);
 
-                //Reset root translation
-                foreach (var obj in actorData.Objects)
-                    ApplyRootTranslation(null, obj);
+                if(actorData.Objects != null)
+                {
+                    //Reset root translation
+                    foreach (var obj in actorData.Objects)
+                        ApplyRootTranslation(armature, obj, true);
+                }
 
                 continue;
             }
@@ -185,9 +189,12 @@ public unsafe sealed class ArmatureManager : IDisposable
                         _logger.Debug($"Removing armature {armature} because it doesn't have any active profiles");
                         RemoveArmature(armature, ArmatureChanged.DeletionReason.NoActiveProfiles);
 
-                        //Reset root translation
-                        foreach (var actor in obj.Value.Objects)
-                            ApplyRootTranslation(null, actor);
+                        if (obj.Value.Objects != null)
+                        {
+                            //Reset root translation
+                            foreach (var actor in obj.Value.Objects)
+                                ApplyRootTranslation(armature, actor, true);
+                        }
 
                         continue;
                     }
@@ -325,9 +332,9 @@ public unsafe sealed class ArmatureManager : IDisposable
     }
 
     /// <summary>
-    /// Apply root bone translation. If null armature is passed then position is reset.
+    /// Apply root bone translation. If reset = true then this will only reset translation if it was edited in supplied armature.
     /// </summary>
-    private void ApplyRootTranslation(Armature? arm, Actor actor)
+    private void ApplyRootTranslation(Armature arm, Actor actor, bool reset = false)
     {
         //I'm honestly not sure if we should or even can check if cBase->DrawObject or cBase->DrawObject.Object is a valid object
         //So for now let's assume we don't need to check for that
@@ -337,15 +344,15 @@ public unsafe sealed class ArmatureManager : IDisposable
         var cBase = actor.Model.AsCharacterBase;
         if (cBase != null)
         {
-            if(arm == null)
+            var rootBoneTransform = arm.GetAppliedBoneTransform("n_root");
+            if (rootBoneTransform == null)
+                return;
+
+            if (reset)
             {
                 cBase->DrawObject.Object.Position = actor.AsObject->Position;
                 return;
             }
-
-            var rootBoneTransform = arm.GetAppliedBoneTransform("n_root");
-            if (rootBoneTransform == null)
-                return;
 
             if (rootBoneTransform.Translation.X == 0 &&
                 rootBoneTransform.Translation.Y == 0 &&

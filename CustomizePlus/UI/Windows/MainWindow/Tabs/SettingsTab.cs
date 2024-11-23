@@ -386,7 +386,7 @@ public class SettingsTab
             _changeLog.Changelog.ForceOpen = true;
     }
 
-    /// <summary> Draw a button to open the official discord server. </summary>
+    /// <summary> Draw a button to open some url. </summary>
     private void DrawUrlButton(string text, string url, uint buttonColor, float width)
     {
         using var color = ImRaii.PushColor(ImGuiCol.Button, buttonColor);

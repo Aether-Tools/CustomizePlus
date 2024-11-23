@@ -26,6 +26,7 @@ public class CPlusChangeLog
         Add2_0_6_3(Changelog);
         Add2_0_7_0(Changelog);
         Add2_0_7_2(Changelog);
+        Add2_0_7_9(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -38,11 +39,19 @@ public class CPlusChangeLog
         _config.Save();
     }
 
+    private static void Add2_0_7_9(Changelog log)
+        => log.NextVersion("Version 2.0.7.9")
+        .RegisterEntry("Added donation button to settings tab.")
+        .RegisterEntry("Saving changes to the template used in the active profile will now tell other plugins that the profile was changed by sending OnProfileUpdate IPC event. (2.0.7.8)")
+        .RegisterEntry("Root bone position edits no longer require character to move in order to apply. (2.0.7.6)")
+
+        .RegisterEntry("Fixed \"Apply to any character you are logged in with\" profile option being ignored by Profile.GetActiveProfileIdOnCharacter IPC function preventing other plugins from being able to detect active profile with this option enabled. (2.0.7.8)")
+
+        .RegisterEntry("Source code maintenance - external libraries update.");
+
     private static void Add2_0_7_2(Changelog log)
         => log.NextVersion("Version 2.0.7.2")
         .RegisterHighlight("Support for 7.1 and Dalamud API 11.")
-        //.RegisterImportant("As an experiment Customize+ will no longer run if you are running testing or development version of Dalamud. Please leave your feedback about this change in support Discord.")
-        //.RegisterEntry("Developers can prevent this from triggering by manually compiling \"Debug\" or \"ReleaseValidate\" builds of Customize+.", 1)
         .RegisterHighlight("Fixed an issue which prevented owned characters (such as Carbuncles and Trust NPCs) from being detected. (2.0.7.1)")
 
         .RegisterEntry("Source code maintenance - external libraries update.");

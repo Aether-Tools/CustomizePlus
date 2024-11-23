@@ -21,6 +21,7 @@ namespace CustomizePlus.UI.Windows.MainWindow.Tabs;
 public class SettingsTab
 {
     private const uint DiscordColor = 0xFFDA8972;
+    private const uint DonateColor = 0xFF5B5EFF;
 
     private readonly IDalamudPluginInterface _pluginInterface;
     private readonly PluginConfiguration _configuration;
@@ -60,6 +61,7 @@ public class SettingsTab
 
         DrawGeneralSettings();
 
+        ImGui.NewLine();
         ImGui.NewLine();
         ImGui.NewLine();
         ImGui.NewLine();
@@ -366,9 +368,12 @@ public class SettingsTab
             xPos -= ImGui.GetStyle().ScrollbarSize + ImGui.GetStyle().FramePadding.X;
 
         ImGui.SetCursorPos(new Vector2(xPos, 0));
-        DrawDiscordButton(width);
+        DrawUrlButton("Join Discord for Support", "https://discord.gg/KvGJCCnG8t", DiscordColor, width);
 
-        ImGui.SetCursorPos(new Vector2(xPos, 1 * ImGui.GetFrameHeightWithSpacing()));
+        ImGui.SetCursorPos(new Vector2(xPos, ImGui.GetFrameHeightWithSpacing()));
+        DrawUrlButton("Support developer using Ko-fi", "https://ko-fi.com/risadev", DonateColor, width);
+
+        ImGui.SetCursorPos(new Vector2(xPos, 2 * ImGui.GetFrameHeightWithSpacing()));
         if (ImGui.Button("Copy Support Info to Clipboard"))
         {
             var text = _supportLogBuilderService.BuildSupportLog();
@@ -376,20 +381,19 @@ public class SettingsTab
             _messageService.NotificationMessage($"Copied Support Info to Clipboard.", NotificationType.Success, false);
         }
 
-        ImGui.SetCursorPos(new Vector2(xPos, 2 * ImGui.GetFrameHeightWithSpacing()));
+        ImGui.SetCursorPos(new Vector2(xPos, 3 * ImGui.GetFrameHeightWithSpacing()));
         if (ImGui.Button("Show update history", new Vector2(width, 0)))
             _changeLog.Changelog.ForceOpen = true;
     }
 
     /// <summary> Draw a button to open the official discord server. </summary>
-    private void DrawDiscordButton(float width)
+    private void DrawUrlButton(string text, string url, uint buttonColor, float width)
     {
-        const string address = @"https://discord.gg/KvGJCCnG8t";
-        using var color = ImRaii.PushColor(ImGuiCol.Button, DiscordColor);
-        if (ImGui.Button("Join Discord for Support", new Vector2(width, 0)))
+        using var color = ImRaii.PushColor(ImGuiCol.Button, buttonColor);
+        if (ImGui.Button(text, new Vector2(width, 0)))
             try
             {
-                var process = new ProcessStartInfo(address)
+                var process = new ProcessStartInfo(url)
                 {
                     UseShellExecute = true,
                 };
@@ -397,10 +401,10 @@ public class SettingsTab
             }
             catch
             {
-                _messageService.NotificationMessage($"Unable to open Discord at {address}.", NotificationType.Error, false);
+                _messageService.NotificationMessage($"Unable to open url {url}.", NotificationType.Error, false);
             }
 
-        ImGuiUtil.HoverTooltip($"Open {address}");
+        ImGuiUtil.HoverTooltip($"Open {url}");
     }
     #endregion
 }

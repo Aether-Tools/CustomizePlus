@@ -432,7 +432,8 @@ public partial class ProfileManager : IDisposable
     /// <summary>
     /// Return profile by actor identifier, does not return temporary profiles.
     /// </summary>
-    public Profile? GetProfileByActor(Actor actor, bool enabledOnly = false)
+    /// todo: use GetEnabledProfilesByActor
+    public Profile? GetActiveProfileByActor(Actor actor)
     {
         var actorIdentifier = actor.GetIdentifier(_actorManager);
 
@@ -442,14 +443,17 @@ public partial class ProfileManager : IDisposable
         if (actorIdentifier.Type == IdentifierType.Owned && !actorIdentifier.IsOwnedByLocalPlayer())
             return null;
 
-        var query = Profiles.Where(p => p.Characters.Any(x => x.MatchesIgnoringOwnership(actorIdentifier)) && !p.IsTemporary);
-        if (enabledOnly)
-            query = query.Where(x => x.Enabled);
+        var query = Profiles.Where(p => p.Characters.Any(x => x.MatchesIgnoringOwnership(actorIdentifier)) && !p.IsTemporary && p.Enabled);
 
         var profile = query.OrderByDescending(x => x.Priority).FirstOrDefault();
 
-        if (profile == null)
+        if(profile == null)
+        {
+            if (DefaultLocalPlayerProfile?.Enabled == true)
+                return DefaultLocalPlayerProfile;
+
             return null;
+        }
 
         return profile;
     }

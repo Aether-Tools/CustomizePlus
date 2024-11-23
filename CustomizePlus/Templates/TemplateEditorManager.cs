@@ -9,6 +9,7 @@ using CustomizePlus.Profiles.Enums;
 using CustomizePlus.Templates.Data;
 using CustomizePlus.Templates.Events;
 using Dalamud.Plugin.Services;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using OtterGui.Classes;
 using OtterGui.Log;
@@ -160,6 +161,10 @@ public class TemplateEditorManager : IDisposable
 
         _logger.Debug($"Disabling editor profile");
 
+        //todo: can be optimized by storing actual reference to original template somewhere
+        var template = _templateManager.GetTemplate(CurrentlyEditedTemplateId);
+        var hasChanges = HasChanges;
+
         CurrentlyEditedTemplateId = Guid.Empty;
         CurrentlyEditedTemplate = null;
         EditorProfile.Enabled = false;
@@ -167,21 +172,35 @@ public class TemplateEditorManager : IDisposable
         IsEditorActive = false;
         HasChanges = false;
 
-        _event.Invoke(TemplateChanged.Type.EditorDisabled, null, Character);
+        _event.Invoke(TemplateChanged.Type.EditorDisabled, template, (Character, hasChanges));
 
         return true;
     }
 
-    public void SaveChanges(bool asCopy = false)
+    public void SaveChangesAndDisableEditor(bool asCopy = false)
     {
+        if (!IsEditorActive || IsEditorPaused)
+            return;
+
+        if(!HasChanges)
+        {
+            DisableEditor();
+            return;
+        }
+
         var targetTemplate = _templateManager.GetTemplate(CurrentlyEditedTemplateId);
         if (targetTemplate == null)
             throw new Exception($"Fatal editor error: Template with ID {CurrentlyEditedTemplateId} not found in template manager");
 
         if (asCopy)
+        {
             targetTemplate = _templateManager.Clone(targetTemplate, $"{targetTemplate.Name} - Copy {Guid.NewGuid().ToString().Substring(0, 4)}", false);
+            HasChanges = false; //do this so EditorDisabled event sends proper info about the state of *currently edited* template
+        }
 
         _templateManager.ApplyBoneChangesAndSave(targetTemplate, CurrentlyEditedTemplate!);
+
+        DisableEditor();
     }
 
     public bool ChangeEditorCharacter(ActorIdentifier character)

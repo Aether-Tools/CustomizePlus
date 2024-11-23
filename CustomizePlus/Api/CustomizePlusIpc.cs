@@ -4,6 +4,8 @@ using CustomizePlus.Game.Services;
 using CustomizePlus.GameData.Services;
 using CustomizePlus.Profiles;
 using CustomizePlus.Profiles.Events;
+using CustomizePlus.Templates.Data;
+using CustomizePlus.Templates.Events;
 using Dalamud.Plugin;
 using ECommonsLite.EzIpcManager;
 using OtterGui.Log;
@@ -29,6 +31,7 @@ public partial class CustomizePlusIpc : IDisposable
     private readonly CutsceneService _cutsceneService;
 
     private readonly ArmatureChanged _armatureChangedEvent;
+    private readonly TemplateChanged _templateChangedEvent;
 
     /// <summary>
     /// Shows if IPC failed to initialize or any other unrecoverable fatal error occured.
@@ -43,7 +46,8 @@ public partial class CustomizePlusIpc : IDisposable
         GameObjectService gameObjectService,
         ProfileFileSystem profileFileSystem,
         CutsceneService cutsceneService,
-        ArmatureChanged armatureChangedEvent)
+        ArmatureChanged armatureChangedEvent,
+        TemplateChanged templateChangedEvent)
     {
         _pluginInterface = pluginInterface;
         _logger = logger;
@@ -54,14 +58,17 @@ public partial class CustomizePlusIpc : IDisposable
         _cutsceneService = cutsceneService;
 
         _armatureChangedEvent = armatureChangedEvent;
+        _templateChangedEvent = templateChangedEvent;
 
         EzIPC.Init(this, "CustomizePlus");
 
         _armatureChangedEvent.Subscribe(OnArmatureChanged, ArmatureChanged.Priority.CustomizePlusIpc);
+        _templateChangedEvent.Subscribe(OnTemplateChanged, TemplateChanged.Priority.CustomizePlusIpc);
     }
 
     public void Dispose()
     {
         _armatureChangedEvent.Unsubscribe(OnArmatureChanged);
+        _templateChangedEvent.Unsubscribe(OnTemplateChanged);
     }
 }

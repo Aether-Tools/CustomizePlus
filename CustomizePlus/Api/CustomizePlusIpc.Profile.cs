@@ -15,6 +15,9 @@ using CustomizePlus.GameData.Extensions;
 using Dalamud.Game.ClientState.Objects.Types;
 using Penumbra.GameData.Structs;
 using Penumbra.GameData.Enums;
+using CustomizePlus.Templates.Data;
+using CustomizePlus.Templates.Events;
+using Penumbra.GameData.Actors;
 
 namespace CustomizePlus.Api;
 
@@ -144,7 +147,7 @@ public partial class CustomizePlusIpc
         if (actor == null || !actor.Value.Valid || !actor.Value.IsCharacter)
             return ((int)ErrorCode.InvalidCharacter, null);
 
-        var profile = _profileManager.GetProfileByActor(actor.Value, true);
+        var profile = _profileManager.GetActiveProfileByActor(actor.Value);
 
         if (profile == null)
             return ((int)ErrorCode.ProfileNotFound, null);
@@ -266,6 +269,35 @@ public partial class CustomizePlusIpc
             _logger.Error($"Exception in DeleteTemporaryProfileOnCharacter. Unique id: {uniqueId}. Exception: {ex}");
             return (int)ErrorCode.UnknownError;
         }
+    }
+
+    //Send profile update if any of the templates were changed in currently active profile
+    private void OnTemplateChanged(TemplateChanged.Type type, Template? template, object? arg3)
+    {
+        if (type != TemplateChanged.Type.EditorDisabled)
+            return;
+
+        (ActorIdentifier actorIdentifier, bool hasChanges) = ((ActorIdentifier, bool))arg3;
+
+        if (!hasChanges || actorIdentifier.Type != IdentifierType.Player)
+            return;
+
+        var actor = _gameObjectService.GetLocalPlayerActor();
+        if (!actor.Valid || !actorIdentifier.PlayerName.EqualsCi(actor.Utf8Name))
+            return;
+
+        var profile = _profileManager.GetActiveProfileByActor(actor);
+        if (profile == null) //safety check
+            return;
+
+        if (!profile.Templates.Contains(template!))
+            return;
+
+        ICharacter? localPlayerCharacter = (ICharacter?)_gameObjectService.GetDalamudGameObjectFromActor(actor);
+        if (localPlayerCharacter == null)
+            return;
+
+        OnProfileUpdateInternal(localPlayerCharacter, profile);
     }
 
     //warn: intended limitation - ignores default profiles because why you would use default profile on your own character

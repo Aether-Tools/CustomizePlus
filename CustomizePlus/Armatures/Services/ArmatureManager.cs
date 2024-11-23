@@ -428,7 +428,15 @@ public unsafe sealed class ArmatureManager : IDisposable
         if (type == TemplateChanged.Type.EditorEnabled ||
             type == TemplateChanged.Type.EditorDisabled)
         {
-            foreach (var armature in GetArmaturesForCharacter((ActorIdentifier)arg3!))
+            ActorIdentifier actor;
+            bool hasChanges;
+
+            if(type == TemplateChanged.Type.EditorEnabled)
+                actor = (ActorIdentifier)arg3;
+            else
+                (actor, hasChanges) = ((ActorIdentifier, bool))arg3;
+
+            foreach (var armature in GetArmaturesForCharacter(actor))
             {
                 armature.IsPendingProfileRebind = true;
                 _logger.Debug($"ArmatureManager.OnTemplateChange template editor enabled/disabled: {type}, pending profile set for {armature}");

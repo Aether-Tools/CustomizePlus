@@ -7,15 +7,13 @@ using CustomizePlus.Armatures.Events;
 using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Extensions;
 using CustomizePlus.Game.Services;
-using CustomizePlus.GameData.Data;
+using CustomizePlus.Game.Services.GPose;
 using CustomizePlus.GameData.Extensions;
-using CustomizePlus.GameData.Services;
 using CustomizePlus.Profiles;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Profiles.Events;
 using CustomizePlus.Templates.Events;
 using Dalamud.Plugin.Services;
-using Lumina.Excel.Sheets;
 using OtterGui.Classes;
 using OtterGui.Log;
 using Penumbra.GameData.Actors;
@@ -36,6 +34,7 @@ public unsafe sealed class ArmatureManager : IDisposable
     private readonly FrameworkManager _framework;
     private readonly ObjectManager _objectManager;
     private readonly ActorManager _actorManager;
+    private readonly GPoseService _gposeService;
     private readonly ArmatureChanged _event;
 
     /// <summary>
@@ -56,6 +55,7 @@ public unsafe sealed class ArmatureManager : IDisposable
         FrameworkManager framework,
         ObjectManager objectManager,
         ActorManager actorManager,
+        GPoseService gposeService,
         ArmatureChanged @event)
     {
         _profileManager = profileManager;
@@ -67,6 +67,7 @@ public unsafe sealed class ArmatureManager : IDisposable
         _framework = framework;
         _objectManager = objectManager;
         _actorManager = actorManager;
+        _gposeService = gposeService;
         _event = @event;
 
         _templateChangedEvent.Subscribe(OnTemplateChange, TemplateChanged.Priority.ArmatureManager);
@@ -221,9 +222,16 @@ public unsafe sealed class ArmatureManager : IDisposable
                     ApplyPiecewiseTransformation(armature, actor, armature.ActorIdentifier);
 
                     if (!_objectMovementFlagsArr[actor.AsObject->ObjectIndex])
-                        ApplyRootTranslation(armature, actor);
+                    {
+                        //todo: ApplyRootTranslation causes character flashing in gpose
+                        //research if this can be fixed without breaking this functionality
+                        if (_gposeService.IsInGPose)
+                            continue;
 
-                    _objectMovementFlagsArr[actor.AsObject->ObjectIndex] = false;
+                        ApplyRootTranslation(armature, actor);
+                    }
+                    else
+                        _objectMovementFlagsArr[actor.AsObject->ObjectIndex] = false;
                 }
             }
         }
@@ -337,8 +345,10 @@ public unsafe sealed class ArmatureManager : IDisposable
         var cBase = actor.Model.AsCharacterBase;
         if (cBase != null)
         {
+            //warn: hotpath for characters with n_root edits. IsApproximately might have some performance hit.
             var rootBoneTransform = arm.GetAppliedBoneTransform("n_root");
-            if (rootBoneTransform == null)
+            if (rootBoneTransform == null || 
+                rootBoneTransform.Translation.IsApproximately(Vector3.Zero, 0.00001f))
                 return;
 
             if (reset)

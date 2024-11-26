@@ -172,12 +172,32 @@ public unsafe class Armature
         {
             for (var i = 0; i < cBase->Skeleton->PartialSkeletonCount; ++i)
             {
+                if (i == 2)
+                    continue; //hair is handled separately
+
                 var newPose = cBase->Skeleton->PartialSkeletons[i].GetHavokPose(Constants.TruePoseIndex);
 
                 if (newPose != null
                     && newPose->Skeleton->Bones.Length != _partialSkeletons[i].Length)
                     return true;
-                //todo: compare bones for hair partial skeleton [2]
+            }
+
+            //handle hair separately because different hairstyles can have the same amount of bones.
+            if(cBase->Skeleton->PartialSkeletonCount > 2)
+            {
+                var newPose = cBase->Skeleton->PartialSkeletons[2].GetHavokPose(Constants.TruePoseIndex);
+
+                if(newPose != null)
+                {
+                    if(newPose->Skeleton->Bones.Length != _partialSkeletons[2].Length)
+                        return true;
+
+                    for(var i = 0; i < newPose->Skeleton->Bones.Length; i++)
+                    {
+                        if (newPose->Skeleton->Bones[i].Name.String != _partialSkeletons[2][i].BoneName)
+                            return true;
+                    }
+                }
             }
         }
 

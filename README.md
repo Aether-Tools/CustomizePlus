@@ -11,7 +11,7 @@ Then search for Customize+ in the plugin manager.
 ## FAQ
 
 ### Where do I learn how to use Customize+?
-Most of the things should be self-explanatory, if you do need help you can join the [XIV Tools Discord](https://discord.gg/KvGJCCnG8t) and ask in the appropriate channel.
+Most of the things should be self-explanatory, if you do need help you can join the [Aetherworks Discord](https://discord.gg/KvGJCCnG8t) and ask in the appropriate channel.
 
 ### How do I report a bug in Customize+ or leave a suggestion?
 GitHub issues is the primary place for posting bugs and suggestions related to Customize+. **But!** First we ask you join [Aetherworks Discord](https://discord.gg/KvGJCCnG8t) and consult our help team about your issue first. It's highly likely that you are not experiencing a bug in Customize+.

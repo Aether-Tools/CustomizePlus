@@ -12,10 +12,12 @@ Then search for Customize+ in the plugin manager.
 
 ### I need help with using Customize+!
 You can try finding it in support discord server run by volunteers: [Aetherworks](https://discord.gg/KvGJCCnG8t). **Do not ask for help or support in issues section on GitHub.**
+
 ⚠ Please note that at the current time the developers do not actively participate in support or discussions on that server.
 
 ### How do I report a bug in Customize+ or leave a suggestion?
 First we ask you join [Aetherworks Discord server](https://discord.gg/KvGJCCnG8t) and consult with volunteer support team about your issue first. It's highly likely that you are not experiencing a bug in Customize+.
+
 Before reporting bug or leaving a suggestion in this GitHub you need to **carefully** read [issue creation guidelines](https://github.com/Aether-Tools/CustomizePlus/issues/11).
 
 ### When will Customize+ be updated?

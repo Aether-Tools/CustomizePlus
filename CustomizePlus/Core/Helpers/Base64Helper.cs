@@ -2,25 +2,27 @@
 using System.IO;
 using System.IO.Compression;
 using System.Text;
+using CustomizePlus.Templates.Data;
 using Newtonsoft.Json;
 
 namespace CustomizePlus.Core.Helpers;
 
+//this is jank but I don't have time to rewrite it
 public static class Base64Helper
 {
     // Compress any type to a base64 encoding of its compressed json representation, prepended with a version byte.
     // Returns an empty string on failure.
     // Original by Ottermandias: OtterGui <3
-    public static unsafe string ExportToBase64<T>(T obj, byte version)
+    public static string ExportTemplateToBase64(Template template)
     {
         try
         {
-            var json = JsonConvert.SerializeObject(obj, Formatting.None);
-            var bytes = Encoding.UTF8.GetBytes(json);
+            var json = template.JsonSerialize();
+            var bytes = Encoding.UTF8.GetBytes(json.ToString(Formatting.None));
             using var compressedStream = new MemoryStream();
             using (var zipStream = new GZipStream(compressedStream, CompressionMode.Compress))
             {
-                zipStream.Write(new ReadOnlySpan<byte>(&version, 1));
+                zipStream.WriteByte(Template.Version);
                 zipStream.Write(bytes, 0, bytes.Length);
             }
 

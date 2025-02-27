@@ -230,7 +230,7 @@ public class TemplatePanel : IDisposable
     {
         try
         {
-            Clipboard.SetText(Base64Helper.ExportToBase64(_selector.Selected!, Constants.ConfigurationVersion));
+            Clipboard.SetText(Base64Helper.ExportTemplateToBase64(_selector.Selected!));
             _popupSystem.ShowPopup(PopupSystem.Messages.ClipboardDataNotLongTerm);
         }
         catch (Exception ex)

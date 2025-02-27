@@ -23,6 +23,8 @@ namespace CustomizePlus.Api;
 
 public partial class CustomizePlusIpc
 {
+    private static JsonSerializerSettings _ipcProfileSerializerSettings = new JsonSerializerSettings { DefaultValueHandling = DefaultValueHandling.Ignore };
+
     /// <summary>
     /// Triggered when changes in currently active profiles are detected. (like changing active profile or making any changes to it)
     /// Not triggered if any changes happen due to character no longer existing.
@@ -88,7 +90,7 @@ public partial class CustomizePlusIpc
 
         try
         {
-            return ((int)ErrorCode.Success, JsonConvert.SerializeObject(convertedProfile));
+            return ((int)ErrorCode.Success, JsonConvert.SerializeObject(convertedProfile, _ipcProfileSerializerSettings));
         }
         catch (Exception ex)
         {

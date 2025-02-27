@@ -27,6 +27,8 @@ public class IPCTestTab //: IDisposable
 {
     private const string _ownedTesProfile = "{\"Bones\":{\"n_root\":{\"Translation\":{\"X\":0.0,\"Y\":0.0,\"Z\":0.0},\"Rotation\":{\"X\":0.0,\"Y\":0.0,\"Z\":0.0},\"Scaling\":{\"X\":2.0,\"Y\":2.0,\"Z\":2.0}}}}";
 
+    private static JsonSerializerSettings _ipcProfileSerializerSettings = new JsonSerializerSettings { DefaultValueHandling = DefaultValueHandling.Ignore };
+
     private readonly IObjectTable _objectTable;
     private readonly ProfileManager _profileManager;
     private readonly PopupSystem _popupSystem;
@@ -186,7 +188,7 @@ public class IPCTestTab //: IDisposable
             if (profile == null)
                 return;
 
-            _rememberedProfileJson = JsonConvert.SerializeObject(IPCCharacterProfile.FromFullProfile(profile));
+            _rememberedProfileJson = JsonConvert.SerializeObject(IPCCharacterProfile.FromFullProfile(profile), _ipcProfileSerializerSettings);
             _popupSystem.ShowPopup(PopupSystem.Messages.IPCProfileRemembered);
         }
 

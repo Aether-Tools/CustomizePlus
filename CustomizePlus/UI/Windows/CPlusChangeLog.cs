@@ -27,6 +27,7 @@ public class CPlusChangeLog
         Add2_0_7_0(Changelog);
         Add2_0_7_2(Changelog);
         Add2_0_7_9(Changelog);
+        Add2_0_7_15(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -38,6 +39,19 @@ public class CPlusChangeLog
         _config.ChangelogSettings.ChangeLogDisplayType = type;
         _config.Save();
     }
+
+    private static void Add2_0_7_15(Changelog log)
+        => log.NextVersion("Version 2.0.7.15")
+        .RegisterEntry("Optimized JSON payload returned by Profile.GetByUniqueId IPC method. (requested by Mare Synchronos)")
+        .RegisterEntry("Values which are considered default are no longer returned, this drastically reduces the size of returned data.", 1)
+        .RegisterEntry("Fixed clipboard copies missing version data.")
+        .RegisterEntry("You do not need to do anything about this. This just fixes format inconsistencies between clipboard copies and on-disk data.", 1)
+        .RegisterEntry("Fixed (some?) \"ImGui assertation failed\" errors (2.0.7.14)")
+        .RegisterEntry("Improved support log contents (2.0.7.13)")
+        .RegisterEntry("Fixed skeleton changes not being detected when changing to between hairstyles with same amount of bones. (2.0.7.11)")
+        .RegisterEntry("Fixed character flashing in GPose. (Root bone position edits are no longer applied in GPose) (2.0.7.10)")
+
+        .RegisterEntry("Source code maintenance - external libraries update.");
 
     private static void Add2_0_7_9(Changelog log)
         => log.NextVersion("Version 2.0.7.9")

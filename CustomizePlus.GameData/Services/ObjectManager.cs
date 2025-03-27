@@ -26,7 +26,8 @@ public class ObjectManager(
         => LastFrame;
 
     private DateTime _identifierUpdate;
-    public bool IsInGPose { get; private set; }
+
+    public bool IsInGPose => clientState.IsGPosing;
     //c+ custom
     public bool IsInLobby { get; private set; }
     public ushort World { get; private set; }
@@ -80,9 +81,6 @@ public class ObjectManager(
                 HandleIdentifier(identifier, actor);
         }
 
-        var gPose = GPosePlayer;
-        IsInGPose = gPose.Utf8Name.Length > 0;
-
         //C+ custom
         IsInLobby = AddLobbyCharacters();
 
@@ -91,7 +89,7 @@ public class ObjectManager(
 
     private void HandleIdentifier(ActorIdentifier identifier, Actor character)
     {
-        if (!character.Model || !identifier.IsValid)
+        if (!identifier.IsValid)
             return;
 
         if (!_identifiers.TryGetValue(identifier, out var data))

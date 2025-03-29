@@ -43,8 +43,7 @@ public class CPlusChangeLog
 
     private static void Add2_0_7_16(Changelog log)
         => log.NextVersion("Version 2.0.7.16")
-        .RegisterHighlight("Support for 7.2 and Dalamud API 12.")
-        .RegisterEntry("Source code maintenance - external libraries update.");
+        .RegisterImportant("Support for update 7.2 and Dalamud API 12.");
 
     private static void Add2_0_7_15(Changelog log)
         => log.NextVersion("Version 2.0.7.15")
@@ -71,7 +70,7 @@ public class CPlusChangeLog
 
     private static void Add2_0_7_2(Changelog log)
         => log.NextVersion("Version 2.0.7.2")
-        .RegisterHighlight("Support for 7.1 and Dalamud API 11.")
+        .RegisterImportant("Support for 7.1 and Dalamud API 11.")
         .RegisterHighlight("Fixed an issue which prevented owned characters (such as Carbuncles and Trust NPCs) from being detected. (2.0.7.1)")
 
         .RegisterEntry("Source code maintenance - external libraries update.");

@@ -12,7 +12,7 @@ namespace CustomizePlus.GameData.ReverseSearchDictionaries;
 
 /// <summary> A dictionary that matches names to mount ids. </summary>
 public sealed class ReverseSearchDictMount(IDalamudPluginInterface pluginInterface, Logger log, IDataManager gameData)
-    : ReverseNameDictionary(pluginInterface, log, gameData, "ReverseSearchMounts", Versions.DictMount, () => CreateMountData(gameData))
+    : ReverseNameDictionary(pluginInterface, log, gameData, "ReverseSearchMounts", Penumbra.GameData.DataContainers.Version.DictMount, () => CreateMountData(gameData))
 {
     /// <summary> Create the data. </summary>
     private static IReadOnlyDictionary<string, uint> CreateMountData(IDataManager gameData)

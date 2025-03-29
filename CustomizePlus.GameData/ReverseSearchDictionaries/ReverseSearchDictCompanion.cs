@@ -11,7 +11,7 @@ namespace CustomizePlus.GameData.ReverseSearchDictionaries;
 
 /// <summary> A dictionary that matches companion names to their ids. </summary>
 public sealed class ReverseSearchDictCompanion(IDalamudPluginInterface pluginInterface, Logger log, IDataManager gameData)
-    : ReverseNameDictionary(pluginInterface, log, gameData, "ReverseSearchCompanions", Versions.DictCompanion, () => CreateCompanionData(gameData))
+    : ReverseNameDictionary(pluginInterface, log, gameData, "ReverseSearchCompanions", Penumbra.GameData.DataContainers.Version.DictCompanion, () => CreateCompanionData(gameData))
 {
     /// <summary> Create the data. </summary>
     private static IReadOnlyDictionary<string, uint> CreateCompanionData(IDataManager gameData)

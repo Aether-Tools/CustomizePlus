@@ -11,7 +11,7 @@ namespace CustomizePlus.GameData.ReverseSearchDictionaries;
 
 /// <summary> A dictionary that matches names to battle npc ids. </summary>
 public sealed class ReverseSearchDictBNpc(IDalamudPluginInterface pluginInterface, Logger log, IDataManager gameData)
-    : ReverseNameDictionary(pluginInterface, log, gameData, "ReverseSearchBNpcs", Versions.DictBNpc, () => CreateBNpcData(gameData))
+    : ReverseNameDictionary(pluginInterface, log, gameData, "ReverseSearchBNpcs", Penumbra.GameData.DataContainers.Version.DictBNpc, () => CreateBNpcData(gameData))
 {
     /// <summary> Create the data. </summary>
     private static IReadOnlyDictionary<string, uint> CreateBNpcData(IDataManager gameData)

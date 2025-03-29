@@ -11,7 +11,7 @@ namespace CustomizePlus.GameData.ReverseSearchDictionaries;
 
 /// <summary> A dictionary that matches names to event npc ids. </summary>
 public sealed class ReverseSearchDictENpc(IDalamudPluginInterface pluginInterface, Logger log, IDataManager gameData)
-    : ReverseNameDictionary(pluginInterface, log, gameData, "ReverseSearchENpcs", 7, () => CreateENpcData(gameData))
+    : ReverseNameDictionary(pluginInterface, log, gameData, "ReverseSearchENpcs", Versions.DictENpc, () => CreateENpcData(gameData))
 {
     /// <summary> Create the data. </summary>
     private static IReadOnlyDictionary<string, uint> CreateENpcData(IDataManager gameData)

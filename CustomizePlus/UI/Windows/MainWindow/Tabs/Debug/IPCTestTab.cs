@@ -20,6 +20,7 @@ using CustomizePlus.Core.Extensions;
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Api.Data;
 using CustomizePlus.GameData.Extensions;
+using Penumbra.GameData.Interop;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 
@@ -33,7 +34,7 @@ public class IPCTestTab //: IDisposable
     private readonly ProfileManager _profileManager;
     private readonly PopupSystem _popupSystem;
     private readonly GameObjectService _gameObjectService;
-    private readonly ObjectManager _objectManager;
+    private readonly ActorObjectManager _objectManager;
     private readonly ActorManager _actorManager;
     private readonly Logger _logger;
 
@@ -92,7 +93,7 @@ public class IPCTestTab //: IDisposable
         IObjectTable objectTable,
         ProfileManager profileManager,
         PopupSystem popupSystem,
-        ObjectManager objectManager,
+        ActorObjectManager objectManager,
         GameObjectService gameObjectService,
         ActorManager actorManager,
         Logger logger,
@@ -115,8 +116,6 @@ public class IPCTestTab //: IDisposable
 
     public unsafe void Draw()
     {
-        _objectManager.Update();
-
         if (_targetCharacterName == null)
             _targetCharacterName = _gameObjectService.GetCurrentPlayerName();
 
@@ -136,7 +135,7 @@ public class IPCTestTab //: IDisposable
         if (ImGui.Button("Owned Actors Temporary Profile Test"))
         {
             bool found = false;
-            foreach(var obj  in _objectManager)
+            foreach(var obj  in _objectManager.Objects)
             {
                 if (!obj.Identifier(_actorManager, out var ownedIdent) ||
                     ownedIdent.Type != Penumbra.GameData.Enums.IdentifierType.Owned ||

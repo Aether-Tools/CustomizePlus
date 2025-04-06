@@ -13,6 +13,7 @@ using CustomizePlus.Core.Extensions;
 using System.Numerics;
 using CustomizePlus.Game.Services;
 using CustomizePlus.Core.Data;
+using Penumbra.GameData.Interop;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 
@@ -21,14 +22,14 @@ public class StateMonitoringTab
     private readonly ProfileManager _profileManager;
     private readonly TemplateManager _templateManager;
     private readonly ArmatureManager _armatureManager;
-    private readonly ObjectManager _objectManager;
+    private readonly ActorObjectManager _objectManager;
     private readonly GameObjectService _gameObjectService;
 
     public StateMonitoringTab(
         ProfileManager profileManager,
         TemplateManager templateManager,
         ArmatureManager armatureManager,
-        ObjectManager objectManager,
+        ActorObjectManager objectManager,
         GameObjectService gameObjectService)
     {
         _profileManager = profileManager;
@@ -55,7 +56,7 @@ public class StateMonitoringTab
         if (showArmatures)
             DrawArmatures();
 
-        var showObjectManager = ImGui.CollapsingHeader($"Object manager ({_objectManager.Identifiers.Count})###objectmanager_header");
+        var showObjectManager = ImGui.CollapsingHeader($"Object manager ({_objectManager.Count})###objectmanager_header");
 
         if (showObjectManager)
             DrawObjectManager();
@@ -93,7 +94,7 @@ public class StateMonitoringTab
 
     private void DrawObjectManager()
     {
-        foreach (var kvPair in _objectManager.Identifiers)
+        foreach (var kvPair in _objectManager)
         {
             var show = ImGui.CollapsingHeader($"{kvPair.Key} ({kvPair.Value.Objects.Count} objects)###object-{kvPair.Key}");
 

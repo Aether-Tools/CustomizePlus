@@ -31,6 +31,7 @@ using OtterGui.Log;
 using OtterGui.Raii;
 using OtterGui.Services;
 using Penumbra.GameData.Actors;
+using Penumbra.GameData.Interop;
 using Penumbra.GameData.Structs;
 
 namespace CustomizePlus.Core;
@@ -60,7 +61,7 @@ public static class ServiceManagerBuilder
 
         services.AddIServices(typeof(EquipItem).Assembly);
         services.AddIServices(typeof(Plugin).Assembly);
-        services.AddIServices(typeof(ObjectManager).Assembly);
+        services.AddIServices(typeof(CutsceneService).Assembly);
         services.AddIServices(typeof(ImRaii).Assembly);
 
         services.CreateProvider();
@@ -206,7 +207,7 @@ public static class ServiceManagerBuilder
             .AddSingleton<CutsceneService>()
             .AddSingleton<GameEventManager>()
             .AddSingleton(p => new CutsceneResolver(idx => (short)p.GetRequiredService<CutsceneService>().GetParentIndex(idx)))
-            .AddSingleton<ObjectManager>();
+            .AddSingleton<ActorObjectManager>();
 
         return services;
     }

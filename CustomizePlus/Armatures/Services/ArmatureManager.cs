@@ -19,7 +19,6 @@ using OtterGui.Log;
 using Penumbra.GameData.Actors;
 using Penumbra.GameData.Enums;
 using Penumbra.GameData.Interop;
-using ObjectManager = CustomizePlus.GameData.Services.ObjectManager;
 
 namespace CustomizePlus.Armatures.Services;
 
@@ -32,7 +31,7 @@ public unsafe sealed class ArmatureManager : IDisposable
     private readonly ProfileChanged _profileChangedEvent;
     private readonly Logger _logger;
     private readonly FrameworkManager _framework;
-    private readonly ObjectManager _objectManager;
+    private readonly ActorObjectManager _objectManager;
     private readonly ActorManager _actorManager;
     private readonly GPoseService _gposeService;
     private readonly ArmatureChanged _event;
@@ -53,7 +52,7 @@ public unsafe sealed class ArmatureManager : IDisposable
         ProfileChanged profileChangedEvent,
         Logger logger,
         FrameworkManager framework,
-        ObjectManager objectManager,
+        ActorObjectManager objectManager,
         ActorManager actorManager,
         GPoseService gposeService,
         ArmatureChanged @event)
@@ -125,8 +124,6 @@ public unsafe sealed class ArmatureManager : IDisposable
     /// </summary>
     private void RefreshArmatures()
     {
-        _objectManager.Update();
-
         var currentTime = DateTime.UtcNow;
         var armatureExpirationDateTime = currentTime.AddSeconds(-30);
         foreach (var kvPair in Armatures.ToList())
@@ -134,7 +131,7 @@ public unsafe sealed class ArmatureManager : IDisposable
             var armature = kvPair.Value;
             //Only remove armatures which haven't been seen for a while
             //But remove armatures of special actors (like examine screen) right away
-            if (!_objectManager.Identifiers.ContainsKey(kvPair.Value.ActorIdentifier) &&
+            if (!_objectManager.ContainsKey(kvPair.Value.ActorIdentifier) &&
                 (armature.LastSeen <= armatureExpirationDateTime || armature.ActorIdentifier.Type == IdentifierType.Special))
             {
                 _logger.Debug($"Removing armature {armature} because {kvPair.Key.IncognitoDebug()} is gone");
@@ -147,7 +144,7 @@ public unsafe sealed class ArmatureManager : IDisposable
             armature.IsVisible = armature.LastSeen.AddSeconds(1) >= currentTime;
         }
 
-        foreach (var obj in _objectManager.Identifiers)
+        foreach (var obj in _objectManager)
         {
             var actorIdentifier = obj.Key.CreatePermanent();
             if (!Armatures.ContainsKey(actorIdentifier))
@@ -243,9 +240,8 @@ public unsafe sealed class ArmatureManager : IDisposable
     /// </summary>
     private bool TryLinkSkeleton(Armature armature)
     {
-        _objectManager.Update();
 
-        if (!_objectManager.Identifiers.ContainsKey(armature.ActorIdentifier))
+        if (!_objectManager.ContainsKey(armature.ActorIdentifier))
             return false;
 
         var actor = _objectManager[armature.ActorIdentifier].Objects[0];

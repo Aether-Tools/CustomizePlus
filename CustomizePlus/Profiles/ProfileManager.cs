@@ -27,7 +27,6 @@ using Penumbra.GameData.Enums;
 using Penumbra.GameData.Interop;
 using System.Runtime.Serialization;
 using CustomizePlus.Game.Services;
-using ObjectManager = CustomizePlus.GameData.Services.ObjectManager;
 using System.Threading.Tasks;
 using OtterGui.Classes;
 
@@ -45,7 +44,7 @@ public partial class ProfileManager : IDisposable
     private readonly PluginConfiguration _configuration;
     private readonly ActorManager _actorManager;
     private readonly GameObjectService _gameObjectService;
-    private readonly ObjectManager _objectManager;
+    private readonly ActorObjectManager _objectManager;
     private readonly ReverseNameDicts _reverseNameDicts;
     private readonly MessageService _messageService;
     private readonly ProfileChanged _event;
@@ -66,7 +65,7 @@ public partial class ProfileManager : IDisposable
         PluginConfiguration configuration,
         ActorManager actorManager,
         GameObjectService gameObjectService,
-        ObjectManager objectManager,
+        ActorObjectManager objectManager,
         ReverseNameDicts reverseNameDicts,
         MessageService messageService,
         ProfileChanged @event,

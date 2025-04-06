@@ -5,7 +5,6 @@ using Dalamud.Plugin.Services;
 using Penumbra.GameData.Actors;
 using Penumbra.GameData.Enums;
 using Penumbra.GameData.Interop;
-using ObjectManager = CustomizePlus.GameData.Services.ObjectManager;
 using DalamudGameObject = Dalamud.Game.ClientState.Objects.Types.IGameObject;
 using CustomizePlus.Configuration.Data;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
@@ -17,13 +16,13 @@ public class GameObjectService
 {
     private readonly ActorManager _actorManager;
     private readonly IObjectTable _objectTable;
-    private readonly ObjectManager _objectManager;
+    private readonly ActorObjectManager _objectManager;
     private readonly PluginConfiguration _configuration;
 
     public GameObjectService(
         ActorManager actorManager,
         IObjectTable objectTable,
-        ObjectManager objectManager,
+        ActorObjectManager objectManager,
         PluginConfiguration configuration)
     {
         _actorManager = actorManager;
@@ -62,9 +61,7 @@ public class GameObjectService
     /// </summary>
     public IEnumerable<(ActorIdentifier, Actor)> FindActorsByName(string name)
     {
-        _objectManager.Update();
-
-        foreach (var kvPair in _objectManager.Identifiers)
+        foreach (var kvPair in _objectManager)
         {
             var identifier = kvPair.Key;
 
@@ -92,9 +89,7 @@ public class GameObjectService
         if (!identifier.IsValid)
             yield break;
 
-        _objectManager.Update();
-
-        foreach (var kvPair in _objectManager.Identifiers)
+        foreach (var kvPair in _objectManager)
         {
             var objectIdentifier = kvPair.Key;
 
@@ -116,7 +111,6 @@ public class GameObjectService
 
     public Actor GetLocalPlayerActor()
     {
-        _objectManager.Update();
         return _objectManager.Player;
     }
 
@@ -179,10 +173,10 @@ public class GameObjectService
     /// </summary>
     public Actor? GetActorByObjectIndex(ushort objectIndex)
     {
-        if (objectIndex < 0 || objectIndex >= _objectManager.TotalCount)
+        if (objectIndex < 0 || objectIndex >= _objectManager.Objects.TotalCount)
             return null;
 
-        var ptr = _objectManager[(int)objectIndex];
+        var ptr = _objectManager.Objects[(int)objectIndex];
 
         return ptr;
     }

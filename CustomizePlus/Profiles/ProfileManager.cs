@@ -178,10 +178,10 @@ public partial class ProfileManager : IDisposable
     /// <summary>
     /// Add character to profile
     /// </summary>
-    public void AddCharacter(Profile profile, ActorIdentifier actorIdentifier)
+    public bool AddCharacter(Profile profile, ActorIdentifier actorIdentifier)
     {
         if (!actorIdentifier.IsValid || profile.Characters.Any(x => actorIdentifier.MatchesIgnoringOwnership(x)) || profile.IsTemporary)
-            return;
+            return false;
 
         profile.Characters.Add(actorIdentifier);
 
@@ -189,15 +189,17 @@ public partial class ProfileManager : IDisposable
 
         _logger.Debug($"Add character for profile {profile.UniqueId}.");
         _event.Invoke(ProfileChanged.Type.AddedCharacter, profile, actorIdentifier);
+
+        return true;
     }
 
     /// <summary>
     /// Delete character from profile
     /// </summary>
-    public void DeleteCharacter(Profile profile, ActorIdentifier actorIdentifier)
+    public bool DeleteCharacter(Profile profile, ActorIdentifier actorIdentifier)
     {
         if (!actorIdentifier.IsValid || !profile.Characters.Any(x => actorIdentifier.MatchesIgnoringOwnership(x)) || profile.IsTemporary)
-            return;
+            return false;
 
         profile.Characters.Remove(actorIdentifier);
 
@@ -205,6 +207,8 @@ public partial class ProfileManager : IDisposable
 
         _logger.Debug($"Removed character from profile {profile.UniqueId}.");
         _event.Invoke(ProfileChanged.Type.RemovedCharacter, profile, actorIdentifier);
+
+        return true;
     }
 
     /// <summary>

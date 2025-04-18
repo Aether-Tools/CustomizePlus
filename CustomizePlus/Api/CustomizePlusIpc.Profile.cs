@@ -107,28 +107,22 @@ public partial class CustomizePlusIpc
     private int AddPlayerCharacterToProfile(Guid uniqueId, string name, ushort worldId)
     {
         if (uniqueId == Guid.Empty)
-        {
             return (int)ErrorCode.ProfileNotFound;
-        }
 
-        var profile = this._profileManager.Profiles.FirstOrDefault(x => x.UniqueId == uniqueId && !x.IsTemporary);
+        var profile = _profileManager.Profiles.FirstOrDefault(x => x.UniqueId == uniqueId && !x.IsTemporary);
         if (profile == null)
-        {
             return (int)ErrorCode.ProfileNotFound;
-        }
 
         if (!ByteString.FromString(name, out var byteString))
-        {
             return (int)ErrorCode.InvalidCharacter;
-        }
 
-        var playerIdentifier = this._actorManager.CreatePlayer(byteString, worldId);
+        var playerIdentifier = _actorManager.CreatePlayer(byteString, worldId);
         if (playerIdentifier == ActorIdentifier.Invalid)
-        {
             return (int)ErrorCode.InvalidCharacter;
-        }
         
-        this._profileManager.AddCharacter(profile, playerIdentifier);
+        if(!_profileManager.AddCharacter(profile, playerIdentifier))
+            return (int)ErrorCode.InvalidArgument; //Returned if character is already associated with provided profile
+
         return (int)ErrorCode.Success;
     }
 
@@ -139,28 +133,22 @@ public partial class CustomizePlusIpc
     private int RemovePlayerCharacterToProfile(Guid uniqueId, string name, ushort worldId)
     {
         if (uniqueId == Guid.Empty)
-        {
             return (int)ErrorCode.ProfileNotFound;
-        }
 
-        var profile = this._profileManager.Profiles.FirstOrDefault(x => x.UniqueId == uniqueId && !x.IsTemporary);
+        var profile = _profileManager.Profiles.FirstOrDefault(x => x.UniqueId == uniqueId && !x.IsTemporary);
         if (profile == null)
-        {
             return (int)ErrorCode.ProfileNotFound;
-        }
 
         if (!ByteString.FromString(name, out var byteString))
-        {
             return (int)ErrorCode.InvalidCharacter;
-        }
 
         var playerIdentifier = this._actorManager.CreatePlayer(byteString, worldId);
         if (playerIdentifier == ActorIdentifier.Invalid)
-        {
             return (int)ErrorCode.InvalidCharacter;
-        }
         
-        this._profileManager.DeleteCharacter(profile, playerIdentifier);
+        if(!_profileManager.DeleteCharacter(profile, playerIdentifier))
+            return (int)ErrorCode.InvalidArgument; //Returned if character is not associated with provided profile
+
         return (int)ErrorCode.Success;
     }
 

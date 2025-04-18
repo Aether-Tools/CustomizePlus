@@ -21,6 +21,7 @@ using CustomizePlus.Configuration.Data;
 using CustomizePlus.Api.Data;
 using CustomizePlus.GameData.Extensions;
 using Penumbra.GameData.Interop;
+using Penumbra.GameData.Structs;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 
@@ -64,6 +65,12 @@ public class IPCTestTab //: IDisposable
 
     [EzIPC("Profile.DeleteTemporaryProfileByUniqueId")]
     private readonly Func<Guid, int> _deleteTemporaryProfileByUniqueIdIpcFunc;
+
+    [EzIPC("Profile.AddPlayerCharacter")]
+    private readonly Func<Guid, string, ushort, int> _addPlayerCharacterIpcFunc;
+
+    [EzIPC("Profile.RemovePlayerCharacter")]
+    private readonly Func<Guid, string, ushort, int> _removePlayerCharacterIpcFunc;
 
     [EzIPC("Profile.GetByUniqueId")]
     private readonly Func<Guid, (int, string?)> _getProfileByIdIpcFunc;
@@ -333,6 +340,32 @@ public class IPCTestTab //: IDisposable
             else
             {
                 _logger.Error($"Error code {result} while calling DeleteTemporaryProfileByUniqueId");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
+        }
+
+        if (ImGui.Button("Add character to profile"))
+        {
+            int result = _addPlayerCharacterIpcFunc(Guid.Parse(_targetProfileId), _targetCharacterName, WorldId.AnyWorld.Id);
+
+            if (result == 0)
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionDone);
+            else
+            {
+                _logger.Error($"Error code {result} while calling AddPlayerCharacter");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
+        }
+
+        if (ImGui.Button("Remove character from profile"))
+        {
+            int result = _removePlayerCharacterIpcFunc(Guid.Parse(_targetProfileId), _targetCharacterName, WorldId.AnyWorld.Id);
+
+            if (result == 0)
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionDone);
+            else
+            {
+                _logger.Error($"Error code {result} while calling RemovePlayerCharacter");
                 _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
             }
         }

@@ -8,6 +8,7 @@ public partial class PopupSystem
     public static class Messages
     {
         public const string ActionError = "action_error";
+        public const string ActionDone = "action_done";
 
         public const string FantasiaPlusDetected = "fantasia_detected_warn";
 
@@ -31,6 +32,7 @@ public partial class PopupSystem
     private void RegisterMessages()
     {
         RegisterPopup(Messages.ActionError, "Error while performing selected action.\nDetails have been printed to Dalamud log (/xllog in chat).");
+        RegisterPopup(Messages.ActionDone, "Action performed successfully.");
 
         RegisterPopup(Messages.FantasiaPlusDetected, "Customize+ detected that you have Fantasia+ installed.\nPlease delete or turn it off and restart your game to use Customize+.");
 

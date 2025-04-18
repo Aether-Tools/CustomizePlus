@@ -10,6 +10,7 @@ using Dalamud.Plugin;
 using ECommonsLite.EzIpcManager;
 using OtterGui.Log;
 using System;
+using Penumbra.GameData.Actors;
 
 namespace CustomizePlus.Api;
 
@@ -26,6 +27,7 @@ public partial class CustomizePlusIpc : IDisposable
     private readonly Logger _logger;
     private readonly HookingService _hookingService;
     private readonly ProfileManager _profileManager;
+    private readonly ActorManager _actorManager;
     private readonly GameObjectService _gameObjectService;
     private readonly ProfileFileSystem _profileFileSystem;
     private readonly CutsceneService _cutsceneService;
@@ -43,6 +45,7 @@ public partial class CustomizePlusIpc : IDisposable
         Logger logger,
         HookingService hookingService,
         ProfileManager profileManager,
+        ActorManager actorManager,
         GameObjectService gameObjectService,
         ProfileFileSystem profileFileSystem,
         CutsceneService cutsceneService,
@@ -53,6 +56,7 @@ public partial class CustomizePlusIpc : IDisposable
         _logger = logger;
         _hookingService = hookingService;
         _profileManager = profileManager;
+        _actorManager = actorManager;
         _gameObjectService = gameObjectService;
         _profileFileSystem = profileFileSystem;
         _cutsceneService = cutsceneService;

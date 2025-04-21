@@ -8,14 +8,12 @@ using System.Linq;
 using System.Numerics;
 using System.Windows.Forms;
 using CustomizePlus.Core.Data;
-using CustomizePlus.Game.Services;
 using CustomizePlus.Templates;
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.Templates.Data;
 using OtterGui.Log;
 using CustomizePlus.Templates.Events;
-using ECommons.Schedulers;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 
@@ -232,7 +230,7 @@ public class TemplatePanel : IDisposable
     {
         try
         {
-            Clipboard.SetText(Base64Helper.ExportToBase64(_selector.Selected!, Constants.ConfigurationVersion));
+            Clipboard.SetText(Base64Helper.ExportTemplateToBase64(_selector.Selected!));
             _popupSystem.ShowPopup(PopupSystem.Messages.ClipboardDataNotLongTerm);
         }
         catch (Exception ex)

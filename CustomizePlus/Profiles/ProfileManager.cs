@@ -27,7 +27,6 @@ using Penumbra.GameData.Enums;
 using Penumbra.GameData.Interop;
 using System.Runtime.Serialization;
 using CustomizePlus.Game.Services;
-using ObjectManager = CustomizePlus.GameData.Services.ObjectManager;
 using System.Threading.Tasks;
 using OtterGui.Classes;
 
@@ -45,7 +44,7 @@ public partial class ProfileManager : IDisposable
     private readonly PluginConfiguration _configuration;
     private readonly ActorManager _actorManager;
     private readonly GameObjectService _gameObjectService;
-    private readonly ObjectManager _objectManager;
+    private readonly ActorObjectManager _objectManager;
     private readonly ReverseNameDicts _reverseNameDicts;
     private readonly MessageService _messageService;
     private readonly ProfileChanged _event;
@@ -66,7 +65,7 @@ public partial class ProfileManager : IDisposable
         PluginConfiguration configuration,
         ActorManager actorManager,
         GameObjectService gameObjectService,
-        ObjectManager objectManager,
+        ActorObjectManager objectManager,
         ReverseNameDicts reverseNameDicts,
         MessageService messageService,
         ProfileChanged @event,
@@ -179,10 +178,10 @@ public partial class ProfileManager : IDisposable
     /// <summary>
     /// Add character to profile
     /// </summary>
-    public void AddCharacter(Profile profile, ActorIdentifier actorIdentifier)
+    public bool AddCharacter(Profile profile, ActorIdentifier actorIdentifier)
     {
         if (!actorIdentifier.IsValid || profile.Characters.Any(x => actorIdentifier.MatchesIgnoringOwnership(x)) || profile.IsTemporary)
-            return;
+            return false;
 
         profile.Characters.Add(actorIdentifier);
 
@@ -190,15 +189,17 @@ public partial class ProfileManager : IDisposable
 
         _logger.Debug($"Add character for profile {profile.UniqueId}.");
         _event.Invoke(ProfileChanged.Type.AddedCharacter, profile, actorIdentifier);
+
+        return true;
     }
 
     /// <summary>
     /// Delete character from profile
     /// </summary>
-    public void DeleteCharacter(Profile profile, ActorIdentifier actorIdentifier)
+    public bool DeleteCharacter(Profile profile, ActorIdentifier actorIdentifier)
     {
         if (!actorIdentifier.IsValid || !profile.Characters.Any(x => actorIdentifier.MatchesIgnoringOwnership(x)) || profile.IsTemporary)
-            return;
+            return false;
 
         profile.Characters.Remove(actorIdentifier);
 
@@ -206,6 +207,8 @@ public partial class ProfileManager : IDisposable
 
         _logger.Debug($"Removed character from profile {profile.UniqueId}.");
         _event.Invoke(ProfileChanged.Type.RemovedCharacter, profile, actorIdentifier);
+
+        return true;
     }
 
     /// <summary>
@@ -432,7 +435,8 @@ public partial class ProfileManager : IDisposable
     /// <summary>
     /// Return profile by actor identifier, does not return temporary profiles.
     /// </summary>
-    public Profile? GetProfileByActor(Actor actor, bool enabledOnly = false)
+    /// todo: use GetEnabledProfilesByActor
+    public Profile? GetActiveProfileByActor(Actor actor)
     {
         var actorIdentifier = actor.GetIdentifier(_actorManager);
 
@@ -442,14 +446,17 @@ public partial class ProfileManager : IDisposable
         if (actorIdentifier.Type == IdentifierType.Owned && !actorIdentifier.IsOwnedByLocalPlayer())
             return null;
 
-        var query = Profiles.Where(p => p.Characters.Any(x => x.MatchesIgnoringOwnership(actorIdentifier)) && !p.IsTemporary);
-        if (enabledOnly)
-            query = query.Where(x => x.Enabled);
+        var query = Profiles.Where(p => p.Characters.Any(x => x.MatchesIgnoringOwnership(actorIdentifier)) && !p.IsTemporary && p.Enabled);
 
         var profile = query.OrderByDescending(x => x.Priority).FirstOrDefault();
 
-        if (profile == null)
+        if(profile == null)
+        {
+            if (DefaultLocalPlayerProfile?.Enabled == true)
+                return DefaultLocalPlayerProfile;
+
             return null;
+        }
 
         return profile;
     }

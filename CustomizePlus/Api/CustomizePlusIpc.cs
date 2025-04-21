@@ -4,10 +4,13 @@ using CustomizePlus.Game.Services;
 using CustomizePlus.GameData.Services;
 using CustomizePlus.Profiles;
 using CustomizePlus.Profiles.Events;
+using CustomizePlus.Templates.Data;
+using CustomizePlus.Templates.Events;
 using Dalamud.Plugin;
-using ECommons.EzIpcManager;
+using ECommonsLite.EzIpcManager;
 using OtterGui.Log;
 using System;
+using Penumbra.GameData.Actors;
 
 namespace CustomizePlus.Api;
 
@@ -24,11 +27,13 @@ public partial class CustomizePlusIpc : IDisposable
     private readonly Logger _logger;
     private readonly HookingService _hookingService;
     private readonly ProfileManager _profileManager;
+    private readonly ActorManager _actorManager;
     private readonly GameObjectService _gameObjectService;
     private readonly ProfileFileSystem _profileFileSystem;
     private readonly CutsceneService _cutsceneService;
 
     private readonly ArmatureChanged _armatureChangedEvent;
+    private readonly TemplateChanged _templateChangedEvent;
 
     /// <summary>
     /// Shows if IPC failed to initialize or any other unrecoverable fatal error occured.
@@ -40,28 +45,34 @@ public partial class CustomizePlusIpc : IDisposable
         Logger logger,
         HookingService hookingService,
         ProfileManager profileManager,
+        ActorManager actorManager,
         GameObjectService gameObjectService,
         ProfileFileSystem profileFileSystem,
         CutsceneService cutsceneService,
-        ArmatureChanged armatureChangedEvent)
+        ArmatureChanged armatureChangedEvent,
+        TemplateChanged templateChangedEvent)
     {
         _pluginInterface = pluginInterface;
         _logger = logger;
         _hookingService = hookingService;
         _profileManager = profileManager;
+        _actorManager = actorManager;
         _gameObjectService = gameObjectService;
         _profileFileSystem = profileFileSystem;
         _cutsceneService = cutsceneService;
 
         _armatureChangedEvent = armatureChangedEvent;
+        _templateChangedEvent = templateChangedEvent;
 
         EzIPC.Init(this, "CustomizePlus");
 
         _armatureChangedEvent.Subscribe(OnArmatureChanged, ArmatureChanged.Priority.CustomizePlusIpc);
+        _templateChangedEvent.Subscribe(OnTemplateChanged, TemplateChanged.Priority.CustomizePlusIpc);
     }
 
     public void Dispose()
     {
         _armatureChangedEvent.Unsubscribe(OnArmatureChanged);
+        _templateChangedEvent.Unsubscribe(OnTemplateChanged);
     }
 }

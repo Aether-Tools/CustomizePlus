@@ -6,6 +6,7 @@ using CustomizePlus.Configuration.Data;
 using CustomizePlus.Configuration.Services;
 using CustomizePlus.Core.Events;
 using CustomizePlus.Core.Services;
+using CustomizePlus.Core.Services.Dalamud;
 using CustomizePlus.Game.Events;
 using CustomizePlus.Game.Services;
 using CustomizePlus.Game.Services.GPose;
@@ -30,6 +31,7 @@ using OtterGui.Log;
 using OtterGui.Raii;
 using OtterGui.Services;
 using Penumbra.GameData.Actors;
+using Penumbra.GameData.Interop;
 using Penumbra.GameData.Structs;
 
 namespace CustomizePlus.Core;
@@ -59,7 +61,7 @@ public static class ServiceManagerBuilder
 
         services.AddIServices(typeof(EquipItem).Assembly);
         services.AddIServices(typeof(Plugin).Assembly);
-        services.AddIServices(typeof(ObjectManager).Assembly);
+        services.AddIServices(typeof(CutsceneService).Assembly);
         services.AddIServices(typeof(ImRaii).Assembly);
 
         services.CreateProvider();
@@ -139,7 +141,7 @@ public static class ServiceManagerBuilder
             .AddSingleton<BackupService>()
             .AddSingleton<FrameworkManager>()
             .AddSingleton<SupportLogBuilderService>()
-            .AddSingleton<TestingVersionNotifierService>();
+            .AddSingleton<UserNotifierService>();
 
         return services;
     }
@@ -205,7 +207,7 @@ public static class ServiceManagerBuilder
             .AddSingleton<CutsceneService>()
             .AddSingleton<GameEventManager>()
             .AddSingleton(p => new CutsceneResolver(idx => (short)p.GetRequiredService<CutsceneService>().GetParentIndex(idx)))
-            .AddSingleton<ObjectManager>();
+            .AddSingleton<ActorObjectManager>();
 
         return services;
     }

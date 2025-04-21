@@ -5,7 +5,7 @@ using CustomizePlus.Core.Helpers;
 using CustomizePlus.Core.Services;
 using CustomizePlus.UI;
 using Dalamud.Plugin;
-using ECommons;
+using ECommonsLite;
 using OtterGui.Log;
 using OtterGui.Services;
 using Penumbra.GameData.Actors;
@@ -23,14 +23,14 @@ public sealed class Plugin : IDalamudPlugin
     {
         try
         {
-            ECommonsMain.Init(pluginInterface, this);
+            ECommonsLiteMain.Init(pluginInterface, this);
             InteropAlloc.Init();
 
             _services = ServiceManagerBuilder.CreateProvider(pluginInterface, Logger);
 
             _services.GetService<ActorManager>(); //needs to be initialized early for config to be read properly
 
-            _services.GetService<TestingVersionNotifierService>();
+            _services.GetService<UserNotifierService>();
             _services.GetService<CustomizePlusIpc>();
             _services.GetService<CPlusWindowSystem>();
             _services.GetService<CommandService>();
@@ -50,6 +50,6 @@ public sealed class Plugin : IDalamudPlugin
     {
         _services?.Dispose();
 
-        ECommonsMain.Dispose();
+        ECommonsLiteMain.Dispose();
     }
 }

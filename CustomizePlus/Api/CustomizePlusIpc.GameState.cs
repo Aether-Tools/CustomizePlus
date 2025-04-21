@@ -1,5 +1,5 @@
 ﻿using CustomizePlus.Api.Enums;
-using ECommons.EzIpcManager;
+using ECommonsLite.EzIpcManager;
 
 namespace CustomizePlus.Api;
 

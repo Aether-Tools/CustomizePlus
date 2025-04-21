@@ -1,23 +1,12 @@
 ﻿using System;
-using System.Collections.Frozen;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading.Tasks;
 using Dalamud.Game.ClientState.Objects.Enums;
-using Dalamud.Plugin;
-using Dalamud.Plugin.Services;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
 using OtterGui.Custom;
-using OtterGui.Log;
 using Penumbra.GameData.Actors;
-using Penumbra.GameData.Data;
 using Penumbra.GameData.DataContainers;
-using Penumbra.GameData.DataContainers.Bases;
 using Penumbra.GameData.Gui;
-using Penumbra.GameData.Interop;
-using Penumbra.GameData.Structs;
 using Penumbra.String;
 
 namespace CustomizePlus.UI.Windows.Controls;

@@ -5,6 +5,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using OtterGui.Services;
 using Penumbra.GameData.Enums;
+using Penumbra.GameData.Interop;
 using Penumbra.String;
 using System.Diagnostics;
 

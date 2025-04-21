@@ -25,6 +25,10 @@ public class CPlusChangeLog
         Add2_0_6_0(Changelog);
         Add2_0_6_3(Changelog);
         Add2_0_7_0(Changelog);
+        Add2_0_7_2(Changelog);
+        Add2_0_7_9(Changelog);
+        Add2_0_7_15(Changelog);
+        Add2_0_7_16(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -36,6 +40,40 @@ public class CPlusChangeLog
         _config.ChangelogSettings.ChangeLogDisplayType = type;
         _config.Save();
     }
+
+    private static void Add2_0_7_16(Changelog log)
+        => log.NextVersion("Version 2.0.7.16")
+        .RegisterImportant("Support for update 7.2 and Dalamud API 12.");
+
+    private static void Add2_0_7_15(Changelog log)
+        => log.NextVersion("Version 2.0.7.15")
+        .RegisterEntry("Optimized JSON payload returned by Profile.GetByUniqueId IPC method. (requested by Mare Synchronos)")
+        .RegisterEntry("Values which are considered default are no longer returned, this drastically reduces the size of returned data.", 1)
+        .RegisterEntry("Fixed clipboard copies missing version data.")
+        .RegisterEntry("You do not need to do anything about this. This just fixes format inconsistencies between clipboard copies and on-disk data.", 1)
+        .RegisterEntry("Fixed (some?) \"ImGui assertation failed\" errors (2.0.7.14)")
+        .RegisterEntry("Improved support log contents (2.0.7.13)")
+        .RegisterEntry("Fixed skeleton changes not being detected when changing between hairstyles with the same amount of bones. (2.0.7.11)")
+        .RegisterEntry("Fixed character flashing in GPose. (Root bone position edits are no longer applied in GPose) (2.0.7.10)")
+
+        .RegisterEntry("Source code maintenance - external libraries update.");
+
+    private static void Add2_0_7_9(Changelog log)
+        => log.NextVersion("Version 2.0.7.9")
+        .RegisterEntry("Added donation button to settings tab.")
+        .RegisterEntry("Saving changes to the template used in the active profile will now tell other plugins that the profile was changed by sending OnProfileUpdate IPC event. (2.0.7.8)")
+        .RegisterEntry("Root bone position edits no longer require character to move in order to apply. (2.0.7.6)")
+
+        .RegisterEntry("Fixed \"Apply to any character you are logged in with\" profile option being ignored by Profile.GetActiveProfileIdOnCharacter IPC function preventing other plugins from being able to detect active profile with this option enabled. (2.0.7.8)")
+
+        .RegisterEntry("Source code maintenance - external libraries update.");
+
+    private static void Add2_0_7_2(Changelog log)
+        => log.NextVersion("Version 2.0.7.2")
+        .RegisterImportant("Support for 7.1 and Dalamud API 11.")
+        .RegisterHighlight("Fixed an issue which prevented owned characters (such as Carbuncles and Trust NPCs) from being detected. (2.0.7.1)")
+
+        .RegisterEntry("Source code maintenance - external libraries update.");
 
     private static void Add2_0_7_0(Changelog log)
         => log.NextVersion("Version 2.0.7.0")

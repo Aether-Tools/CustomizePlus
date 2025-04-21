@@ -11,7 +11,7 @@ using CustomizePlus.Configuration.Helpers;
 using CustomizePlus.Game.Services;
 using CustomizePlus.GameData.Services;
 using Penumbra.GameData.Actors;
-using ECommons.EzIpcManager;
+using ECommonsLite.EzIpcManager;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,6 +20,8 @@ using CustomizePlus.Core.Extensions;
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Api.Data;
 using CustomizePlus.GameData.Extensions;
+using Penumbra.GameData.Interop;
+using Penumbra.GameData.Structs;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 
@@ -27,11 +29,13 @@ public class IPCTestTab //: IDisposable
 {
     private const string _ownedTesProfile = "{\"Bones\":{\"n_root\":{\"Translation\":{\"X\":0.0,\"Y\":0.0,\"Z\":0.0},\"Rotation\":{\"X\":0.0,\"Y\":0.0,\"Z\":0.0},\"Scaling\":{\"X\":2.0,\"Y\":2.0,\"Z\":2.0}}}}";
 
+    private static JsonSerializerSettings _ipcProfileSerializerSettings = new JsonSerializerSettings { DefaultValueHandling = DefaultValueHandling.Ignore };
+
     private readonly IObjectTable _objectTable;
     private readonly ProfileManager _profileManager;
     private readonly PopupSystem _popupSystem;
     private readonly GameObjectService _gameObjectService;
-    private readonly ObjectManager _objectManager;
+    private readonly ActorObjectManager _objectManager;
     private readonly ActorManager _actorManager;
     private readonly Logger _logger;
 
@@ -62,6 +66,12 @@ public class IPCTestTab //: IDisposable
     [EzIPC("Profile.DeleteTemporaryProfileByUniqueId")]
     private readonly Func<Guid, int> _deleteTemporaryProfileByUniqueIdIpcFunc;
 
+    [EzIPC("Profile.AddPlayerCharacter")]
+    private readonly Func<Guid, string, ushort, int> _addPlayerCharacterIpcFunc;
+
+    [EzIPC("Profile.RemovePlayerCharacter")]
+    private readonly Func<Guid, string, ushort, int> _removePlayerCharacterIpcFunc;
+
     [EzIPC("Profile.GetByUniqueId")]
     private readonly Func<Guid, (int, string?)> _getProfileByIdIpcFunc;
 
@@ -90,7 +100,7 @@ public class IPCTestTab //: IDisposable
         IObjectTable objectTable,
         ProfileManager profileManager,
         PopupSystem popupSystem,
-        ObjectManager objectManager,
+        ActorObjectManager objectManager,
         GameObjectService gameObjectService,
         ActorManager actorManager,
         Logger logger,
@@ -113,8 +123,6 @@ public class IPCTestTab //: IDisposable
 
     public unsafe void Draw()
     {
-        _objectManager.Update();
-
         if (_targetCharacterName == null)
             _targetCharacterName = _gameObjectService.GetCurrentPlayerName();
 
@@ -134,7 +142,7 @@ public class IPCTestTab //: IDisposable
         if (ImGui.Button("Owned Actors Temporary Profile Test"))
         {
             bool found = false;
-            foreach(var obj  in _objectManager)
+            foreach(var obj  in _objectManager.Objects)
             {
                 if (!obj.Identifier(_actorManager, out var ownedIdent) ||
                     ownedIdent.Type != Penumbra.GameData.Enums.IdentifierType.Owned ||
@@ -186,7 +194,7 @@ public class IPCTestTab //: IDisposable
             if (profile == null)
                 return;
 
-            _rememberedProfileJson = JsonConvert.SerializeObject(IPCCharacterProfile.FromFullProfile(profile));
+            _rememberedProfileJson = JsonConvert.SerializeObject(IPCCharacterProfile.FromFullProfile(profile), _ipcProfileSerializerSettings);
             _popupSystem.ShowPopup(PopupSystem.Messages.IPCProfileRemembered);
         }
 
@@ -332,6 +340,32 @@ public class IPCTestTab //: IDisposable
             else
             {
                 _logger.Error($"Error code {result} while calling DeleteTemporaryProfileByUniqueId");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
+        }
+
+        if (ImGui.Button("Add character to profile"))
+        {
+            int result = _addPlayerCharacterIpcFunc(Guid.Parse(_targetProfileId), _targetCharacterName, WorldId.AnyWorld.Id);
+
+            if (result == 0)
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionDone);
+            else
+            {
+                _logger.Error($"Error code {result} while calling AddPlayerCharacter");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
+        }
+
+        if (ImGui.Button("Remove character from profile"))
+        {
+            int result = _removePlayerCharacterIpcFunc(Guid.Parse(_targetProfileId), _targetCharacterName, WorldId.AnyWorld.Id);
+
+            if (result == 0)
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionDone);
+            else
+            {
+                _logger.Error($"Error code {result} while calling RemovePlayerCharacter");
                 _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
             }
         }

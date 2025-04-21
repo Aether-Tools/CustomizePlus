@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ECommons.EzIpcManager;
+using ECommonsLite.EzIpcManager;
 using Newtonsoft.Json;
 using CustomizePlus.Api.Data;
 using CustomizePlus.Api.Enums;
@@ -15,11 +15,17 @@ using CustomizePlus.GameData.Extensions;
 using Dalamud.Game.ClientState.Objects.Types;
 using Penumbra.GameData.Structs;
 using Penumbra.GameData.Enums;
+using CustomizePlus.Templates.Data;
+using CustomizePlus.Templates.Events;
+using Penumbra.GameData.Actors;
+using Penumbra.String;
 
 namespace CustomizePlus.Api;
 
 public partial class CustomizePlusIpc
 {
+    private static JsonSerializerSettings _ipcProfileSerializerSettings = new JsonSerializerSettings { DefaultValueHandling = DefaultValueHandling.Ignore };
+
     /// <summary>
     /// Triggered when changes in currently active profiles are detected. (like changing active profile or making any changes to it)
     /// Not triggered if any changes happen due to character no longer existing.
@@ -85,13 +91,65 @@ public partial class CustomizePlusIpc
 
         try
         {
-            return ((int)ErrorCode.Success, JsonConvert.SerializeObject(convertedProfile));
+            return ((int)ErrorCode.Success, JsonConvert.SerializeObject(convertedProfile, _ipcProfileSerializerSettings));
         }
         catch (Exception ex)
         {
             _logger.Error($"Exception in IPCCharacterProfile.FromFullProfile for id {uniqueId}: {ex}");
             return ((int)ErrorCode.UnknownError, null);
         }
+    }
+
+    /// <summary>
+    /// Adds a player character to a specified profile.
+    /// </summary>
+    [EzIPC("Profile.AddPlayerCharacter")]
+    private int AddPlayerCharacterToProfile(Guid uniqueId, string name, ushort worldId)
+    {
+        if (uniqueId == Guid.Empty)
+            return (int)ErrorCode.ProfileNotFound;
+
+        var profile = _profileManager.Profiles.FirstOrDefault(x => x.UniqueId == uniqueId && !x.IsTemporary);
+        if (profile == null)
+            return (int)ErrorCode.ProfileNotFound;
+
+        if (!ByteString.FromString(name, out var byteString))
+            return (int)ErrorCode.InvalidCharacter;
+
+        var playerIdentifier = _actorManager.CreatePlayer(byteString, worldId);
+        if (playerIdentifier == ActorIdentifier.Invalid)
+            return (int)ErrorCode.InvalidCharacter;
+        
+        if(!_profileManager.AddCharacter(profile, playerIdentifier))
+            return (int)ErrorCode.InvalidArgument; //Returned if character is already associated with provided profile
+
+        return (int)ErrorCode.Success;
+    }
+
+    /// <summary>
+    /// Removes a player character to a specified profile.
+    /// </summary>
+    [EzIPC("Profile.RemovePlayerCharacter")]
+    private int RemovePlayerCharacterToProfile(Guid uniqueId, string name, ushort worldId)
+    {
+        if (uniqueId == Guid.Empty)
+            return (int)ErrorCode.ProfileNotFound;
+
+        var profile = _profileManager.Profiles.FirstOrDefault(x => x.UniqueId == uniqueId && !x.IsTemporary);
+        if (profile == null)
+            return (int)ErrorCode.ProfileNotFound;
+
+        if (!ByteString.FromString(name, out var byteString))
+            return (int)ErrorCode.InvalidCharacter;
+
+        var playerIdentifier = this._actorManager.CreatePlayer(byteString, worldId);
+        if (playerIdentifier == ActorIdentifier.Invalid)
+            return (int)ErrorCode.InvalidCharacter;
+        
+        if(!_profileManager.DeleteCharacter(profile, playerIdentifier))
+            return (int)ErrorCode.InvalidArgument; //Returned if character is not associated with provided profile
+
+        return (int)ErrorCode.Success;
     }
 
     /// <summary>
@@ -144,7 +202,7 @@ public partial class CustomizePlusIpc
         if (actor == null || !actor.Value.Valid || !actor.Value.IsCharacter)
             return ((int)ErrorCode.InvalidCharacter, null);
 
-        var profile = _profileManager.GetProfileByActor(actor.Value, true);
+        var profile = _profileManager.GetActiveProfileByActor(actor.Value);
 
         if (profile == null)
             return ((int)ErrorCode.ProfileNotFound, null);
@@ -266,6 +324,35 @@ public partial class CustomizePlusIpc
             _logger.Error($"Exception in DeleteTemporaryProfileOnCharacter. Unique id: {uniqueId}. Exception: {ex}");
             return (int)ErrorCode.UnknownError;
         }
+    }
+
+    //Send profile update if any of the templates were changed in currently active profile
+    private void OnTemplateChanged(TemplateChanged.Type type, Template? template, object? arg3)
+    {
+        if (type != TemplateChanged.Type.EditorDisabled)
+            return;
+
+        (ActorIdentifier actorIdentifier, bool hasChanges) = ((ActorIdentifier, bool))arg3;
+
+        if (!hasChanges || actorIdentifier.Type != IdentifierType.Player)
+            return;
+
+        var actor = _gameObjectService.GetLocalPlayerActor();
+        if (!actor.Valid || !actorIdentifier.PlayerName.EqualsCi(actor.Utf8Name))
+            return;
+
+        var profile = _profileManager.GetActiveProfileByActor(actor);
+        if (profile == null) //safety check
+            return;
+
+        if (!profile.Templates.Contains(template!))
+            return;
+
+        ICharacter? localPlayerCharacter = (ICharacter?)_gameObjectService.GetDalamudGameObjectFromActor(actor);
+        if (localPlayerCharacter == null)
+            return;
+
+        OnProfileUpdateInternal(localPlayerCharacter, profile);
     }
 
     //warn: intended limitation - ignores default profiles because why you would use default profile on your own character

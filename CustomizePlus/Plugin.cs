@@ -9,6 +9,7 @@ using ECommonsLite;
 using OtterGui.Log;
 using OtterGui.Services;
 using Penumbra.GameData.Actors;
+using CustomizePlus.Armatures.Data;
 
 namespace CustomizePlus;
 
@@ -23,6 +24,7 @@ public sealed class Plugin : IDalamudPlugin
         try
         {
             ECommonsLiteMain.Init(pluginInterface, this);
+            InteropAlloc.Init();
 
             _services = ServiceManagerBuilder.CreateProvider(pluginInterface, Logger);
 

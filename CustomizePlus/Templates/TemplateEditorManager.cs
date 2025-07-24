@@ -138,7 +138,7 @@ public class TemplateEditorManager : IDisposable
         };
 
         if (!Character.IsValid) //safeguard
-            ChangeEditorCharacterInternal(_gameObjectService.GetCurrentPlayerActorIdentifier()); //will set EditorProfile.Character
+            ChangeEditorCharacterInternal(_gameObjectService.GetCurrentPlayerActorIdentifier().CreatePermanent()); //will set EditorProfile.Character
 
         EditorProfile.Templates.Clear(); //safeguard
         EditorProfile.Templates.Add(CurrentlyEditedTemplate);
@@ -334,6 +334,8 @@ public class TemplateEditorManager : IDisposable
                 _logger.Warning("Can't retrieve local player on login");
                 return;
             }
+
+            localPlayer = localPlayer.CreatePermanent();
 
             if (_configuration.EditorConfiguration.PreviewCharacter != localPlayer)
             {

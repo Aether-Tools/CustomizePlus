@@ -276,7 +276,7 @@ public class ProfilePanel
                 if (ImGuiUtil.DrawDisabledButton("Apply to mannequin", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetMannequin))
                     _manager.AddCharacter(_selector.Selected!, _actorAssignmentUi.MannequinIdentifier);
 
-                var currentPlayer = _actorManager.GetCurrentPlayer();
+                var currentPlayer = _actorManager.GetCurrentPlayer().CreatePermanent();
                 if (ImGuiUtil.DrawDisabledButton("Apply to current character", buttonWidth, string.Empty, !currentPlayer.IsValid))
                     _manager.AddCharacter(_selector.Selected!, currentPlayer);
 

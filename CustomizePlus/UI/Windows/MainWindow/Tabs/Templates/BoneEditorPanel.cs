@@ -144,7 +144,7 @@ public class BoneEditorPanel
                         if (ImGuiUtil.DrawDisabledButton("Apply to mannequin", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetMannequin))
                             _editorManager.ChangeEditorCharacter(_actorAssignmentUi.MannequinIdentifier);
 
-                        var currentPlayer = _gameObjectService.GetCurrentPlayerActorIdentifier();
+                        var currentPlayer = _gameObjectService.GetCurrentPlayerActorIdentifier().CreatePermanent();
                         if (ImGuiUtil.DrawDisabledButton("Apply to current character", buttonWidth, string.Empty, !currentPlayer.IsValid))
                             _editorManager.ChangeEditorCharacter(currentPlayer);
 

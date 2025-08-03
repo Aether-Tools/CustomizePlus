@@ -14,6 +14,7 @@ using CustomizePlus.Profiles;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Templates.Events;
 using CustomizePlus.Templates.Data;
+using OtterGui.Extensions;
 
 namespace CustomizePlus.UI.Windows.Controls;
 

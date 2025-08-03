@@ -368,10 +368,12 @@ public class SettingsTab
             xPos -= ImGui.GetStyle().ScrollbarSize + ImGui.GetStyle().FramePadding.X;
 
         ImGui.SetCursorPos(new Vector2(xPos, 0));
-        DrawUrlButton("Join Discord for Support", "https://discord.gg/KvGJCCnG8t", DiscordColor, width);
+        DrawUrlButton("Join Discord for Support", "https://discord.gg/KvGJCCnG8t", DiscordColor, width,
+            "Join Discord server run by community volunteers who can help you with your questions. Opens https://discord.gg/KvGJCCnG8t in your web browser.");
 
         ImGui.SetCursorPos(new Vector2(xPos, ImGui.GetFrameHeightWithSpacing()));
-        DrawUrlButton("Support developer using Ko-fi", "https://ko-fi.com/risadev", DonateColor, width);
+        DrawUrlButton("Support developer using Ko-fi", "https://ko-fi.com/risadev", DonateColor, width,
+            "Any donations made are voluntary and treated as a token of gratitude for work done on Customize+. Opens https://ko-fi.com/risadev in your web browser.");
 
         ImGui.SetCursorPos(new Vector2(xPos, 2 * ImGui.GetFrameHeightWithSpacing()));
         if (ImGui.Button("Copy Support Info to Clipboard"))
@@ -387,7 +389,7 @@ public class SettingsTab
     }
 
     /// <summary> Draw a button to open some url. </summary>
-    private void DrawUrlButton(string text, string url, uint buttonColor, float width)
+    private void DrawUrlButton(string text, string url, uint buttonColor, float width, string? description = null)
     {
         using var color = ImRaii.PushColor(ImGuiCol.Button, buttonColor);
         if (ImGui.Button(text, new Vector2(width, 0)))
@@ -404,7 +406,7 @@ public class SettingsTab
                 _messageService.NotificationMessage($"Unable to open url {url}.", NotificationType.Error, false);
             }
 
-        ImGuiUtil.HoverTooltip($"Open {url}");
+        ImGuiUtil.HoverTooltip(description ?? $"Open {url}");
     }
     #endregion
 }

@@ -19,6 +19,7 @@ using static FFXIVClientStructs.FFXIV.Client.LayoutEngine.ILayoutInstance;
 using CustomizePlus.GameData.Extensions;
 using CustomizePlus.Core.Extensions;
 using Dalamud.Interface.Components;
+using OtterGui.Extensions;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 

@@ -1,32 +1,33 @@
-﻿using Dalamud.Interface;
+﻿using CustomizePlus.Anamnesis;
+using CustomizePlus.Configuration.Data;
+using CustomizePlus.Configuration.Data.Version2;
+using CustomizePlus.Configuration.Data.Version3;
+using CustomizePlus.Configuration.Helpers;
+using CustomizePlus.Core.Helpers;
+using CustomizePlus.Profiles;
+using CustomizePlus.Profiles.Data;
+using CustomizePlus.Profiles.Events;
+using CustomizePlus.Templates;
+using CustomizePlus.Templates.Data;
+using CustomizePlus.Templates.Events;
+using Dalamud.Interface;
+using Dalamud.Interface.ImGuiFileDialog;
+using Dalamud.Interface.ImGuiNotification;
 using Dalamud.Plugin.Services;
 using ImGuiNET;
+using Newtonsoft.Json;
 using OtterGui;
 using OtterGui.Classes;
 using OtterGui.Filesystem;
 using OtterGui.FileSystem.Selector;
 using OtterGui.Log;
 using OtterGui.Raii;
+using OtterGui.Text;
 using System;
+using System.IO;
+using System.Linq;
 using System.Numerics;
 using static CustomizePlus.UI.Windows.MainWindow.Tabs.Templates.TemplateFileSystemSelector;
-using Newtonsoft.Json;
-using System.Linq;
-using Dalamud.Interface.ImGuiFileDialog;
-using System.IO;
-using CustomizePlus.Templates;
-using CustomizePlus.Configuration.Data;
-using CustomizePlus.Profiles;
-using CustomizePlus.Core.Helpers;
-using CustomizePlus.Anamnesis;
-using CustomizePlus.Profiles.Data;
-using CustomizePlus.Templates.Events;
-using CustomizePlus.Profiles.Events;
-using CustomizePlus.Templates.Data;
-using CustomizePlus.Configuration.Helpers;
-using CustomizePlus.Configuration.Data.Version3;
-using CustomizePlus.Configuration.Data.Version2;
-using Dalamud.Interface.ImGuiNotification;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 
@@ -62,6 +63,29 @@ public class TemplateFileSystemSelector : FileSystemSelector<Template, TemplateS
     public struct TemplateState
     {
         public ColorId Color;
+    }
+
+    protected override float CurrentWidth
+        => _configuration.UISettings.CurrentTemplateSelectorWidth * ImUtf8.GlobalScale;
+
+    protected override float MinimumAbsoluteRemainder
+        => 470 * ImUtf8.GlobalScale;
+
+    protected override float MinimumScaling
+        => _configuration.UISettings.TemplateSelectorMinimumScale;
+
+    protected override float MaximumScaling
+        => _configuration.UISettings.TemplateSelectorMaximumScale;
+
+    protected override void SetSize(Vector2 size)
+    {
+        base.SetSize(size);
+        var adaptedSize = MathF.Round(size.X / ImUtf8.GlobalScale);
+        if (adaptedSize == _configuration.UISettings.CurrentTemplateSelectorWidth)
+            return;
+
+        _configuration.UISettings.CurrentTemplateSelectorWidth = adaptedSize;
+        _configuration.Save();
     }
 
     public TemplateFileSystemSelector(

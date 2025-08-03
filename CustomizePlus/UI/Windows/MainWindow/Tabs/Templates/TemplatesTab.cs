@@ -16,7 +16,7 @@ public class TemplatesTab
 
     public void Draw()
     {
-        _selector.Draw(200f * ImGuiHelpers.GlobalScale);
+        _selector.Draw();
         ImGui.SameLine();
         _panel.Draw();
     }

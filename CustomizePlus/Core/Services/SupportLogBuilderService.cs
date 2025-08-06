@@ -21,22 +21,18 @@ public class SupportLogBuilderService
     private readonly ProfileManager _profileManager;
     private readonly ArmatureManager _armatureManager;
     private readonly IDalamudPluginInterface _dalamudPluginInterface;
-    private readonly DalamudBranchService _dalamudBranchService;
-
     public SupportLogBuilderService(
         PluginConfiguration configuration,
         TemplateManager templateManager,
         ProfileManager profileManager,
         ArmatureManager armatureManager,
-        IDalamudPluginInterface dalamudPluginInterface,
-        DalamudBranchService dalamudBranchService)
+        IDalamudPluginInterface dalamudPluginInterface)
     {
         _configuration = configuration;
         _templateManager = templateManager;
         _profileManager = profileManager;
         _armatureManager = armatureManager;
         _dalamudPluginInterface = dalamudPluginInterface;
-        _dalamudBranchService = dalamudBranchService;
     }
 
     public string BuildSupportLog()
@@ -45,7 +41,6 @@ public class SupportLogBuilderService
         sb.AppendLine("**Settings**");
         sb.Append($"> **`Plugin Version:                 `** {VersionHelper.Version}\n");
         sb.Append($"> **`Commit Hash:                    `** {ThisAssembly.Git.Commit}+{ThisAssembly.Git.Sha}\n");
-        sb.Append($"> **`Dalamud Branch:                 `** {_dalamudBranchService.CurrentBranchName} ({_dalamudBranchService.CurrentBranch})\n");
         sb.Append($"> **`Plugin enabled:                 `** {_configuration.PluginEnabled}\n");
         sb.AppendLine("**Settings -> Editor Settings**");
         sb.Append($"> **`Preview character (editor):     `** {_configuration.EditorConfiguration.PreviewCharacter.Incognito(null)}\n");

@@ -148,8 +148,9 @@ public unsafe sealed class ArmatureManager : IDisposable
         {
             var actorIdentifier = obj.Key.CreatePermanent();
 
-            //warn: intentionally only checking object #0 for IsRenderedByGame check since TryLinkSkeleton uses only it.
-            if (obj.Value.Objects == null || obj.Value.Objects.Count == 0 || !obj.Value.Objects[0].IsRenderedByGame())
+            //warn: in cutscenes the game creates a copy of your character and object #0,
+            //so we need to check if there is at least one object being rendered
+            if (obj.Value.Objects == null || obj.Value.Objects.Count == 0 || !obj.Value.Objects.Any(x => x.IsRenderedByGame()))
                 continue;
 
             if (!Armatures.ContainsKey(actorIdentifier))
@@ -265,6 +266,7 @@ public unsafe sealed class ArmatureManager : IDisposable
         if (!_objectManager.ContainsKey(armature.ActorIdentifier))
             return false;
 
+        //we assume that all other objects are a copy of object #0
         var actor = _objectManager[armature.ActorIdentifier].Objects[0];
 
         if (!armature.IsBuilt || armature.IsSkeletonUpdated(actor.Model.AsCharacterBase))

@@ -48,7 +48,7 @@ public partial class CustomizePlusIpc
             .Where(x => x.ProfileType == ProfileType.Normal)
             .Select(x =>
             {
-                string path = _profileFileSystem.FindLeaf(x, out var leaf) ? leaf.FullName() : x.Name.Text;
+                string path = _profileFileSystem.TryGetValue(x, out var leaf) ? leaf.FullName() : x.Name.Text;
                 var charactersList = new List<IPCCharacterDataTuple>(x.Characters.Count);
 
                 foreach (var character in x.Characters)

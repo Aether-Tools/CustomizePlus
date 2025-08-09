@@ -1,5 +1,5 @@
 ﻿using Dalamud.Interface.Utility;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using OtterGui.Classes;
 using OtterGui.Log;
 using OtterGui.Widgets;
@@ -15,6 +15,7 @@ using CustomizePlus.Profiles.Data;
 using CustomizePlus.Templates.Events;
 using CustomizePlus.Templates.Data;
 using OtterGui.Extensions;
+using OtterGui.Raii;
 
 namespace CustomizePlus.UI.Windows.Controls;
 
@@ -23,6 +24,10 @@ public abstract class TemplateComboBase : FilterComboCache<Tuple<Template, strin
     private readonly PluginConfiguration _configuration;
     private readonly TemplateChanged _templateChanged;
     // protected readonly TabSelected TabSelected;
+
+    private bool _isCurrentSelectionDirty;
+    private Template? _currentTemplate;
+
     protected float InnerWidth;
 
     protected TemplateComboBase(
@@ -47,31 +52,27 @@ public abstract class TemplateComboBase : FilterComboCache<Tuple<Template, strin
 
     protected override bool DrawSelectable(int globalIdx, bool selected)
     {
-        var ret = base.DrawSelectable(globalIdx, selected);
-        var (design, path) = Items[globalIdx];
-        if (path.Length > 0 && design.Name != path)
-        {
-            var start = ImGui.GetItemRectMin();
-            var pos = start.X + ImGui.CalcTextSize(design.Name).X;
-            var maxSize = ImGui.GetWindowPos().X + ImGui.GetWindowContentRegionMax().X;
-            var remainingSpace = maxSize - pos;
-            var requiredSize = ImGui.CalcTextSize(path).X + ImGui.GetStyle().ItemInnerSpacing.X;
-            var offset = remainingSpace - requiredSize;
-            if (ImGui.GetScrollMaxY() == 0)
-                offset -= ImGui.GetStyle().ItemInnerSpacing.X;
+        var (template, path) = Items[globalIdx];
+        bool ret;
 
-            if (offset < ImGui.GetStyle().ItemSpacing.X)
-                ImGuiUtil.HoverTooltip(path);
-            else
-                ImGui.GetWindowDrawList().AddText(start with { X = pos + offset },
-                    ImGui.GetColorU32(ImGuiCol.TextDisabled), path);
-        }
-
+        using var color = ImRaii.PushColor(ImGuiCol.Text, ColorId.UsedTemplate.Value());
+        ret = base.DrawSelectable(globalIdx, selected);
+        DrawPath(path, template);
         return ret;
+    }
+
+    private static void DrawPath(string path, Template template)
+    {
+        if (path.Length <= 0 || template.Name == path)
+            return;
+
+        DrawRightAligned(template.Name, path, ImGui.GetColorU32(ImGuiCol.TextDisabled));
     }
 
     protected bool Draw(Template? currentTemplate, string? label, float width)
     {
+        _currentTemplate = currentTemplate;
+        UpdateCurrentSelection();
         InnerWidth = 400 * ImGuiHelpers.GlobalScale;
         CurrentSelectionIdx = Math.Max(Items.IndexOf(p => currentTemplate == p.Item1), 0);
         CurrentSelection = Items[CurrentSelectionIdx];
@@ -79,7 +80,52 @@ public abstract class TemplateComboBase : FilterComboCache<Tuple<Template, strin
         var ret = Draw("##template", name, string.Empty, width, ImGui.GetTextLineHeightWithSpacing())
          && CurrentSelection != null;
 
+        _currentTemplate = null;
+
         return ret;
+    }
+
+    protected override void OnMouseWheel(string preview, ref int _2, int steps)
+    {
+        if (!ReferenceEquals(_currentTemplate, CurrentSelection?.Item1))
+            CurrentSelectionIdx = -1;
+
+        base.OnMouseWheel(preview, ref _2, steps);
+    }
+
+    private void UpdateCurrentSelection()
+    {
+        if (!_isCurrentSelectionDirty)
+            return;
+
+        var priorState = IsInitialized;
+        if (priorState)
+            Cleanup();
+        CurrentSelectionIdx = Items.IndexOf(s => ReferenceEquals(s.Item1, CurrentSelection?.Item1));
+        if (CurrentSelectionIdx >= 0)
+        {
+            UpdateSelection(Items[CurrentSelectionIdx]);
+        }
+        else if (Items.Count > 0)
+        {
+            CurrentSelectionIdx = 0;
+            UpdateSelection(Items[0]);
+        }
+        else
+        {
+            UpdateSelection(null);
+        }
+
+        if (!priorState)
+            Cleanup();
+        _isCurrentSelectionDirty = false;
+    }
+
+    protected override int UpdateCurrentSelected(int currentSelected)
+    {
+        CurrentSelectionIdx = Items.IndexOf(p => _currentTemplate == p.Item1);
+        UpdateSelection(CurrentSelectionIdx >= 0 ? Items[CurrentSelectionIdx] : null);
+        return CurrentSelectionIdx;
     }
 
     protected override string ToString(Tuple<Template, string> obj)
@@ -96,22 +142,31 @@ public abstract class TemplateComboBase : FilterComboCache<Tuple<Template, strin
 
     private void OnTemplateChange(TemplateChanged.Type type, Template template, object? data = null)
     {
-        switch (type)
+        _isCurrentSelectionDirty = type switch
         {
-            case TemplateChanged.Type.Created:
-            case TemplateChanged.Type.Renamed:
-                Cleanup();
-                break;
-            case TemplateChanged.Type.Deleted:
-                Cleanup();
-                if (CurrentSelection?.Item1 == template)
-                {
-                    CurrentSelectionIdx = -1;
-                    CurrentSelection = null;
-                }
+            TemplateChanged.Type.Created => true,
+            TemplateChanged.Type.Renamed => true,
+            TemplateChanged.Type.Deleted => true,
+            _ => _isCurrentSelectionDirty,
+        };
+    }
 
-                break;
-        }
+    private static void DrawRightAligned(string leftText, string text, uint color)
+    {
+        var start = ImGui.GetItemRectMin();
+        var pos = start.X + ImGui.CalcTextSize(leftText).X;
+        var maxSize = ImGui.GetWindowPos().X + ImGui.GetWindowContentRegionMax().X;
+        var remainingSpace = maxSize - pos;
+        var requiredSize = ImGui.CalcTextSize(text).X + ImGui.GetStyle().ItemInnerSpacing.X;
+        var offset = remainingSpace - requiredSize;
+        if (ImGui.GetScrollMaxY() == 0)
+            offset -= ImGui.GetStyle().ItemInnerSpacing.X;
+
+        if (offset < ImGui.GetStyle().ItemSpacing.X)
+            ImGuiUtil.HoverTooltip(text);
+        else
+            ImGui.GetWindowDrawList().AddText(start with { X = pos + offset },
+                color, text);
     }
 }
 
@@ -129,7 +184,7 @@ public sealed class TemplateCombo : TemplateComboBase
         PluginConfiguration configuration)
         : base(
             () => templateManager.Templates
-                .Select(d => new Tuple<Template, string>(d, fileSystem.FindLeaf(d, out var l) ? l.FullName() : string.Empty))
+                .Select(d => new Tuple<Template, string>(d, fileSystem.TryGetValue(d, out var l) ? l.FullName() : string.Empty))
                 .OrderBy(d => d.Item2)
                 .ToList(), logger, templateChanged,/* tabSelected, */configuration)
     {

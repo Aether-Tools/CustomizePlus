@@ -1,5 +1,5 @@
 ﻿using Dalamud.Interface.Utility;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 

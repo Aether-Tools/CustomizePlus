@@ -1,10 +1,10 @@
 [
   {
     "Author": "Abelfreyja",
-    "Name": "Customize+",
+    "Name": "Customize++",
     "Description": "A plugin that allows you to customize your character beyond FFXIV limitations by directly editing bone parameters.",
     "Punchline": "Customize your character beyond FFXIV's limitations.",
-    "InternalName": "CustomizePlus",
+    "InternalName": "CustomizePlusPlus",
     "AssemblyVersion": "2.0.8.0",
     "TestingAssemblyVersion": "2.0.8.0",
     "RepoUrl": "https://github.com/Abelfreyja/CustomizePlus",

@@ -1,7 +1,7 @@
 ﻿using System;
 using Dalamud.Interface;
 using Dalamud.Utility;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 
 namespace CustomizePlus.Core.Helpers;
 

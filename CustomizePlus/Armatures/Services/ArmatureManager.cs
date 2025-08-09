@@ -147,6 +147,12 @@ public unsafe sealed class ArmatureManager : IDisposable
         foreach (var obj in _objectManager)
         {
             var actorIdentifier = obj.Key.CreatePermanent();
+
+            //warn: in cutscenes the game creates a copy of your character and object #0,
+            //so we need to check if there is at least one object being rendered
+            if (obj.Value.Objects == null || obj.Value.Objects.Count == 0 || !obj.Value.Objects.Any(x => x.IsRenderedByGame()))
+                continue;
+
             if (!Armatures.ContainsKey(actorIdentifier))
             {
                 var activeProfile = _profileManager.GetEnabledProfilesByActor(actorIdentifier).FirstOrDefault();
@@ -173,7 +179,8 @@ public unsafe sealed class ArmatureManager : IDisposable
 
                 var activeProfile = _profileManager.GetEnabledProfilesByActor(actorIdentifier).FirstOrDefault();
                 Profile? oldProfile = armature.Profile;
-                if (activeProfile != armature.Profile)
+                bool profileChange = activeProfile != armature.Profile;
+                if (profileChange)
                 {
                     if (activeProfile == null)
                     {
@@ -197,11 +204,27 @@ public unsafe sealed class ArmatureManager : IDisposable
 
                 armature.RebuildBoneTemplateBinding();
 
+                //warn: might be a bit of a performance hit on profiles with a lot of templates/bones
+                //warn: this must be done after RebuildBoneTemplateBinding or it will not work
+                if (profileChange &&
+                    oldProfile.Templates.Where(x => x.Bones.ContainsKey("n_root")).Any())
+                {
+                    _logger.Debug($"Resetting root transform for {armature} because new profile doesn't have root edits");
+
+                    if (obj.Value.Objects != null)
+                    {
+                        //Reset root translation
+                        foreach (var actor in obj.Value.Objects)
+                            ApplyRootTranslation(armature, actor, true);
+                    }
+                }
+
                 _event.Invoke(ArmatureChanged.Type.Updated, armature, (activeProfile, oldProfile));
             }
 
-            //Needed because skeleton sometimes appears to be not ready when armature is created
-            //and also because we want to keep armature up to date with any character skeleton changes
+            //Needed because:
+            //* Skeleton sometimes appears to be not ready when armature is created
+            //* We want to keep armature up to date with any character skeleton changes
             TryLinkSkeleton(armature);
         }
     }
@@ -240,10 +263,10 @@ public unsafe sealed class ArmatureManager : IDisposable
     /// </summary>
     private bool TryLinkSkeleton(Armature armature)
     {
-
         if (!_objectManager.ContainsKey(armature.ActorIdentifier))
             return false;
 
+        //we assume that all other objects are a copy of object #0
         var actor = _objectManager[armature.ActorIdentifier].Objects[0];
 
         if (!armature.IsBuilt || armature.IsSkeletonUpdated(actor.Model.AsCharacterBase))
@@ -329,7 +352,7 @@ public unsafe sealed class ArmatureManager : IDisposable
     }
 
     /// <summary>
-    /// Apply root bone translation. If reset = true then this will only reset translation if it was edited in supplied armature.
+    /// Apply root bone translation. If reset = true then this will forcibly reset translation to in-game value.
     /// </summary>
     private void ApplyRootTranslation(Armature arm, Actor actor, bool reset = false)
     {
@@ -341,17 +364,17 @@ public unsafe sealed class ArmatureManager : IDisposable
         var cBase = actor.Model.AsCharacterBase;
         if (cBase != null)
         {
-            //warn: hotpath for characters with n_root edits. IsApproximately might have some performance hit.
-            var rootBoneTransform = arm.GetAppliedBoneTransform("n_root");
-            if (rootBoneTransform == null || 
-                rootBoneTransform.Translation.IsApproximately(Vector3.Zero, 0.00001f))
-                return;
-
             if (reset)
             {
                 cBase->DrawObject.Object.Position = actor.AsObject->Position;
                 return;
             }
+
+            //warn: hotpath for characters with n_root edits. IsApproximately might have some performance hit.
+            var rootBoneTransform = arm.GetAppliedBoneTransform("n_root");
+            if (rootBoneTransform == null || 
+                rootBoneTransform.Translation.IsApproximately(Vector3.Zero, 0.00001f))
+                return;
 
             if (rootBoneTransform.Translation.X == 0 &&
                 rootBoneTransform.Translation.Y == 0 &&

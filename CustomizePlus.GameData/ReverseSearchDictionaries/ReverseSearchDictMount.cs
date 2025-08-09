@@ -29,7 +29,7 @@ public sealed class ReverseSearchDictMount(IDalamudPluginInterface pluginInterfa
         {
             if (m.Singular.ByteLength > 0 && m.Order >= 0)
             {
-                dict.TryAdd(DataUtility.ToTitleCaseExtended(m.Singular, m.Article), m.RowId);
+                dict.TryAdd(DataUtility.ToTitleCaseExtended(m.Singular, gameData.Language), m.RowId);
             }
             else if (m.Unknown1.ByteLength > 0)
             {

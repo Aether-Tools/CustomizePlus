@@ -8,6 +8,8 @@ using OtterGui.Services;
 
 namespace CustomizePlus.Core.Services.Dalamud;
 
+#pragma warning disable SeStringEvaluator
+
 public class DalamudServices
 {
     public static void AddServices(ServiceManager services, IDalamudPluginInterface pi)
@@ -27,6 +29,7 @@ public class DalamudServices
             .AddDalamudService<IPluginLog>(pi)
             .AddDalamudService<ITargetManager>(pi)
             .AddDalamudService<INotificationManager>(pi)
-            .AddDalamudService<IContextMenu>(pi);
+            .AddDalamudService<IContextMenu>(pi)
+            .AddDalamudService<ISeStringEvaluator>(pi);
     }
 }

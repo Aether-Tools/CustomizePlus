@@ -29,6 +29,7 @@ public class CPlusChangeLog
         Add2_0_7_9(Changelog);
         Add2_0_7_15(Changelog);
         Add2_0_7_16(Changelog);
+        Add2_0_7_23(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -40,6 +41,15 @@ public class CPlusChangeLog
         _config.ChangelogSettings.ChangeLogDisplayType = type;
         _config.Save();
     }
+
+    private static void Add2_0_7_23(Changelog log)
+        => log.NextVersion("Version 2.0.7.23")
+        .RegisterImportant("Support for 7.3 and Dalamud API 13.")
+        .RegisterEntry("IPC version updated to 6.1. (2.0.7.20)")
+        .RegisterEntry("Added Profile.AddPlayerCharacter and Profile.RemovePlayerCharacter IPC endpoints. (by Caraxi)", 1)
+        .RegisterEntry("Left side selectors in \"Templates\" and \"Profiles\" tabs can now be resized.")
+        .RegisterEntry("Fixed crashes on login/logout.")
+        .RegisterEntry("This usually happened when when \"Apply Profiles on Character Select Screen\" and/or \"Automatically Set Current Character as Editor Preview Character\" options are enabled in settings.", 1);
 
     private static void Add2_0_7_16(Changelog log)
         => log.NextVersion("Version 2.0.7.16")

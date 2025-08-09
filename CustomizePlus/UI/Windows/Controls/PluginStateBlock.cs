@@ -1,6 +1,6 @@
 ﻿using Dalamud.Interface.Utility;
 using Dalamud.Interface;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System.Numerics;
 using CustomizePlus.Core.Services;
 using CustomizePlus.Game.Services;
@@ -20,22 +20,19 @@ public class PluginStateBlock
     private readonly GameStateService _gameStateService;
     private readonly HookingService _hookingService;
     private readonly CustomizePlusIpc _ipcService;
-    private readonly DalamudBranchService _dalamudBranchService;
 
     public PluginStateBlock(
         BoneEditorPanel boneEditorPanel,
         PluginConfiguration configuration,
         GameStateService gameStateService,
         HookingService hookingService,
-        CustomizePlusIpc ipcService,
-        DalamudBranchService dalamudBranchService)
+        CustomizePlusIpc ipcService)
     {
         _boneEditorPanel = boneEditorPanel;
         _configuration = configuration;
         _gameStateService = gameStateService;
         _hookingService = hookingService;
         _ipcService = ipcService;
-        _dalamudBranchService = dalamudBranchService;
     }
 
     public void Draw(float yPos)
@@ -78,12 +75,6 @@ public class PluginStateBlock
         {
             severity = PluginStateSeverity.Error;
             message = "Detected failure in IPC. Integrations with other plugins will not function.";
-        }
-        else if (!_dalamudBranchService.AllowPluginToRun)
-        {
-            severity = PluginStateSeverity.Error;
-            message = "You are running unsupported version of Dalamud, hover for more information.";
-            hoverInfo = "Regular users are not supposed to run Customize+ on development or testing versions of Dalamud.\nThis is not supported and therefore Customize+ has disabled itself.";
         }
         else if(VersionHelper.IsTesting)
         {

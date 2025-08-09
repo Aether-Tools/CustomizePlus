@@ -63,6 +63,18 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
 
         public bool IncognitoMode { get; set; } = false;
 
+        public float CurrentTemplateSelectorWidth { get; set; } = 200f;
+
+        public float TemplateSelectorMinimumScale { get; set; } = 0.1f;
+
+        public float TemplateSelectorMaximumScale { get; set; } = 0.5f;
+
+        public float CurrentProfileSelectorWidth { get; set; } = 200f;
+
+        public float ProfileSelectorMinimumScale { get; set; } = 0.1f;
+
+        public float ProfileSelectorMaximumScale { get; set; } = 0.5f;
+
         public List<string> ViewedMessageWindows { get; set; } = new();
     }
 

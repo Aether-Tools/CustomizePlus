@@ -109,6 +109,19 @@ public class TemplateFileSystemSelector : FileSystemSelector<Template, TemplateS
         _profileChangedEvent.Unsubscribe(OnProfileChange);
     }
 
+    private float? _forcedWidth;
+
+    protected override float CurrentWidth
+        => _forcedWidth ?? base.CurrentWidth;
+
+    public void Draw(float width)
+    {
+        _forcedWidth = width;
+        base.Draw();
+        _forcedWidth = null;
+    }
+
+
     protected override uint ExpandedFolderColor
         => ColorId.FolderExpanded.Value();
 

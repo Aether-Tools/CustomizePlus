@@ -147,6 +147,11 @@ public unsafe sealed class ArmatureManager : IDisposable
         foreach (var obj in _objectManager)
         {
             var actorIdentifier = obj.Key.CreatePermanent();
+
+            //warn: intentionally only checking object #0 for IsRenderedByGame check since TryLinkSkeleton uses only it.
+            if (obj.Value.Objects == null || obj.Value.Objects.Count == 0 || !obj.Value.Objects[0].IsRenderedByGame())
+                continue;
+
             if (!Armatures.ContainsKey(actorIdentifier))
             {
                 var activeProfile = _profileManager.GetEnabledProfilesByActor(actorIdentifier).FirstOrDefault();
@@ -216,8 +221,9 @@ public unsafe sealed class ArmatureManager : IDisposable
                 _event.Invoke(ArmatureChanged.Type.Updated, armature, (activeProfile, oldProfile));
             }
 
-            //Needed because skeleton sometimes appears to be not ready when armature is created
-            //and also because we want to keep armature up to date with any character skeleton changes
+            //Needed because:
+            //* Skeleton sometimes appears to be not ready when armature is created
+            //* We want to keep armature up to date with any character skeleton changes
             TryLinkSkeleton(armature);
         }
     }
@@ -256,7 +262,6 @@ public unsafe sealed class ArmatureManager : IDisposable
     /// </summary>
     private bool TryLinkSkeleton(Armature armature)
     {
-
         if (!_objectManager.ContainsKey(armature.ActorIdentifier))
             return false;
 

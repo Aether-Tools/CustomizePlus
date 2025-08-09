@@ -96,7 +96,7 @@ public class StateMonitoringTab
     {
         foreach (var kvPair in _objectManager)
         {
-            var show = ImGui.CollapsingHeader($"{kvPair.Key} ({kvPair.Value.Objects.Count} objects)###object-{kvPair.Key}");
+            var show = ImGui.CollapsingHeader($"{kvPair.Key} ({kvPair.Value.Objects.Count} objects [{kvPair.Value.Objects.Count(x => x.IsRenderedByGame())} rendered])###object-{kvPair.Key}");
 
             if (!show)
                 continue;
@@ -124,7 +124,7 @@ public class StateMonitoringTab
             ImGui.Text($"Count: {kvPair.Value.Objects.Count}");
             foreach (var item in kvPair.Value.Objects)
             {
-                ImGui.Text($"[{item.Index}] - {item}, valid: {item.Valid}");
+                ImGui.Text($"[{item.Index}] - {item}, valid: {item.Valid}, rendered: {item.IsRenderedByGame()}");
             }
 
             ImGui.Spacing();

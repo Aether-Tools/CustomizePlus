@@ -49,7 +49,10 @@ public class CPlusChangeLog
         .RegisterEntry("Added Profile.AddPlayerCharacter and Profile.RemovePlayerCharacter IPC endpoints. (by Caraxi)", 1)
         .RegisterEntry("Left side selectors in \"Templates\" and \"Profiles\" tabs can now be resized.")
         .RegisterEntry("Fixed crashes on login/logout.")
-        .RegisterEntry("This usually happened when when \"Apply Profiles on Character Select Screen\" and/or \"Automatically Set Current Character as Editor Preview Character\" options are enabled in settings.", 1);
+        .RegisterEntry("This usually happened when when \"Apply Profiles on Character Select Screen\" and/or \"Automatically Set Current Character as Editor Preview Character\" options are enabled in settings.", 1)
+        .RegisterEntry("Fixed root transforms sometimes not resetting when toggling between profiles until character is moved.")
+        .RegisterEntry("Fixed an issue where profiles would attempt to be applied to objects not currently drawn on the screen.")
+        .RegisterEntry("Slight refactoring of user interface code.");
 
     private static void Add2_0_7_16(Changelog log)
         => log.NextVersion("Version 2.0.7.16")

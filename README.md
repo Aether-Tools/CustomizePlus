@@ -3,7 +3,7 @@ Customize+ is a Dalamud plugin designed to give you better control over your Fin
 [Original Plugin](https://github.com/Aether-Tools/CustomizePlus)
 
 ## Installing
-`https://github.com/Abelfreyja/CustomizePlus/blob/main/repo.json`
+`https://raw.githubusercontent.com/Abelfreyja/CustomizePlus/refs/heads/main/repo.json`
 
 ## License
 All files in this repository are licensed under the license listed in LICENSE.md file unless stated otherwise. By contributing the code into this repository you agreeing with licensing submitted code under this license.

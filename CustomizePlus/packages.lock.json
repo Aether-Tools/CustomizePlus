@@ -4,9 +4,9 @@
     "net9.0-windows7.0": {
       "DalamudPackager": {
         "type": "Direct",
-        "requested": "[12.0.0, )",
-        "resolved": "12.0.0",
-        "contentHash": "J5TJLV3f16T/E2H2P17ClWjtfEBPpq3yxvqW46eN36JCm6wR+EaoaYkqG9Rm5sHqs3/nK/vKjWWyvEs/jhKoXw=="
+        "requested": "[13.0.0, )",
+        "resolved": "13.0.0",
+        "contentHash": "Mb3cUDSK/vDPQ8gQIeuCw03EMYrej1B4J44a1AvIJ9C759p9XeqdU9Hg4WgOmlnlPe0G7ILTD32PKSUpkQNa8w=="
       },
       "DotNet.ReproducibleBuilds": {
         "type": "Direct",
@@ -16,20 +16,20 @@
       },
       "GitInfo": {
         "type": "Direct",
-        "requested": "[3.3.5, )",
-        "resolved": "3.3.5",
-        "contentHash": "xt8tAMq42KompgmZI5fpko9IY9cuGqjvNFCc+B6iZeoCHlqcbuGZz33SFD+jTsPZTFfrxqTXvywm/s8DcFcEIg==",
+        "requested": "[3.5.0, )",
+        "resolved": "3.5.0",
+        "contentHash": "w7pFvv7PutCdK126BSq9O+wXfiyXQ68c2BeZnd9AHAbkV+IlTCF47LCZHNCqNchWMEv+GBbWGHCcGzZT411tIw==",
         "dependencies": {
-          "ThisAssembly.Constants": "1.4.1"
+          "ThisAssembly.Constants": "2.0.6"
         }
       },
       "Microsoft.Extensions.DependencyInjection": {
         "type": "Direct",
-        "requested": "[9.0.2, )",
-        "resolved": "9.0.2",
-        "contentHash": "ZffbJrskOZ40JTzcTyKwFHS5eACSWp2bUQBBApIgGV+es8RaTD4OxUG7XxFr3RIPLXtYQ1jQzF2DjKB5fZn7Qg==",
+        "requested": "[9.0.8, )",
+        "resolved": "9.0.8",
+        "contentHash": "JJjI2Fa+QtZcUyuNjbKn04OjIUX5IgFGFu/Xc+qvzh1rXdZHLcnqqVXhR4093bGirTwacRlHiVg1XYI9xum6QQ==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.2"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.8"
         }
       },
       "StyleCop.Analyzers": {
@@ -50,8 +50,8 @@
       },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Transitive",
-        "resolved": "9.0.2",
-        "contentHash": "MNe7GSTBf3jQx5vYrXF0NZvn6l7hUKF6J54ENfAgCO8y6xjN1XUmKKWG464LP2ye6QqDiA1dkaWEZBYnhoZzjg=="
+        "resolved": "9.0.8",
+        "contentHash": "xY3lTjj4+ZYmiKIkyWitddrp1uL5uYiweQjqo4BKBw01ZC4HhcfgLghDpPZcUlppgWAFqFy9SgkiYWOMx365pw=="
       },
       "System.Threading.Tasks.Extensions": {
         "type": "Transitive",
@@ -60,8 +60,8 @@
       },
       "ThisAssembly.Constants": {
         "type": "Transitive",
-        "resolved": "1.4.1",
-        "contentHash": "sV0CDYlC6YSIkYbdwd4+jRinLb888Dac71pmNhF2Ll6UXY1J+1oVt3EfmX6euXEKz2RLdfV+4GyZctfEA0NSqA==",
+        "resolved": "2.0.6",
+        "contentHash": "XF1RWxkEx+xvSRZOpkLF0rrclMsjKYkO+j7UoCk+ebSzKcxoIye7Na4HvkmIJogNoB+vZqSz7df5McxgzZHtbg==",
         "dependencies": {
           "Microsoft.CSharp": "4.7.0",
           "System.Threading.Tasks.Extensions": "4.5.4"
@@ -90,7 +90,7 @@
         "type": "Project",
         "dependencies": {
           "OtterGui": "[1.0.0, )",
-          "Penumbra.Api": "[5.6.1, )",
+          "Penumbra.Api": "[5.10.0, )",
           "Penumbra.String": "[1.0.6, )"
         }
       },

@@ -82,7 +82,7 @@ internal static class Constants
     /// <summary>
     /// Movement hook address, used for position offset and other changes which cannot be done in main hook
     /// </summary>
-    public const string MovementHookAddress = "E8 ?? ?? ?? ?? 84 DB 74 45";
+    public const string MovementHookAddress = "E8 ?? ?? ?? ?? 84 DB 74 3A";
 
     internal static class Colors
     {

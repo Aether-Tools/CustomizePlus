@@ -1,5 +1,5 @@
 ﻿using Dalamud.Interface.Utility;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 
@@ -16,7 +16,7 @@ public class ProfilesTab
 
     public void Draw()
     {
-        _selector.Draw(200f * ImGuiHelpers.GlobalScale);
+        _selector.Draw(200f * ImGuiHelpers.GlobalScale); // not sure
         ImGui.SameLine();
         _panel.Draw();
     }

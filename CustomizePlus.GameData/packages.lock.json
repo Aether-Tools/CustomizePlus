@@ -40,7 +40,7 @@
         "type": "Project",
         "dependencies": {
           "OtterGui": "[1.0.0, )",
-          "Penumbra.Api": "[5.6.1, )",
+          "Penumbra.Api": "[5.10.0, )",
           "Penumbra.String": "[1.0.6, )"
         }
       },

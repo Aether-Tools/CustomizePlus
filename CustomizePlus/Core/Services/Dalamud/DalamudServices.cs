@@ -16,6 +16,7 @@ public class DalamudServices
             .AddExistingService(pi.UiBuilder)
             .AddDalamudService<ISigScanner>(pi)
             .AddDalamudService<IFramework>(pi)
+            .AddDalamudService<ISeStringEvaluator>(pi)
             .AddDalamudService<IObjectTable>(pi)
             .AddDalamudService<ICommandManager>(pi)
             .AddDalamudService<IChatGui>(pi)

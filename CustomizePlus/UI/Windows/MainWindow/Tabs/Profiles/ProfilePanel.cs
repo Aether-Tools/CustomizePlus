@@ -1,8 +1,9 @@
 ﻿using Dalamud.Interface;
 using Dalamud.Interface.Utility;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using OtterGui;
 using OtterGui.Raii;
+using OtterGui.Extensions;
 using System;
 using System.Linq;
 using System.Numerics;
@@ -504,7 +505,7 @@ public class ProfilePanel
             if (source)
             {
                 ImGui.TextUnformatted($"Moving template #{index + 1:D2}...");
-                if (ImGui.SetDragDropPayload(dragDropLabel, nint.Zero, 0))
+                if (ImGui.SetDragDropPayload(dragDropLabel, ReadOnlySpan<byte>.Empty, 0))
                 {
                     _dragIndex = index;
                 }

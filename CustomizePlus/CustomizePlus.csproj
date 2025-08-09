@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 
-<Project Sdk="Dalamud.NET.Sdk/12.0.2">
+<Project Sdk="Dalamud.NET.Sdk/13.0.0">
   <PropertyGroup>
     <AssemblyTitle>CustomizePlus</AssemblyTitle>
     <Version>2.0.0.0</Version>
@@ -23,18 +23,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="GitInfo" Version="3.3.5">
+    <PackageReference Include="GitInfo" Version="3.5.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <ProjectReference Include="..\CustomizePlus.GameData\CustomizePlus.GameData.csproj" />
     <ProjectReference Include="..\submodules\ECommonsLite\ECommonsLite\ECommonsLite.csproj" />
-    <ProjectReference Include="..\submodules\OtterGui\OtterGui.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,8 +1,9 @@
 ﻿using Dalamud.Interface.Utility;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using OtterGui.Classes;
 using OtterGui.Log;
 using OtterGui.Widgets;
+using OtterGui.Extensions;
 using OtterGui;
 using System;
 using System.Collections.Generic;
@@ -51,7 +52,7 @@ public abstract class TemplateComboBase : FilterComboCache<Tuple<Template, strin
         if (path.Length > 0 && design.Name != path)
         {
             var start = ImGui.GetItemRectMin();
-            var pos = start.X + ImGui.CalcTextSize(design.Name).X;
+            var pos = start.X + ImGui.CalcTextSize(design.Name.ToString()).X;
             var maxSize = ImGui.GetWindowPos().X + ImGui.GetWindowContentRegionMax().X;
             var remainingSpace = maxSize - pos;
             var requiredSize = ImGui.CalcTextSize(path).X + ImGui.GetStyle().ItemInnerSpacing.X;

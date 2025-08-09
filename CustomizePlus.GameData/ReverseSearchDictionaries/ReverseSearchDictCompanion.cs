@@ -19,7 +19,7 @@ public sealed class ReverseSearchDictCompanion(IDalamudPluginInterface pluginInt
         var sheet = gameData.GetExcelSheet<Companion>(gameData.Language)!;
         var dict = new Dictionary<string, uint>((int)sheet.Count);
         foreach (var c in sheet.Where(c => c.Singular.ByteLength > 0 && c.Order < ushort.MaxValue))
-            dict.TryAdd(DataUtility.ToTitleCaseExtended(c.Singular, c.Article), c.RowId);
+            dict.TryAdd(DataUtility.ToTitleCaseExtended(c.Singular, (Dalamud.Game.ClientLanguage)c.Article), c.RowId);
         return dict.ToFrozenDictionary();
     }
 

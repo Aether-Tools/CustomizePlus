@@ -1,7 +1,8 @@
 ﻿using System;
 using Dalamud.Interface;
 using Dalamud.Utility;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
+using System.Text;
 
 namespace CustomizePlus.Core.Helpers;
 
@@ -67,15 +68,22 @@ public static class CtrlHelper
 
     public static bool ArrowToggle(string label, ref bool value)
     {
-        var toggled = ImGui.ArrowButton(label, value ? ImGuiDir.Down : ImGuiDir.Right);
-
-        if (toggled)
+        unsafe // temporary fix
         {
-            value = !value;
-        }
+            var utf8Label = Encoding.UTF8.GetBytes(label + "\0");
 
-        return value;
+            fixed (byte* labelPtr = utf8Label)
+            {
+                bool toggled = ImGuiNative.ArrowButton(labelPtr, value ? ImGuiDir.Down : ImGuiDir.Right) != 0;
+
+                if (toggled)
+                    value = !value;
+
+                return value;
+            }
+        }
     }
+
 
     public static void AddHoverText(string text)
     {

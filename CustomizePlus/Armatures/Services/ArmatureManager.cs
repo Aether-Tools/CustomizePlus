@@ -173,7 +173,8 @@ public unsafe sealed class ArmatureManager : IDisposable
 
                 var activeProfile = _profileManager.GetEnabledProfilesByActor(actorIdentifier).FirstOrDefault();
                 Profile? oldProfile = armature.Profile;
-                if (activeProfile != armature.Profile)
+                bool profileChange = activeProfile != armature.Profile;
+                if (profileChange)
                 {
                     if (activeProfile == null)
                     {
@@ -196,6 +197,21 @@ public unsafe sealed class ArmatureManager : IDisposable
                 }
 
                 armature.RebuildBoneTemplateBinding();
+
+                //warn: might be a bit of a performance hit on profiles with a lot of templates/bones
+                //warn: this must be done after RebuildBoneTemplateBinding or it will not work
+                if (profileChange &&
+                    oldProfile.Templates.Where(x => x.Bones.ContainsKey("n_root")).Any())
+                {
+                    _logger.Debug($"Resetting root transform for {armature} because new profile doesn't have root edits");
+
+                    if (obj.Value.Objects != null)
+                    {
+                        //Reset root translation
+                        foreach (var actor in obj.Value.Objects)
+                            ApplyRootTranslation(armature, actor, true);
+                    }
+                }
 
                 _event.Invoke(ArmatureChanged.Type.Updated, armature, (activeProfile, oldProfile));
             }
@@ -329,7 +345,7 @@ public unsafe sealed class ArmatureManager : IDisposable
     }
 
     /// <summary>
-    /// Apply root bone translation. If reset = true then this will only reset translation if it was edited in supplied armature.
+    /// Apply root bone translation. If reset = true then this will forcibly reset translation to in-game value.
     /// </summary>
     private void ApplyRootTranslation(Armature arm, Actor actor, bool reset = false)
     {
@@ -341,17 +357,17 @@ public unsafe sealed class ArmatureManager : IDisposable
         var cBase = actor.Model.AsCharacterBase;
         if (cBase != null)
         {
-            //warn: hotpath for characters with n_root edits. IsApproximately might have some performance hit.
-            var rootBoneTransform = arm.GetAppliedBoneTransform("n_root");
-            if (rootBoneTransform == null || 
-                rootBoneTransform.Translation.IsApproximately(Vector3.Zero, 0.00001f))
-                return;
-
             if (reset)
             {
                 cBase->DrawObject.Object.Position = actor.AsObject->Position;
                 return;
             }
+
+            //warn: hotpath for characters with n_root edits. IsApproximately might have some performance hit.
+            var rootBoneTransform = arm.GetAppliedBoneTransform("n_root");
+            if (rootBoneTransform == null || 
+                rootBoneTransform.Translation.IsApproximately(Vector3.Zero, 0.00001f))
+                return;
 
             if (rootBoneTransform.Translation.X == 0 &&
                 rootBoneTransform.Translation.Y == 0 &&

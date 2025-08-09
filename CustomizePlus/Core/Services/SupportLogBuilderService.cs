@@ -75,7 +75,7 @@ public class SupportLogBuilderService
             sb.Append($">   >   > **`Count:                  `** {profile.Templates.Count}\n");
             foreach (var template in profile.Templates)
             {
-                sb.Append($">   >   > **`{template.ToString(), -32}`**\n");
+                sb.Append($">   >   > **`{template.ToString(),-32}`**\n");
 
                 if (profile.DisabledTemplates.Contains(template.UniqueId))
                     sb.Append($">   >   >   >  **`Disabled`**\n");
@@ -84,7 +84,7 @@ public class SupportLogBuilderService
             sb.Append($">   >   > **`Count:                  `** {profile.Armatures.Count}\n");
             foreach (var armature in profile.Armatures)
             {
-                sb.Append($">   >   > **`{armature.ToString(), -32}`**\n");
+                sb.Append($">   >   > **`{armature.ToString(),-32}`**\n");
             }
             sb.Append($">   > =====\n");
         }

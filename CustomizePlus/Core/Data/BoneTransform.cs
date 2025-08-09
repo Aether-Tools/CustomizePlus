@@ -58,6 +58,10 @@ public class BoneTransform
         set => _scaling = ClampVector(value);
     }
 
+    public bool PropagateTranslation = false;
+    public bool PropagateRotation = false;
+    public bool PropagateScale = false;
+
     [OnDeserialized]
     internal void OnDeserialized(StreamingContext context)
     {
@@ -80,23 +84,29 @@ public class BoneTransform
         {
             Translation = Translation,
             Rotation = Rotation,
-            Scaling = Scaling
+            Scaling = Scaling,
+            PropagateTranslation = PropagateTranslation,
+            PropagateRotation = PropagateRotation,
+            PropagateScale = PropagateScale
         };
     }
 
-    public void UpdateAttribute(BoneAttribute which, Vector3 newValue)
+    public void UpdateAttribute(BoneAttribute which, Vector3 newValue, bool shouldPropagate)
     {
         if (which == BoneAttribute.Position)
         {
             Translation = newValue;
+            PropagateTranslation = shouldPropagate;
         }
         else if (which == BoneAttribute.Rotation)
         {
             Rotation = newValue;
+            PropagateRotation = shouldPropagate;
         }
         else
         {
             Scaling = newValue;
+            PropagateScale = shouldPropagate;
         }
     }
 
@@ -105,6 +115,9 @@ public class BoneTransform
         Translation = newValues.Translation;
         Rotation = newValues.Rotation;
         Scaling = newValues.Scaling;
+        PropagateTranslation = newValues.PropagateTranslation;
+        PropagateRotation = newValues.PropagateRotation;
+        PropagateScale = newValues.PropagateScale;
     }
 
     /// <summary>
@@ -117,7 +130,10 @@ public class BoneTransform
         {
             Translation = new Vector3(Translation.X, Translation.Y, -1 * Translation.Z),
             Rotation = new Vector3(-1 * Rotation.X, -1 * Rotation.Y, Rotation.Z),
-            Scaling = Scaling
+            Scaling = Scaling,
+            PropagateTranslation = PropagateTranslation,
+            PropagateRotation = PropagateRotation,
+            PropagateScale = PropagateScale
         };
     }
 
@@ -131,7 +147,10 @@ public class BoneTransform
         {
             Translation = new Vector3(Translation.X, -1 * Translation.Y, Translation.Z),
             Rotation = new Vector3(Rotation.X, -1 * Rotation.Y, -1 * Rotation.Z),
-            Scaling = Scaling
+            Scaling = Scaling,
+            PropagateTranslation = PropagateTranslation,
+            PropagateRotation = PropagateRotation,
+            PropagateScale = PropagateScale
         };
     }
 

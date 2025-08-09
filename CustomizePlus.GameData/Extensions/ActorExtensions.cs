@@ -1,4 +1,4 @@
-﻿using Penumbra.GameData.Interop;
+using Penumbra.GameData.Interop;
 
 namespace CustomizePlus.GameData.Extensions;
 

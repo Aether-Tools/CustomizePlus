@@ -72,14 +72,14 @@ public class TemplateEditorManager : IDisposable
     /// Checks if preview character exists at the time of call
     /// </summary>
     public bool IsCharacterFound
-    { 
+    {
         get
         {
             var playerName = _gameObjectService.GetCurrentPlayerName();
             return _gameObjectService.FindActorsByIdentifierIgnoringOwnership(Character)
                 .Where(x => x.Item1.Type != Penumbra.GameData.Enums.IdentifierType.Owned || x.Item1.IsOwnedByLocalPlayer())
                 .Any();
-        } 
+        }
     }
 
     public bool IsKeepOnlyEditorProfileActive { get; set; } //todo
@@ -182,7 +182,7 @@ public class TemplateEditorManager : IDisposable
         if (!IsEditorActive || IsEditorPaused)
             return;
 
-        if(!HasChanges)
+        if (!HasChanges)
         {
             DisableEditor();
             return;
@@ -238,24 +238,28 @@ public class TemplateEditorManager : IDisposable
             return false;
 
         var resetValue = GetResetValueForAttribute(attribute);
+        var defaultPropagationState = false;
 
         switch (attribute)
         {
             case BoneAttribute.Position:
-                if (resetValue == CurrentlyEditedTemplate!.Bones[boneName].Translation)
+                if ((resetValue == CurrentlyEditedTemplate!.Bones[boneName].Translation) &&
+                    (defaultPropagationState == CurrentlyEditedTemplate!.Bones[boneName].PropagateTranslation))
                     return false;
                 break;
             case BoneAttribute.Rotation:
-                if (resetValue == CurrentlyEditedTemplate!.Bones[boneName].Rotation)
+                if ((resetValue == CurrentlyEditedTemplate!.Bones[boneName].Rotation) &&
+                    (defaultPropagationState == CurrentlyEditedTemplate!.Bones[boneName].PropagateRotation))
                     return false;
                 break;
             case BoneAttribute.Scale:
-                if (resetValue == CurrentlyEditedTemplate!.Bones[boneName].Scaling)
+                if ((resetValue == CurrentlyEditedTemplate!.Bones[boneName].Scaling) &&
+                    (defaultPropagationState == CurrentlyEditedTemplate!.Bones[boneName].PropagateScale))
                     return false;
                 break;
         }
 
-        CurrentlyEditedTemplate!.Bones[boneName].UpdateAttribute(attribute, resetValue);
+        CurrentlyEditedTemplate!.Bones[boneName].UpdateAttribute(attribute, resetValue, defaultPropagationState);
 
         if (!HasChanges)
             HasChanges = true;
@@ -276,6 +280,7 @@ public class TemplateEditorManager : IDisposable
             return false;
 
         Vector3? originalValue = null!;
+        bool originalPropagationState = false;
 
         if (_currentlyEditedTemplateOriginal.Bones.ContainsKey(boneName))
         {
@@ -283,25 +288,34 @@ public class TemplateEditorManager : IDisposable
             {
                 case BoneAttribute.Position:
                     originalValue = _currentlyEditedTemplateOriginal.Bones[boneName].Translation;
-                    if (originalValue == CurrentlyEditedTemplate!.Bones[boneName].Translation)
+                    originalPropagationState = _currentlyEditedTemplateOriginal.Bones[boneName].PropagateTranslation;
+                    if ((originalValue == CurrentlyEditedTemplate!.Bones[boneName].Translation) &&
+                        (originalPropagationState == CurrentlyEditedTemplate!.Bones[boneName].PropagateTranslation))
                         return false;
                     break;
                 case BoneAttribute.Rotation:
                     originalValue = _currentlyEditedTemplateOriginal.Bones[boneName].Rotation;
-                    if (originalValue == CurrentlyEditedTemplate!.Bones[boneName].Rotation)
+                    originalPropagationState = _currentlyEditedTemplateOriginal.Bones[boneName].PropagateRotation;
+                    if ((originalValue == CurrentlyEditedTemplate!.Bones[boneName].Rotation) &&
+                        (originalPropagationState == CurrentlyEditedTemplate!.Bones[boneName].PropagateRotation))
                         return false;
                     break;
                 case BoneAttribute.Scale:
                     originalValue = _currentlyEditedTemplateOriginal.Bones[boneName].Scaling;
-                    if (originalValue == CurrentlyEditedTemplate!.Bones[boneName].Scaling)
+                    originalPropagationState = _currentlyEditedTemplateOriginal.Bones[boneName].PropagateScale;
+                    if ((originalValue == CurrentlyEditedTemplate!.Bones[boneName].Scaling) &&
+                        (originalPropagationState == CurrentlyEditedTemplate!.Bones[boneName].PropagateScale))
                         return false;
                     break;
             }
         }
         else
+        {
             originalValue = GetResetValueForAttribute(attribute);
+            originalPropagationState = false;
+        }
 
-        CurrentlyEditedTemplate!.Bones[boneName].UpdateAttribute(attribute, originalValue.Value);
+        CurrentlyEditedTemplate!.Bones[boneName].UpdateAttribute(attribute, originalValue.Value, originalPropagationState);
 
         if (!HasChanges)
             HasChanges = true;
@@ -329,7 +343,7 @@ public class TemplateEditorManager : IDisposable
             !_configuration.EditorConfiguration.PreviewCharacter.IsValid)
         {
             var localPlayer = _gameObjectService.GetCurrentPlayerActorIdentifier();
-            if(!localPlayer.IsValid)
+            if (!localPlayer.IsValid)
             {
                 _logger.Warning("Can't retrieve local player on login");
                 return;

@@ -1,14 +1,16 @@
-﻿using System;
-using CustomizePlus.Api;
+﻿using CustomizePlus.Api;
+using CustomizePlus.Armatures.Data;
 using CustomizePlus.Core;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.Core.Services;
+using CustomizePlus.Interop.Ipc;
 using CustomizePlus.UI;
 using Dalamud.Plugin;
 using ECommonsLite;
 using OtterGui.Log;
 using OtterGui.Services;
 using Penumbra.GameData.Actors;
+using System;
 
 namespace CustomizePlus;
 
@@ -23,9 +25,12 @@ public sealed class Plugin : IDalamudPlugin
         try
         {
             ECommonsLiteMain.Init(pluginInterface, this);
+            InteropAlloc.Init();
 
             _services = ServiceManagerBuilder.CreateProvider(pluginInterface, Logger);
 
+            _services.GetService<IpcHandler>().Initialize();
+            _services.GetService<PcpService>();
             _services.GetService<ActorManager>(); //needs to be initialized early for config to be read properly
 
             _services.GetService<UserNotifierService>();

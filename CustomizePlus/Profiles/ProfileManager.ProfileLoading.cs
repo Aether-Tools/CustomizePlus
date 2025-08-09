@@ -198,7 +198,7 @@ public partial class ProfileManager : IDisposable
                 continue;
 
             profile.Templates.Add(template);
-                
+
             var templateEnabled = templateObjCast["Enabled"]?.ToObject<bool>() ?? true;
             if (!templateEnabled)
             {

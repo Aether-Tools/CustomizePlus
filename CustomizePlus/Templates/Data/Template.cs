@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using CustomizePlus.Api.Data;
 using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Extensions;
 using CustomizePlus.Core.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OtterGui.Classes;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace CustomizePlus.Templates.Data;
 
@@ -34,6 +35,28 @@ public sealed class Template : ISavable
 
     public Template()
     {
+    }
+
+    /// <summary>
+    /// Creates a new pseudo template from IPCCharacterProfile bone data
+    /// </summary>
+    public Template(IPCCharacterProfile profile)
+    {
+        CreationDate = DateTimeOffset.UtcNow;
+        ModifiedDate = DateTimeOffset.UtcNow;
+
+        foreach (var (boneName, ipcBone) in profile.Bones)
+        {
+            Bones[boneName] = new BoneTransform
+            {
+                Translation = ipcBone.Translation,
+                Rotation = ipcBone.Rotation,
+                Scaling = ipcBone.Scaling,
+                PropagateTranslation = ipcBone.PropagateTranslation,
+                PropagateRotation = ipcBone.PropagateRotation,
+                PropagateScale = ipcBone.PropagateScale,
+            };
+        }
     }
 
     /// <summary>

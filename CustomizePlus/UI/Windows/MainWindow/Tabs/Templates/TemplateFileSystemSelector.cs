@@ -10,11 +10,11 @@ using CustomizePlus.Profiles.Events;
 using CustomizePlus.Templates;
 using CustomizePlus.Templates.Data;
 using CustomizePlus.Templates.Events;
+using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
 using Dalamud.Interface.ImGuiFileDialog;
 using Dalamud.Interface.ImGuiNotification;
 using Dalamud.Plugin.Services;
-using Dalamud.Bindings.ImGui;
 using Newtonsoft.Json;
 using OtterGui;
 using OtterGui.Classes;
@@ -66,7 +66,7 @@ public class TemplateFileSystemSelector : FileSystemSelector<Template, TemplateS
     }
 
     protected override float CurrentWidth
-        => _configuration.UISettings.CurrentTemplateSelectorWidth * ImUtf8.GlobalScale;
+    	=> _configuration.UISettings.CurrentTemplateSelectorWidth * ImUtf8.GlobalScale;
 
     protected override float MinimumAbsoluteRemainder
         => 470 * ImUtf8.GlobalScale;
@@ -87,6 +87,7 @@ public class TemplateFileSystemSelector : FileSystemSelector<Template, TemplateS
         _configuration.UISettings.CurrentTemplateSelectorWidth = adaptedSize;
         _configuration.Save();
     }
+
 
     public TemplateFileSystemSelector(
         TemplateFileSystem fileSystem,

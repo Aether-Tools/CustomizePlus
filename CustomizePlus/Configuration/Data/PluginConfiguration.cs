@@ -99,6 +99,8 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
         public BoneAttribute EditorMode { get; set; } = BoneAttribute.Position;
 
         public bool SetPreviewToCurrentCharacterOnLogin { get; set; } = false;
+
+        public HashSet<string> FavoriteBones { get; set; } = new();
     }
 
     public EditorConfigurationEntries EditorConfiguration { get; set; } = new();
@@ -122,6 +124,14 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
     }
 
     public ProfileApplicationSettingsEntries ProfileApplicationSettings { get; set; } = new();
+
+    [Serializable]
+    public class ExternalSettingsEntries
+    {
+        public bool HandlePCPFiles { get; set; } = true;
+    }
+
+    public ExternalSettingsEntries ExternalSettings { get; set; } = new();
 
     [JsonIgnore]
     private readonly SaveService _saveService;

@@ -3,7 +3,9 @@ using Dalamud.Bindings.ImGui;
 using OtterGui.Classes;
 using OtterGui.Log;
 using OtterGui.Widgets;
+using OtterGui.Extensions;
 using OtterGui;
+using OtterGui.Raii;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +16,6 @@ using CustomizePlus.Profiles;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Templates.Events;
 using CustomizePlus.Templates.Data;
-using OtterGui.Extensions;
-using OtterGui.Raii;
 
 namespace CustomizePlus.UI.Windows.Controls;
 
@@ -58,6 +58,7 @@ public abstract class TemplateComboBase : FilterComboCache<Tuple<Template, strin
         using var color = ImRaii.PushColor(ImGuiCol.Text, ColorId.UsedTemplate.Value());
         ret = base.DrawSelectable(globalIdx, selected);
         DrawPath(path, template);
+
         return ret;
     }
 

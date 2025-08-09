@@ -71,6 +71,7 @@ public class SettingsTab
             DrawProfileApplicationSettings();
             DrawInterface();
             DrawCommands();
+            DrawExternal();
             DrawAdvancedSettings();
         }
 
@@ -310,6 +311,33 @@ public class SettingsTab
                 "Controls whether editor character will be automatically set to the current character during login.", ref isChecked))
         {
             _configuration.EditorConfiguration.SetPreviewToCurrentCharacterOnLogin = isChecked;
+            _configuration.Save();
+        }
+    }
+
+    #endregion
+
+    #region External Settings
+
+    private void DrawExternal()
+    {
+        var isShouldDraw = ImGui.CollapsingHeader("External");
+
+        if (!isShouldDraw)
+            return;
+
+        DrawHandlePCP();
+    }
+
+    private void DrawHandlePCP()
+    {
+        var isChecked = _configuration.ExternalSettings.HandlePCPFiles;
+
+        if (CtrlHelper.CheckboxWithTextAndHelp("##handlepcp", "Handle Penumbra's .pcp files",
+                "Controls whether C+ will add the currently active profile data from an actor to .pcp files upon creation, and construct new profile for said actor upon import.", ref isChecked))
+        {
+            _configuration.ExternalSettings.HandlePCPFiles = isChecked;
+
             _configuration.Save();
         }
     }

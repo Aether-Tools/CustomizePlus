@@ -6,8 +6,8 @@
 	"InternalName": "CustomizePlus",
 	"ApplicableVersion": "any",
 	"AssemblyVersion": "2.0.0.0",
-	"DalamudApiLevel": 12,
-	"TestingDalamudApiLevel": 12,
+	"DalamudApiLevel": 13,
+	"TestingDalamudApiLevel": 13,
 	"Tags": [
 		"Anamnesis",
 		"Customization",

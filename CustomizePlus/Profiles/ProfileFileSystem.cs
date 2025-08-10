@@ -6,12 +6,12 @@ using System.Text.RegularExpressions;
 using System;
 using System.Linq;
 using OtterGui.Classes;
-using CustomizePlus.Core.Services;
-using CustomizePlus.Profiles.Data;
-using CustomizePlus.Profiles.Events;
+using CustomizePlusPlus.Core.Services;
+using CustomizePlusPlus.Profiles.Data;
+using CustomizePlusPlus.Profiles.Events;
 using Dalamud.Interface.ImGuiNotification;
 
-namespace CustomizePlus.Profiles;
+namespace CustomizePlusPlus.Profiles;
 
 public class ProfileFileSystem : FileSystem<Profile>, IDisposable, ISavable
 {
@@ -46,15 +46,6 @@ public class ProfileFileSystem : FileSystem<Profile>, IDisposable, ISavable
         _profileChanged.Unsubscribe(OnProfileChange);
     }
 
-    // Search the entire filesystem for the leaf corresponding to a profile.
-    public bool FindLeaf(Profile profile, [NotNullWhen(true)] out Leaf? leaf)
-    {
-        leaf = Root.GetAllDescendants(ISortMode<Profile>.Lexicographical)
-            .OfType<Leaf>()
-            .FirstOrDefault(l => l.Value == profile);
-        return leaf != null;
-    }
-
     private void OnProfileChange(ProfileChanged.Type type, Profile? profile, object? data)
     {
         switch (type)
@@ -75,14 +66,14 @@ public class ProfileFileSystem : FileSystem<Profile>, IDisposable, ISavable
 
                 return;
             case ProfileChanged.Type.Deleted:
-                if (FindLeaf(profile, out var leaf1))
+                if (TryGetValue(profile, out var leaf1))
                     Delete(leaf1);
                 return;
             case ProfileChanged.Type.ReloadedAll:
                 Reload();
                 return;
             case ProfileChanged.Type.Renamed when data is string oldName:
-                if (!FindLeaf(profile, out var leaf2))
+                if (!TryGetValue(profile, out var leaf2))
                     return;
 
                 var old = oldName.FixName();

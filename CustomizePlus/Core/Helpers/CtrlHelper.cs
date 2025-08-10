@@ -4,7 +4,7 @@ using Dalamud.Utility;
 using Dalamud.Bindings.ImGui;
 using System.Text;
 
-namespace CustomizePlus.Core.Helpers;
+namespace CustomizePlusPlus.Core.Helpers;
 
 public static class CtrlHelper
 {

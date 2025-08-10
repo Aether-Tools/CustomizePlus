@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Dalamud.Utility;
 
-namespace CustomizePlus.Core.Data;
+namespace CustomizePlusPlus.Core.Data;
 
 public static class BoneData //todo: DI, do not show IVCS unless IVCS is installed/user enabled it, do not show weapon bones
 {

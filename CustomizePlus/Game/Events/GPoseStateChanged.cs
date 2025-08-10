@@ -1,7 +1,7 @@
 ﻿using OtterGui.Classes;
 using System;
 
-namespace CustomizePlus.Game.Events;
+namespace CustomizePlusPlus.Game.Events;
 
 /// <summary>
 /// Triggered when GPose is entered/exited

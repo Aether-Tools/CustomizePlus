@@ -1,34 +1,35 @@
-﻿using Dalamud.Interface;
-using Dalamud.Plugin.Services;
+﻿using CustomizePlusPlus.Anamnesis;
+using CustomizePlusPlus.Configuration.Data;
+using CustomizePlusPlus.Configuration.Data.Version2;
+using CustomizePlusPlus.Configuration.Data.Version3;
+using CustomizePlusPlus.Configuration.Helpers;
+using CustomizePlusPlus.Core.Helpers;
+using CustomizePlusPlus.Profiles;
+using CustomizePlusPlus.Profiles.Data;
+using CustomizePlusPlus.Profiles.Events;
+using CustomizePlusPlus.Templates;
+using CustomizePlusPlus.Templates.Data;
+using CustomizePlusPlus.Templates.Events;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface;
+using Dalamud.Interface.ImGuiFileDialog;
+using Dalamud.Interface.ImGuiNotification;
+using Dalamud.Plugin.Services;
+using Newtonsoft.Json;
 using OtterGui;
 using OtterGui.Classes;
 using OtterGui.Filesystem;
 using OtterGui.FileSystem.Selector;
 using OtterGui.Log;
 using OtterGui.Raii;
+using OtterGui.Text;
 using System;
-using System.Numerics;
-using static CustomizePlus.UI.Windows.MainWindow.Tabs.Templates.TemplateFileSystemSelector;
-using Newtonsoft.Json;
-using System.Linq;
-using Dalamud.Interface.ImGuiFileDialog;
 using System.IO;
-using CustomizePlus.Templates;
-using CustomizePlus.Configuration.Data;
-using CustomizePlus.Profiles;
-using CustomizePlus.Core.Helpers;
-using CustomizePlus.Anamnesis;
-using CustomizePlus.Profiles.Data;
-using CustomizePlus.Templates.Events;
-using CustomizePlus.Profiles.Events;
-using CustomizePlus.Templates.Data;
-using CustomizePlus.Configuration.Helpers;
-using CustomizePlus.Configuration.Data.Version3;
-using CustomizePlus.Configuration.Data.Version2;
-using Dalamud.Interface.ImGuiNotification;
+using System.Linq;
+using System.Numerics;
+using static CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Templates.TemplateFileSystemSelector;
 
-namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
+namespace CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Templates;
 
 public class TemplateFileSystemSelector : FileSystemSelector<Template, TemplateState>
 {
@@ -63,6 +64,30 @@ public class TemplateFileSystemSelector : FileSystemSelector<Template, TemplateS
     {
         public ColorId Color;
     }
+
+    protected override float CurrentWidth
+    => _configuration.UISettings.CurrentTemplateSelectorWidth * ImUtf8.GlobalScale;
+
+    protected override float MinimumAbsoluteRemainder
+        => 470 * ImUtf8.GlobalScale;
+
+    protected override float MinimumScaling
+        => _configuration.UISettings.TemplateSelectorMinimumScale;
+
+    protected override float MaximumScaling
+        => _configuration.UISettings.TemplateSelectorMaximumScale;
+
+    protected override void SetSize(Vector2 size)
+    {
+        base.SetSize(size);
+        var adaptedSize = MathF.Round(size.X / ImUtf8.GlobalScale);
+        if (adaptedSize == _configuration.UISettings.CurrentTemplateSelectorWidth)
+            return;
+
+        _configuration.UISettings.CurrentTemplateSelectorWidth = adaptedSize;
+        _configuration.Save();
+    }
+
 
     public TemplateFileSystemSelector(
         TemplateFileSystem fileSystem,
@@ -108,19 +133,6 @@ public class TemplateFileSystemSelector : FileSystemSelector<Template, TemplateS
         _templateChangedEvent.Unsubscribe(OnTemplateChange);
         _profileChangedEvent.Unsubscribe(OnProfileChange);
     }
-
-    private float? _forcedWidth;
-
-    protected override float CurrentWidth
-        => _forcedWidth ?? base.CurrentWidth;
-
-    public void Draw(float width)
-    {
-        _forcedWidth = width;
-        base.Draw();
-        _forcedWidth = null;
-    }
-
 
     protected override uint ExpandedFolderColor
         => ColorId.FolderExpanded.Value();

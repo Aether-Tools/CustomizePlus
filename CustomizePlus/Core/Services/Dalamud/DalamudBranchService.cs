@@ -1,7 +1,7 @@
 ﻿using OtterGui.Log;
 using OtterGui.Services;
 
-namespace CustomizePlus.Core.Services.Dalamud;
+namespace CustomizePlusPlus.Core.Services.Dalamud;
 
 public class DalamudBranchService : IService
 {

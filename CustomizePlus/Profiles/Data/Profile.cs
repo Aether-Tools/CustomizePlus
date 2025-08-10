@@ -2,19 +2,19 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CustomizePlus.Armatures.Data;
-using CustomizePlus.Core.Data;
-using CustomizePlus.Core.Extensions;
-using CustomizePlus.Core.Services;
-using CustomizePlus.Profiles.Enums;
-using CustomizePlus.Templates;
-using CustomizePlus.Templates.Data;
+using CustomizePlusPlus.Armatures.Data;
+using CustomizePlusPlus.Core.Data;
+using CustomizePlusPlus.Core.Extensions;
+using CustomizePlusPlus.Core.Services;
+using CustomizePlusPlus.Profiles.Enums;
+using CustomizePlusPlus.Templates;
+using CustomizePlusPlus.Templates.Data;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OtterGui.Classes;
 using Penumbra.GameData.Actors;
 
-namespace CustomizePlus.Profiles.Data;
+namespace CustomizePlusPlus.Profiles.Data;
 
 /// <summary>
 ///     Encapsulates the user-controlled aspects of a character profile, ie all of

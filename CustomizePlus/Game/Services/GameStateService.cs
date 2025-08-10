@@ -1,7 +1,7 @@
-﻿using CustomizePlus.Game.Services.GPose;
-using CustomizePlus.Game.Services.GPose.ExternalTools;
+﻿using CustomizePlusPlus.Game.Services.GPose;
+using CustomizePlusPlus.Game.Services.GPose.ExternalTools;
 
-namespace CustomizePlus.Game.Services;
+namespace CustomizePlusPlus.Game.Services;
 
 public class GameStateService
 {

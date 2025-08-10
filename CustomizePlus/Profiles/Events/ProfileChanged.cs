@@ -1,8 +1,8 @@
-﻿using CustomizePlus.Profiles.Data;
+﻿using CustomizePlusPlus.Profiles.Data;
 using OtterGui.Classes;
 using System;
 
-namespace CustomizePlus.Profiles.Events;
+namespace CustomizePlusPlus.Profiles.Events;
 
 /// <summary>
 /// Triggered when profile is changed

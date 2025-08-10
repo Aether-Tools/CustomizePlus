@@ -4,25 +4,25 @@ using Dalamud.Bindings.ImGui;
 using OtterGui.Raii;
 using System;
 using System.Numerics;
-using SettingsTab = CustomizePlus.UI.Windows.MainWindow.Tabs.SettingsTab;
-using CustomizePlus.Core.Services;
-using CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
-using CustomizePlus.Configuration.Data;
-using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
-using CustomizePlus.UI.Windows.Controls;
-using CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
-using CustomizePlus.UI.Windows.MainWindow.Tabs;
-using CustomizePlus.Templates;
+using SettingsTab = CustomizePlusPlus.UI.Windows.MainWindow.Tabs.SettingsTab;
+using CustomizePlusPlus.Core.Services;
+using CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Debug;
+using CustomizePlusPlus.Configuration.Data;
+using CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Templates;
+using CustomizePlusPlus.UI.Windows.Controls;
+using CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Profiles;
+using CustomizePlusPlus.UI.Windows.MainWindow.Tabs;
+using CustomizePlusPlus.Templates;
 using ECommonsLite.ImGuiMethods;
 using static System.Windows.Forms.AxHost;
 using Dalamud.Interface.Colors;
-using CustomizePlus.Templates.Events;
-using CustomizePlus.Templates.Data;
+using CustomizePlusPlus.Templates.Events;
+using CustomizePlusPlus.Templates.Data;
 using ECommonsLite.Schedulers;
-using CustomizePlus.Core.Helpers;
-using CustomizePlus.Core.Services.Dalamud;
+using CustomizePlusPlus.Core.Helpers;
+using CustomizePlusPlus.Core.Services.Dalamud;
 
-namespace CustomizePlus.UI.Windows.MainWindow;
+namespace CustomizePlusPlus.UI.Windows.MainWindow;
 
 public class MainWindow : Window, IDisposable
 {
@@ -63,7 +63,7 @@ public class MainWindow : Window, IDisposable
         HookingService hookingService,
         DalamudBranchService dalamudBranchService,
         TemplateEditorEvent templateEditorEvent
-        ) : base($"Customize+ {VersionHelper.Version}###CPlusMainWindow")
+        ) : base($"Customize++ {VersionHelper.Version}###CPlusMainWindow")
     {
         _settingsTab = settingsTab;
         _templatesTab = templatesTab;

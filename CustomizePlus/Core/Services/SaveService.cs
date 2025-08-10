@@ -1,7 +1,7 @@
 ﻿using OtterGui.Classes;
 using OtterGui.Log;
 
-namespace CustomizePlus.Core.Services;
+namespace CustomizePlusPlus.Core.Services;
 
 /// <summary>
 /// Any file type that we want to save via SaveService.

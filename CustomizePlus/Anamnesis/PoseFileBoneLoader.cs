@@ -1,13 +1,13 @@
-﻿using CustomizePlus.Anamnesis.Data;
-using CustomizePlus.Core.Data;
-using CustomizePlus.Core.Extensions;
+﻿using CustomizePlusPlus.Anamnesis.Data;
+using CustomizePlusPlus.Core.Data;
+using CustomizePlusPlus.Core.Extensions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 
-namespace CustomizePlus.Anamnesis;
+namespace CustomizePlusPlus.Anamnesis;
 
 public class PoseFileBoneLoader
 {

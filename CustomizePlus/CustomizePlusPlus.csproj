@@ -2,9 +2,9 @@
 
 <Project Sdk="Dalamud.NET.Sdk/13.0.0">
   <PropertyGroup>
-    <AssemblyTitle>CustomizePlus</AssemblyTitle>
-    <Version>2.0.0.0</Version>
-    <Description>Customize+</Description>
+    <AssemblyTitle>CustomizePlusPlus</AssemblyTitle>
+    <Version>2.0.8.1</Version>
+    <Description>Customize++</Description>
     <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/Aether-Tools/CustomizePlus</PackageProjectUrl>
     <UseWindowsForms>true</UseWindowsForms>
@@ -32,12 +32,12 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <ProjectReference Include="..\CustomizePlus.GameData\CustomizePlus.GameData.csproj" />
+    <ProjectReference Include="..\CustomizePlus.GameData\CustomizePlusPlus.GameData.csproj" />
     <ProjectReference Include="..\submodules\ECommonsLite\ECommonsLite\ECommonsLite.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="CustomizePlus.json">
+    <None Include="CustomizePlusPlus.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

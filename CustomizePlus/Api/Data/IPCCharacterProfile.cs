@@ -1,9 +1,9 @@
-﻿using CustomizePlus.Configuration.Data.Version3;
-using CustomizePlus.Core.Data;
-using CustomizePlus.Game.Services;
-using CustomizePlus.GameData.Extensions;
-using CustomizePlus.Profiles.Data;
-using CustomizePlus.Templates.Data;
+﻿using CustomizePlusPlus.Configuration.Data.Version3;
+using CustomizePlusPlus.Core.Data;
+using CustomizePlusPlus.Game.Services;
+using CustomizePlusPlus.GameData.Extensions;
+using CustomizePlusPlus.Profiles.Data;
+using CustomizePlusPlus.Templates.Data;
 using Penumbra.GameData.Enums;
 using Penumbra.GameData.Structs;
 using System;
@@ -13,7 +13,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CustomizePlus.Api.Data;
+namespace CustomizePlusPlus.Api.Data;
 
 /// <summary>
 /// Bare essentials version of character profile

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Numerics;
-using CustomizePlus.Anamnesis.Data;
+using CustomizePlusPlus.Anamnesis.Data;
 using FFXIVClientStructs.Havok;
 using FFXIVClientStructs.Havok.Common.Base.Math.Quaternion;
 using FFXIVClientStructs.Havok.Common.Base.Math.Vector;
 
-namespace CustomizePlus.Core.Extensions;
+namespace CustomizePlusPlus.Core.Extensions;
 
 internal static class VectorExtensions
 {

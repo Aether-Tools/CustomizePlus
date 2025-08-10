@@ -4,15 +4,15 @@ using OtterGui.Log;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using CustomizePlus.Core.Data;
-using CustomizePlus.Core.Services;
-using CustomizePlus.Configuration.Helpers;
-using CustomizePlus.Configuration.Data;
-using CustomizePlus.Core.Events;
-using CustomizePlus.Configuration.Data.Version3;
+using CustomizePlusPlus.Core.Data;
+using CustomizePlusPlus.Core.Services;
+using CustomizePlusPlus.Configuration.Helpers;
+using CustomizePlusPlus.Configuration.Data;
+using CustomizePlusPlus.Core.Events;
+using CustomizePlusPlus.Configuration.Data.Version3;
 using Dalamud.Interface.ImGuiNotification;
 
-namespace CustomizePlus.Configuration.Services;
+namespace CustomizePlusPlus.Configuration.Services;
 
 public class ConfigurationMigrator
 {

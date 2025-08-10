@@ -3,9 +3,9 @@ using Dalamud.Hooking;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using OtterGui.Log;
-using CustomizePlus.Game.Events;
+using CustomizePlusPlus.Game.Events;
 
-namespace CustomizePlus.Game.Services.GPose;
+namespace CustomizePlusPlus.Game.Services.GPose;
 
 public class GPoseService : IDisposable
 {

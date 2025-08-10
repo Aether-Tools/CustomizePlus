@@ -6,12 +6,12 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using CustomizePlus.Core.Services;
-using CustomizePlus.Templates.Events;
-using CustomizePlus.Templates.Data;
+using CustomizePlusPlus.Core.Services;
+using CustomizePlusPlus.Templates.Events;
+using CustomizePlusPlus.Templates.Data;
 using Dalamud.Interface.ImGuiNotification;
 
-namespace CustomizePlus.Templates;
+namespace CustomizePlusPlus.Templates;
 
 //Adapted from glamourer source code
 public sealed class TemplateFileSystem : FileSystem<Template>, IDisposable, ISavable
@@ -47,15 +47,6 @@ public sealed class TemplateFileSystem : FileSystem<Template>, IDisposable, ISav
         _templateChanged.Unsubscribe(OnTemplateChange);
     }
 
-    // Search the entire filesystem for the leaf corresponding to a template.
-    public bool FindLeaf(Template template, [NotNullWhen(true)] out Leaf? leaf)
-    {
-        leaf = Root.GetAllDescendants(ISortMode<Template>.Lexicographical)
-            .OfType<Leaf>()
-            .FirstOrDefault(l => l.Value == template);
-        return leaf != null;
-    }
-
     private void OnTemplateChange(TemplateChanged.Type type, Template? template, object? data)
     {
         switch (type)
@@ -76,14 +67,14 @@ public sealed class TemplateFileSystem : FileSystem<Template>, IDisposable, ISav
 
                 return;
             case TemplateChanged.Type.Deleted:
-                if (FindLeaf(template, out var leaf1))
+                if (TryGetValue(template, out var leaf1))
                     Delete(leaf1);
                 return;
             case TemplateChanged.Type.ReloadedAll:
                 Reload();
                 return;
             case TemplateChanged.Type.Renamed when data is string oldName:
-                if (!FindLeaf(template, out var leaf2))
+                if (!TryGetValue(template, out var leaf2))
                     return;
 
                 var old = oldName.FixName();

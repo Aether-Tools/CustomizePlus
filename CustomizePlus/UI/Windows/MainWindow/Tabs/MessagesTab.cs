@@ -1,6 +1,6 @@
 ﻿using OtterGui.Classes;
 
-namespace CustomizePlus.UI.Windows.MainWindow.Tabs;
+namespace CustomizePlusPlus.UI.Windows.MainWindow.Tabs;
 
 public class MessagesTab
 {

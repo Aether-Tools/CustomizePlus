@@ -1,9 +1,9 @@
-﻿using CustomizePlus.Configuration.Data.Version2;
-using CustomizePlus.Configuration.Data.Version3;
-using CustomizePlus.Core.Data;
+﻿using CustomizePlusPlus.Configuration.Data.Version2;
+using CustomizePlusPlus.Configuration.Data.Version3;
+using CustomizePlusPlus.Core.Data;
 using System.Numerics;
 
-namespace CustomizePlus.Configuration.Helpers;
+namespace CustomizePlusPlus.Configuration.Helpers;
 
 internal static class V2ProfileToV3Converter
 {

@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 using Penumbra.GameData.Actors;
 using Newtonsoft.Json.Linq;
 
-namespace CustomizePlus.Core.Helpers;
+namespace CustomizePlusPlus.Core.Helpers;
 
 internal sealed class ActorIdentifierJsonConverter : JsonConverter<ActorIdentifier>
 {

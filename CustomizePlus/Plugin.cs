@@ -1,16 +1,16 @@
 ﻿using System;
-using CustomizePlus.Api;
-using CustomizePlus.Core;
-using CustomizePlus.Core.Helpers;
-using CustomizePlus.Core.Services;
-using CustomizePlus.UI;
+using CustomizePlusPlus.Api;
+using CustomizePlusPlus.Core;
+using CustomizePlusPlus.Core.Helpers;
+using CustomizePlusPlus.Core.Services;
+using CustomizePlusPlus.UI;
 using Dalamud.Plugin;
 using ECommonsLite;
 using OtterGui.Log;
 using OtterGui.Services;
 using Penumbra.GameData.Actors;
 
-namespace CustomizePlus;
+namespace CustomizePlusPlus;
 
 public sealed class Plugin : IDalamudPlugin
 {
@@ -33,7 +33,7 @@ public sealed class Plugin : IDalamudPlugin
             _services.GetService<CPlusWindowSystem>();
             _services.GetService<CommandService>();
 
-            Logger.Information($"Customize+ {VersionHelper.Version} ({ThisAssembly.Git.Commit}+{ThisAssembly.Git.Sha}) [FantasiaPlus] started");
+            Logger.Information($"Customize++ {VersionHelper.Version} ({ThisAssembly.Git.Commit}+{ThisAssembly.Git.Sha}) [FantasiaPlus] started");
         }
         catch (Exception ex)
         {

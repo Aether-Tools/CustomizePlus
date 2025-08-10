@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CustomizePlus.Core.Data;
-using CustomizePlus.Templates.Data;
+using CustomizePlusPlus.Core.Data;
+using CustomizePlusPlus.Templates.Data;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.Havok;
 using FFXIVClientStructs.Havok.Common.Base.Math.QsTransform;
 
-namespace CustomizePlus.Armatures.Data;
+namespace CustomizePlusPlus.Armatures.Data;
 
 /// <summary>
 ///     Represents a single bone of an ingame character's skeleton.

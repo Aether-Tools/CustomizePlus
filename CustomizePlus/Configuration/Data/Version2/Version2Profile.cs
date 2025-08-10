@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CustomizePlus.Configuration.Data.Version2;
+namespace CustomizePlusPlus.Configuration.Data.Version2;
 
 [Serializable]
 public class Version2Profile

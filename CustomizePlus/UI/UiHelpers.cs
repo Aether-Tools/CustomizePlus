@@ -7,7 +7,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CustomizePlus.UI;
+namespace CustomizePlusPlus.UI;
 internal class UiHelpers
 {
     /// <summary> Vertical spacing between groups. </summary>

@@ -1,7 +1,7 @@
-﻿using CustomizePlus.Configuration.Data;
+﻿using CustomizePlusPlus.Configuration.Data;
 using OtterGui.Widgets;
 
-namespace CustomizePlus.UI.Windows;
+namespace CustomizePlusPlus.UI.Windows;
 
 public class CPlusChangeLog
 {
@@ -30,6 +30,7 @@ public class CPlusChangeLog
         Add2_0_7_15(Changelog);
         Add2_0_7_16(Changelog);
         Add2_0_8_0(Changelog);
+        Add2_0_8_1(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -41,9 +42,14 @@ public class CPlusChangeLog
         _config.ChangelogSettings.ChangeLogDisplayType = type;
         _config.Save();
     }
+
+    private static void Add2_0_8_1(Changelog log)
+        => log.NextVersion("Version 2.0.8.1")
+        .RegisterImportant("Added search filter and undo/redo functionality during bone editing.");
+
     private static void Add2_0_8_0(Changelog log)
-    => log.NextVersion("Version 2.0.8.0")
-    .RegisterImportant("Support for update 7.3 and Dalamud API 13.");
+        => log.NextVersion("Version 2.0.8.0")
+        .RegisterImportant("Support for update 7.3 and Dalamud API 13.");
 
     private static void Add2_0_7_16(Changelog log)
         => log.NextVersion("Version 2.0.7.16")

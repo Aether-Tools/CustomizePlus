@@ -4,7 +4,7 @@ using Penumbra.GameData.Enums;
 using Penumbra.GameData.Interop;
 using PenumbraExtensions = Penumbra.GameData.Actors.ActorIdentifierExtensions;
 
-namespace CustomizePlus.GameData.Extensions;
+namespace CustomizePlusPlus.GameData.Extensions;
 
 public static class ActorIdentifierExtensions
 {

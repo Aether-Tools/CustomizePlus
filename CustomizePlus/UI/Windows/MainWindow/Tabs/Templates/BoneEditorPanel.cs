@@ -8,19 +8,19 @@ using System.Numerics;
 using Dalamud.Interface.Utility;
 using OtterGui;
 using OtterGui.Raii;
-using CustomizePlus.Core.Data;
-using CustomizePlus.Armatures.Data;
-using CustomizePlus.Configuration.Data;
-using CustomizePlus.Core.Helpers;
-using CustomizePlus.Templates;
-using CustomizePlus.Game.Services;
-using CustomizePlus.Templates.Data;
-using CustomizePlus.UI.Windows.Controls;
+using CustomizePlusPlus.Core.Data;
+using CustomizePlusPlus.Armatures.Data;
+using CustomizePlusPlus.Configuration.Data;
+using CustomizePlusPlus.Core.Helpers;
+using CustomizePlusPlus.Templates;
+using CustomizePlusPlus.Game.Services;
+using CustomizePlusPlus.Templates.Data;
+using CustomizePlusPlus.UI.Windows.Controls;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Render;
 using Penumbra.GameData.Actors;
-using CustomizePlus.GameData.Extensions;
+using CustomizePlusPlus.GameData.Extensions;
 
-namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
+namespace CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Templates;
 
 public class BoneEditorPanel
 {
@@ -41,6 +41,11 @@ public class BoneEditorPanel
     private bool _openSavePopup;
 
     private bool _isUnlocked = false;
+    private bool _editSnapshotTaken = false;
+    private string _boneSearch = string.Empty;
+
+    private readonly Stack<Dictionary<string, BoneTransform>> _undoStack = new();
+    private readonly Stack<Dictionary<string, BoneTransform>> _redoStack = new();
 
     public bool HasChanges => _editorManager.HasChanges;
     public bool IsEditorActive => _editorManager.IsEditorActive;
@@ -71,7 +76,8 @@ public class BoneEditorPanel
         if (_editorManager.EnableEditor(template))
         {
             //_editorManager.SetLimitLookupToOwned(_configuration.EditorConfiguration.LimitLookupToOwnedObjects);
-
+            _undoStack.Clear();
+            _redoStack.Clear();
             return true;
         }
 
@@ -195,6 +201,38 @@ public class BoneEditorPanel
                     modeChanged = true;
                 }
 
+                ImGui.SameLine();
+                ImGui.SetNextItemWidth(200 * ImGuiHelpers.GlobalScale);
+                ImGui.InputTextWithHint("##BoneSearch", "Search bones...", ref _boneSearch, 64);
+
+                ImGui.SameLine();
+                ImGui.BeginDisabled(_undoStack.Count == 0);
+                if (ImGuiComponents.IconButton("##UndoBone", FontAwesomeIcon.Undo))
+                {
+                    var state = _undoStack.Pop();
+                    _redoStack.Push(_editorManager.EditorProfile.Armatures[0]
+                        .GetAllBones()
+                        .DistinctBy(b => b.BoneName)
+                        .ToDictionary(b => b.BoneName, b => new BoneTransform(b.CustomizedTransform ?? new BoneTransform())));
+                    RestoreState(state);
+                }
+                ImGui.EndDisabled();
+                CtrlHelper.AddHoverText("Undo");
+
+                ImGui.SameLine();
+                ImGui.BeginDisabled(_redoStack.Count == 0);
+                if (ImGuiComponents.IconButton("##RedoBone", FontAwesomeIcon.Redo))
+                {
+                    var state = _redoStack.Pop();
+                    _undoStack.Push(_editorManager.EditorProfile.Armatures[0]
+                        .GetAllBones()
+                        .DistinctBy(b => b.BoneName)
+                        .ToDictionary(b => b.BoneName, b => new BoneTransform(b.CustomizedTransform ?? new BoneTransform())));
+                    RestoreState(state);
+                }
+                ImGui.EndDisabled();
+                CtrlHelper.AddHoverText("Redo");
+
                 if (modeChanged)
                 {
                     _configuration.EditorConfiguration.EditorMode = _editingAttribute;
@@ -264,6 +302,13 @@ public class BoneEditorPanel
                             .Select(x => new EditRowParams(x.Key, x.Value.Bones[x.Key])); //todo: this is awful
                 else
                     relevantModelBones = _templateFileSystemSelector.Selected!.Bones.Select(x => new EditRowParams(x.Key, x.Value));
+
+                if (!string.IsNullOrEmpty(_boneSearch))
+                {
+                    relevantModelBones = relevantModelBones
+                        .Where(x => x.BoneDisplayName.Contains(_boneSearch, StringComparison.OrdinalIgnoreCase)
+                                 || x.BoneCodeName.Contains(_boneSearch, StringComparison.OrdinalIgnoreCase));
+                }
 
                 var groupedBones = relevantModelBones.GroupBy(x => BoneData.GetBoneFamily(x.BoneCodeName));
 
@@ -339,10 +384,13 @@ public class BoneEditorPanel
         var yPos = ImGui.GetWindowHeight() - 2 * ImGui.GetFrameHeight();
         var xPos = (ImGui.GetWindowWidth() - ImGui.GetStyle().ItemSpacing.X) / 4 - buttonWidth.X;
         ImGui.SetCursorPos(new Vector2(xPos, yPos));
+
+        var ExitedEditor = false;
+
         if (ImGui.Button("Save", buttonWidth))
         {
             _editorManager.SaveChangesAndDisableEditor();
-
+            ExitedEditor = true;
             ImGui.CloseCurrentPopup();
         }
 
@@ -350,7 +398,7 @@ public class BoneEditorPanel
         if (ImGui.Button("Save as a copy", buttonWidth))
         {
             _editorManager.SaveChangesAndDisableEditor(true);
-
+            ExitedEditor = true;
             ImGui.CloseCurrentPopup();
         }
 
@@ -358,7 +406,7 @@ public class BoneEditorPanel
         if (ImGui.Button("Do not save", buttonWidth))
         {
             _editorManager.DisableEditor();
-
+            ExitedEditor = true;
             ImGui.CloseCurrentPopup();
         }
 
@@ -366,6 +414,12 @@ public class BoneEditorPanel
         if (ImGui.Button("Keep editing", buttonWidth))
         {
             ImGui.CloseCurrentPopup();
+        }
+
+        if (ExitedEditor)
+        {
+            _undoStack.Clear();
+            _redoStack.Clear();
         }
     }
 
@@ -451,8 +505,6 @@ public class BoneEditorPanel
         var displayName = bone.BoneDisplayName;
         var transform = new BoneTransform(bone.Transform);
 
-        var flagUpdate = false;
-
         var newVector = _editingAttribute switch
         {
             BoneAttribute.Position => transform.Translation,
@@ -460,46 +512,75 @@ public class BoneEditorPanel
             _ => transform.Scaling
         };
 
+        bool valueChanged = false;
+
         using var id = ImRaii.PushId(codename);
         ImGui.TableNextColumn();
         using (var disabled = ImRaii.Disabled(!_isUnlocked))
         {
-            //----------------------------------
             ImGui.Dummy(new Vector2(CtrlHelper.IconButtonWidth * 0.75f, 0));
             ImGui.SameLine();
             ResetBoneButton(bone);
             ImGui.SameLine();
             RevertBoneButton(bone);
 
-            //----------------------------------
+            // change da X
             ImGui.TableNextColumn();
-            flagUpdate |= SingleValueSlider($"##{displayName}-X", ref newVector.X);
+            if (SingleValueSlider($"##{displayName}-X", ref newVector.X))
+                valueChanged = true;
+            if (ImGui.IsItemActivated() && !_editSnapshotTaken)
+            {
+                SaveStateForUndo();
+                _editSnapshotTaken = true;
+            }
+            if (ImGui.IsItemDeactivatedAfterEdit())
+                _editSnapshotTaken = false;
 
-            //----------------------------------
+            // change da Y
             ImGui.TableNextColumn();
-            flagUpdate |= SingleValueSlider($"##{displayName}-Y", ref newVector.Y);
+            if (SingleValueSlider($"##{displayName}-Y", ref newVector.Y))
+                valueChanged = true;
+            if (ImGui.IsItemActivated() && !_editSnapshotTaken)
+            {
+                SaveStateForUndo();
+                _editSnapshotTaken = true;
+            }
+            if (ImGui.IsItemDeactivatedAfterEdit())
+                _editSnapshotTaken = false;
 
-            //-----------------------------------
+            //  change da Z
             ImGui.TableNextColumn();
-            flagUpdate |= SingleValueSlider($"##{displayName}-Z", ref newVector.Z);
+            if (SingleValueSlider($"##{displayName}-Z", ref newVector.Z))
+                valueChanged = true;
+            if (ImGui.IsItemActivated() && !_editSnapshotTaken)
+            {
+                SaveStateForUndo();
+                _editSnapshotTaken = true;
+            }
+            if (ImGui.IsItemDeactivatedAfterEdit())
+                _editSnapshotTaken = false;
 
-            //----------------------------------
+            // scale
             if (_editingAttribute != BoneAttribute.Scale)
                 ImGui.BeginDisabled();
 
             ImGui.TableNextColumn();
-            var tempVec = new Vector3(newVector.X, newVector.Y, newVector.Z);
-            flagUpdate |= FullBoneSlider($"##{displayName}-All", ref newVector);
+            if (FullBoneSlider($"##{displayName}-All", ref newVector))
+                valueChanged = true;
+            if (ImGui.IsItemActivated() && !_editSnapshotTaken)
+            {
+                SaveStateForUndo();
+                _editSnapshotTaken = true;
+            }
+            if (ImGui.IsItemDeactivatedAfterEdit())
+                _editSnapshotTaken = false;
 
             if (_editingAttribute != BoneAttribute.Scale)
                 ImGui.EndDisabled();
         }
 
-        //----------------------------------
         ImGui.TableNextColumn();
-
-        if((BoneData.IsIVCSCompatibleBone(codename) || boneFamily == BoneData.BoneFamily.Unknown)
-            && !codename.StartsWith("j_f_"))
+        if ((BoneData.IsIVCSCompatibleBone(codename) || boneFamily == BoneData.BoneFamily.Unknown) && !codename.StartsWith("j_f_"))
         {
             ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Warning);
             ImGuiUtil.PrintIcon(FontAwesomeIcon.Wrench);
@@ -511,19 +592,57 @@ public class BoneEditorPanel
                 "\r\nIf you experience issues, try performing the same actions using posing tools.");
             ImGui.SameLine();
         }
-        CtrlHelper.StaticLabel(displayName, CtrlHelper.TextAlignment.Left, BoneData.IsIVCSCompatibleBone(codename) ? $"(IVCS Compatible) {codename}" : codename);
+        CtrlHelper.StaticLabel(displayName, CtrlHelper.TextAlignment.Left,
+            BoneData.IsIVCSCompatibleBone(codename) ? $"(IVCS Compatible) {codename}" : codename);
 
-        if (flagUpdate)
+
+        if (valueChanged)
         {
             transform.UpdateAttribute(_editingAttribute, newVector);
-
             _editorManager.ModifyBoneTransform(codename, transform);
-            if (_isMirrorModeEnabled && bone.Basis?.TwinBone != null) //todo: put it inside manager
-                _editorManager.ModifyBoneTransform(bone.Basis.TwinBone.BoneName,
-                    BoneData.IsIVCSCompatibleBone(codename) ? transform.GetSpecialReflection() : transform.GetStandardReflection());
+
+            if (_isMirrorModeEnabled && bone.Basis?.TwinBone != null)
+            {
+                _editorManager.ModifyBoneTransform(
+                    bone.Basis.TwinBone.BoneName,
+                    BoneData.IsIVCSCompatibleBone(codename)
+                        ? transform.GetSpecialReflection()
+                        : transform.GetStandardReflection()
+                );
+            }
         }
 
         ImGui.TableNextRow();
+    }
+
+
+
+    private void SaveStateForUndo()
+    {
+        if (_editorManager.EditorProfile?.Armatures.Count > 0)
+        {
+            var snapshot = _editorManager.EditorProfile.Armatures[0]
+                .GetAllBones()
+                .DistinctBy(b => b.BoneName)
+                .ToDictionary(
+                    b => b.BoneName,
+                    b => new BoneTransform(b.CustomizedTransform ?? new BoneTransform())
+                );
+
+            if (_undoStack.Count == 0 || !snapshot.SequenceEqual(_undoStack.Peek()))
+            {
+                _undoStack.Push(snapshot);
+                _redoStack.Clear();
+            }
+        }
+    }
+
+    private void RestoreState(Dictionary<string, BoneTransform> state)
+    {
+        foreach (var kvp in state.DistinctBy(x => x.Key))
+        {
+            _editorManager.ModifyBoneTransform(kvp.Key, kvp.Value);
+        }
     }
 
     #endregion

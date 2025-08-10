@@ -1,7 +1,7 @@
-﻿using CustomizePlus.Profiles.Data;
-using CustomizePlus.Profiles.Events;
-using CustomizePlus.Templates.Data;
-using CustomizePlus.Templates;
+﻿using CustomizePlusPlus.Profiles.Data;
+using CustomizePlusPlus.Profiles.Events;
+using CustomizePlusPlus.Templates.Data;
+using CustomizePlusPlus.Templates;
 using Newtonsoft.Json.Linq;
 using OtterGui.Classes;
 using Penumbra.GameData.Actors;
@@ -15,7 +15,7 @@ using Dalamud.Game.ClientState.Objects.Enums;
 using Penumbra.GameData.Gui;
 using System.Xml;
 
-namespace CustomizePlus.Profiles;
+namespace CustomizePlusPlus.Profiles;
 
 public partial class ProfileManager : IDisposable
 {

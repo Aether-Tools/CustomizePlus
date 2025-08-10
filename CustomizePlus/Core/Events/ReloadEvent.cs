@@ -1,7 +1,7 @@
 ﻿using OtterGui.Classes;
 using System;
 
-namespace CustomizePlus.Core.Events;
+namespace CustomizePlusPlus.Core.Events;
 
 /// <summary>
 /// Triggered when complete plugin reload is requested

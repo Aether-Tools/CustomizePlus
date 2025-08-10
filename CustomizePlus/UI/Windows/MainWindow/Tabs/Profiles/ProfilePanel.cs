@@ -451,10 +451,24 @@ public class ProfilePanel
             ImGui.Selectable($"#{idx + 1:D2}");
             DrawDragDrop(_selector.Selected!, idx);
             ImGui.TableNextColumn();
+
             _templateCombo.Draw(_selector.Selected!, template, idx);
+
             DrawDragDrop(_selector.Selected!, idx);
             ImGui.TableNextColumn();
 
+            bool enabled = _selector.Selected!.IsTemplateEnabled(template.UniqueId);
+            if (ImGui.Checkbox($"##tplEnabled{template.UniqueId:N}", ref enabled))
+            {
+                _manager.SetTemplateEnabled(_selector.Selected!, template.UniqueId, enabled);
+            }
+
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("Toggle template.");
+            }
+
+            ImGui.SameLine();
             var disabledCondition = _templateEditorManager.IsEditorActive || template.IsWriteProtected;
 
             if (ImGuiUtil.DrawDisabledButton(FontAwesomeIcon.Edit.ToIconString(), new Vector2(ImGui.GetFrameHeight()), "Open this template in the template editor", disabledCondition, true))

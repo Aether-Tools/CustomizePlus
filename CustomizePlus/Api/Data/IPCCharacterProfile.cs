@@ -28,7 +28,10 @@ public class IPCCharacterProfile
 
         foreach (var template in profile.Templates)
         {
-            foreach (var kvPair in template.Bones) //not super optimal but whatever
+            if (!profile.IsTemplateEnabled(template.UniqueId))
+                continue;
+
+            foreach (var kvPair in template.Bones)
             {
                 ipcProfile.Bones[kvPair.Key] = new IPCBoneTransform
                 {

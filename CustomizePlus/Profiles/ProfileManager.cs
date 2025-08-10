@@ -330,6 +330,19 @@ public partial class ProfileManager : IDisposable
         _event.Invoke(ProfileChanged.Type.MovedTemplate, profile, (fromIndex, toIndex));
     }
 
+    public void SetTemplateEnabled(Profile profile, Guid templateId, bool enabled)
+    {
+        profile.TemplateEnabledStates[templateId] = enabled;
+        SaveProfile(profile);
+
+        foreach (var arm in profile.Armatures.ToList())
+        {
+            arm.RebuildBoneTemplateBinding();
+        }
+
+        _event.Invoke(ProfileChanged.Type.ChangedTemplate, profile, (templateId, enabled));
+    }
+
     public void SetDefaultProfile(Profile? profile)
     {
         if (profile == null)

@@ -42,6 +42,8 @@ public sealed class Profile : ISavable
 
     public List<Template> Templates { get; init; } = new();
 
+    public Dictionary<Guid, bool> TemplateEnabledStates { get; set; } = new();
+
     public bool IsWriteProtected { get; internal set; }
 
     public ProfileType ProfileType { get; set; }
@@ -84,6 +86,11 @@ public sealed class Profile : ISavable
         return $"Profile '{Name.Text.Incognify()}' on {string.Join(',', Characters.Select(x => x.Incognito(null)))} [{UniqueId}]";
     }
 
+    public bool IsTemplateEnabled(Guid templateId)
+    {
+        return !TemplateEnabledStates.TryGetValue(templateId, out var enabled) || enabled;
+    }
+
     #region Serialization
 
     public new JObject JsonSerialize()
@@ -112,7 +119,8 @@ public sealed class Profile : ISavable
         {
             ret.Add(new JObject()
             {
-                ["TemplateId"] = template.UniqueId
+                ["TemplateId"] = template.UniqueId,
+                ["Enabled"] = IsTemplateEnabled(template.UniqueId)
             });
         }
         return ret;

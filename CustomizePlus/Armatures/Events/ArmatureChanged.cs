@@ -1,8 +1,8 @@
-﻿using CustomizePlus.Armatures.Data;
+﻿using CustomizePlusPlus.Armatures.Data;
 using OtterGui.Classes;
 using System;
 
-namespace CustomizePlus.Armatures.Events;
+namespace CustomizePlusPlus.Armatures.Events;
 
 /// <summary>
 /// Triggered when armature is changed

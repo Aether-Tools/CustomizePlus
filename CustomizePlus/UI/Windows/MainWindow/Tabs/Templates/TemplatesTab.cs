@@ -1,7 +1,7 @@
 ﻿using Dalamud.Interface.Utility;
 using Dalamud.Bindings.ImGui;
 
-namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
+namespace CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Templates;
 
 public class TemplatesTab
 {
@@ -16,7 +16,7 @@ public class TemplatesTab
 
     public void Draw()
     {
-        _selector.Draw(200f * ImGuiHelpers.GlobalScale); // not sure either
+        _selector.Draw();
         ImGui.SameLine();
         _panel.Draw();
     }

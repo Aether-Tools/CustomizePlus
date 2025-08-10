@@ -2,7 +2,7 @@
 using System.Reflection;
 #endif
 
-namespace CustomizePlus.Core.Helpers;
+namespace CustomizePlusPlus.Core.Helpers;
 
 internal static class VersionHelper
 {

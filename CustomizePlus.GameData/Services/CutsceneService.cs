@@ -1,4 +1,4 @@
-﻿using CustomizePlus.GameData.Hooks.Objects;
+﻿using CustomizePlusPlus.GameData.Hooks.Objects;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
@@ -9,7 +9,7 @@ using Penumbra.GameData.Interop;
 using Penumbra.String;
 using System.Diagnostics;
 
-namespace CustomizePlus.GameData.Services;
+namespace CustomizePlusPlus.GameData.Services;
 
 public sealed class CutsceneService : IRequiredService, IDisposable
 {

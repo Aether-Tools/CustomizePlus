@@ -6,9 +6,9 @@ using OtterGui.Raii;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using CustomizePlus.Configuration.Data;
+using CustomizePlusPlus.Configuration.Data;
 
-namespace CustomizePlus.UI.Windows;
+namespace CustomizePlusPlus.UI.Windows;
 
 public partial class PopupSystem
 {

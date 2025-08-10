@@ -6,15 +6,15 @@ using Newtonsoft.Json;
 using OtterGui.Classes;
 using OtterGui.Widgets;
 using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
-using CustomizePlus.Core.Services;
-using CustomizePlus.Core.Data;
-using CustomizePlus.Configuration.Services;
-using CustomizePlus.UI.Windows;
+using CustomizePlusPlus.Core.Services;
+using CustomizePlusPlus.Core.Data;
+using CustomizePlusPlus.Configuration.Services;
+using CustomizePlusPlus.UI.Windows;
 using Dalamud.Interface.ImGuiNotification;
 using Penumbra.GameData.Actors;
-using CustomizePlus.Core.Helpers;
+using CustomizePlusPlus.Core.Helpers;
 
-namespace CustomizePlus.Configuration.Data;
+namespace CustomizePlusPlus.Configuration.Data;
 
 [Serializable]
 public class PluginConfiguration : IPluginConfiguration, ISavable
@@ -62,6 +62,19 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
         public bool HideWindowInGPose { get; set; } = false;
 
         public bool IncognitoMode { get; set; } = false;
+
+        public float CurrentTemplateSelectorWidth { get; set; } = 200f;
+
+        public float TemplateSelectorMinimumScale { get; set; } = 0.1f;
+
+        public float TemplateSelectorMaximumScale { get; set; } = 0.5f;
+
+        public float CurrentProfileSelectorWidth { get; set; } = 200f;
+
+        public float ProfileSelectorMinimumScale { get; set; } = 0.1f;
+
+        public float ProfileSelectorMaximumScale { get; set; } = 0.5f;
+
 
         public List<string> ViewedMessageWindows { get; set; } = new();
     }

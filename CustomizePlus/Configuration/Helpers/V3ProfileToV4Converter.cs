@@ -1,11 +1,11 @@
-﻿using CustomizePlus.Configuration.Data.Version3;
-using CustomizePlus.Core.Data;
-using CustomizePlus.Profiles.Data;
-using CustomizePlus.Templates.Data;
+﻿using CustomizePlusPlus.Configuration.Data.Version3;
+using CustomizePlusPlus.Core.Data;
+using CustomizePlusPlus.Profiles.Data;
+using CustomizePlusPlus.Templates.Data;
 using System;
 using System.Collections.Generic;
 
-namespace CustomizePlus.Configuration.Helpers;
+namespace CustomizePlusPlus.Configuration.Helpers;
 
 internal static class V3ProfileToV4Converter
 {

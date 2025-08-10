@@ -1,8 +1,8 @@
-﻿using CustomizePlus.Templates.Data;
+﻿using CustomizePlusPlus.Templates.Data;
 using OtterGui.Classes;
 using System;
 
-namespace CustomizePlus.Templates.Events;
+namespace CustomizePlusPlus.Templates.Events;
 
 /// <summary>
 /// Triggered when Template is changed

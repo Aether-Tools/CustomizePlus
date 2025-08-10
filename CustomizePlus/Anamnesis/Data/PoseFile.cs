@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Newtonsoft.Json;
 
-namespace CustomizePlus.Anamnesis.Data;
+namespace CustomizePlusPlus.Anamnesis.Data;
 
 [Serializable]
 public class PoseFile

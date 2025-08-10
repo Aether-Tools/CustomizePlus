@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Numerics;
 using System.Runtime.Serialization;
-using CustomizePlus.Core.Extensions;
-using CustomizePlus.Game.Services.GPose.ExternalTools;
+using CustomizePlusPlus.Core.Extensions;
+using CustomizePlusPlus.Game.Services.GPose.ExternalTools;
 using FFXIVClientStructs.Havok;
 using FFXIVClientStructs.Havok.Common.Base.Math.QsTransform;
 
-namespace CustomizePlus.Core.Data;
+namespace CustomizePlusPlus.Core.Data;
 
 //not the correct terms but they double as user-visible labels so ¯\_(ツ)_/¯
 public enum BoneAttribute

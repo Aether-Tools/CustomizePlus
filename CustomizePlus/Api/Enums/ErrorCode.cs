@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CustomizePlus.Api.Enums;
+namespace CustomizePlusPlus.Api.Enums;
 
 /// <summary>
 /// Error codes returned by some API methods

@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CustomizePlus.GameData.Services;
+namespace CustomizePlusPlus.GameData.Services;
 
 public unsafe class GameEventManager : IDisposable
 {

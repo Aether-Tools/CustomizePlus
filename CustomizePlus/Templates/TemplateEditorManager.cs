@@ -1,13 +1,13 @@
-﻿using CustomizePlus.Configuration.Data;
-using CustomizePlus.Core.Data;
-using CustomizePlus.Game.Events;
-using CustomizePlus.Game.Services;
-using CustomizePlus.GameData.Extensions;
-using CustomizePlus.Profiles;
-using CustomizePlus.Profiles.Data;
-using CustomizePlus.Profiles.Enums;
-using CustomizePlus.Templates.Data;
-using CustomizePlus.Templates.Events;
+﻿using CustomizePlusPlus.Configuration.Data;
+using CustomizePlusPlus.Core.Data;
+using CustomizePlusPlus.Game.Events;
+using CustomizePlusPlus.Game.Services;
+using CustomizePlusPlus.GameData.Extensions;
+using CustomizePlusPlus.Profiles;
+using CustomizePlusPlus.Profiles.Data;
+using CustomizePlusPlus.Profiles.Enums;
+using CustomizePlusPlus.Templates.Data;
+using CustomizePlusPlus.Templates.Events;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
-namespace CustomizePlus.Templates;
+namespace CustomizePlusPlus.Templates;
 
 public class TemplateEditorManager : IDisposable
 {

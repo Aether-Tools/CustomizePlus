@@ -1,19 +1,19 @@
 {
-	"Author": "Risa",
-	"Name": "Customize+",
+	"Author": "Abelfreyja",
+	"Name": "Customize++",
 	"Punchline": "Customize your character beyond FFXIV's limitations.",
 	"Description": "A plugin that allows you to customize your character beyond FFXIV limitations by directly editing bone parameters.",
-	"InternalName": "CustomizePlus",
+	"InternalName": "CustomizePlusPlus",
 	"ApplicableVersion": "any",
-	"AssemblyVersion": "2.0.0.0",
-	"DalamudApiLevel": 12,
-	"TestingDalamudApiLevel": 12,
+	"AssemblyVersion": "2.0.8.1",
+	"DalamudApiLevel": 13,
+	"TestingDalamudApiLevel": 13,
 	"Tags": [
 		"Anamnesis",
 		"Customization",
 		"Appearance",
 		"Character",
-		"Risa"
+		"Abelfreyja"
 	],
 	"ImageUrls": null,
 	"IconUrl": "https://raw.githubusercontent.com/Aether-Tools/CustomizePlus/main/Data/icon.png"

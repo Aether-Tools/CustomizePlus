@@ -6,24 +6,24 @@ using Dalamud.Bindings.ImGui;
 using Newtonsoft.Json;
 using OtterGui.Raii;
 using System.Linq;
-using CustomizePlus.Profiles;
-using CustomizePlus.Configuration.Helpers;
-using CustomizePlus.Game.Services;
-using CustomizePlus.GameData.Services;
+using CustomizePlusPlus.Profiles;
+using CustomizePlusPlus.Configuration.Helpers;
+using CustomizePlusPlus.Game.Services;
+using CustomizePlusPlus.GameData.Services;
 using Penumbra.GameData.Actors;
 using ECommonsLite.EzIpcManager;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using OtterGui.Log;
-using CustomizePlus.Core.Extensions;
-using CustomizePlus.Configuration.Data;
-using CustomizePlus.Api.Data;
-using CustomizePlus.GameData.Extensions;
+using CustomizePlusPlus.Core.Extensions;
+using CustomizePlusPlus.Configuration.Data;
+using CustomizePlusPlus.Api.Data;
+using CustomizePlusPlus.GameData.Extensions;
 using Penumbra.GameData.Interop;
 using Penumbra.GameData.Structs;
 
-namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
+namespace CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Debug;
 
 public class IPCTestTab //: IDisposable
 {

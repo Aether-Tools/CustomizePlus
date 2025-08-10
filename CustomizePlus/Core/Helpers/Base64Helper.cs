@@ -2,10 +2,10 @@
 using System.IO;
 using System.IO.Compression;
 using System.Text;
-using CustomizePlus.Templates.Data;
+using CustomizePlusPlus.Templates.Data;
 using Newtonsoft.Json;
 
-namespace CustomizePlus.Core.Helpers;
+namespace CustomizePlusPlus.Core.Helpers;
 
 //this is jank but I don't have time to rewrite it
 public static class Base64Helper

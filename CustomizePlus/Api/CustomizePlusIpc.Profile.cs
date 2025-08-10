@@ -1,26 +1,26 @@
-﻿using CustomizePlus.Profiles.Enums;
+﻿using CustomizePlusPlus.Profiles.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using ECommonsLite.EzIpcManager;
 using Newtonsoft.Json;
-using CustomizePlus.Api.Data;
-using CustomizePlus.Api.Enums;
-using CustomizePlus.Profiles.Exceptions;
-using CustomizePlus.Profiles.Data;
-using CustomizePlus.Core.Extensions;
-using CustomizePlus.Armatures.Data;
-using CustomizePlus.Armatures.Events;
-using CustomizePlus.GameData.Extensions;
+using CustomizePlusPlus.Api.Data;
+using CustomizePlusPlus.Api.Enums;
+using CustomizePlusPlus.Profiles.Exceptions;
+using CustomizePlusPlus.Profiles.Data;
+using CustomizePlusPlus.Core.Extensions;
+using CustomizePlusPlus.Armatures.Data;
+using CustomizePlusPlus.Armatures.Events;
+using CustomizePlusPlus.GameData.Extensions;
 using Dalamud.Game.ClientState.Objects.Types;
 using Penumbra.GameData.Structs;
 using Penumbra.GameData.Enums;
-using CustomizePlus.Templates.Data;
-using CustomizePlus.Templates.Events;
+using CustomizePlusPlus.Templates.Data;
+using CustomizePlusPlus.Templates.Events;
 using Penumbra.GameData.Actors;
 using Penumbra.String;
 
-namespace CustomizePlus.Api;
+namespace CustomizePlusPlus.Api;
 
 public partial class CustomizePlusIpc
 {
@@ -48,7 +48,7 @@ public partial class CustomizePlusIpc
             .Where(x => x.ProfileType == ProfileType.Normal)
             .Select(x =>
             {
-                string path = _profileFileSystem.FindLeaf(x, out var leaf) ? leaf.FullName() : x.Name.Text;
+                string path = _profileFileSystem.TryGetValue(x, out var leaf) ? leaf.FullName() : x.Name.Text;
                 var charactersList = new List<IPCCharacterDataTuple>(x.Characters.Count);
 
                 foreach (var character in x.Characters)

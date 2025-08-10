@@ -1,21 +1,21 @@
 ﻿using Dalamud.Bindings.ImGui;
 using System.Linq;
 using System;
-using CustomizePlus.Armatures.Data;
-using CustomizePlus.Profiles;
-using CustomizePlus.Armatures.Services;
-using CustomizePlus.Templates;
-using CustomizePlus.Profiles.Data;
-using CustomizePlus.Templates.Data;
-using CustomizePlus.GameData.Extensions;
-using CustomizePlus.GameData.Services;
-using CustomizePlus.Core.Extensions;
+using CustomizePlusPlus.Armatures.Data;
+using CustomizePlusPlus.Profiles;
+using CustomizePlusPlus.Armatures.Services;
+using CustomizePlusPlus.Templates;
+using CustomizePlusPlus.Profiles.Data;
+using CustomizePlusPlus.Templates.Data;
+using CustomizePlusPlus.GameData.Extensions;
+using CustomizePlusPlus.GameData.Services;
+using CustomizePlusPlus.Core.Extensions;
 using System.Numerics;
-using CustomizePlus.Game.Services;
-using CustomizePlus.Core.Data;
+using CustomizePlusPlus.Game.Services;
+using CustomizePlusPlus.Core.Data;
 using Penumbra.GameData.Interop;
 
-namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
+namespace CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Debug;
 
 public class StateMonitoringTab
 {
@@ -96,7 +96,7 @@ public class StateMonitoringTab
     {
         foreach (var kvPair in _objectManager)
         {
-            var show = ImGui.CollapsingHeader($"{kvPair.Key} ({kvPair.Value.Objects.Count} objects)###object-{kvPair.Key}");
+            var show = ImGui.CollapsingHeader($"{kvPair.Key} ({kvPair.Value.Objects.Count} objects [{kvPair.Value.Objects.Count(x => x.IsRenderedByGame())} rendered])###object-{kvPair.Key}");
 
             if (!show)
                 continue;
@@ -124,7 +124,7 @@ public class StateMonitoringTab
             ImGui.Text($"Count: {kvPair.Value.Objects.Count}");
             foreach (var item in kvPair.Value.Objects)
             {
-                ImGui.Text($"[{item.Index}] - {item}, valid: {item.Valid}");
+                ImGui.Text($"[{item.Index}] - {item}, valid: {item.Valid}, rendered: {item.IsRenderedByGame()}");
             }
 
             ImGui.Spacing();

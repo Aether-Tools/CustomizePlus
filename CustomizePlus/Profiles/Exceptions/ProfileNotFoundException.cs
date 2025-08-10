@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CustomizePlus.Profiles.Exceptions;
+namespace CustomizePlusPlus.Profiles.Exceptions;
 internal class ProfileNotFoundException : ProfileException
 {
     public ProfileNotFoundException()

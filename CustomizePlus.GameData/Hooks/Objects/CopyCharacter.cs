@@ -3,7 +3,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using OtterGui.Classes;
 using OtterGui.Services;
 
-namespace CustomizePlus.GameData.Hooks.Objects;
+namespace CustomizePlusPlus.GameData.Hooks.Objects;
 public sealed unsafe class CopyCharacter : EventWrapperPtr<Character, Character, CopyCharacter.Priority>, IHookService
 {
     public enum Priority

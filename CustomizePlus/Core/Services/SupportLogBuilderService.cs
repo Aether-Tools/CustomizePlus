@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
-using CustomizePlus.Armatures.Services;
-using CustomizePlus.Configuration.Data;
-using CustomizePlus.Core.Data;
-using CustomizePlus.Core.Extensions;
-using CustomizePlus.Core.Helpers;
-using CustomizePlus.Core.Services.Dalamud;
-using CustomizePlus.Profiles;
-using CustomizePlus.Templates;
+using CustomizePlusPlus.Armatures.Services;
+using CustomizePlusPlus.Configuration.Data;
+using CustomizePlusPlus.Core.Data;
+using CustomizePlusPlus.Core.Extensions;
+using CustomizePlusPlus.Core.Helpers;
+using CustomizePlusPlus.Core.Services.Dalamud;
+using CustomizePlusPlus.Profiles;
+using CustomizePlusPlus.Templates;
 using Dalamud.Plugin;
 
-namespace CustomizePlus.Core.Services;
+namespace CustomizePlusPlus.Core.Services;
 
 //Based on Penumbra's support log
 public class SupportLogBuilderService

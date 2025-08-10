@@ -7,15 +7,15 @@ using System;
 using System.Linq;
 using System.Numerics;
 using System.Windows.Forms;
-using CustomizePlus.Core.Data;
-using CustomizePlus.Templates;
-using CustomizePlus.Configuration.Data;
-using CustomizePlus.Core.Helpers;
-using CustomizePlus.Templates.Data;
+using CustomizePlusPlus.Core.Data;
+using CustomizePlusPlus.Templates;
+using CustomizePlusPlus.Configuration.Data;
+using CustomizePlusPlus.Core.Helpers;
+using CustomizePlusPlus.Templates.Data;
 using OtterGui.Log;
-using CustomizePlus.Templates.Events;
+using CustomizePlusPlus.Templates.Events;
 
-namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
+namespace CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Templates;
 
 public class TemplatePanel : IDisposable
 {

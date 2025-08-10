@@ -1,25 +1,26 @@
-﻿using Dalamud.Interface;
-using Dalamud.Plugin.Services;
+﻿using CustomizePlusPlus.Configuration.Data;
+using CustomizePlusPlus.Game.Services;
+using CustomizePlusPlus.GameData.Extensions;
+using CustomizePlusPlus.Profiles;
+using CustomizePlusPlus.Profiles.Data;
+using CustomizePlusPlus.Profiles.Events;
 using Dalamud.Bindings.ImGui;
-using OtterGui.Classes;
-using OtterGui.FileSystem.Selector;
-using OtterGui.Filesystem;
-using OtterGui.Log;
+using Dalamud.Interface;
+using Dalamud.Plugin.Services;
 using OtterGui;
-using System;
-using static CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles.ProfileFileSystemSelector;
+using OtterGui.Classes;
+using OtterGui.Filesystem;
+using OtterGui.FileSystem.Selector;
+using OtterGui.Log;
 using OtterGui.Raii;
+using OtterGui.Text;
+using System;
+using System.Linq;
 using System.Numerics;
 using System.Reflection;
-using CustomizePlus.Profiles;
-using CustomizePlus.Configuration.Data;
-using CustomizePlus.Profiles.Data;
-using CustomizePlus.Game.Services;
-using CustomizePlus.Profiles.Events;
-using CustomizePlus.GameData.Extensions;
-using System.Linq;
+using static CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Profiles.ProfileFileSystemSelector;
 
-namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
+namespace CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Profiles;
 
 public class ProfileFileSystemSelector : FileSystemSelector<Profile, ProfileState>
 {
@@ -46,6 +47,30 @@ public class ProfileFileSystemSelector : FileSystemSelector<Profile, ProfileStat
     {
         public ColorId Color;
     }
+
+    protected override float CurrentWidth
+=> _configuration.UISettings.CurrentProfileSelectorWidth * ImUtf8.GlobalScale;
+
+    protected override float MinimumAbsoluteRemainder
+        => 470 * ImUtf8.GlobalScale;
+
+    protected override float MinimumScaling
+        => _configuration.UISettings.ProfileSelectorMinimumScale;
+
+    protected override float MaximumScaling
+        => _configuration.UISettings.ProfileSelectorMaximumScale;
+
+    protected override void SetSize(Vector2 size)
+    {
+        base.SetSize(size);
+        var adaptedSize = MathF.Round(size.X / ImUtf8.GlobalScale);
+        if (adaptedSize == _configuration.UISettings.CurrentProfileSelectorWidth)
+            return;
+
+        _configuration.UISettings.CurrentProfileSelectorWidth = adaptedSize;
+        _configuration.Save();
+    }
+
 
     public ProfileFileSystemSelector(
         ProfileFileSystem fileSystem,
@@ -81,19 +106,6 @@ public class ProfileFileSystemSelector : FileSystemSelector<Profile, ProfileStat
         _event.Unsubscribe(OnProfileChange);
         _clientState.Login -= OnLogin;
         _clientState.Logout -= OnLogout;
-    }
-
-
-    private float? _forcedWidth;
-
-    protected override float CurrentWidth
-        => _forcedWidth ?? base.CurrentWidth;
-
-    public void Draw(float width)
-    {
-        _forcedWidth = width;
-        base.Draw();
-        _forcedWidth = null;
     }
 
     protected override uint ExpandedFolderColor

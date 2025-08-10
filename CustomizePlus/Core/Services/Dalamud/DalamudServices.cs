@@ -6,7 +6,9 @@ using Dalamud.Plugin.Services;
 using Microsoft.Extensions.DependencyInjection;
 using OtterGui.Services;
 
-namespace CustomizePlus.Core.Services.Dalamud;
+namespace CustomizePlusPlus.Core.Services.Dalamud;
+
+#pragma warning disable SeStringEvaluator
 
 public class DalamudServices
 {

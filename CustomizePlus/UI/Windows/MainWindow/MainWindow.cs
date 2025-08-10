@@ -1,26 +1,23 @@
-﻿using Dalamud.Interface.Windowing;
-using Dalamud.Plugin;
+﻿using CustomizePlus.Configuration.Data;
+using CustomizePlus.Core.Helpers;
+using CustomizePlus.Core.Services;
+using CustomizePlus.Templates;
+using CustomizePlus.Templates.Data;
+using CustomizePlus.Templates.Events;
+using CustomizePlus.UI.Windows.Controls;
+using CustomizePlus.UI.Windows.MainWindow.Tabs;
+using CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
+using CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
+using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface.Colors;
+using Dalamud.Interface.Windowing;
+using Dalamud.Plugin;
+using ECommonsLite.ImGuiMethods;
+using ECommonsLite.Schedulers;
 using OtterGui.Raii;
 using System;
 using System.Numerics;
-using SettingsTab = CustomizePlus.UI.Windows.MainWindow.Tabs.SettingsTab;
-using CustomizePlus.Core.Services;
-using CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
-using CustomizePlus.Configuration.Data;
-using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
-using CustomizePlus.UI.Windows.Controls;
-using CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
-using CustomizePlus.UI.Windows.MainWindow.Tabs;
-using CustomizePlus.Templates;
-using ECommonsLite.ImGuiMethods;
-using static System.Windows.Forms.AxHost;
-using Dalamud.Interface.Colors;
-using CustomizePlus.Templates.Events;
-using CustomizePlus.Templates.Data;
-using ECommonsLite.Schedulers;
-using CustomizePlus.Core.Helpers;
-using CustomizePlus.Core.Services.Dalamud;
 
 namespace CustomizePlus.UI.Windows.MainWindow;
 
@@ -119,6 +116,12 @@ public class MainWindow : Window, IDisposable
         }
 
         _pluginStateBlock.Draw(yPos);
+    }
+
+    public void OpenSettings()
+    {
+        IsOpen = true;
+        _switchToTab = "Settings";
     }
 
     private void LockWindowClosureIfNeeded()

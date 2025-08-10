@@ -28,7 +28,8 @@ public class CPlusWindowSystem : IDisposable
         _windowSystem.AddWindow(mainWindow);
         _windowSystem.AddWindow(changelog.Changelog);
         _uiBuilder.Draw += OnDraw;
-        _uiBuilder.OpenConfigUi += _mainWindow.Toggle;
+        _uiBuilder.OpenMainUi += _mainWindow.Toggle;
+        _uiBuilder.OpenConfigUi += _mainWindow.OpenSettings;
 
         _uiBuilder.DisableGposeUiHide = !configuration.UISettings.HideWindowInGPose; //seems to be broken as of 2024/10/18
         _uiBuilder.DisableCutsceneUiHide = !configuration.UISettings.HideWindowInCutscene;
@@ -44,6 +45,7 @@ public class CPlusWindowSystem : IDisposable
     public void Dispose()
     {
         _uiBuilder.Draw -= _windowSystem.Draw;
-        _uiBuilder.OpenConfigUi -= _mainWindow.Toggle;
+        _uiBuilder.OpenMainUi -= _mainWindow.Toggle;
+        _uiBuilder.OpenConfigUi += _mainWindow.OpenSettings;
     }
 }

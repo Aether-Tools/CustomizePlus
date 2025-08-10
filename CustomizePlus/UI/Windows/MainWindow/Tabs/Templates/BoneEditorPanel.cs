@@ -282,7 +282,7 @@ public class BoneEditorPanel
                 var col3Label = _editingAttribute == BoneAttribute.Rotation ? "Yaw" : "Z";
                 var col4Label = _editingAttribute == BoneAttribute.Scale ? "All" : "N/A";
 
-                ImGui.TableSetupColumn("Bones", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthFixed, 3 * CtrlHelper.IconButtonWidth);
+                ImGui.TableSetupColumn("Bones", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthFixed, 4 * CtrlHelper.IconButtonWidth);
 
                 ImGui.TableSetupColumn($"{col1Label}", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthStretch);
                 ImGui.TableSetupColumn($"{col2Label}", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthStretch);
@@ -457,6 +457,27 @@ public class BoneEditorPanel
         return output;
     }
 
+    private bool PropagateCheckbox(EditRowParams bone, ref bool enabled)
+    {
+        const FontAwesomeIcon icon = FontAwesomeIcon.Link;
+        var id = $"##Propagate{bone.BoneCodeName}";
+
+        if (enabled)
+            ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Active);
+
+        var output = ImGuiComponents.IconButton(id, icon);
+        CtrlHelper.AddHoverText(
+            $"Apply '{BoneData.GetBoneDisplayName(bone.BoneCodeName)}' transformations to its child bones");
+
+        if (enabled)
+            ImGui.PopStyleColor();
+
+        if (output)
+            enabled = !enabled;
+
+        return output;
+    }
+
     private bool FullBoneSlider(string label, ref Vector3 value)
     {
         var velocity = _editingAttribute == BoneAttribute.Rotation ? 0.1f : 0.001f;
@@ -512,6 +533,13 @@ public class BoneEditorPanel
             _ => transform.Scaling
         };
 
+        var propagationEnabled = _editingAttribute switch
+        {
+            BoneAttribute.Position => transform.propagateTranslation,
+            BoneAttribute.Rotation => transform.propagateRotation,
+            _ => transform.propagateScale
+        };
+
         bool valueChanged = false;
 
         using var id = ImRaii.PushId(codename);
@@ -519,10 +547,18 @@ public class BoneEditorPanel
         using (var disabled = ImRaii.Disabled(!_isUnlocked))
         {
             ImGui.Dummy(new Vector2(CtrlHelper.IconButtonWidth * 0.75f, 0));
+
             ImGui.SameLine();
             ResetBoneButton(bone);
+
             ImGui.SameLine();
             RevertBoneButton(bone);
+
+            ImGui.SameLine();
+
+            // NEW: Propagation checkbox
+            if (PropagateCheckbox(bone, ref propagationEnabled))
+                valueChanged = true;
 
             // change da X
             ImGui.TableNextColumn();
@@ -598,7 +634,7 @@ public class BoneEditorPanel
 
         if (valueChanged)
         {
-            transform.UpdateAttribute(_editingAttribute, newVector);
+            transform.UpdateAttribute(_editingAttribute, newVector, propagationEnabled);
             _editorManager.ModifyBoneTransform(codename, transform);
 
             if (_isMirrorModeEnabled && bone.Basis?.TwinBone != null)

@@ -264,6 +264,11 @@ public class ProfileFileSystemSelector : FileSystemSelector<Profile, ProfileStat
     /// <summary> Combined wrapper for handling all filters and setting state. </summary>
     private bool ApplyFiltersAndState(ProfileFileSystem.Leaf leaf, out ProfileState state)
     {
+        state = default;
+
+        if (leaf == null || leaf.Value == null)
+            return true;
+
         //Do not display temporary profiles;
         if (leaf.Value.IsTemporary)
         {

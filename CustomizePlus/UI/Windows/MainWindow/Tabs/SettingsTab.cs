@@ -367,8 +367,8 @@ public class SettingsTab
         if (ImGui.GetScrollMaxY() > 0)
             xPos -= ImGui.GetStyle().ScrollbarSize + ImGui.GetStyle().FramePadding.X;
 
-        ImGui.SetCursorPos(new Vector2(xPos, 0));
-        DrawUrlButton("Join Discord for Support", "https://discord.gg/KvGJCCnG8t", DiscordColor, width);
+        //ImGui.SetCursorPos(new Vector2(xPos, 0));
+        //DrawUrlButton("Join Discord for Support", "https://discord.gg/KvGJCCnG8t", DiscordColor, width);
 
         ImGui.SetCursorPos(new Vector2(xPos, ImGui.GetFrameHeightWithSpacing()));
         DrawUrlButton("Support developer using Ko-fi", "https://ko-fi.com/risadev", DonateColor, width);

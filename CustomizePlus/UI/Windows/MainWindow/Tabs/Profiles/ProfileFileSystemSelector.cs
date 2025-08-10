@@ -124,7 +124,7 @@ public class ProfileFileSystemSelector : FileSystemSelector<Profile, ProfileStat
         var flag = selected ? ImGuiTreeNodeFlags.Selected | LeafFlags : LeafFlags;
         var name = IncognitoMode ? leaf.Value.Incognito : leaf.Value.Name.Text;
         using var color = ImRaii.PushColor(ImGuiCol.Text, state.Color.Value());
-        using var _ = ImRaii.TreeNode(name, flag);
+        using var _ = ImUtf8.TreeNode(name, flag);
     }
 
     protected override void DrawPopups()

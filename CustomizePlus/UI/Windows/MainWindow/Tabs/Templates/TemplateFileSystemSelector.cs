@@ -150,7 +150,7 @@ public class TemplateFileSystemSelector : FileSystemSelector<Template, TemplateS
         var flag = selected ? ImGuiTreeNodeFlags.Selected | LeafFlags : LeafFlags;
         var name = IncognitoMode ? leaf.Value.Incognito : leaf.Value.Name.Text;
         using var color = ImRaii.PushColor(ImGuiCol.Text, state.Color.Value());
-        using var _ = ImRaii.TreeNode(name, flag);
+        using var _ = ImUtf8.TreeNode(name, flag);
     }
 
     protected override void Select(FileSystem<Template>.Leaf? leaf, bool clear, in TemplateState storage = default)

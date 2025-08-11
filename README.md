@@ -15,10 +15,10 @@ It allows you to apply **character bone manipulations** during gameplay, with ex
 
 Compared to Customize+, Customize++ offers:
 
-* *proper* support for YAS and IVCS2 bones.
-* Undo and Redo buttons for changed values.
-* Bone propagation.
-* More to come i guess.
+* *proper* support for YAS and IVCS2 bones
+* Undo and Redo buttons for changed values
+* Bone propagation
+* More to come i guess
 
 ---
 
@@ -30,8 +30,8 @@ Compared to Customize+, Customize++ offers:
    ```
    https://raw.githubusercontent.com/Abelfreyja/CustomizePlus/refs/heads/main/repo.json
    ```
-3. Search for **Customize++** in the Plugin Installer
-4. Install and copy over your templates from **Customize+**
+3. Search for **Customize++** in the Plugin Installer and Install
+4. Copy over your templates from **Customize+**
 
 ---
 

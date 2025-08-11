@@ -1,5 +1,5 @@
 {
-	"Author": "Abelfreyja",
+	"Author": "Abel, Zura",
 	"Name": "Customize++",
 	"Punchline": "Customize your character beyond FFXIV's limitations.",
 	"Description": "A plugin that allows you to customize your character beyond FFXIV limitations by directly editing bone parameters.",
@@ -13,8 +13,9 @@
 		"Customization",
 		"Appearance",
 		"Character",
-		"Abelfreyja"
+		"Abel",
+		"Zura"
 	],
 	"ImageUrls": null,
-	"IconUrl": "https://raw.githubusercontent.com/Aether-Tools/CustomizePlus/main/Data/icon.png"
+	"IconUrl": "https://raw.githubusercontent.com/Abelfreyja/CustomizePlus/main/Data/icon.png"
 }

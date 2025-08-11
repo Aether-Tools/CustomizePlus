@@ -45,6 +45,7 @@ Compared to Customize+, Customize++ offers:
 ## ⚠ Compatibility Notice
 
 * Some Customize++ features are **not** compatible with Customize+ through Mare. (Such as the bone propagation)
+* C++ will sync with C+ through mare **for now** this could change in the future
 
 ---
 

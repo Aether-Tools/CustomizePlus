@@ -210,10 +210,7 @@ public class BoneEditorPanel
                 if (ImGuiComponents.IconButton("##UndoBone", FontAwesomeIcon.Undo))
                 {
                     var state = _undoStack.Pop();
-                    _redoStack.Push(_editorManager.EditorProfile.Armatures[0]
-                        .GetAllBones()
-                        .DistinctBy(b => b.BoneName)
-                        .ToDictionary(b => b.BoneName, b => new BoneTransform(b.CustomizedTransform ?? new BoneTransform())));
+                    _redoStack.Push(CurrentSnapshot());
                     RestoreState(state);
                 }
                 ImGui.EndDisabled();
@@ -224,10 +221,7 @@ public class BoneEditorPanel
                 if (ImGuiComponents.IconButton("##RedoBone", FontAwesomeIcon.Redo))
                 {
                     var state = _redoStack.Pop();
-                    _undoStack.Push(_editorManager.EditorProfile.Armatures[0]
-                        .GetAllBones()
-                        .DistinctBy(b => b.BoneName)
-                        .ToDictionary(b => b.BoneName, b => new BoneTransform(b.CustomizedTransform ?? new BoneTransform())));
+                    _undoStack.Push(CurrentSnapshot());
                     RestoreState(state);
                 }
                 ImGui.EndDisabled();
@@ -657,12 +651,15 @@ public class BoneEditorPanel
     {
         if (_editorManager.EditorProfile?.Armatures.Count > 0)
         {
-            var snapshot = _editorManager.EditorProfile.Armatures[0]
-                .GetAllBones()
-                .DistinctBy(b => b.BoneName)
+            var armature = _editorManager.EditorProfile.Armatures[0];
+
+            var snapshot = armature.BoneTemplateBinding
+                .SelectMany(kvp => kvp.Value.Bones)
+                .Where(b => b.Value.IsEdited())
+                .DistinctBy(b => b.Key)
                 .ToDictionary(
-                    b => b.BoneName,
-                    b => new BoneTransform(b.CustomizedTransform ?? new BoneTransform())
+                    b => b.Key,
+                    b => new BoneTransform(b.Value)
                 );
 
             if (_undoStack.Count == 0 || !snapshot.SequenceEqual(_undoStack.Peek()))
@@ -673,11 +670,40 @@ public class BoneEditorPanel
         }
     }
 
+    // checking for edits meow
+    private Dictionary<string, BoneTransform> CurrentSnapshot()
+    {
+        var armature = _editorManager.EditorProfile.Armatures[0];
+
+        return armature.BoneTemplateBinding
+            .SelectMany(kvp => kvp.Value.Bones)
+            .Where(b => b.Value.IsEdited())
+            .DistinctBy(b => b.Key)
+            .ToDictionary(
+                b => b.Key,
+                b => new BoneTransform(b.Value)
+            );
+    }
+    
+    // same thing here too
     private void RestoreState(Dictionary<string, BoneTransform> state)
     {
-        foreach (var kvp in state.DistinctBy(x => x.Key))
+        var armature = _editorManager.EditorProfile.Armatures[0];
+
+        foreach (var kvp in state)
         {
-            _editorManager.ModifyBoneTransform(kvp.Key, kvp.Value);
+            if (!kvp.Value.IsEdited())
+            {
+                foreach (var binding in armature.BoneTemplateBinding.Values)
+                {
+                    if (binding.Bones.Remove(kvp.Key))
+                        break;
+                }
+            }
+            else
+            {
+                _editorManager.ModifyBoneTransform(kvp.Key, kvp.Value);
+            }
         }
     }
 

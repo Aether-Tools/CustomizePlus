@@ -1,24 +1,30 @@
-﻿using Dalamud.Interface.Components;
-using Dalamud.Interface;
+﻿using CustomizePlusPlus.Armatures.Data;
+using CustomizePlusPlus.Configuration.Data;
+using CustomizePlusPlus.Core.Data;
+using CustomizePlusPlus.Core.Helpers;
+using CustomizePlusPlus.Game.Services;
+using CustomizePlusPlus.GameData.Extensions;
+using CustomizePlusPlus.Templates;
+using CustomizePlusPlus.Templates.Data;
+using CustomizePlusPlus.UI.Windows.Controls;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface;
+using Dalamud.Interface.Components;
+using Dalamud.Interface.Utility;
+using ECommonsLite.Logging;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Render;
+using OtterGui;
+using OtterGui.Log;
+using OtterGui.Raii;
+using Penumbra.GameData.Actors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Interface.Utility;
-using OtterGui;
-using OtterGui.Raii;
-using CustomizePlusPlus.Core.Data;
-using CustomizePlusPlus.Armatures.Data;
-using CustomizePlusPlus.Configuration.Data;
-using CustomizePlusPlus.Core.Helpers;
-using CustomizePlusPlus.Templates;
-using CustomizePlusPlus.Game.Services;
-using CustomizePlusPlus.Templates.Data;
-using CustomizePlusPlus.UI.Windows.Controls;
-using FFXIVClientStructs.FFXIV.Client.Graphics.Render;
-using Penumbra.GameData.Actors;
-using CustomizePlusPlus.GameData.Extensions;
+using System.Text.Json;
+using System.Threading;
+using System.Windows.Forms;
+using System.Threading.Tasks;
 
 namespace CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Templates;
 
@@ -29,6 +35,8 @@ public class BoneEditorPanel
     private readonly PluginConfiguration _configuration;
     private readonly GameObjectService _gameObjectService;
     private readonly ActorAssignmentUi _actorAssignmentUi;
+    private readonly PopupSystem _popupSystem;
+    private readonly Logger _logger;
 
     private BoneAttribute _editingAttribute;
     private int _precision;
@@ -340,6 +348,30 @@ public class BoneEditorPanel
                     CtrlHelper.StaticLabel(boneGroup.Key.ToString());
                     if (BoneData.DisplayableFamilies.TryGetValue(boneGroup.Key, out var tip) && tip != null)
                         CtrlHelper.AddHoverText(tip);
+
+                    // sigma
+                    var rowMin = ImGui.GetItemRectMin();
+                    var rowMax = new Vector2(ImGui.GetContentRegionAvail().X + rowMin.X, ImGui.GetItemRectMax().Y);
+
+                    if (ImGui.IsMouseHoveringRect(rowMin, rowMax) && ImGui.IsMouseClicked(ImGuiMouseButton.Right))
+                    {
+                        ImGui.OpenPopup($"GroupContext##{boneGroup.Key}");
+                    }
+
+                    if (ImGui.BeginPopup($"GroupContext##{boneGroup.Key}"))
+                    {
+                        if (ImGui.MenuItem("Copy"))
+                        {
+                            _logger.Debug($"Copy {boneGroup.Key}");
+                        }
+
+                        if (ImGui.MenuItem("Import"))
+                        {
+                            _logger.Debug($"Import {boneGroup.Key}");
+                        }
+
+                        ImGui.EndPopup();
+                    }
 
                     if (expanded)
                     {

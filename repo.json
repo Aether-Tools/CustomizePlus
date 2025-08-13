@@ -5,8 +5,8 @@
     "Description": "A plugin that allows you to customize your character beyond FFXIV limitations by directly editing bone parameters.",
     "Punchline": "Customize your character beyond FFXIV's limitations.",
     "InternalName": "CustomizePlusPlus",
-    "AssemblyVersion": "2.0.8.2",
-    "TestingAssemblyVersion": "2.0.8.2",
+    "AssemblyVersion": "2.0.8.3",
+    "TestingAssemblyVersion": "2.0.8.3",
     "RepoUrl": "https://github.com/Abelfreyja/CustomizePlus",
     "ApplicableVersion": "any",
     "DalamudApiLevel": 13,
@@ -16,15 +16,17 @@
     "DownloadCount": 0,
     "LastUpdate": 0,
     "LoadPriority": 0,
-    "DownloadLinkInstall": "https://github.com/Abelfreyja/CustomizePlus/releases/download/2.0.8.2/CustomizePlus.zip",
-    "DownloadLinkUpdate": "https://github.com/Abelfreyja/CustomizePlus/releases/download/2.0.8.2/CustomizePlus.zip",
-    "DownloadLinkTesting": "https://github.com/Abelfreyja/CustomizePlus/releases/download/2.0.8.2/CustomizePlus.zip",
+    "DownloadLinkInstall": "https://github.com/Abelfreyja/CustomizePlus/releases/download/2.0.8.3/CustomizePlus.zip",
+    "DownloadLinkUpdate": "https://github.com/Abelfreyja/CustomizePlus/releases/download/2.0.8.3/CustomizePlus.zip",
+    "DownloadLinkTesting": "https://github.com/Abelfreyja/CustomizePlus/releases/download/2.0.8.3/CustomizePlus.zip",
     "IconUrl": "https://raw.githubusercontent.com/Abelfreyja/CustomizePlus/main/Data/icon.png",
     "Tags": [
       "Anamnesis",
       "Customization",
       "Appearance",
-      "Character"
+      "Character",
+      "Abel",
+      "Zura"
     ]
   }
 ]

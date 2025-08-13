@@ -13,18 +13,22 @@ using Dalamud.Interface.Components;
 using Dalamud.Interface.Utility;
 using ECommonsLite.Logging;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Render;
+using Newtonsoft.Json;
 using OtterGui;
 using OtterGui.Log;
 using OtterGui.Raii;
 using Penumbra.GameData.Actors;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Numerics;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
-using System.Windows.Forms;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Templates;
 
@@ -55,6 +59,8 @@ public class BoneEditorPanel
     private readonly Stack<Dictionary<string, BoneTransform>> _undoStack = new();
     private readonly Stack<Dictionary<string, BoneTransform>> _redoStack = new();
 
+    private string? _pendingClipboardText;
+    private string? _pendingImportText;
     public bool HasChanges => _editorManager.HasChanges;
     public bool IsEditorActive => _editorManager.IsEditorActive;
     public bool IsEditorPaused => _editorManager.IsEditorPaused;
@@ -65,13 +71,15 @@ public class BoneEditorPanel
         TemplateEditorManager editorManager,
         PluginConfiguration configuration,
         GameObjectService gameObjectService,
-        ActorAssignmentUi actorAssignmentUi)
+        ActorAssignmentUi actorAssignmentUi,
+        Logger logger)
     {
         _templateFileSystemSelector = templateFileSystemSelector;
         _editorManager = editorManager;
         _configuration = configuration;
         _gameObjectService = gameObjectService;
         _actorAssignmentUi = actorAssignmentUi;
+        _logger = logger;
 
         _isShowLiveBones = configuration.EditorConfiguration.ShowLiveBones;
         _isMirrorModeEnabled = configuration.EditorConfiguration.BoneMirroringEnabled;
@@ -218,7 +226,10 @@ public class BoneEditorPanel
                 if (ImGuiComponents.IconButton("##UndoBone", FontAwesomeIcon.Undo))
                 {
                     var state = _undoStack.Pop();
-                    _redoStack.Push(CurrentSnapshot());
+                    _redoStack.Push(_editorManager.EditorProfile.Armatures[0]
+                        .GetAllBones()
+                        .DistinctBy(b => b.BoneName)
+                        .ToDictionary(b => b.BoneName, b => new BoneTransform(b.CustomizedTransform ?? new BoneTransform())));
                     RestoreState(state);
                 }
                 ImGui.EndDisabled();
@@ -229,7 +240,10 @@ public class BoneEditorPanel
                 if (ImGuiComponents.IconButton("##RedoBone", FontAwesomeIcon.Redo))
                 {
                     var state = _redoStack.Pop();
-                    _undoStack.Push(CurrentSnapshot());
+                    _undoStack.Push(_editorManager.EditorProfile.Armatures[0]
+                        .GetAllBones()
+                        .DistinctBy(b => b.BoneName)
+                        .ToDictionary(b => b.BoneName, b => new BoneTransform(b.CustomizedTransform ?? new BoneTransform())));
                     RestoreState(state);
                 }
                 ImGui.EndDisabled();
@@ -316,6 +330,38 @@ public class BoneEditorPanel
 
                 foreach (var boneGroup in groupedBones.OrderBy(x => (int)x.Key))
                 {
+                    if (!string.IsNullOrEmpty(_pendingImportText))
+                    {
+                        _logger.Debug("check import text 1: " + (_pendingImportText));
+                        try
+                        {
+                            var importedBones = Base64Helper.ImportEditedBonesFromBase64(_pendingImportText);
+                            if (importedBones != null)
+                            {
+                                foreach (var boneData in importedBones)
+                                {
+                                    _editorManager.ModifyBoneTransform(
+                                        boneData.BoneCodeName,
+                                        new BoneTransform
+                                        {
+                                            Translation = boneData.Translation,
+                                            Rotation = boneData.Rotation,
+                                            Scaling = boneData.Scaling,
+                                            propagateTranslation = boneData.PropagateTranslation,
+                                            propagateRotation = boneData.PropagateRotation,
+                                            propagateScale = boneData.PropagateScale
+                                        }
+                                    );
+                                }
+                            }
+                        }
+                        catch {  }
+                        finally
+                        {
+                            _pendingImportText = null;
+                        }
+                    }
+
                     //Hide root bone if it's not enabled in settings or if we are in rotation mode
                     if (boneGroup.Key == BoneData.BoneFamily.Root &&
                         (!_configuration.EditorConfiguration.RootPositionEditingEnabled ||
@@ -360,14 +406,34 @@ public class BoneEditorPanel
 
                     if (ImGui.BeginPopup($"GroupContext##{boneGroup.Key}"))
                     {
-                        if (ImGui.MenuItem("Copy"))
+                        using (var disabled = ImRaii.Disabled(!_isUnlocked))
                         {
-                            _logger.Debug($"Copy {boneGroup.Key}");
-                        }
+                            if (ImGui.MenuItem("Copy Group"))
+                            {
+                                try
+                                {
+                                    var editedBones = boneGroup
+                                        .Where(b => b.Transform != null && b.Transform.IsEdited())
+                                        .Select(b => (b.BoneCodeName, b.Transform))
+                                        .ToList();
 
-                        if (ImGui.MenuItem("Import"))
-                        {
-                            _logger.Debug($"Import {boneGroup.Key}");
+                                    if (editedBones.Count > 0)
+                                    {
+                                        _pendingClipboardText = Base64Helper.ExportEditedBonesToBase64(editedBones);
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+                                }
+                            }
+
+                            if (ImGui.MenuItem("Import Group"))
+                            {
+                                var clipboardText = Clipboard.GetText();
+                                if (!string.IsNullOrEmpty(clipboardText))
+                                    _pendingImportText = clipboardText;
+                            }
                         }
 
                         ImGui.EndPopup();
@@ -386,6 +452,21 @@ public class BoneEditorPanel
                 }
             }
         }
+
+        if (!string.IsNullOrEmpty(_pendingClipboardText))
+        {
+            try
+            {
+                Clipboard.SetText(_pendingClipboardText);
+                _logger.Debug("copied to clipboard: " + _pendingClipboardText);
+            }
+            catch (Exception ex)
+            {
+                _logger.Debug("clipboard blew up :(");
+            }
+            _pendingClipboardText = null;
+        }
+
     }
 
     private void DrawEditorConfirmationPopup()
@@ -677,21 +758,16 @@ public class BoneEditorPanel
         ImGui.TableNextRow();
     }
 
-
-
     private void SaveStateForUndo()
     {
         if (_editorManager.EditorProfile?.Armatures.Count > 0)
         {
-            var armature = _editorManager.EditorProfile.Armatures[0];
-
-            var snapshot = armature.BoneTemplateBinding
-                .SelectMany(kvp => kvp.Value.Bones)
-                .Where(b => b.Value.IsEdited())
-                .DistinctBy(b => b.Key)
+            var snapshot = _editorManager.EditorProfile.Armatures[0]
+                .GetAllBones()
+                .DistinctBy(b => b.BoneName)
                 .ToDictionary(
-                    b => b.Key,
-                    b => new BoneTransform(b.Value)
+                    b => b.BoneName,
+                    b => new BoneTransform(b.CustomizedTransform ?? new BoneTransform())
                 );
 
             if (_undoStack.Count == 0 || !snapshot.SequenceEqual(_undoStack.Peek()))
@@ -702,40 +778,11 @@ public class BoneEditorPanel
         }
     }
 
-    // checking for edits meow
-    private Dictionary<string, BoneTransform> CurrentSnapshot()
-    {
-        var armature = _editorManager.EditorProfile.Armatures[0];
-
-        return armature.BoneTemplateBinding
-            .SelectMany(kvp => kvp.Value.Bones)
-            .Where(b => b.Value.IsEdited())
-            .DistinctBy(b => b.Key)
-            .ToDictionary(
-                b => b.Key,
-                b => new BoneTransform(b.Value)
-            );
-    }
-    
-    // same thing here too
     private void RestoreState(Dictionary<string, BoneTransform> state)
     {
-        var armature = _editorManager.EditorProfile.Armatures[0];
-
-        foreach (var kvp in state)
+        foreach (var kvp in state.DistinctBy(x => x.Key))
         {
-            if (!kvp.Value.IsEdited())
-            {
-                foreach (var binding in armature.BoneTemplateBinding.Values)
-                {
-                    if (binding.Bones.Remove(kvp.Key))
-                        break;
-                }
-            }
-            else
-            {
-                _editorManager.ModifyBoneTransform(kvp.Key, kvp.Value);
-            }
+            _editorManager.ModifyBoneTransform(kvp.Key, kvp.Value);
         }
     }
 

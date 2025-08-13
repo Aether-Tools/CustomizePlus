@@ -1,11 +1,25 @@
-﻿using System;
-using System.IO;
-using System.IO.Compression;
-using System.Text;
+﻿using CustomizePlusPlus.Core.Data;
 using CustomizePlusPlus.Templates.Data;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Numerics;
+using System.Text;
 
 namespace CustomizePlusPlus.Core.Helpers;
+public class BoneTransformData // literally not cooking
+{
+    public string BoneCodeName { get; set; }
+    public Vector3 Translation { get; set; }
+    public Vector3 Rotation { get; set; }
+    public Vector3 Scaling { get; set; }
+    public bool PropagateTranslation { get; set; }
+    public bool PropagateRotation { get; set; }
+    public bool PropagateScale { get; set; }
+}
 
 //this is jank but I don't have time to rewrite it
 public static class Base64Helper
@@ -58,5 +72,61 @@ public static class Base64Helper
         }
 
         return version;
+    }
+
+    public static string ExportEditedBonesToBase64(IEnumerable<(string BoneCodeName, BoneTransform Transform)> bones)
+    {
+        try
+        {
+            var DataList = bones.Select(b => new BoneTransformData
+            {
+                BoneCodeName = b.BoneCodeName,
+                Translation = b.Transform.Translation,
+                Rotation = b.Transform.Rotation,
+                Scaling = b.Transform.Scaling,
+                PropagateTranslation = b.Transform.propagateTranslation,
+                PropagateRotation = b.Transform.propagateRotation,
+                PropagateScale = b.Transform.propagateScale
+            }).ToList(); // dont let me cook
+
+            var json = JsonConvert.SerializeObject(DataList, Formatting.None);
+            var bytes = Encoding.UTF8.GetBytes(json);
+
+            using var compressedStream = new MemoryStream();
+            using (var zipStream = new GZipStream(compressedStream, CompressionMode.Compress))
+            {
+                zipStream.WriteByte(1);
+                zipStream.Write(bytes, 0, bytes.Length);
+            }
+
+            return Convert.ToBase64String(compressedStream.ToArray());
+        }
+        catch
+        {
+            return string.Empty;
+        }
+    }
+
+    public static List<BoneTransformData> ImportEditedBonesFromBase64(string base64)
+    {
+        try
+        {
+            var bytes = Convert.FromBase64String(base64);
+
+            using var compressedStream = new MemoryStream(bytes);
+            using var zipStream = new GZipStream(compressedStream, CompressionMode.Decompress);
+
+            _ = zipStream.ReadByte();
+
+            using var resultStream = new MemoryStream();
+            zipStream.CopyTo(resultStream);
+
+            var json = Encoding.UTF8.GetString(resultStream.ToArray());
+            return JsonConvert.DeserializeObject<List<BoneTransformData>>(json);
+        }
+        catch
+        {
+            return null;
+        }
     }
 }

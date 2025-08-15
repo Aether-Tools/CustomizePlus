@@ -1,6 +1,6 @@
 # Customize++
 
-> A QoL improvement to [Customize+](https://github.com/Aether-Tools/CustomizePlus), built with new features and quality-of-life improvements.
+> [Customize+](https://github.com/Aether-Tools/CustomizePlus), but built with new features and quality-of-life improvements.
 
 ---
 

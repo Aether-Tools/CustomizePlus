@@ -194,8 +194,16 @@ public partial class ProfileManager : IDisposable
                 continue; //todo: error
 
             var template = _templateManager.GetTemplate((Guid)templateId);
-            if (template != null)
-                profile.Templates.Add(template);
+            if (template == null)
+                continue;
+
+            profile.Templates.Add(template);
+                
+            var templateEnabled = templateObjCast["Enabled"]?.ToObject<bool>() ?? true;
+            if (!templateEnabled)
+            {
+                profile.DisabledTemplates.Add(template.UniqueId);
+            }
         }
 
         return profile;

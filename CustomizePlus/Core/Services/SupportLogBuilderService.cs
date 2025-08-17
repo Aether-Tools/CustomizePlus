@@ -76,6 +76,8 @@ public class SupportLogBuilderService
             foreach (var template in profile.Templates)
             {
                 sb.Append($">   >   > **`{template.ToString(), -32}`**\n");
+                if (profile.DisabledTemplates.Contains(template.UniqueId))
+                    sb.Append($">   >   >   >  **`Disabled`**\n");
             }
             sb.Append($">   > **`Armatures:`**\n");
             sb.Append($">   >   > **`Count:                  `** {profile.Armatures.Count}\n");

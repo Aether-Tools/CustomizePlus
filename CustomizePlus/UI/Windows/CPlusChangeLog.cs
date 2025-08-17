@@ -30,6 +30,7 @@ public class CPlusChangeLog
         Add2_0_7_15(Changelog);
         Add2_0_7_16(Changelog);
         Add2_0_7_23(Changelog);
+        Add2_0_7_27(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -41,6 +42,13 @@ public class CPlusChangeLog
         _config.ChangelogSettings.ChangeLogDisplayType = type;
         _config.Save();
     }
+
+    private static void Add2_0_7_27(Changelog log)
+        => log.NextVersion("Version 2.0.7.27")
+        .RegisterEntry("Added ability to toggle template in a profile without removing it. (by Caraxi)")
+        .RegisterEntry("IPC version updated to 6.2.")
+        .RegisterEntry("Added Profile.GetTemplates, Profile.EnableTemplateByUniqueId, Profile.DisableTemplateByUniqueId IPC endpoints. (by Caraxi)", 1)
+        .RegisterEntry("Fixed crash when trying to open template/profile tab if there is a template/profile with empty name. (2.0.7.25)");
 
     private static void Add2_0_7_23(Changelog log)
         => log.NextVersion("Version 2.0.7.23")

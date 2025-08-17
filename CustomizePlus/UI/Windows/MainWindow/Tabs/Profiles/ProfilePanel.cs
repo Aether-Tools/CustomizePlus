@@ -453,10 +453,10 @@ public class ProfilePanel
             DrawDragDrop(_selector.Selected!, idx);
 
             ImGui.TableNextColumn();
-            var enabled = !this._selector.Selected!.DisabledTemplates.Contains(template.UniqueId);
+            var enabled = !_selector.Selected!.DisabledTemplates.Contains(template.UniqueId);
             if (ImGui.Checkbox("##EnableCheckbox", ref enabled))
-                this._manager.ToggleTemplate(_selector.Selected!, idx);
-            ImGuiUtil.HoverTooltip("Enable or disable this template without removing it from profile");
+                _manager.ToggleTemplate(_selector.Selected!, idx);
+            ImGuiUtil.HoverTooltip("Whether this template is applied to the profile.");
 
             ImGui.TableNextColumn();
             _templateCombo.Draw(_selector.Selected!, template, idx);
@@ -466,7 +466,7 @@ public class ProfilePanel
 
             var disabledCondition = _templateEditorManager.IsEditorActive || template.IsWriteProtected;
 
-            if (ImGuiUtil.DrawDisabledButton(FontAwesomeIcon.Edit.ToIconString(), new Vector2(ImGui.GetFrameHeight()), "Open this template in the template editor", disabledCondition, true))
+            if (ImGuiUtil.DrawDisabledButton(FontAwesomeIcon.Edit.ToIconString(), new Vector2(ImGui.GetFrameHeight()), "Open this template in the template editor.", disabledCondition, true))
                 _templateEditorEvent.Invoke(TemplateEditorEvent.Type.EditorEnableRequested, template);
 
             if (disabledCondition)

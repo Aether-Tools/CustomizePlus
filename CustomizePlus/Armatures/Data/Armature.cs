@@ -318,6 +318,7 @@ public unsafe class Armature
         {
             if (Profile.DisabledTemplates.Contains(template.UniqueId))
                 continue;
+
             foreach (var kvPair in template.Bones)
             {
                 BoneTemplateBinding[kvPair.Key] = template;

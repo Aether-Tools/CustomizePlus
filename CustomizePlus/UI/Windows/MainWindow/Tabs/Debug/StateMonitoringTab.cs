@@ -156,7 +156,7 @@ public class StateMonitoringTab
         {
             foreach (var template in profile.Templates)
             {
-                DrawSingleTemplate($"profile-{profile.UniqueId}", template);
+                DrawSingleTemplate($"profile-{profile.UniqueId}", template, profile.DisabledTemplates.Contains(template.UniqueId) ? " [Disabled]" : null);
             }
         }
 
@@ -167,7 +167,7 @@ public class StateMonitoringTab
             ImGui.Text("No armatures");
     }
 
-    private void DrawSingleTemplate(string prefix, Template template)
+    private void DrawSingleTemplate(string prefix, Template template, string? additionalText = null)
     {
         string name = template.Name;
 
@@ -175,7 +175,7 @@ public class StateMonitoringTab
         name = name.Incognify();
 #endif
 
-        var show = ImGui.CollapsingHeader($"{name} [{template.UniqueId}]###{prefix}-template-{template.UniqueId}");
+        var show = ImGui.CollapsingHeader($"{name} [{template.UniqueId}]{(additionalText != null ? additionalText : "")}###{prefix}-template-{template.UniqueId}");
 
         if (!show)
             return;

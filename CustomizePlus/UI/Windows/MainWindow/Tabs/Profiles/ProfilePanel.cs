@@ -451,13 +451,17 @@ public class ProfilePanel
             ImGui.TableNextColumn();
             ImGui.Selectable($"#{idx + 1:D2}");
             DrawDragDrop(_selector.Selected!, idx);
+
             ImGui.TableNextColumn();
             var enabled = !this._selector.Selected!.DisabledTemplates.Contains(template.UniqueId);
             if (ImGui.Checkbox("##EnableCheckbox", ref enabled))
                 this._manager.ToggleTemplate(_selector.Selected!, idx);
+            ImGuiUtil.HoverTooltip("Enable or disable this template without removing it from profile");
+
             ImGui.TableNextColumn();
             _templateCombo.Draw(_selector.Selected!, template, idx);
             DrawDragDrop(_selector.Selected!, idx);
+
             ImGui.TableNextColumn();
 
             var disabledCondition = _templateEditorManager.IsEditorActive || template.IsWriteProtected;

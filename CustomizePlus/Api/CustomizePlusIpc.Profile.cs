@@ -143,7 +143,7 @@ public partial class CustomizePlusIpc
         if (!ByteString.FromString(name, out var byteString))
             return (int)ErrorCode.InvalidCharacter;
 
-        var playerIdentifier = this._actorManager.CreatePlayer(byteString, worldId);
+        var playerIdentifier = _actorManager.CreatePlayer(byteString, worldId);
         if (playerIdentifier == ActorIdentifier.Invalid)
             return (int)ErrorCode.InvalidCharacter;
         
@@ -228,7 +228,7 @@ public partial class CustomizePlusIpc
         if (profile == null)
             return (int)ErrorCode.ProfileNotFound;
 
-        if (this._profileManager.EnableTemplate(profile, templateId))
+        if (_profileManager.EnableTemplate(profile, templateId))
             return (int)ErrorCode.Success;
 
         return (int)ErrorCode.InvalidArgument;
@@ -244,7 +244,7 @@ public partial class CustomizePlusIpc
         if (profile == null)
             return (int)ErrorCode.ProfileNotFound;
 
-        if (this._profileManager.DisableTemplate(profile, templateId)) 
+        if (_profileManager.DisableTemplate(profile, templateId)) 
             return (int)ErrorCode.Success;
 
         return (int)ErrorCode.InvalidArgument;

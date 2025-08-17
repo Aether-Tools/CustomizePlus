@@ -20,6 +20,8 @@ public sealed class ProfileChanged() : EventWrapper<ProfileChanged.Type, Profile
         RemovedCharacter,
         AddedTemplate,
         RemovedTemplate,
+        EnabledTemplate,
+        DisabledTemplate,
         MovedTemplate,
         ChangedTemplate,
         ReloadedAll,

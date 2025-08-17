@@ -337,10 +337,10 @@ public partial class ProfileManager : IDisposable
 
         var template = profile.Templates[index];
 
-        var eventType = ProfileChanged.Type.AddedTemplate;
+        var eventType = ProfileChanged.Type.DisabledTemplate;
         if (!profile.DisabledTemplates.Add(template.UniqueId))
         {
-            eventType = ProfileChanged.Type.RemovedTemplate;
+            eventType = ProfileChanged.Type.EnabledTemplate;
             profile.DisabledTemplates.Remove(template.UniqueId);
         }
         
@@ -367,7 +367,7 @@ public partial class ProfileManager : IDisposable
         
         SaveProfile(profile);
         _logger.Debug($"Enable template {templateId} on profile {profile.UniqueId}");
-        _event.Invoke(ProfileChanged.Type.AddedTemplate, profile, template);
+        _event.Invoke(ProfileChanged.Type.EnabledTemplate, profile, template);
         return true;
     }
     
@@ -388,7 +388,7 @@ public partial class ProfileManager : IDisposable
         
         SaveProfile(profile);
         _logger.Debug($"Disable template {templateId} on profile {profile.UniqueId}");
-        _event.Invoke(ProfileChanged.Type.RemovedTemplate, profile, template);
+        _event.Invoke(ProfileChanged.Type.DisabledTemplate, profile, template);
         return true;
     }
     

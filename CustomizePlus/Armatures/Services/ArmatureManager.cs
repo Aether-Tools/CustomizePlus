@@ -479,6 +479,8 @@ public unsafe sealed class ArmatureManager : IDisposable
     {
         if (type is not ProfileChanged.Type.AddedTemplate &&
             type is not ProfileChanged.Type.RemovedTemplate &&
+            type is not ProfileChanged.Type.EnabledTemplate &&
+            type is not ProfileChanged.Type.DisabledTemplate &&
             type is not ProfileChanged.Type.MovedTemplate &&
             type is not ProfileChanged.Type.ChangedTemplate &&
             type is not ProfileChanged.Type.Toggled &&

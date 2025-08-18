@@ -31,6 +31,7 @@ public class CPlusChangeLog
         Add2_0_7_16(Changelog);
         Add2_0_8_0(Changelog);
         Add2_0_8_1(Changelog);
+        Add2_0_8_3(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -42,6 +43,9 @@ public class CPlusChangeLog
         _config.ChangelogSettings.ChangeLogDisplayType = type;
         _config.Save();
     }
+    private static void Add2_0_8_3(Changelog log)
+        => log.NextVersion("Version 2.0.8.3")
+        .RegisterImportant("Added the ability to copy bone groups to clipboard and import them, also reverted undo/redo changes");
 
     private static void Add2_0_8_1(Changelog log)
         => log.NextVersion("Version 2.0.8.1")

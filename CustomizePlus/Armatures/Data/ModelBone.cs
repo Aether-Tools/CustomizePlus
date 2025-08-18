@@ -292,38 +292,53 @@ public unsafe class ModelBone
         if (!IsActive)
             return;
 
-        if (cBase != null
-            && CustomizedTransform != null && CustomizedTransform.IsEdited())
+        if (cBase == null || CustomizedTransform == null || !CustomizedTransform.IsEdited())
+            return;
+
+        var doPropagate = CustomizedTransform.propagateTranslation ||
+                          CustomizedTransform.propagateRotation ||
+                          CustomizedTransform.propagateScale;
+
+        if (!doPropagate)
         {
-            var gameTransformAccess = GetGameTransformAccess(cBase, PoseType.Model);
-            if (gameTransformAccess != null)
+            var gameTransform = GetGameTransform(cBase, PoseType.Model);
+            if (!gameTransform.Equals(Constants.NullTransform))
             {
-                // Transforms before any modifications
-                var initialPos = gameTransformAccess->Translation.ToVector3();
-                var initialRot = gameTransformAccess->Rotation.ToQuaternion();
-                var initialScale = gameTransformAccess->Scale.ToVector3();
-
-                var modTransform = CustomizedTransform.ModifyExistingTransform(*gameTransformAccess);
-                SetGameTransform(cBase, modTransform, PoseType.Model);
-
-                // Getting it again, because SetGameTransform replaced the previous Havok transform object
-                var access2 = GetGameTransformAccess(cBase, PoseType.Model);
-
-                var propagateTranslation = CustomizedTransform.propagateTranslation &&
-                                           !CustomizedTransform.Translation.Equals(Vector3.Zero);
-                var propagateRotation = CustomizedTransform.propagateRotation &&
-                                           !CustomizedTransform.Rotation.Equals(Vector3.Zero);
-                var propagateScale = CustomizedTransform.propagateScale &&
-                                           !CustomizedTransform.Scaling.Equals(Vector3.One);
-
-                if (propagateTranslation || propagateRotation || propagateScale)
+                var modify_Transform = CustomizedTransform.ModifyExistingTransform(gameTransform);
+                if (!modify_Transform.Equals(Constants.NullTransform))
                 {
-                    // Plugin.Logger.Debug($">>> Start propagating from {BoneName}, Translation: {propagateTranslation} Rotation: {propagateRotation} Scale: {propagateScale}");
-                    PropagateChildren(cBase, access2, initialPos, initialRot, initialScale, propagateTranslation, propagateRotation, propagateScale);
+                    SetGameTransform(cBase, modify_Transform, PoseType.Model);
                 }
             }
+
+            return;
         }
+
+        var gameTransformAccess = GetGameTransformAccess(cBase, PoseType.Model);
+        if (gameTransformAccess == null)
+            return;
+
+        var initialPos = gameTransformAccess->Translation.ToVector3();
+        var initialRot = gameTransformAccess->Rotation.ToQuaternion();
+        var initialScale = gameTransformAccess->Scale.ToVector3();
+
+        var modTransform = CustomizedTransform.ModifyExistingTransform(*gameTransformAccess);
+        SetGameTransform(cBase, modTransform, PoseType.Model);
+
+        var pose = cBase->Skeleton->PartialSkeletons[PartialSkeletonIndex].GetHavokPose(Constants.TruePoseIndex);
+        if (pose == null || pose->ModelInSync == 0)
+            return;
+
+        var access2 = GetGameTransformAccess(cBase, PoseType.Model);
+        if (access2 == null)
+            return;
+
+        PropagateChildren(cBase, access2, initialPos, initialRot, initialScale,
+            CustomizedTransform.propagateTranslation && !CustomizedTransform.Translation.Equals(Vector3.Zero),
+            CustomizedTransform.propagateRotation && !CustomizedTransform.Rotation.Equals(Vector3.Zero),
+            CustomizedTransform.propagateScale && !CustomizedTransform.Scaling.Equals(Vector3.One));
     }
+
 
     public unsafe void PropagateChildren(CharacterBase* cBase, hkQsTransformf* transform, Vector3 initialPos, Quaternion initialRot, Vector3 initialScale, bool propagateTranslation, bool propagateRotation, bool propagateScale, bool includePartials = true)
     {

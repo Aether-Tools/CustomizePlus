@@ -38,19 +38,6 @@
         "resolved": "1.1.118",
         "contentHash": "Onx6ovGSqXSK07n/0eM3ZusiNdB6cIlJdabQhWGgJp3Vooy9AaLS/tigeybOJAobqbtggTamoWndz72JscZBvw=="
       },
-      "FlatSharp.Compiler": {
-        "type": "Transitive",
-        "resolved": "7.9.0",
-        "contentHash": "MU6808xvdbWJ3Ev+5PKalqQuzvVbn1DzzQH8txRDHGFUNDvHjd+ejqpvnYc9BSJ8Qp8VjkkpJD8OzRYilbPp3A=="
-      },
-      "FlatSharp.Runtime": {
-        "type": "Transitive",
-        "resolved": "7.9.0",
-        "contentHash": "Bm8+WqzEsWNpxqrD5x4x+zQ8dyINlToCreM5FI2oNSfUVc9U9ZB+qztX/jd8rlJb3r0vBSlPwVLpw0xBtPa3Vw==",
-        "dependencies": {
-          "System.Memory": "4.5.5"
-        }
-      },
       "JetBrains.Annotations": {
         "type": "Transitive",
         "resolved": "2024.3.0",
@@ -65,11 +52,6 @@
         "type": "Transitive",
         "resolved": "9.0.8",
         "contentHash": "xY3lTjj4+ZYmiKIkyWitddrp1uL5uYiweQjqo4BKBw01ZC4HhcfgLghDpPZcUlppgWAFqFy9SgkiYWOMx365pw=="
-      },
-      "System.Memory": {
-        "type": "Transitive",
-        "resolved": "4.5.5",
-        "contentHash": "XIWiDvKPXaTveaB7HVganDlOCRoj03l+jrwNvcge/t8vhGYKvqV+dMv6G4SAX2NoNmN0wZfVPTAlFwZcZvVOUw=="
       },
       "System.Threading.Tasks.Extensions": {
         "type": "Transitive",
@@ -107,8 +89,6 @@
       "penumbra.gamedata": {
         "type": "Project",
         "dependencies": {
-          "FlatSharp.Compiler": "[7.9.0, )",
-          "FlatSharp.Runtime": "[7.9.0, )",
           "OtterGui": "[1.0.0, )",
           "Penumbra.Api": "[5.10.0, )",
           "Penumbra.String": "[1.0.6, )"

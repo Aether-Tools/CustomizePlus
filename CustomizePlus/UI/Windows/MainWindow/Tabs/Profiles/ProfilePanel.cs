@@ -457,10 +457,10 @@ public class ProfilePanel
             DrawDragDrop(_selector.Selected!, idx);
             ImGui.TableNextColumn();
 
-            bool enabled = _selector.Selected!.IsTemplateEnabled(template.UniqueId);
-            if (ImGui.Checkbox($"##tplEnabled{template.UniqueId:N}", ref enabled))
+            var enabled = !this._selector.Selected!.DisabledTemplates.Contains(template.UniqueId);
+            if (ImGui.Checkbox($"##EnableCheckbox", ref enabled))
             {
-                _manager.SetTemplateEnabled(_selector.Selected!, template.UniqueId, enabled);
+                this._manager.ToggleTemplate(_selector.Selected!, idx);
             }
 
             if (ImGui.IsItemHovered())

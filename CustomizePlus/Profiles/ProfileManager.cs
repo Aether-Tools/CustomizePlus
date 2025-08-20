@@ -330,17 +330,66 @@ public partial class ProfileManager : IDisposable
         _event.Invoke(ProfileChanged.Type.MovedTemplate, profile, (fromIndex, toIndex));
     }
 
-    public void SetTemplateEnabled(Profile profile, Guid templateId, bool enabled)
+    public void ToggleTemplate(Profile profile, int index)
     {
-        profile.TemplateEnabledStates[templateId] = enabled;
-        SaveProfile(profile);
+        if (index >= profile.Templates.Count || index < 0)
+            return;
 
-        foreach (var arm in profile.Armatures.ToList())
+        var template = profile.Templates[index];
+
+        var eventType = ProfileChanged.Type.DisabledTemplate;
+        if (!profile.DisabledTemplates.Add(template.UniqueId))
         {
-            arm.RebuildBoneTemplateBinding();
+            eventType = ProfileChanged.Type.EnabledTemplate;
+            profile.DisabledTemplates.Remove(template.UniqueId);
         }
 
-        _event.Invoke(ProfileChanged.Type.ChangedTemplate, profile, (templateId, enabled));
+        SaveProfile(profile);
+
+        _logger.Debug($"Toggled template {template.UniqueId} on profile {profile.UniqueId}");
+        _event.Invoke(eventType, profile, template);
+    }
+
+    public bool EnableTemplate(Profile profile, Guid templateId)
+    {
+        if (profile.Templates.All(t => t.UniqueId != templateId))
+            return false;
+
+        var template = profile.Templates.Find(t => t.UniqueId == templateId);
+        if (template == null)
+            return false;
+
+        if (!profile.DisabledTemplates.Remove(templateId))
+        {
+            // Template was already enabled.
+            return true;
+        }
+
+        SaveProfile(profile);
+        _logger.Debug($"Enable template {templateId} on profile {profile.UniqueId}");
+        _event.Invoke(ProfileChanged.Type.EnabledTemplate, profile, template);
+        return true;
+    }
+
+    public bool DisableTemplate(Profile profile, Guid templateId)
+    {
+        if (profile.Templates.All(t => t.UniqueId != templateId))
+            return false;
+
+        var template = profile.Templates.Find(t => t.UniqueId == templateId);
+        if (template == null)
+            return false;
+
+        if (!profile.DisabledTemplates.Add(templateId))
+        {
+            // Template was already disabled.
+            return true;
+        }
+
+        SaveProfile(profile);
+        _logger.Debug($"Disable template {templateId} on profile {profile.UniqueId}");
+        _event.Invoke(ProfileChanged.Type.DisabledTemplate, profile, template);
+        return true;
     }
 
     public void SetDefaultProfile(Profile? profile)

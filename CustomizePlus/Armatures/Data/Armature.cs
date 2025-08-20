@@ -316,7 +316,7 @@ public unsafe class Armature
 
         foreach (var template in Profile.Templates)
         {
-            if (!Profile.IsTemplateEnabled(template.UniqueId))
+            if (Profile.DisabledTemplates.Contains(template.UniqueId))
                 continue;
 
             foreach (var kvPair in template.Bones)

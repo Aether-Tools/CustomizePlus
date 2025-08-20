@@ -25,6 +25,7 @@ using Penumbra.GameData.Structs;
 
 namespace CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Debug;
 
+//todo: buttons for Profile.GetTemplates, Profile.EnableTemplateByUniqueId, Profile.DisableTemplateByUniqueId
 public class IPCTestTab //: IDisposable
 {
     private const string _ownedTesProfile = "{\"Bones\":{\"n_root\":{\"Translation\":{\"X\":0.0,\"Y\":0.0,\"Z\":0.0},\"Rotation\":{\"X\":0.0,\"Y\":0.0,\"Z\":0.0},\"Scaling\":{\"X\":2.0,\"Y\":2.0,\"Z\":2.0}}}}";

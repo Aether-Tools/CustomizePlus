@@ -91,5 +91,6 @@ internal static class Constants
         public static Vector4 Warning = new Vector4(1, 0.5f, 0, 1);
         public static Vector4 Error = new Vector4(1, 0, 0, 1);
         public static Vector4 Active = new Vector4(0, 1, 0, 1);
+        public static Vector4 Favorite = new Vector4(0.9f, 0.8f, 0.4f, 1);
     }
 }

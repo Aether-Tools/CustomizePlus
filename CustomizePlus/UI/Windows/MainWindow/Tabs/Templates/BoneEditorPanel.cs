@@ -59,6 +59,9 @@ public class BoneEditorPanel
     private readonly Stack<Dictionary<string, BoneTransform>> _undoStack = new();
     private readonly Stack<Dictionary<string, BoneTransform>> _redoStack = new();
 
+    private readonly HashSet<string> _favoriteBones = new();
+    private int _favoriteListIdentifier = 0;
+
     private string? _pendingClipboardText;
     private string? _pendingImportText;
     public bool HasChanges => _editorManager.HasChanges;
@@ -288,7 +291,7 @@ public class BoneEditorPanel
 
             ImGui.Separator();
 
-            using (var table = ImRaii.Table("BoneEditorContents", 6, ImGuiTableFlags.BordersOuterH | ImGuiTableFlags.BordersV | ImGuiTableFlags.ScrollY))
+            using (var table = ImRaii.Table($"BoneEditorContents##{_favoriteListIdentifier}", 6, ImGuiTableFlags.BordersOuterH | ImGuiTableFlags.BordersV | ImGuiTableFlags.ScrollY))
             {
                 if (!table)
                     return;
@@ -326,7 +329,48 @@ public class BoneEditorPanel
                                  || x.BoneCodeName.Contains(_boneSearch, StringComparison.OrdinalIgnoreCase));
                 }
 
-                var groupedBones = relevantModelBones.GroupBy(x => BoneData.GetBoneFamily(x.BoneCodeName));
+                var favoriteRows = relevantModelBones
+                    .Where(b => _favoriteBones.Contains(b.BoneCodeName))
+                    .OrderBy(b => BoneData.GetBoneRanking(b.BoneCodeName))
+                    .ToList();
+
+                var nonFavoriteRows = relevantModelBones
+                    .Where(b => !_favoriteBones.Contains(b.BoneCodeName))
+                    .ToList();
+
+                var groupedBones = nonFavoriteRows
+                    .GroupBy(x => BoneData.GetBoneFamily(x.BoneCodeName));
+
+                if (favoriteRows.Count > 0)
+                {
+                    const string favoritesHeaderId = "FavoritesHeader";
+
+                    if (!_groupExpandedState.TryGetValue((BoneData.BoneFamily)(-1), out var expanded))
+                        _groupExpandedState[(BoneData.BoneFamily)(-1)] = expanded = true;
+
+                    if (expanded)
+                        ImGui.TableNextRow(ImGuiTableRowFlags.Headers);
+                    else
+                        ImGui.TableNextRow();
+
+                    using var id = ImRaii.PushId(favoritesHeaderId);
+                    ImGui.TableNextColumn();
+                    CtrlHelper.ArrowToggle($"##{favoritesHeaderId}", ref expanded);
+                    ImGui.SameLine();
+                    CtrlHelper.StaticLabel("Favorites");
+
+                    if (expanded)
+                    {
+                        ImGui.TableNextRow();
+                        foreach (var erp in favoriteRows)
+                        {
+                            var family = BoneData.GetBoneFamily(erp.BoneCodeName);
+                            CompleteBoneEditor(family, erp);
+                        }
+                    }
+
+                    _groupExpandedState[(BoneData.BoneFamily)(-1)] = expanded;
+                }
 
                 foreach (var boneGroup in groupedBones.OrderBy(x => (int)x.Key))
                 {
@@ -632,6 +676,7 @@ public class BoneEditorPanel
         var codename = bone.BoneCodeName;
         var displayName = bone.BoneDisplayName;
         var transform = new BoneTransform(bone.Transform);
+        var isFavorite = _favoriteBones.Contains(codename);
 
         var newVector = _editingAttribute switch
         {
@@ -738,6 +783,31 @@ public class BoneEditorPanel
         CtrlHelper.StaticLabel(displayName, CtrlHelper.TextAlignment.Left,
             BoneData.IsIVCSCompatibleBone(codename) ? $"(IVCS Compatible) {codename}" : codename);
 
+        if (ImGui.BeginPopupContextItem($"bonecontext_{codename}"))
+        {
+            if (ImGui.MenuItem(isFavorite ? "Unfavorite" : "Favorite"))
+            {
+                if (isFavorite)
+                    _favoriteBones.Remove(codename);
+                else
+                    _favoriteBones.Add(codename);
+
+                _favoriteListIdentifier++;
+            }
+            ImGui.EndPopup();
+        }
+
+        if (isFavorite)
+        {
+            ImGui.SameLine();
+            ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Favorite);
+            ImGui.TextUnformatted("★");
+            ImGui.PopStyleColor();
+
+
+            if (ImGui.IsItemHovered())
+                CtrlHelper.AddHoverText($"{boneFamily}");
+        }
 
         if (valueChanged)
         {

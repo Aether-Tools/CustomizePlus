@@ -45,6 +45,7 @@ public class CPlusChangeLog
 
     private static void Add2_0_7_x(Changelog log)
         => log.NextVersion("Version 2.0.7.x")
+        .RegisterHighlight("Added support for Penumbra PCP files. (by abelfreyja)")
         .RegisterEntry("Added search filter and undo/redo functionality during bone editing. (by abelfreyja)")
         .RegisterEntry("Added the ability to copy bone groups to clipboard and import them, also reverted undo/redo changes. (by abelfreyja)")
         .RegisterEntry("Added the ability to have favorite bones. (by abelfreyja)")

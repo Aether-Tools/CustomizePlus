@@ -43,6 +43,13 @@ public class CPlusChangeLog
         _config.Save();
     }
 
+    private static void Add2_0_7_x(Changelog log)
+        => log.NextVersion("Version 2.0.7.x")
+        .RegisterEntry("Added search filter and undo/redo functionality during bone editing. (by abelfreyja)")
+        .RegisterEntry("Added the ability to copy bone groups to clipboard and import them, also reverted undo/redo changes. (by abelfreyja)")
+        .RegisterEntry("Added the ability to have favorite bones. (by abelfreyja)")
+        .RegisterEntry("Added bone edits propagation. (by d87)");
+
     private static void Add2_0_7_27(Changelog log)
         => log.NextVersion("Version 2.0.7.27")
         .RegisterEntry("Added ability to toggle template in a profile without removing it. (by Caraxi)")

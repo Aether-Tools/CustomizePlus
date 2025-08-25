@@ -41,6 +41,7 @@ We expect contributed code to adhere to the code style of already existing code 
 * Some of the game object interaction code is copied from [Penumbra](https://github.com/xivdev/Penumbra) and [Glamourer](https://github.com/Ottermandias/Glamourer) projects in order to make Customize+ not rely on Penumbra being installed.
 * GitHub workflows have been taken from [Glamourer](https://github.com/Ottermandias/Glamourer) project.
 * Customize+ makes use of code from [ECommons](https://github.com/NightmareXIV/ECommons) library for IPC functionality.
+* Some of the bone manipulation code was taken from [Ktisis](https://github.com/ktisis-tools/Ktisis).
 * [Dalamud](https://github.com/goatcorp/Dalamud) team for making plugins possible at all.
 * Special thanks goes to Yuki, Phenrei, Stoia, dendr01d and others for developing and maintaining original version of Customize+.
 * Everyone who contributed code and features through pull requests.

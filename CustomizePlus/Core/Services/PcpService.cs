@@ -49,7 +49,7 @@ public class PcpService : IRequiredService
 
     private void OnPcpCreated(JObject jObj, ushort index, string path)
     {
-        if (!_config.ExternalSettings.HandlePCPFiles)
+        if (!_config.IntegrationSettings.PenumbraPCPIntegrationEnabled)
             return;
 
         _log.Debug($"[CPlusPCPService] PcpCreated: Index={index}, Path='{path}'");
@@ -88,7 +88,7 @@ public class PcpService : IRequiredService
 
     private void OnPcpParsed(JObject jObj, string modDirectory, Guid collection)
     {
-        if (!_config.ExternalSettings.HandlePCPFiles)
+        if (!_config.IntegrationSettings.PenumbraPCPIntegrationEnabled)
             return;
 
         _log.Debug($"[CPlusPCPService] PcpParsed: ModDirectory='{modDirectory}', Collection={collection}");

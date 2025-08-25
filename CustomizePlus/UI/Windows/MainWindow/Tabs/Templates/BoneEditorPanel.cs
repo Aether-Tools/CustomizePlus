@@ -11,23 +11,13 @@ using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
 using Dalamud.Interface.Components;
 using Dalamud.Interface.Utility;
-using ECommonsLite.Logging;
-using FFXIVClientStructs.FFXIV.Client.Graphics.Render;
-using Newtonsoft.Json;
 using OtterGui;
 using OtterGui.Log;
 using OtterGui.Raii;
-using Penumbra.GameData.Actors;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Templates;
@@ -53,16 +43,18 @@ public class BoneEditorPanel
     private bool _openSavePopup;
 
     private bool _isUnlocked = false;
-    private bool _editSnapshotTaken = false;
+
     private string _boneSearch = string.Empty;
 
+    // all the stuff to handle undo/redo
     private readonly Stack<Dictionary<string, BoneTransform>> _undoStack = new();
     private readonly Stack<Dictionary<string, BoneTransform>> _redoStack = new();
     private Dictionary<string, BoneTransform>? _pendingUndoSnapshot = null;
     private float _initialX, _initialY, _initialZ;
     private Vector3 _initialScale;
 
-    private readonly HashSet<string> _favoriteBones = new();
+    // favorite bone stuff
+    private HashSet<string> _favoriteBones;
     private int _favoriteListIdentifier = 0;
 
     private string? _pendingClipboardText;
@@ -91,6 +83,7 @@ public class BoneEditorPanel
         _isMirrorModeEnabled = configuration.EditorConfiguration.BoneMirroringEnabled;
         _precision = configuration.EditorConfiguration.EditorValuesPrecision;
         _editingAttribute = configuration.EditorConfiguration.EditorMode;
+        _favoriteBones = new HashSet<string>(_configuration.EditorConfiguration.FavoriteBones);
     }
 
     public bool EnableEditor(Template template)
@@ -712,7 +705,7 @@ public class BoneEditorPanel
                 valueChanged = true;
 
             // adjusted logic, should only snapshot if there is a change in the value.
-            //  change da X
+            // change da X
             ImGui.TableNextColumn();
             float tempX = newVector.X;
             if (ImGui.IsItemActivated())
@@ -735,7 +728,7 @@ public class BoneEditorPanel
                 }
             }
 
-            //  change da Y
+            // change da Y
             ImGui.TableNextColumn();
             float tempY = newVector.Y;
             if (ImGui.IsItemActivated())
@@ -758,7 +751,7 @@ public class BoneEditorPanel
                 }
             }
 
-            //  change da Z
+            // change da Z
             ImGui.TableNextColumn();
             float tempZ = newVector.Z;
             if (ImGui.IsItemActivated())
@@ -781,7 +774,7 @@ public class BoneEditorPanel
                 }
             }
 
-            //  scale
+            // scale
             if (_editingAttribute != BoneAttribute.Scale)
                 ImGui.BeginDisabled();
 
@@ -836,6 +829,9 @@ public class BoneEditorPanel
                     _favoriteBones.Remove(codename);
                 else
                     _favoriteBones.Add(codename);
+
+                _configuration.EditorConfiguration.FavoriteBones = new HashSet<string>(_favoriteBones);
+                _configuration.Save();
 
                 _favoriteListIdentifier++;
             }

@@ -100,6 +100,8 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
         public BoneAttribute EditorMode { get; set; } = BoneAttribute.Position;
 
         public bool SetPreviewToCurrentCharacterOnLogin { get; set; } = false;
+
+        public HashSet<string> FavoriteBones { get; set; } = new();
     }
 
     public EditorConfigurationEntries EditorConfiguration { get; set; } = new();

@@ -53,8 +53,8 @@ public class IPCTestTab //: IDisposable
     [EzIPC("Profile.SetPriorityByUniqueId")]
     private readonly Func<Guid, int, int> _setPriorityByUniqueIdIpcFunc;
 
-    [EzIPC("Profile.SetProfileByUniqueId")]
-    private readonly Func<Guid, bool, int, int> _setProfileByUniqueIdIpcFunc;
+    [EzIPC("Profile.SetStateByUniqueId")]
+    private readonly Func<Guid, bool, int, int> _setStateByUniqueIdIpcFunc;
 
     [EzIPC("Profile.GetActiveProfileIdOnCharacter")]
     private readonly Func<ushort, (int, Guid?)> _getActiveProfileIdOnCharacterIpcFunc;
@@ -350,7 +350,7 @@ public class IPCTestTab //: IDisposable
 
         if (ImGui.Button("Enable profile state by ID and Priority"))
         {
-            int result = _setProfileByUniqueIdIpcFunc(Guid.Parse(_targetProfileId), true, _targetProfilePriority);
+            int result = _setStateByUniqueIdIpcFunc(Guid.Parse(_targetProfileId), true, _targetProfilePriority);
             if (result == 0)
             {
                 _popupSystem.ShowPopup(PopupSystem.Messages.IPCSetStateByIdDone);
@@ -364,7 +364,7 @@ public class IPCTestTab //: IDisposable
 
         if (ImGui.Button("Disable profile state by ID and priority"))
         {
-            int result = _setProfileByUniqueIdIpcFunc(Guid.Parse(_targetProfileId), false, _targetProfilePriority);
+            int result = _setStateByUniqueIdIpcFunc(Guid.Parse(_targetProfileId), false, _targetProfilePriority);
             if (result == 0)
             {
                 _popupSystem.ShowPopup(PopupSystem.Messages.IPCSetStateByIdDone);

@@ -1,67 +1,54 @@
-# Customize++
+# Customize+
+Customize+ is a Dalamud plugin designed to give you better control over your Final Fantasy XIV character appearance. Namely it allows you to apply character bone manipulations during gameplay.
 
-> [Customize+](https://github.com/Aether-Tools/CustomizePlus), but built with new features and quality-of-life improvements.
+## Installing
+**Do not use repo.json from this repository**
 
----
+Add [Aether Tools](https://github.com/Aether-Tools/DalamudPlugins) or [Sea of Stars](https://github.com/Ottermandias/SeaOfStars) dalamud repository by following instructions on the respective pages. 
 
-## Overview
+Then search for Customize+ in the plugin manager.
 
-Customize++ is a Dalamud plugin for **Final Fantasy XIV** that gives you greater control over your character’s appearance.
-It allows you to apply **character bone manipulations** during gameplay, with expanded options and improvements over Customize+.
+## FAQ
 
----
+### I need help with using Customize+!
+You can try finding it in support discord server run by volunteers: [Aetherworks](https://discord.gg/KvGJCCnG8t). **Do not ask for help or support in issues section on GitHub.**
 
-## Key Improvements
+⚠ Please note that at the current time the developers do not actively participate in support or discussions on that server.
 
-Compared to Customize+, Customize++ offers:
+### How do I report a bug in Customize+ or leave a suggestion?
+First we ask you join [Aetherworks Discord server](https://discord.gg/KvGJCCnG8t) and consult with volunteer support team about your issue first. It's highly likely that you are not experiencing a bug in Customize+.
 
-* *proper* support for YAS and IVCS2 bones
-* Undo and Redo buttons for changed values
-* Bone propagation
-* More to come i guess
+Before reporting bug or leaving a suggestion in this GitHub you need to **carefully** read [issue creation guidelines](https://github.com/Aether-Tools/CustomizePlus/issues/11).
 
----
+### When will Customize+ be updated?
+This plugin is being worked on when developers have free time and have a desire to do so, therefore update schedule does not exist. Real life and paid employment take priority over this project.
 
-## 📥 Installation
+### IPC
+Customize+ provides IPC for integrations with other plugins. We have opted for inline documentation, so please head over to `CustomizePlus/Api` directory and check source code files to see what kind of functionality is provided.
 
-1. In Dalamud, go to **Settings → Experimental → Custom Plugin Repositories**
-2. Add the repo:
+## Contributing
+**This is important, please read before contributing.**
 
-   ```
-   https://raw.githubusercontent.com/Abelfreyja/CustomizePlus/refs/heads/main/repo.json
-   ```
-3. Search for **Customize++** in the Plugin Installer and Install
-4. Copy over your templates from **Customize+**
+Before you contribute your code and features we would like to ask you to first discuss your ideas with us so you don't spend your time making something that possibly won't be accepted. It is possible that your idea might be either out of scope for this project or we have a specific vision for how it should be implemented. You can do that in free form using Issues section.
 
----
+We expect contributed code to adhere to the code style of already existing code and be reasonably well tested. We kindly ask you to be ready to make changes to the code in your Pull Requests if we feel like it needs to be changed.
 
-## Support
-
-* For general questions or troubleshooting, the [Light-Syncshell Discord](https://discord.gg/dsbjcXMnhA) is the best place to get help.
-* If you’ve found a reproducible bug or have a feature request, feel free to open an issue here on GitHub.
-
----
-
-## ⚠ Compatibility Notice
-
-* Some Customize++ features are **not** compatible with Customize+ through Mare. (Such as the bone propagation)
-* C++ will sync with C+ through Mare **for now** this could change in the future
-
----
+## Development team
+* [Risa](https://github.com/RisaDev/) - Author and Lead Developer.
 
 ## Acknowledgements
-
-* **Risa** — Author and lead developer of [Customize+](https://github.com/Aether-Tools/CustomizePlus)
-* User interface and general plugin architecture based on [Glamourer](https://github.com/Ottermandias/Glamourer) and [OtterGui](https://github.com/Ottermandias/OtterGui/)
-* Some game object interaction code adapted from [Penumbra](https://github.com/xivdev/Penumbra) and [Glamourer](https://github.com/Ottermandias/Glamourer)
-* GitHub workflows from [Glamourer](https://github.com/Ottermandias/Glamourer)
-* Code from [ECommons](https://github.com/NightmareXIV/ECommons) for IPC functionality
-* [Dalamud](https://github.com/goatcorp/Dalamud) team for enabling plugin development
-* Special thanks to Yuki, Phenrei, Stoia, dendr01d, and others who contributed to the original Customize+ project
-
----
+* User interface and general plugin architecture is heavily based on the code written as a part of [Glamourer](https://github.com/Ottermandias/Glamourer) and [OtterGui](https://github.com/Ottermandias/OtterGui/) projects. Original code is licensed under Apache License 2.0.
+* Some of the game object interaction code is copied from [Penumbra](https://github.com/xivdev/Penumbra) and [Glamourer](https://github.com/Ottermandias/Glamourer) projects in order to make Customize+ not rely on Penumbra being installed.
+* GitHub workflows have been taken from [Glamourer](https://github.com/Ottermandias/Glamourer) project.
+* Customize+ makes use of code from [ECommons](https://github.com/NightmareXIV/ECommons) library for IPC functionality.
+* Some of the bone manipulation code was taken from [Ktisis](https://github.com/ktisis-tools/Ktisis).
+* [Dalamud](https://github.com/goatcorp/Dalamud) team for making plugins possible at all.
+* Special thanks goes to Yuki, Phenrei, Stoia, dendr01d and others for developing and maintaining original version of Customize+.
+* Everyone who contributed code and features through pull requests.
 
 ## License
+All files in this repository are licensed under the license listed in LICENSE.md file unless stated otherwise. By contributing the code into this repository you agreeing with licensing submitted code under this license.
 
-This project is licensed under the terms listed in the LICENSE.md file.
-*Final Fantasy XIV © SQUARE ENIX CO., LTD. All Rights Reserved. Customize++ and its developers are not affiliated with SQUARE ENIX CO., LTD. in any way.*
+*Customize+ includes code previously licensed to it by its contributors under MIT license. The text of the MIT license can be found [here](https://opensource.org/license/mit/). This code has been relicensed under license listed in LICENSE.md file.*
+
+##### Final Fantasy XIV © SQUARE ENIX CO., LTD. All Rights Reserved. Customize+ and its developers are not affiliated with SQUARE ENIX CO., LTD. in any way.

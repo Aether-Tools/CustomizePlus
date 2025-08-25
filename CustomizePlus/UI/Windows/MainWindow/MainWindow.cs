@@ -1,26 +1,23 @@
-﻿using Dalamud.Interface.Windowing;
-using Dalamud.Plugin;
+﻿using CustomizePlusPlus.Configuration.Data;
+using CustomizePlusPlus.Core.Helpers;
+using CustomizePlusPlus.Core.Services;
+using CustomizePlusPlus.Templates;
+using CustomizePlusPlus.Templates.Data;
+using CustomizePlusPlus.Templates.Events;
+using CustomizePlusPlus.UI.Windows.Controls;
+using CustomizePlusPlus.UI.Windows.MainWindow.Tabs;
+using CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Debug;
+using CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Profiles;
+using CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Templates;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Interface.Colors;
+using Dalamud.Interface.Windowing;
+using Dalamud.Plugin;
+using ECommonsLite.ImGuiMethods;
+using ECommonsLite.Schedulers;
 using OtterGui.Raii;
 using System;
 using System.Numerics;
-using SettingsTab = CustomizePlusPlus.UI.Windows.MainWindow.Tabs.SettingsTab;
-using CustomizePlusPlus.Core.Services;
-using CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Debug;
-using CustomizePlusPlus.Configuration.Data;
-using CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Templates;
-using CustomizePlusPlus.UI.Windows.Controls;
-using CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Profiles;
-using CustomizePlusPlus.UI.Windows.MainWindow.Tabs;
-using CustomizePlusPlus.Templates;
-using ECommonsLite.ImGuiMethods;
-using static System.Windows.Forms.AxHost;
-using Dalamud.Interface.Colors;
-using CustomizePlusPlus.Templates.Events;
-using CustomizePlusPlus.Templates.Data;
-using ECommonsLite.Schedulers;
-using CustomizePlusPlus.Core.Helpers;
-using CustomizePlusPlus.Core.Services.Dalamud;
 
 namespace CustomizePlusPlus.UI.Windows.MainWindow;
 
@@ -38,7 +35,6 @@ public class MainWindow : Window, IDisposable
     private readonly TemplateEditorManager _templateEditorManager;
     private readonly PluginConfiguration _configuration;
     private readonly HookingService _hookingService;
-    private readonly DalamudBranchService _dalamudBranchService;
 
     private readonly TemplateEditorEvent _templateEditorEvent;
 
@@ -61,7 +57,6 @@ public class MainWindow : Window, IDisposable
         TemplateEditorManager templateEditorManager,
         PluginConfiguration configuration,
         HookingService hookingService,
-        DalamudBranchService dalamudBranchService,
         TemplateEditorEvent templateEditorEvent
         ) : base($"Customize++ {VersionHelper.Version}###CPlusMainWindow")
     {
@@ -77,7 +72,6 @@ public class MainWindow : Window, IDisposable
         _templateEditorManager = templateEditorManager;
         _configuration = configuration;
         _hookingService = hookingService;
-        _dalamudBranchService = dalamudBranchService;
 
         _templateEditorEvent = templateEditorEvent;
 
@@ -101,7 +95,7 @@ public class MainWindow : Window, IDisposable
     {
         var yPos = ImGui.GetCursorPosY();
 
-        using (var disabled = ImRaii.Disabled(_hookingService.RenderHookFailed || _hookingService.MovementHookFailed || !_dalamudBranchService.AllowPluginToRun))
+        using (var disabled = ImRaii.Disabled(_hookingService.RenderHookFailed || _hookingService.MovementHookFailed))
         {
             LockWindowClosureIfNeeded();
             ImGuiEx.EzTabBar("##tabs", null, _switchToTab, [

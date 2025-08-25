@@ -3,6 +3,7 @@ using Dalamud.Interface.Utility;
 using Dalamud.Bindings.ImGui;
 using OtterGui;
 using OtterGui.Raii;
+using OtterGui.Extensions;
 using System;
 using System.Linq;
 using System.Numerics;
@@ -459,7 +460,9 @@ public class ProfilePanel
             ImGuiUtil.HoverTooltip("Whether this template is applied to the profile.");
 
             ImGui.TableNextColumn();
+
             _templateCombo.Draw(_selector.Selected!, template, idx);
+
             DrawDragDrop(_selector.Selected!, idx);
 
             ImGui.TableNextColumn();

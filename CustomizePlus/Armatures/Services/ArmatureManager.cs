@@ -372,7 +372,7 @@ public unsafe sealed class ArmatureManager : IDisposable
 
             //warn: hotpath for characters with n_root edits. IsApproximately might have some performance hit.
             var rootBoneTransform = arm.GetAppliedBoneTransform("n_root");
-            if (rootBoneTransform == null || 
+            if (rootBoneTransform == null ||
                 rootBoneTransform.Translation.IsApproximately(Vector3.Zero, 0.00001f))
                 return;
 

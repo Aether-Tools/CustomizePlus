@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -138,7 +138,9 @@ public static class BoneData //todo: DI, do not show IVCS unless IVCS is install
         "n_sippo_b,Tail B,Tail,FALSE,FALSE,n_sippo_a,", "n_sippo_c,Tail C,Tail,FALSE,FALSE,n_sippo_b,",
         "n_sippo_d,Tail D,Tail,FALSE,FALSE,n_sippo_c,", "n_sippo_e,Tail E,Tail,FALSE,FALSE,n_sippo_d,",
         "iv_shiri_l,Buttock Left,Groin,FALSE,TRUE,j_kosi,iv_shiri_r",
+        "ya_shiri_phys_l,Lower Buttock Left,Groin,TRUE,TRUE,j_kosi,ya_shiri_phys_r",
         "iv_shiri_r,Buttock Right,Groin,FALSE,TRUE,j_kosi,iv_shiri_l",
+        "ya_shiri_phys_r,Lower Buttock Right,Groin,TRUE,TRUE,j_kosi,ya_shiri_phys_l",
         "iv_kougan_l,Scrotum Left,Groin,FALSE,TRUE,iv_ochinko_a,iv_kougan_r",
         "iv_kougan_r,Scrotum Right,Groin,FALSE,TRUE,iv_ochinko_a,iv_kougan_l",
         "iv_ochinko_a,Penis A,Groin,FALSE,TRUE,j_kosi,", "iv_ochinko_b,Penis B,Groin,FALSE,TRUE,iv_ochinko_a,",
@@ -152,7 +154,11 @@ public static class BoneData //todo: DI, do not show IVCS unless IVCS is install
         "iv_koumon_l,Anus B Right,Groin,FALSE,TRUE,iv_koumon,iv_koumon_r",
         "iv_koumon_r,Anus B Left,Groin,FALSE,TRUE,iv_koumon,iv_koumon_l",
         "j_asi_a_l,Leg Left,Legs,TRUE,FALSE,j_kosi,j_asi_a_r",
+        "ya_daitai_phys_l,Front Thigh Left,Legs,TRUE,FALSE,j_asi_a_l,ya_daitai_phys_r",
+        "iv_daitai_phys_l,Back Thigh Left,Legs,TRUE,FALSE,j_asi_a_l,iv_daitai_phys_r",
         "j_asi_a_r,Leg Right,Legs,TRUE,FALSE,j_kosi,j_asi_a_l",
+        "ya_daitai_phys_r,Front Thigh Right,Legs,TRUE,FALSE,j_asi_a_r,ya_daitai_phys_l",
+        "iv_daitai_phys_r,Back Thigh Right,Legs,TRUE,FALSE,j_asi_a_r,iv_daitai_phys_l",
         "j_asi_b_l,Knee Left,Legs,TRUE,FALSE,j_asi_a_l,j_asi_b_r",
         "j_asi_b_r,Knee Right,Legs,TRUE,FALSE,j_asi_a_r,j_asi_b_l",
         "j_asi_c_l,Calf Left,Legs,TRUE,FALSE,j_asi_b_l,j_asi_c_r",
@@ -293,6 +299,9 @@ public static class BoneData //todo: DI, do not show IVCS unless IVCS is install
         "j_f_mmayu_r,Eyebrow B Right,Eyes,TRUE,FALSE,j_f_face,j_f_mmayu_l",
         "j_f_miken_01_r,Brow Ridge A Right,Eyes,TRUE,FALSE,j_f_mmayu_r,j_f_miken_01_l",
         "j_f_miken_02_r,Brow Ridge B Right,Eyes,TRUE,FALSE,j_f_miken_01_r,j_f_miken_02_l",
+
+        "iv_fukubu_phys,Upper Belly,Spine,TRUE,FALSE,j_sebo_a,j_sebo_a",
+        "ya_fukubu_phys,Lower Belly,Spine,TRUE,FALSE,j_kosi,j_kosi",
     };
 
     public static readonly Dictionary<BoneFamily, string?> DisplayableFamilies = new()

@@ -1,19 +1,17 @@
-﻿using Dalamud.Bindings.ImGui;
-using System.Linq;
-using System;
-using CustomizePlus.Armatures.Data;
-using CustomizePlus.Profiles;
+﻿using CustomizePlus.Armatures.Data;
 using CustomizePlus.Armatures.Services;
-using CustomizePlus.Templates;
-using CustomizePlus.Profiles.Data;
-using CustomizePlus.Templates.Data;
-using CustomizePlus.GameData.Extensions;
-using CustomizePlus.GameData.Services;
-using CustomizePlus.Core.Extensions;
-using System.Numerics;
-using CustomizePlus.Game.Services;
 using CustomizePlus.Core.Data;
+using CustomizePlus.Core.Extensions;
+using CustomizePlus.Game.Services;
+using CustomizePlus.GameData.Extensions;
+using CustomizePlus.Profiles;
+using CustomizePlus.Profiles.Data;
+using CustomizePlus.Templates;
+using CustomizePlus.Templates.Data;
+using Dalamud.Bindings.ImGui;
 using Penumbra.GameData.Interop;
+using System;
+using System.Linq;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 

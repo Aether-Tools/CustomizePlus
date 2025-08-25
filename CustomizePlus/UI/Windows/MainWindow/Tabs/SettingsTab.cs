@@ -321,7 +321,7 @@ public class SettingsTab
 
     private void DrawExternal()
     {
-        var isShouldDraw = ImGui.CollapsingHeader("External");
+        var isShouldDraw = ImGui.CollapsingHeader("Integrations");
 
         if (!isShouldDraw)
             return;
@@ -331,12 +331,12 @@ public class SettingsTab
 
     private void DrawHandlePCP()
     {
-        var isChecked = _configuration.ExternalSettings.HandlePCPFiles;
+        var isChecked = _configuration.IntegrationSettings.PenumbraPCPIntegrationEnabled;
 
-        if (CtrlHelper.CheckboxWithTextAndHelp("##handlepcp", "Handle Penumbra's .pcp files",
+        if (CtrlHelper.CheckboxWithTextAndHelp("##pcpintegrationenabled", "Enable Penumbra PCP integration",
                 "Controls whether C+ will add the currently active profile data from an actor to .pcp files upon creation, and construct new profile for said actor upon import.", ref isChecked))
         {
-            _configuration.ExternalSettings.HandlePCPFiles = isChecked;
+            _configuration.IntegrationSettings.PenumbraPCPIntegrationEnabled = isChecked;
 
             _configuration.Save();
         }

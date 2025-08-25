@@ -6,15 +6,15 @@ using Newtonsoft.Json;
 using OtterGui.Classes;
 using OtterGui.Widgets;
 using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
-using CustomizePlusPlus.Core.Services;
-using CustomizePlusPlus.Core.Data;
-using CustomizePlusPlus.Configuration.Services;
-using CustomizePlusPlus.UI.Windows;
+using CustomizePlus.Core.Services;
+using CustomizePlus.Core.Data;
+using CustomizePlus.Configuration.Services;
+using CustomizePlus.UI.Windows;
 using Dalamud.Interface.ImGuiNotification;
 using Penumbra.GameData.Actors;
-using CustomizePlusPlus.Core.Helpers;
+using CustomizePlus.Core.Helpers;
 
-namespace CustomizePlusPlus.Configuration.Data;
+namespace CustomizePlus.Configuration.Data;
 
 [Serializable]
 public class PluginConfiguration : IPluginConfiguration, ISavable

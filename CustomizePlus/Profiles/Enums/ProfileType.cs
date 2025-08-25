@@ -1,4 +1,4 @@
-﻿namespace CustomizePlusPlus.Profiles.Enums;
+﻿namespace CustomizePlus.Profiles.Enums;
 
 public enum ProfileType
 {

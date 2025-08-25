@@ -1,10 +1,10 @@
-﻿using CustomizePlusPlus.Api;
-using CustomizePlusPlus.Armatures.Data;
-using CustomizePlusPlus.Core;
-using CustomizePlusPlus.Core.Helpers;
-using CustomizePlusPlus.Core.Services;
-using CustomizePlusPlus.Interop.Ipc;
-using CustomizePlusPlus.UI;
+﻿using CustomizePlus.Api;
+using CustomizePlus.Armatures.Data;
+using CustomizePlus.Core;
+using CustomizePlus.Core.Helpers;
+using CustomizePlus.Core.Services;
+using CustomizePlus.Interop.Ipc;
+using CustomizePlus.UI;
 using Dalamud.Plugin;
 using ECommonsLite;
 using OtterGui.Log;
@@ -12,7 +12,7 @@ using OtterGui.Services;
 using Penumbra.GameData.Actors;
 using System;
 
-namespace CustomizePlusPlus;
+namespace CustomizePlus;
 
 public sealed class Plugin : IDalamudPlugin
 {

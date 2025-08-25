@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Numerics;
 
-namespace CustomizePlusPlus.Configuration.Data.Version2;
+namespace CustomizePlus.Configuration.Data.Version2;
 
 [Serializable]
 public struct V2BoneEditsContainer

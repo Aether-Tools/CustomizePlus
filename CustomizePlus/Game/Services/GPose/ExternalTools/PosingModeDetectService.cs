@@ -1,6 +1,6 @@
 ﻿using Dalamud.Game;
 
-namespace CustomizePlusPlus.Game.Services.GPose.ExternalTools;
+namespace CustomizePlus.Game.Services.GPose.ExternalTools;
 
 /// <summary>
 ///     Service which detects if Anamnesis/Ktisis posing mode is enabled.

@@ -1,7 +1,7 @@
 ﻿using Dalamud.Utility;
 using System;
 
-namespace CustomizePlusPlus.Core.Extensions;
+namespace CustomizePlus.Core.Extensions;
 
 internal static class StringExtensions
 {

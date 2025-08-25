@@ -1,7 +1,7 @@
-﻿using CustomizePlusPlus.Configuration.Data;
+﻿using CustomizePlus.Configuration.Data;
 using OtterGui.Widgets;
 
-namespace CustomizePlusPlus.UI.Windows;
+namespace CustomizePlus.UI.Windows;
 
 public class CPlusChangeLog
 {

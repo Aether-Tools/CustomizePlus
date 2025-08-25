@@ -1,9 +1,9 @@
-﻿using CustomizePlusPlus.Configuration.Data;
-using CustomizePlusPlus.Game.Services;
-using CustomizePlusPlus.GameData.Extensions;
-using CustomizePlusPlus.Profiles;
-using CustomizePlusPlus.Profiles.Data;
-using CustomizePlusPlus.Profiles.Events;
+﻿using CustomizePlus.Configuration.Data;
+using CustomizePlus.Game.Services;
+using CustomizePlus.GameData.Extensions;
+using CustomizePlus.Profiles;
+using CustomizePlus.Profiles.Data;
+using CustomizePlus.Profiles.Events;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
 using Dalamud.Plugin.Services;
@@ -18,9 +18,9 @@ using System;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
-using static CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Profiles.ProfileFileSystemSelector;
+using static CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles.ProfileFileSystemSelector;
 
-namespace CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Profiles;
+namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 
 public class ProfileFileSystemSelector : FileSystemSelector<Profile, ProfileState>
 {

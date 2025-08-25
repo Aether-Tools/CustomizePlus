@@ -4,18 +4,18 @@ using Dalamud.Plugin.Services;
 using System;
 using System.Runtime.InteropServices;
 using OtterGui.Log;
-using CustomizePlusPlus.Core.Data;
-using CustomizePlusPlus.Game.Services;
-using CustomizePlusPlus.Configuration.Data;
-using CustomizePlusPlus.Profiles;
-using CustomizePlusPlus.Armatures.Services;
-using CustomizePlusPlus.GameData.Data;
+using CustomizePlus.Core.Data;
+using CustomizePlus.Game.Services;
+using CustomizePlus.Configuration.Data;
+using CustomizePlus.Profiles;
+using CustomizePlus.Armatures.Services;
+using CustomizePlus.GameData.Data;
 using Penumbra.GameData.Interop;
 using Dalamud.Plugin;
-using CustomizePlusPlus.Core.Helpers;
-using CustomizePlusPlus.Core.Services.Dalamud;
+using CustomizePlus.Core.Helpers;
+using CustomizePlus.Core.Services.Dalamud;
 
-namespace CustomizePlusPlus.Core.Services;
+namespace CustomizePlus.Core.Services;
 
 public class HookingService : IDisposable
 {

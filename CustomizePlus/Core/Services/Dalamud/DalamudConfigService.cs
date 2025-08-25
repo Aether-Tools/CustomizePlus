@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System;
 
-namespace CustomizePlusPlus.Core.Services.Dalamud;
+namespace CustomizePlus.Core.Services.Dalamud;
 
 public class DalamudConfigService : IService
 {

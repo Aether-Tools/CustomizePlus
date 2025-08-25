@@ -1,4 +1,4 @@
-﻿using CustomizePlusPlus.Templates.Data;
+﻿using CustomizePlus.Templates.Data;
 using OtterGui.Classes;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CustomizePlusPlus.Templates.Events;
+namespace CustomizePlus.Templates.Events;
 
 /// <summary>
 /// Triggered when something related to template editor happens

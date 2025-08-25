@@ -1,15 +1,15 @@
-﻿using CustomizePlusPlus.Anamnesis;
-using CustomizePlusPlus.Configuration.Data;
-using CustomizePlusPlus.Configuration.Data.Version2;
-using CustomizePlusPlus.Configuration.Data.Version3;
-using CustomizePlusPlus.Configuration.Helpers;
-using CustomizePlusPlus.Core.Helpers;
-using CustomizePlusPlus.Profiles;
-using CustomizePlusPlus.Profiles.Data;
-using CustomizePlusPlus.Profiles.Events;
-using CustomizePlusPlus.Templates;
-using CustomizePlusPlus.Templates.Data;
-using CustomizePlusPlus.Templates.Events;
+﻿using CustomizePlus.Anamnesis;
+using CustomizePlus.Configuration.Data;
+using CustomizePlus.Configuration.Data.Version2;
+using CustomizePlus.Configuration.Data.Version3;
+using CustomizePlus.Configuration.Helpers;
+using CustomizePlus.Core.Helpers;
+using CustomizePlus.Profiles;
+using CustomizePlus.Profiles.Data;
+using CustomizePlus.Profiles.Events;
+using CustomizePlus.Templates;
+using CustomizePlus.Templates.Data;
+using CustomizePlus.Templates.Events;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
 using Dalamud.Interface.ImGuiFileDialog;
@@ -27,9 +27,9 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using static CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Templates.TemplateFileSystemSelector;
+using static CustomizePlus.UI.Windows.MainWindow.Tabs.Templates.TemplateFileSystemSelector;
 
-namespace CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Templates;
+namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 
 public class TemplateFileSystemSelector : FileSystemSelector<Template, TemplateState>
 {

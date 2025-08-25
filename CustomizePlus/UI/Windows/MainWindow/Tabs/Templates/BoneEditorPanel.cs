@@ -1,12 +1,12 @@
-﻿using CustomizePlusPlus.Armatures.Data;
-using CustomizePlusPlus.Configuration.Data;
-using CustomizePlusPlus.Core.Data;
-using CustomizePlusPlus.Core.Helpers;
-using CustomizePlusPlus.Game.Services;
-using CustomizePlusPlus.GameData.Extensions;
-using CustomizePlusPlus.Templates;
-using CustomizePlusPlus.Templates.Data;
-using CustomizePlusPlus.UI.Windows.Controls;
+﻿using CustomizePlus.Armatures.Data;
+using CustomizePlus.Configuration.Data;
+using CustomizePlus.Core.Data;
+using CustomizePlus.Core.Helpers;
+using CustomizePlus.Game.Services;
+using CustomizePlus.GameData.Extensions;
+using CustomizePlus.Templates;
+using CustomizePlus.Templates.Data;
+using CustomizePlus.UI.Windows.Controls;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
 using Dalamud.Interface.Components;
@@ -20,7 +20,7 @@ using System.Linq;
 using System.Numerics;
 using System.Windows.Forms;
 
-namespace CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Templates;
+namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 
 public class BoneEditorPanel
 {

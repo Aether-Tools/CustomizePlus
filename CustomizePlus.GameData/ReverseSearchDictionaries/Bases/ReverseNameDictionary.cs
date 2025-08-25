@@ -13,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CustomizePlusPlus.GameData.ReverseSearchDictionaries.Bases;
+namespace CustomizePlus.GameData.ReverseSearchDictionaries.Bases;
 
 /// <summary> A base class for dictionaries from NPC names to their IDs. </summary>
 /// <param name="pluginInterface"> The plugin interface. </param>

@@ -1,4 +1,4 @@
-﻿using CustomizePlusPlus.GameData.ReverseSearchDictionaries;
+﻿using CustomizePlus.GameData.ReverseSearchDictionaries;
 using Dalamud.Game.ClientState.Objects.Enums;
 using OtterGui.Services;
 using Penumbra.GameData.DataContainers;
@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CustomizePlusPlus.GameData.Data;
+namespace CustomizePlus.GameData.Data;
 
 /// <summary> A collection service for all the name dictionaries required for reverse name search. </summary>
 /// note: this is mvp for profile upgrading purposes, not intended to be used for anything else.

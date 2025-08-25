@@ -2,7 +2,7 @@
 
 <Project Sdk="Dalamud.NET.Sdk/13.0.0">
   <PropertyGroup>
-    <AssemblyTitle>CustomizePlusPlus</AssemblyTitle>
+    <AssemblyTitle>CustomizePlus</AssemblyTitle>
     <Version>2.0.8.4</Version>
     <Description>Customize++</Description>
     <Copyright></Copyright>
@@ -32,12 +32,12 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <ProjectReference Include="..\CustomizePlus.GameData\CustomizePlusPlus.GameData.csproj" />
+    <ProjectReference Include="..\CustomizePlus.GameData\CustomizePlus.GameData.csproj" />
     <ProjectReference Include="..\submodules\ECommonsLite\ECommonsLite\ECommonsLite.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="CustomizePlusPlus.json">
+    <None Include="CustomizePlus.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

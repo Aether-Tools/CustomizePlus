@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Numerics;
 
-namespace CustomizePlusPlus.Configuration.Data.Version3;
+namespace CustomizePlus.Configuration.Data.Version3;
 
 public class V3BoneTransform
 {

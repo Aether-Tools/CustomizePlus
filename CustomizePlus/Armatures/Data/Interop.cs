@@ -6,7 +6,7 @@ using FFXIVClientStructs.FFXIV.Client.System.Memory;
 using FFXIVClientStructs.Havok.Common.Base.Math.Matrix;
 using FFXIVClientStructs.Havok.Common.Base.Math.QsTransform;
 
-namespace CustomizePlusPlus.Armatures.Data;
+namespace CustomizePlus.Armatures.Data;
 internal static class InteropAlloc
 {
     // Allocations

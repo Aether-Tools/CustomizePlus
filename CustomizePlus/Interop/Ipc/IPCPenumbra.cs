@@ -5,7 +5,7 @@ using Penumbra.Api.Helpers;
 using Penumbra.Api.IpcSubscribers;
 using System;
 
-namespace CustomizePlusPlus.Interop.Ipc;
+namespace CustomizePlus.Interop.Ipc;
 
 public sealed class PenumbraIpcHandler : IIpcSubscriber
 {

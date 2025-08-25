@@ -1,7 +1,7 @@
 ﻿using Dalamud.Interface.Utility;
 using Dalamud.Bindings.ImGui;
 
-namespace CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Templates;
+namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 
 public class TemplatesTab
 {

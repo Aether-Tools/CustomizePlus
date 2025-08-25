@@ -1,12 +1,12 @@
 ﻿using System;
-using CustomizePlusPlus.Core.Helpers;
-using CustomizePlusPlus.Core.Services.Dalamud;
-using CustomizePlusPlus.Game.Services;
-using CustomizePlusPlus.UI.Windows;
+using CustomizePlus.Core.Helpers;
+using CustomizePlus.Core.Services.Dalamud;
+using CustomizePlus.Game.Services;
+using CustomizePlus.UI.Windows;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.UI;
 
-namespace CustomizePlusPlus.Core.Services;
+namespace CustomizePlus.Core.Services;
 
 public class UserNotifierService : IDisposable
 {

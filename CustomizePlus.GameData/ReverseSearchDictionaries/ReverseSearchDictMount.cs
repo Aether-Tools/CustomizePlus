@@ -4,11 +4,11 @@ using OtterGui.Log;
 using Penumbra.GameData.Data;
 using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
-using CustomizePlusPlus.GameData.ReverseSearchDictionaries.Bases;
+using CustomizePlus.GameData.ReverseSearchDictionaries.Bases;
 using Dalamud.Utility;
 using Lumina.Excel.Sheets;
 
-namespace CustomizePlusPlus.GameData.ReverseSearchDictionaries;
+namespace CustomizePlus.GameData.ReverseSearchDictionaries;
 
 /// <summary> A dictionary that matches names to mount ids. </summary>
 public sealed class ReverseSearchDictMount(IDalamudPluginInterface pluginInterface, Logger log, IDataManager gameData)

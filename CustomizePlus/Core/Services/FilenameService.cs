@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using CustomizePlusPlus.Profiles.Data;
+using CustomizePlus.Profiles.Data;
 
-namespace CustomizePlusPlus.Core.Services;
+namespace CustomizePlus.Core.Services;
 
 public class FilenameService
 {

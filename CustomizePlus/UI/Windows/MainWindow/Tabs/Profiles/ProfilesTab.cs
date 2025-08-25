@@ -1,7 +1,7 @@
 ﻿using Dalamud.Interface.Utility;
 using Dalamud.Bindings.ImGui;
 
-namespace CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Profiles;
+namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 
 public class ProfilesTab
 {

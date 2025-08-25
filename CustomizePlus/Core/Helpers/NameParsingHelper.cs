@@ -1,4 +1,4 @@
-﻿namespace CustomizePlusPlus.Core.Helpers;
+﻿namespace CustomizePlus.Core.Helpers;
 
 //todo: better name
 internal static class NameParsingHelper

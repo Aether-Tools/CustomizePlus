@@ -1,7 +1,7 @@
-﻿using CustomizePlusPlus.Api.Enums;
+﻿using CustomizePlus.Api.Enums;
 using ECommonsLite.EzIpcManager;
 
-namespace CustomizePlusPlus.Api;
+namespace CustomizePlus.Api;
 
 public partial class CustomizePlusIpc
 {

@@ -1,6 +1,6 @@
 ﻿using ECommonsLite.EzIpcManager;
 
-namespace CustomizePlusPlus.Api;
+namespace CustomizePlus.Api;
 
 public partial class CustomizePlusIpc
 {

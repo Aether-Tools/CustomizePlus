@@ -4,7 +4,7 @@ using FFXIVClientStructs.Havok.Common.Base.Math.Quaternion;
 using FFXIVClientStructs.Havok.Common.Base.Math.Vector;
 using System.Numerics;
 
-namespace CustomizePlusPlus.Core.Data;
+namespace CustomizePlus.Core.Data;
 
 internal static class Constants
 {

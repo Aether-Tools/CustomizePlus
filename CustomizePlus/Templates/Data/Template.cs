@@ -1,7 +1,7 @@
-﻿using CustomizePlusPlus.Api.Data;
-using CustomizePlusPlus.Core.Data;
-using CustomizePlusPlus.Core.Extensions;
-using CustomizePlusPlus.Core.Services;
+﻿using CustomizePlus.Api.Data;
+using CustomizePlus.Core.Data;
+using CustomizePlus.Core.Extensions;
+using CustomizePlus.Core.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OtterGui.Classes;
@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace CustomizePlusPlus.Templates.Data;
+namespace CustomizePlus.Templates.Data;
 
 /// <summary>
 ///     Encapsulates the user-controlled aspects of a template, ie all of

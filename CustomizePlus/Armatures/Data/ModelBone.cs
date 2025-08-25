@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using CustomizePlusPlus.Configuration.Data.Version3;
-using CustomizePlusPlus.Core.Data;
-using CustomizePlusPlus.Core.Extensions;
-using CustomizePlusPlus.Templates.Data;
+using CustomizePlus.Configuration.Data.Version3;
+using CustomizePlus.Core.Data;
+using CustomizePlus.Core.Extensions;
+using CustomizePlus.Templates.Data;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.Havok;
 using FFXIVClientStructs.Havok.Animation.Rig;
 using FFXIVClientStructs.Havok.Common.Base.Math.QsTransform;
 using OtterGui.Text.EndObjects;
 using Penumbra.GameData;
-using static CustomizePlusPlus.Anamnesis.Data.PoseFile;
+using static CustomizePlus.Anamnesis.Data.PoseFile;
 using static FFXIVClientStructs.Havok.Animation.Rig.hkaPose;
 
-namespace CustomizePlusPlus.Armatures.Data;
+namespace CustomizePlus.Armatures.Data;
 
 /// <summary>
 ///     Represents a single bone of an ingame character's skeleton.

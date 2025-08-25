@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using CustomizePlusPlus.Armatures.Data;
-using CustomizePlusPlus.Armatures.Events;
-using CustomizePlusPlus.Core.Data;
-using CustomizePlusPlus.Core.Extensions;
-using CustomizePlusPlus.Game.Services;
-using CustomizePlusPlus.Game.Services.GPose;
-using CustomizePlusPlus.GameData.Extensions;
-using CustomizePlusPlus.Profiles;
-using CustomizePlusPlus.Profiles.Data;
-using CustomizePlusPlus.Profiles.Events;
-using CustomizePlusPlus.Templates.Events;
+using CustomizePlus.Armatures.Data;
+using CustomizePlus.Armatures.Events;
+using CustomizePlus.Core.Data;
+using CustomizePlus.Core.Extensions;
+using CustomizePlus.Game.Services;
+using CustomizePlus.Game.Services.GPose;
+using CustomizePlus.GameData.Extensions;
+using CustomizePlus.Profiles;
+using CustomizePlus.Profiles.Data;
+using CustomizePlus.Profiles.Events;
+using CustomizePlus.Templates.Events;
 using Dalamud.Plugin.Services;
 using OtterGui.Classes;
 using OtterGui.Log;
@@ -20,7 +20,7 @@ using Penumbra.GameData.Actors;
 using Penumbra.GameData.Enums;
 using Penumbra.GameData.Interop;
 
-namespace CustomizePlusPlus.Armatures.Services;
+namespace CustomizePlus.Armatures.Services;
 
 public unsafe sealed class ArmatureManager : IDisposable
 {

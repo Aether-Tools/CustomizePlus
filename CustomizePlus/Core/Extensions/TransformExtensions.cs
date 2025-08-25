@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Numerics;
-using CustomizePlusPlus.Core.Data;
+using CustomizePlus.Core.Data;
 using FFXIVClientStructs.Havok;
 using FFXIVClientStructs.Havok.Common.Base.Math.QsTransform;
 using FFXIVClientStructs.Havok.Common.Base.Math.Vector;
 
 //using FFXIVClientStructs.FFXIV.Client.Graphics;
 
-namespace CustomizePlusPlus.Core.Extensions;
+namespace CustomizePlus.Core.Extensions;
 
 internal static class TransformExtensions
 {

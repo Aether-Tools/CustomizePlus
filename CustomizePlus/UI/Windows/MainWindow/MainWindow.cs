@@ -1,14 +1,14 @@
-﻿using CustomizePlusPlus.Configuration.Data;
-using CustomizePlusPlus.Core.Helpers;
-using CustomizePlusPlus.Core.Services;
-using CustomizePlusPlus.Templates;
-using CustomizePlusPlus.Templates.Data;
-using CustomizePlusPlus.Templates.Events;
-using CustomizePlusPlus.UI.Windows.Controls;
-using CustomizePlusPlus.UI.Windows.MainWindow.Tabs;
-using CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Debug;
-using CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Profiles;
-using CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Templates;
+﻿using CustomizePlus.Configuration.Data;
+using CustomizePlus.Core.Helpers;
+using CustomizePlus.Core.Services;
+using CustomizePlus.Templates;
+using CustomizePlus.Templates.Data;
+using CustomizePlus.Templates.Events;
+using CustomizePlus.UI.Windows.Controls;
+using CustomizePlus.UI.Windows.MainWindow.Tabs;
+using CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
+using CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
+using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Colors;
 using Dalamud.Interface.Windowing;
@@ -19,7 +19,7 @@ using OtterGui.Raii;
 using System;
 using System.Numerics;
 
-namespace CustomizePlusPlus.UI.Windows.MainWindow;
+namespace CustomizePlus.UI.Windows.MainWindow;
 
 public class MainWindow : Window, IDisposable
 {

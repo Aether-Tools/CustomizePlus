@@ -1,4 +1,4 @@
-﻿using CustomizePlusPlus.Interop.Ipc;
+﻿using CustomizePlus.Interop.Ipc;
 using System;
 using System.Linq;
 using System.Collections.Generic;

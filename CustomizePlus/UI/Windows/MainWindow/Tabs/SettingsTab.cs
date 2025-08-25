@@ -7,16 +7,16 @@ using OtterGui.Raii;
 using OtterGui.Widgets;
 using System.Diagnostics;
 using System.Numerics;
-using CustomizePlusPlus.Core.Services;
-using CustomizePlusPlus.Configuration.Data;
-using CustomizePlusPlus.Profiles;
-using CustomizePlusPlus.Templates;
-using CustomizePlusPlus.Core.Helpers;
-using CustomizePlusPlus.Armatures.Services;
+using CustomizePlus.Core.Services;
+using CustomizePlus.Configuration.Data;
+using CustomizePlus.Profiles;
+using CustomizePlus.Templates;
+using CustomizePlus.Core.Helpers;
+using CustomizePlus.Armatures.Services;
 using Dalamud.Interface.ImGuiNotification;
 using Dalamud.Plugin;
 
-namespace CustomizePlusPlus.UI.Windows.MainWindow.Tabs;
+namespace CustomizePlus.UI.Windows.MainWindow.Tabs;
 
 public class SettingsTab
 {

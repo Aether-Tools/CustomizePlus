@@ -6,12 +6,12 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using CustomizePlusPlus.Core.Services;
-using CustomizePlusPlus.Templates.Events;
-using CustomizePlusPlus.Templates.Data;
+using CustomizePlus.Core.Services;
+using CustomizePlus.Templates.Events;
+using CustomizePlus.Templates.Data;
 using Dalamud.Interface.ImGuiNotification;
 
-namespace CustomizePlusPlus.Templates;
+namespace CustomizePlus.Templates;
 
 //Adapted from glamourer source code
 public sealed class TemplateFileSystem : FileSystem<Template>, IDisposable, ISavable

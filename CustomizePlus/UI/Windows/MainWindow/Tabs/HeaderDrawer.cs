@@ -7,7 +7,7 @@ using System.Linq;
 using OtterGui.Raii;
 using System.Numerics;
 
-namespace CustomizePlusPlus.UI.Windows.MainWindow.Tabs;
+namespace CustomizePlus.UI.Windows.MainWindow.Tabs;
 
 public static class HeaderDrawer
 {

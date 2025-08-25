@@ -10,14 +10,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using CustomizePlusPlus.Templates;
-using CustomizePlusPlus.Configuration.Data;
-using CustomizePlusPlus.Profiles;
-using CustomizePlusPlus.Profiles.Data;
-using CustomizePlusPlus.Templates.Events;
-using CustomizePlusPlus.Templates.Data;
+using CustomizePlus.Templates;
+using CustomizePlus.Configuration.Data;
+using CustomizePlus.Profiles;
+using CustomizePlus.Profiles.Data;
+using CustomizePlus.Templates.Events;
+using CustomizePlus.Templates.Data;
 
-namespace CustomizePlusPlus.UI.Windows.Controls;
+namespace CustomizePlus.UI.Windows.Controls;
 
 public abstract class TemplateComboBase : FilterComboCache<Tuple<Template, string>>, IDisposable
 {

@@ -4,11 +4,11 @@ using OtterGui.Log;
 using Penumbra.GameData.Data;
 using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
-using CustomizePlusPlus.GameData.ReverseSearchDictionaries.Bases;
+using CustomizePlus.GameData.ReverseSearchDictionaries.Bases;
 using Lumina.Excel.Sheets;
 using Dalamud.Game.ClientState.Objects.Enums;
 
-namespace CustomizePlusPlus.GameData.ReverseSearchDictionaries;
+namespace CustomizePlus.GameData.ReverseSearchDictionaries;
 
 #pragma warning disable SeStringEvaluator
 

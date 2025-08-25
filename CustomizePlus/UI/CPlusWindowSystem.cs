@@ -1,11 +1,11 @@
 ﻿using Dalamud.Interface;
 using Dalamud.Interface.Windowing;
 using System;
-using CustomizePlusPlus.Configuration.Data;
-using CustomizePlusPlus.UI.Windows.MainWindow;
-using CustomizePlusPlus.UI.Windows;
+using CustomizePlus.Configuration.Data;
+using CustomizePlus.UI.Windows.MainWindow;
+using CustomizePlus.UI.Windows;
 
-namespace CustomizePlusPlus.UI;
+namespace CustomizePlus.UI;
 
 public class CPlusWindowSystem : IDisposable
 {

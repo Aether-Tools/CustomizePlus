@@ -1,8 +1,8 @@
-﻿using CustomizePlusPlus.Core.Data;
+﻿using CustomizePlus.Core.Data;
 using System;
 using System.Collections.Generic;
 
-namespace CustomizePlusPlus.Configuration.Data.Version3;
+namespace CustomizePlus.Configuration.Data.Version3;
 
 /// <summary>
 ///     Encapsulates the user-controlled aspects of a character profile, ie all of

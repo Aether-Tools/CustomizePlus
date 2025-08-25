@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using Penumbra.GameData.Actors;
-using CustomizePlusPlus.Core.Data;
-using CustomizePlusPlus.Profiles.Data;
-using CustomizePlusPlus.Templates.Data;
-using CustomizePlusPlus.GameData.Extensions;
+using CustomizePlus.Core.Data;
+using CustomizePlus.Profiles.Data;
+using CustomizePlus.Templates.Data;
+using CustomizePlus.GameData.Extensions;
 
-namespace CustomizePlusPlus.Armatures.Data;
+namespace CustomizePlus.Armatures.Data;
 
 /// <summary>
 /// Represents a "copy" of the ingame skeleton upon which the linked character profile is meant to operate.

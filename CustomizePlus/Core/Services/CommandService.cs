@@ -5,20 +5,20 @@ using System;
 using System.Linq;
 using OtterGui.Log;
 using Dalamud.Game.Text.SeStringHandling;
-using CustomizePlusPlus.Profiles;
-using CustomizePlusPlus.Game.Services;
-using CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Templates;
-using CustomizePlusPlus.UI.Windows.MainWindow;
+using CustomizePlus.Profiles;
+using CustomizePlus.Game.Services;
+using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
+using CustomizePlus.UI.Windows.MainWindow;
 using static System.Windows.Forms.AxHost;
-using CustomizePlusPlus.Profiles.Data;
-using CustomizePlusPlus.Configuration.Data;
+using CustomizePlus.Profiles.Data;
+using CustomizePlus.Configuration.Data;
 using Dalamud.Interface.ImGuiNotification;
-using CustomizePlusPlus.GameData.Extensions;
+using CustomizePlus.GameData.Extensions;
 using System.Collections.Generic;
 using ECommonsLite;
-using CustomizePlusPlus.Core.Helpers;
+using CustomizePlus.Core.Helpers;
 
-namespace CustomizePlusPlus.Core.Services;
+namespace CustomizePlus.Core.Services;
 
 public class CommandService : IDisposable
 {

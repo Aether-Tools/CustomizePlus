@@ -1,7 +1,7 @@
-﻿using CustomizePlusPlus.Core.Services.Dalamud;
+﻿using CustomizePlus.Core.Services.Dalamud;
 using System.Numerics;
 
-namespace CustomizePlusPlus.UI.Windows;
+namespace CustomizePlus.UI.Windows;
 
 public partial class PopupSystem
 {

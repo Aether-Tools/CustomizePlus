@@ -1,27 +1,27 @@
-﻿using CustomizePlusPlus.Profiles.Enums;
+﻿using CustomizePlus.Profiles.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using ECommonsLite.EzIpcManager;
 using Newtonsoft.Json;
-using CustomizePlusPlus.Api.Data;
-using CustomizePlusPlus.Api.Enums;
-using CustomizePlusPlus.Profiles.Exceptions;
-using CustomizePlusPlus.Profiles.Data;
-using CustomizePlusPlus.Core.Extensions;
-using CustomizePlusPlus.Armatures.Data;
-using CustomizePlusPlus.Armatures.Events;
-using CustomizePlusPlus.GameData.Extensions;
+using CustomizePlus.Api.Data;
+using CustomizePlus.Api.Enums;
+using CustomizePlus.Profiles.Exceptions;
+using CustomizePlus.Profiles.Data;
+using CustomizePlus.Core.Extensions;
+using CustomizePlus.Armatures.Data;
+using CustomizePlus.Armatures.Events;
+using CustomizePlus.GameData.Extensions;
 using Dalamud.Game.ClientState.Objects.Types;
 using Penumbra.GameData.Structs;
 using Penumbra.GameData.Enums;
-using CustomizePlusPlus.Templates.Data;
-using CustomizePlusPlus.Templates.Events;
+using CustomizePlus.Templates.Data;
+using CustomizePlus.Templates.Events;
 using OtterGui.Extensions;
 using Penumbra.GameData.Actors;
 using Penumbra.String;
 
-namespace CustomizePlusPlus.Api;
+namespace CustomizePlus.Api;
 
 public partial class CustomizePlusIpc
 {

@@ -1,19 +1,19 @@
-﻿using CustomizePlusPlus.Armatures.Data;
-using CustomizePlusPlus.Armatures.Services;
-using CustomizePlusPlus.Core.Data;
-using CustomizePlusPlus.Core.Extensions;
-using CustomizePlusPlus.Game.Services;
-using CustomizePlusPlus.GameData.Extensions;
-using CustomizePlusPlus.Profiles;
-using CustomizePlusPlus.Profiles.Data;
-using CustomizePlusPlus.Templates;
-using CustomizePlusPlus.Templates.Data;
+﻿using CustomizePlus.Armatures.Data;
+using CustomizePlus.Armatures.Services;
+using CustomizePlus.Core.Data;
+using CustomizePlus.Core.Extensions;
+using CustomizePlus.Game.Services;
+using CustomizePlus.GameData.Extensions;
+using CustomizePlus.Profiles;
+using CustomizePlus.Profiles.Data;
+using CustomizePlus.Templates;
+using CustomizePlus.Templates.Data;
 using Dalamud.Bindings.ImGui;
 using Penumbra.GameData.Interop;
 using System;
 using System.Linq;
 
-namespace CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Debug;
+namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 
 public class StateMonitoringTab
 {

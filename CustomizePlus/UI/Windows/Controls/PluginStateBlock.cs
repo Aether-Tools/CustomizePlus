@@ -2,16 +2,16 @@
 using Dalamud.Interface;
 using Dalamud.Bindings.ImGui;
 using System.Numerics;
-using CustomizePlusPlus.Core.Services;
-using CustomizePlusPlus.Game.Services;
-using CustomizePlusPlus.Configuration.Data;
-using CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Templates;
-using CustomizePlusPlus.Core.Helpers;
-using CustomizePlusPlus.Api;
-using CustomizePlusPlus.Core.Data;
-using CustomizePlusPlus.Core.Services.Dalamud;
+using CustomizePlus.Core.Services;
+using CustomizePlus.Game.Services;
+using CustomizePlus.Configuration.Data;
+using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
+using CustomizePlus.Core.Helpers;
+using CustomizePlus.Api;
+using CustomizePlus.Core.Data;
+using CustomizePlus.Core.Services.Dalamud;
 
-namespace CustomizePlusPlus.UI.Windows.Controls;
+namespace CustomizePlus.UI.Windows.Controls;
 
 public class PluginStateBlock
 {

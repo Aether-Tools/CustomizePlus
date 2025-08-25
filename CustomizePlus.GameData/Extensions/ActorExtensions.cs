@@ -1,6 +1,6 @@
 ﻿using Penumbra.GameData.Interop;
 
-namespace CustomizePlusPlus.GameData.Extensions;
+namespace CustomizePlus.GameData.Extensions;
 
 public static unsafe class ActorExtensions
 {

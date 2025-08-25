@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
-using CustomizePlusPlus.Core.Data;
-using CustomizePlusPlus.GameData.Extensions;
+using CustomizePlus.Core.Data;
+using CustomizePlus.GameData.Extensions;
 using Dalamud.Plugin.Services;
 using Penumbra.GameData.Actors;
 using Penumbra.GameData.Enums;
 using Penumbra.GameData.Interop;
 using DalamudGameObject = Dalamud.Game.ClientState.Objects.Types.IGameObject;
-using CustomizePlusPlus.Configuration.Data;
+using CustomizePlus.Configuration.Data;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using Penumbra.GameData.Files.ShaderStructs;
 
-namespace CustomizePlusPlus.Game.Services;
+namespace CustomizePlus.Game.Services;
 
 public class GameObjectService
 {

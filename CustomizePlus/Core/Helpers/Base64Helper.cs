@@ -1,5 +1,5 @@
-﻿using CustomizePlusPlus.Core.Data;
-using CustomizePlusPlus.Templates.Data;
+﻿using CustomizePlus.Core.Data;
+using CustomizePlus.Templates.Data;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 
-namespace CustomizePlusPlus.Core.Helpers;
+namespace CustomizePlus.Core.Helpers;
 public class BoneTransformData // literally not cooking
 {
     public string BoneCodeName { get; set; }

@@ -9,7 +9,7 @@ using Penumbra.GameData.DataContainers;
 using Penumbra.GameData.Gui;
 using Penumbra.String;
 
-namespace CustomizePlusPlus.UI.Windows.Controls;
+namespace CustomizePlus.UI.Windows.Controls;
 
 public class ActorAssignmentUi
 {

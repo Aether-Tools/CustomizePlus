@@ -1,7 +1,7 @@
 ﻿using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Plugin.Services;
 
-namespace CustomizePlusPlus.Game.Services;
+namespace CustomizePlus.Game.Services;
 
 public class ChatService
 {

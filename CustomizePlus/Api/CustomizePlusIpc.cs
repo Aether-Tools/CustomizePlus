@@ -1,23 +1,23 @@
-﻿using CustomizePlusPlus.Armatures.Events;
-using CustomizePlusPlus.Core.Services;
-using CustomizePlusPlus.Game.Services;
-using CustomizePlusPlus.GameData.Services;
-using CustomizePlusPlus.Profiles;
-using CustomizePlusPlus.Profiles.Events;
-using CustomizePlusPlus.Templates.Data;
-using CustomizePlusPlus.Templates.Events;
+﻿using CustomizePlus.Armatures.Events;
+using CustomizePlus.Core.Services;
+using CustomizePlus.Game.Services;
+using CustomizePlus.GameData.Services;
+using CustomizePlus.Profiles;
+using CustomizePlus.Profiles.Events;
+using CustomizePlus.Templates.Data;
+using CustomizePlus.Templates.Events;
 using Dalamud.Plugin;
 using ECommonsLite.EzIpcManager;
 using OtterGui.Log;
 using System;
 using Penumbra.GameData.Actors;
 
-namespace CustomizePlusPlus.Api;
+namespace CustomizePlus.Api;
 
 /// <summary>
 /// Customize+ IPC.
-/// All of the function/event names start with "CustomizePlusPlus." prefix.
-/// For example: CustomizePlusPlus.Profile.GetList.
+/// All of the function/event names start with "CustomizePlus." prefix.
+/// For example: CustomizePlus.Profile.GetList.
 /// While Customize+ is using EzIPC to make it easier to work with IPC,
 /// you are not required to use it to interact with the plugin.
 /// </summary>

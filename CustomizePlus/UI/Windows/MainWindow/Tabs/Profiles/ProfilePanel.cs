@@ -7,21 +7,21 @@ using OtterGui.Extensions;
 using System;
 using System.Linq;
 using System.Numerics;
-using CustomizePlusPlus.Profiles;
-using CustomizePlusPlus.Configuration.Data;
-using CustomizePlusPlus.Profiles.Data;
-using CustomizePlusPlus.UI.Windows.Controls;
-using CustomizePlusPlus.Templates;
-using CustomizePlusPlus.Core.Data;
-using CustomizePlusPlus.Templates.Events;
+using CustomizePlus.Profiles;
+using CustomizePlus.Configuration.Data;
+using CustomizePlus.Profiles.Data;
+using CustomizePlus.UI.Windows.Controls;
+using CustomizePlus.Templates;
+using CustomizePlus.Core.Data;
+using CustomizePlus.Templates.Events;
 using Penumbra.GameData.Actors;
 using Penumbra.String;
 using static FFXIVClientStructs.FFXIV.Client.LayoutEngine.ILayoutInstance;
-using CustomizePlusPlus.GameData.Extensions;
-using CustomizePlusPlus.Core.Extensions;
+using CustomizePlus.GameData.Extensions;
+using CustomizePlus.Core.Extensions;
 using Dalamud.Interface.Components;
 
-namespace CustomizePlusPlus.UI.Windows.MainWindow.Tabs.Profiles;
+namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 
 public class ProfilePanel
 {

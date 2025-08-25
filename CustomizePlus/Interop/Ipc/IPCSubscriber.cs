@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CustomizePlusPlus.Interop.Ipc;
+namespace CustomizePlus.Interop.Ipc;
 
 public interface IIpcSubscriber : IDisposable
 {

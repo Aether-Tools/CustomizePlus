@@ -6,12 +6,12 @@ using System.Text.RegularExpressions;
 using System;
 using System.Linq;
 using OtterGui.Classes;
-using CustomizePlusPlus.Core.Services;
-using CustomizePlusPlus.Profiles.Data;
-using CustomizePlusPlus.Profiles.Events;
+using CustomizePlus.Core.Services;
+using CustomizePlus.Profiles.Data;
+using CustomizePlus.Profiles.Events;
 using Dalamud.Interface.ImGuiNotification;
 
-namespace CustomizePlusPlus.Profiles;
+namespace CustomizePlus.Profiles;
 
 public class ProfileFileSystem : FileSystem<Profile>, IDisposable, ISavable
 {

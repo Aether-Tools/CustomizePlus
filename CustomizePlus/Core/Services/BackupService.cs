@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace CustomizePlusPlus.Core.Services;
+namespace CustomizePlus.Core.Services;
 
 public class BackupService
 {

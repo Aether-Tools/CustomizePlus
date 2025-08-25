@@ -4,7 +4,7 @@ using OtterGui.Classes;
 using OtterGui.Services;
 using Penumbra.GameData;
 
-namespace CustomizePlusPlus.GameData.Hooks.Objects;
+namespace CustomizePlus.GameData.Hooks.Objects;
 public sealed unsafe class CharacterDestructor : EventWrapperPtr<Character, CharacterDestructor.Priority>, IHookService
 {
     public enum Priority

@@ -8,13 +8,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomizePlusPlus", "CustomizePlus\CustomizePlusPlus.csproj", "{5BA385F5-C17E-4CE4-828A-24F7F19C434B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomizePlus", "CustomizePlus\CustomizePlus.csproj", "{5BA385F5-C17E-4CE4-828A-24F7F19C434B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "submodules", "submodules", "{121C2200-A844-44FD-85C4-22D6C7E35553}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OtterGui", "submodules\OtterGui\OtterGui.csproj", "{0D465539-6133-4088-B4BB-F260FA2A1557}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomizePlusPlus.GameData", "CustomizePlus.GameData\CustomizePlusPlus.GameData.csproj", "{CDB26C94-1200-45AA-AF96-D4526DC76AD5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomizePlus.GameData", "CustomizePlus.GameData\CustomizePlus.GameData.csproj", "{CDB26C94-1200-45AA-AF96-D4526DC76AD5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Penumbra.GameData", "submodules\Penumbra.GameData\Penumbra.GameData.csproj", "{D79C8833-D241-4867-BF6F-8097E0ED8067}"
 EndProject

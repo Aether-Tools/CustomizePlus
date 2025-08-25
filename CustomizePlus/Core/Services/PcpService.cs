@@ -1,9 +1,9 @@
-﻿using CustomizePlusPlus.Api.Data;
-using CustomizePlusPlus.Configuration.Data;
-using CustomizePlusPlus.Interop.Ipc;
-using CustomizePlusPlus.Profiles;
-using CustomizePlusPlus.Templates;
-using CustomizePlusPlus.Templates.Data;
+﻿using CustomizePlus.Api.Data;
+using CustomizePlus.Configuration.Data;
+using CustomizePlus.Interop.Ipc;
+using CustomizePlus.Profiles;
+using CustomizePlus.Templates;
+using CustomizePlus.Templates.Data;
 using Newtonsoft.Json.Linq;
 using OtterGui.Log;
 using OtterGui.Services;
@@ -11,7 +11,7 @@ using Penumbra.GameData.Actors;
 using Penumbra.GameData.Interop;
 using System;
 
-namespace CustomizePlusPlus.Core.Services;
+namespace CustomizePlus.Core.Services;
 
 public class PcpService : IRequiredService
 {

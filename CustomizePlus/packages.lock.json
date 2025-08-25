@@ -85,7 +85,7 @@
           "System.Threading.Tasks.Extensions": "4.5.4"
         }
       },
-      "customizeplusplus.gamedata": {
+      "CustomizePlus.gamedata": {
         "type": "Project",
         "dependencies": {
           "Penumbra.GameData": "[1.0.0, )"

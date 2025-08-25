@@ -1,9 +1,9 @@
-﻿using CustomizePlusPlus.Core.Data;
-using CustomizePlusPlus.Core.Events;
-using CustomizePlusPlus.Core.Helpers;
-using CustomizePlusPlus.Core.Services;
-using CustomizePlusPlus.Templates.Data;
-using CustomizePlusPlus.Templates.Events;
+﻿using CustomizePlus.Core.Data;
+using CustomizePlus.Core.Events;
+using CustomizePlus.Core.Helpers;
+using CustomizePlus.Core.Services;
+using CustomizePlus.Templates.Data;
+using CustomizePlus.Templates.Events;
 using Newtonsoft.Json.Linq;
 using OtterGui.Log;
 using System;
@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace CustomizePlusPlus.Templates;
+namespace CustomizePlus.Templates;
 
 public class TemplateManager : IDisposable
 {

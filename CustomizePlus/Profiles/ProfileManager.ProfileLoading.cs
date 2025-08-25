@@ -1,19 +1,16 @@
 ﻿using CustomizePlus.Profiles.Data;
 using CustomizePlus.Profiles.Events;
 using CustomizePlus.Templates.Data;
-using CustomizePlus.Templates;
+using Dalamud.Game.ClientState.Objects.Enums;
 using Newtonsoft.Json.Linq;
 using OtterGui.Classes;
 using Penumbra.GameData.Actors;
+using Penumbra.GameData.Structs;
+using Penumbra.String;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Penumbra.String;
-using Penumbra.GameData.Structs;
-using Dalamud.Game.ClientState.Objects.Enums;
-using Penumbra.GameData.Gui;
-using System.Xml;
 
 namespace CustomizePlus.Profiles;
 

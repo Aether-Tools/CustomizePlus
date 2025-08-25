@@ -1,27 +1,22 @@
-﻿using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Plugin;
-using Dalamud.Plugin.Ipc;
-using Dalamud.Plugin.Services;
-using Dalamud.Bindings.ImGui;
-using Newtonsoft.Json;
-using OtterGui.Raii;
-using System.Linq;
-using CustomizePlus.Profiles;
-using CustomizePlus.Configuration.Helpers;
-using CustomizePlus.Game.Services;
-using CustomizePlus.GameData.Services;
-using Penumbra.GameData.Actors;
-using ECommonsLite.EzIpcManager;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using OtterGui.Log;
-using CustomizePlus.Core.Extensions;
+﻿using CustomizePlus.Api.Data;
 using CustomizePlus.Configuration.Data;
-using CustomizePlus.Api.Data;
+using CustomizePlus.Core.Extensions;
+using CustomizePlus.Game.Services;
 using CustomizePlus.GameData.Extensions;
+using CustomizePlus.Profiles;
+using Dalamud.Bindings.ImGui;
+using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
+using ECommonsLite.EzIpcManager;
+using Newtonsoft.Json;
+using OtterGui.Log;
+using OtterGui.Raii;
+using Penumbra.GameData.Actors;
 using Penumbra.GameData.Interop;
 using Penumbra.GameData.Structs;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 
@@ -54,6 +49,12 @@ public class IPCTestTab //: IDisposable
 
     [EzIPC("Profile.DisableByUniqueId")]
     private readonly Func<Guid, int> _disableProfileByUniqueIdIpcFunc;
+
+    [EzIPC("Profile.SetPriorityByUniqueId")]
+    private readonly Func<Guid, int, int> _setPriorityByUniqueIdIpcFunc;
+
+    [EzIPC("Profile.SetStateByUniqueId")]
+    private readonly Func<Guid, bool, int, int> _setStateByUniqueIdIpcFunc;
 
     [EzIPC("Profile.GetActiveProfileIdOnCharacter")]
     private readonly Func<ushort, (int, Guid?)> _getActiveProfileIdOnCharacterIpcFunc;
@@ -91,6 +92,7 @@ public class IPCTestTab //: IDisposable
     private string? _targetCharacterName;
 
     private string _targetProfileId = "";
+    private int _targetProfilePriority = 0;
 
     private int _cutsceneActorIdx;
     private int _cutsceneActorParentIdx;
@@ -270,6 +272,9 @@ public class IPCTestTab //: IDisposable
         ImGui.Text("Profile Unique ID:");
         ImGui.SameLine();
         ImGui.InputText("##profileguid", ref _targetProfileId, 128);
+        ImGui.Text("Profile Priority:");
+        ImGui.SameLine();
+        ImGui.InputInt("##profilepriority", ref _targetProfilePriority);
 
         if (ImGui.Button("Get profile by Unique ID into clipboard"))
         {
@@ -328,6 +333,49 @@ public class IPCTestTab //: IDisposable
                 _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
             }
         }
+
+        if (ImGui.Button("Set profile priority by Unique ID"))
+        {
+            int result = _setPriorityByUniqueIdIpcFunc(Guid.Parse(_targetProfileId), _targetProfilePriority);
+            if (result == 0)
+            {
+                _popupSystem.ShowPopup(PopupSystem.Messages.IPCSetPriorityByIdDone);
+            }
+            else
+            {
+                _logger.Error($"Error code {result} while calling SetPriorityByUniqueId");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
+        }
+
+        if (ImGui.Button("Enable profile state by ID and Priority"))
+        {
+            int result = _setStateByUniqueIdIpcFunc(Guid.Parse(_targetProfileId), true, _targetProfilePriority);
+            if (result == 0)
+            {
+                _popupSystem.ShowPopup(PopupSystem.Messages.IPCSetStateByIdDone);
+            }
+            else
+            {
+                _logger.Error($"Error code {result} while calling SetProfileByUniqueId");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
+        }
+
+        if (ImGui.Button("Disable profile state by ID and priority"))
+        {
+            int result = _setStateByUniqueIdIpcFunc(Guid.Parse(_targetProfileId), false, _targetProfilePriority);
+            if (result == 0)
+            {
+                _popupSystem.ShowPopup(PopupSystem.Messages.IPCSetStateByIdDone);
+            }
+            else
+            {
+                _logger.Error($"Error code {result} while calling SetProfileByUniqueId");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
+        }
+
 
         if (ImGui.Button("DeleteTemporaryProfileByUniqueId"))
         {

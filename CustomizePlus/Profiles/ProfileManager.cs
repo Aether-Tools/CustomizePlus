@@ -1,34 +1,30 @@
-﻿using System;
+﻿using CustomizePlus.Armatures.Data;
+using CustomizePlus.Armatures.Events;
+using CustomizePlus.Configuration.Data;
+using CustomizePlus.Core.Events;
+using CustomizePlus.Core.Helpers;
+using CustomizePlus.Core.Services;
+using CustomizePlus.Game.Services;
+using CustomizePlus.GameData.Data;
+using CustomizePlus.GameData.Extensions;
+using CustomizePlus.Profiles.Data;
+using CustomizePlus.Profiles.Enums;
+using CustomizePlus.Profiles.Events;
+using CustomizePlus.Profiles.Exceptions;
+using CustomizePlus.Templates;
+using CustomizePlus.Templates.Data;
+using CustomizePlus.Templates.Events;
+using OtterGui.Classes;
+using OtterGui.Filesystem;
+using OtterGui.Log;
+using Penumbra.GameData.Actors;
+using Penumbra.GameData.Enums;
+using Penumbra.GameData.Interop;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Dalamud.Utility;
-using Newtonsoft.Json.Linq;
-using OtterGui.Log;
-using OtterGui.Filesystem;
-using Penumbra.GameData.Actors;
-using CustomizePlus.Core.Services;
-using CustomizePlus.Core.Helpers;
-using CustomizePlus.Armatures.Events;
-using CustomizePlus.Configuration.Data;
-using CustomizePlus.Armatures.Data;
-using CustomizePlus.Core.Events;
-using CustomizePlus.Templates;
-using CustomizePlus.Profiles.Data;
-using CustomizePlus.Templates.Events;
-using CustomizePlus.Profiles.Events;
-using CustomizePlus.Templates.Data;
-using CustomizePlus.GameData.Data;
-using CustomizePlus.GameData.Services;
-using CustomizePlus.GameData.Extensions;
-using CustomizePlus.Profiles.Enums;
-using CustomizePlus.Profiles.Exceptions;
-using Penumbra.GameData.Enums;
-using Penumbra.GameData.Interop;
-using System.Runtime.Serialization;
-using CustomizePlus.Game.Services;
 using System.Threading.Tasks;
-using OtterGui.Classes;
 
 namespace CustomizePlus.Profiles;
 
@@ -249,7 +245,7 @@ public partial class ProfileManager : IDisposable
 
         _event.Invoke(ProfileChanged.Type.Toggled, profile, value);
     }
-    
+   
     public void SetEnabled(Guid guid, bool value)
     {
         var profile = Profiles.FirstOrDefault(x => x.UniqueId == guid && x.ProfileType == ProfileType.Normal);
@@ -274,6 +270,27 @@ public partial class ProfileManager : IDisposable
         SaveProfile(profile);
 
         _event.Invoke(ProfileChanged.Type.PriorityChanged, profile, value);
+    }
+
+    public void SetPriority(Guid guid, int value)
+    {
+        var profile = Profiles.FirstOrDefault(x => x.UniqueId == guid && x.ProfileType == ProfileType.Normal);
+        if (profile != null)
+        {
+            SetPriority(profile, value);
+        }
+        else
+            throw new ProfileNotFoundException();
+    }
+
+    public void SetProfileState(Guid guid, bool state, int priority)
+    {
+        var profile = Profiles.FirstOrDefault(x => x.UniqueId == guid && x.ProfileType == ProfileType.Normal);
+        if (profile == null)
+            throw new ProfileNotFoundException();
+
+        SetEnabled(profile, state);
+        SetPriority(profile, priority);
     }
 
     public void DeleteTemplate(Profile profile, int templateIndex)

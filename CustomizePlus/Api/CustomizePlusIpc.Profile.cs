@@ -172,21 +172,21 @@ public partial class CustomizePlusIpc
     }
 
     /// <summary>
-    /// Sets the state of a profile by its Unique ID. Does not work on temporary profiles.
-    /// </summary>
-    [EzIPC("Profile.SetStateByUniqueId")]
-    private int SetProfileStateByUniqueId(Guid uniqueId, bool state, int priority)
-    {
-        return (int)SetProfileStateInternal(uniqueId, state, priority);
-    }
-
-    /// <summary>
     /// Set profile priority by Unique ID. Does not work on temporary profiles.
     /// </summary>
     [EzIPC("Profile.SetPriorityByUniqueId")]
     private int SetProfilePriorityByUniqueId(Guid uniqueId, int priority)
     {
         return (int)SetProfileStateInternal(uniqueId, priority);
+    }
+
+    /// <summary>
+    /// General purpose state changer for state and priority by its Unique ID. Does not work on temporary profiles.
+    /// </summary>
+    [EzIPC("Profile.SetStateByUniqueId")]
+    private int SetProfileStateByUniqueId(Guid uniqueId, bool state, int priority)
+    {
+        return (int)SetProfileStateInternal(uniqueId, state, priority);
     }
 
     private ErrorCode SetProfileStateInternal(Guid uniqueId, bool state, int priority)

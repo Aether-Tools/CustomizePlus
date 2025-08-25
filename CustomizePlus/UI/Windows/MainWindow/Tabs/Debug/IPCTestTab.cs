@@ -55,6 +55,12 @@ public class IPCTestTab //: IDisposable
     [EzIPC("Profile.DisableByUniqueId")]
     private readonly Func<Guid, int> _disableProfileByUniqueIdIpcFunc;
 
+    [EzIPC("Profile.SetPriorityByUniqueId")]
+    private readonly Func<Guid, int, int> _setPriorityByUniqueIdIpcFunc;
+
+    [EzIPC("Profile.SetProfileByUniqueId")]
+    private readonly Func<Guid, bool, int, int> _setProfileByUniqueIdIpcFunc;
+
     [EzIPC("Profile.GetActiveProfileIdOnCharacter")]
     private readonly Func<ushort, (int, Guid?)> _getActiveProfileIdOnCharacterIpcFunc;
 
@@ -91,6 +97,7 @@ public class IPCTestTab //: IDisposable
     private string? _targetCharacterName;
 
     private string _targetProfileId = "";
+    private int _targetProfilePriority = 0;
 
     private int _cutsceneActorIdx;
     private int _cutsceneActorParentIdx;
@@ -270,6 +277,9 @@ public class IPCTestTab //: IDisposable
         ImGui.Text("Profile Unique ID:");
         ImGui.SameLine();
         ImGui.InputText("##profileguid", ref _targetProfileId, 128);
+        ImGui.Text("Profile Priority:");
+        ImGui.SameLine();
+        ImGui.InputInt("##profilepriority", ref _targetProfilePriority);
 
         if (ImGui.Button("Get profile by Unique ID into clipboard"))
         {
@@ -328,6 +338,49 @@ public class IPCTestTab //: IDisposable
                 _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
             }
         }
+
+        if (ImGui.Button("Set profile priority by Unique ID"))
+        {
+            int result = _setPriorityByUniqueIdIpcFunc(Guid.Parse(_targetProfileId), _targetProfilePriority);
+            if (result == 0)
+            {
+                _popupSystem.ShowPopup(PopupSystem.Messages.IPCSetPriorityByIdDone);
+            }
+            else
+            {
+                _logger.Error($"Error code {result} while calling SetPriorityByUniqueId");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
+        }
+
+        if (ImGui.Button("Enable profile state by ID and Priority"))
+        {
+            int result = _setProfileByUniqueIdIpcFunc(Guid.Parse(_targetProfileId), true, _targetProfilePriority);
+            if (result == 0)
+            {
+                _popupSystem.ShowPopup(PopupSystem.Messages.IPCSetStateByIdDone);
+            }
+            else
+            {
+                _logger.Error($"Error code {result} while calling SetProfileByUniqueId");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
+        }
+
+        if (ImGui.Button("Disable profile state by ID and priority"))
+        {
+            int result = _setProfileByUniqueIdIpcFunc(Guid.Parse(_targetProfileId), false, _targetProfilePriority);
+            if (result == 0)
+            {
+                _popupSystem.ShowPopup(PopupSystem.Messages.IPCSetStateByIdDone);
+            }
+            else
+            {
+                _logger.Error($"Error code {result} while calling SetProfileByUniqueId");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
+        }
+
 
         if (ImGui.Button("DeleteTemporaryProfileByUniqueId"))
         {

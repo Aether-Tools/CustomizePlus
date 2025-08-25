@@ -12,6 +12,7 @@ using CustomizePlusPlus.Game.Services;
 using CustomizePlusPlus.Game.Services.GPose;
 using CustomizePlusPlus.Game.Services.GPose.ExternalTools;
 using CustomizePlusPlus.GameData.Services;
+using CustomizePlusPlus.Interop.Ipc;
 using CustomizePlusPlus.Profiles;
 using CustomizePlusPlus.Profiles.Events;
 using CustomizePlusPlus.Templates;
@@ -34,6 +35,7 @@ using OtterGui.Services;
 using Penumbra.GameData.Actors;
 using Penumbra.GameData.Interop;
 using Penumbra.GameData.Structs;
+using System.Collections.Generic;
 
 namespace CustomizePlusPlus.Core;
 
@@ -54,6 +56,7 @@ public static class ServiceManagerBuilder
             .AddTemplateServices()
             .AddProfileServices()
             .AddGameServices()
+            .AddInterop()
             .AddConfigServices()
             .AddDataLoaders()
             .AddApi();
@@ -143,6 +146,25 @@ public static class ServiceManagerBuilder
             .AddSingleton<FrameworkManager>()
             .AddSingleton<SupportLogBuilderService>()
             .AddSingleton<UserNotifierService>();
+
+        return services;
+    }
+
+    // might be scuffed, not sure
+    private static ServiceManager AddInterop(this ServiceManager services)
+    {
+        services
+            .AddSingleton<PenumbraIpcHandler>()
+            .AddSingleton<PcpService>()
+            .AddSingleton<IpcHandler>(provider =>
+            {
+                var subscribers = new List<IIpcSubscriber>
+                {
+                provider.GetRequiredService<PenumbraIpcHandler>(),
+                };
+
+                return new IpcHandler(subscribers);
+            });
 
         return services;
     }

@@ -124,6 +124,14 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
 
     public ProfileApplicationSettingsEntries ProfileApplicationSettings { get; set; } = new();
 
+    [Serializable]
+    public class ExternalSettingsEntries
+    {
+        public bool HandlePCPFiles { get; set; } = true;
+    }
+
+    public ExternalSettingsEntries ExternalSettings { get; set; } = new();
+
     [JsonIgnore]
     private readonly SaveService _saveService;
 

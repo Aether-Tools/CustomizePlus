@@ -58,6 +58,9 @@ public class BoneEditorPanel
 
     private readonly Stack<Dictionary<string, BoneTransform>> _undoStack = new();
     private readonly Stack<Dictionary<string, BoneTransform>> _redoStack = new();
+    private Dictionary<string, BoneTransform>? _pendingUndoSnapshot = null;
+    private float _initialX, _initialY, _initialZ;
+    private Vector3 _initialScale;
 
     private readonly HashSet<string> _favoriteBones = new();
     private int _favoriteListIdentifier = 0;
@@ -699,69 +702,110 @@ public class BoneEditorPanel
         using (var disabled = ImRaii.Disabled(!_isUnlocked))
         {
             ImGui.Dummy(new Vector2(CtrlHelper.IconButtonWidth * 0.75f, 0));
-
             ImGui.SameLine();
             ResetBoneButton(bone);
-
             ImGui.SameLine();
             RevertBoneButton(bone);
-
             ImGui.SameLine();
 
-            // NEW: Propagation checkbox
             if (PropagateCheckbox(bone, ref propagationEnabled))
                 valueChanged = true;
 
-            // change da X
+            // adjusted logic, should only snapshot if there is a change in the value.
+            //  change da X
             ImGui.TableNextColumn();
-            if (SingleValueSlider($"##{displayName}-X", ref newVector.X))
-                valueChanged = true;
-            if (ImGui.IsItemActivated() && !_editSnapshotTaken)
+            float tempX = newVector.X;
+            if (ImGui.IsItemActivated())
             {
-                SaveStateForUndo();
-                _editSnapshotTaken = true;
+                _initialX = tempX;
+                if (_pendingUndoSnapshot == null)
+                    _pendingUndoSnapshot = CaptureCurrentState();
+            }
+            if (SingleValueSlider($"##{displayName}-X", ref tempX))
+            {
+                newVector.X = tempX;
+                valueChanged = true;
             }
             if (ImGui.IsItemDeactivatedAfterEdit())
-                _editSnapshotTaken = false;
+            {
+                if (_pendingUndoSnapshot != null && _initialX != newVector.X)
+                {
+                    SaveStateForUndo(_pendingUndoSnapshot);
+                    _pendingUndoSnapshot = null;
+                }
+            }
 
-            // change da Y
+            //  change da Y
             ImGui.TableNextColumn();
-            if (SingleValueSlider($"##{displayName}-Y", ref newVector.Y))
-                valueChanged = true;
-            if (ImGui.IsItemActivated() && !_editSnapshotTaken)
+            float tempY = newVector.Y;
+            if (ImGui.IsItemActivated())
             {
-                SaveStateForUndo();
-                _editSnapshotTaken = true;
+                _initialY = tempY;
+                if (_pendingUndoSnapshot == null)
+                    _pendingUndoSnapshot = CaptureCurrentState();
+            }
+            if (SingleValueSlider($"##{displayName}-Y", ref tempY))
+            {
+                newVector.Y = tempY;
+                valueChanged = true;
             }
             if (ImGui.IsItemDeactivatedAfterEdit())
-                _editSnapshotTaken = false;
+            {
+                if (_pendingUndoSnapshot != null && _initialY != newVector.Y)
+                {
+                    SaveStateForUndo(_pendingUndoSnapshot);
+                    _pendingUndoSnapshot = null;
+                }
+            }
 
             //  change da Z
             ImGui.TableNextColumn();
-            if (SingleValueSlider($"##{displayName}-Z", ref newVector.Z))
-                valueChanged = true;
-            if (ImGui.IsItemActivated() && !_editSnapshotTaken)
+            float tempZ = newVector.Z;
+            if (ImGui.IsItemActivated())
             {
-                SaveStateForUndo();
-                _editSnapshotTaken = true;
+                _initialZ = tempZ;
+                if (_pendingUndoSnapshot == null)
+                    _pendingUndoSnapshot = CaptureCurrentState();
+            }
+            if (SingleValueSlider($"##{displayName}-Z", ref tempZ))
+            {
+                newVector.Z = tempZ;
+                valueChanged = true;
             }
             if (ImGui.IsItemDeactivatedAfterEdit())
-                _editSnapshotTaken = false;
+            {
+                if (_pendingUndoSnapshot != null && _initialZ != newVector.Z)
+                {
+                    SaveStateForUndo(_pendingUndoSnapshot);
+                    _pendingUndoSnapshot = null;
+                }
+            }
 
-            // scale
+            //  scale
             if (_editingAttribute != BoneAttribute.Scale)
                 ImGui.BeginDisabled();
 
             ImGui.TableNextColumn();
-            if (FullBoneSlider($"##{displayName}-All", ref newVector))
-                valueChanged = true;
-            if (ImGui.IsItemActivated() && !_editSnapshotTaken)
+            Vector3 tempScale = newVector;
+            if (ImGui.IsItemActivated())
             {
-                SaveStateForUndo();
-                _editSnapshotTaken = true;
+                _initialScale = tempScale;
+                if (_pendingUndoSnapshot == null)
+                    _pendingUndoSnapshot = CaptureCurrentState();
+            }
+            if (FullBoneSlider($"##{displayName}-All", ref tempScale))
+            {
+                newVector = tempScale;
+                valueChanged = true;
             }
             if (ImGui.IsItemDeactivatedAfterEdit())
-                _editSnapshotTaken = false;
+            {
+                if (_pendingUndoSnapshot != null && _initialScale != newVector)
+                {
+                    SaveStateForUndo(_pendingUndoSnapshot);
+                    _pendingUndoSnapshot = null;
+                }
+            }
 
             if (_editingAttribute != BoneAttribute.Scale)
                 ImGui.EndDisabled();
@@ -780,6 +824,7 @@ public class BoneEditorPanel
                 "\r\nIf you experience issues, try performing the same actions using posing tools.");
             ImGui.SameLine();
         }
+
         CtrlHelper.StaticLabel(displayName, CtrlHelper.TextAlignment.Left,
             BoneData.IsIVCSCompatibleBone(codename) ? $"(IVCS Compatible) {codename}" : codename);
 
@@ -804,7 +849,6 @@ public class BoneEditorPanel
             ImGui.TextUnformatted("★");
             ImGui.PopStyleColor();
 
-
             if (ImGui.IsItemHovered())
                 CtrlHelper.AddHoverText($"{boneFamily}");
         }
@@ -828,23 +872,25 @@ public class BoneEditorPanel
         ImGui.TableNextRow();
     }
 
-    private void SaveStateForUndo()
+    private Dictionary<string, BoneTransform> CaptureCurrentState()
     {
-        if (_editorManager.EditorProfile?.Armatures.Count > 0)
-        {
-            var snapshot = _editorManager.EditorProfile.Armatures[0]
+        return _editorManager.EditorProfile?.Armatures.Count > 0
+            ? _editorManager.EditorProfile.Armatures[0]
                 .GetAllBones()
                 .DistinctBy(b => b.BoneName)
                 .ToDictionary(
                     b => b.BoneName,
                     b => new BoneTransform(b.CustomizedTransform ?? new BoneTransform())
-                );
+                )
+            : new Dictionary<string, BoneTransform>();
+    }
 
-            if (_undoStack.Count == 0 || !snapshot.SequenceEqual(_undoStack.Peek()))
-            {
-                _undoStack.Push(snapshot);
-                _redoStack.Clear();
-            }
+    private void SaveStateForUndo(Dictionary<string, BoneTransform> snapshot)
+    {
+        if (_undoStack.Count == 0 || !_undoStack.Peek().SequenceEqual(snapshot))
+        {
+            _undoStack.Push(snapshot);
+            _redoStack.Clear();
         }
     }
 

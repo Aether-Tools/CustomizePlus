@@ -17,7 +17,6 @@ using Penumbra.GameData.Structs;
 using Penumbra.GameData.Enums;
 using CustomizePlus.Templates.Data;
 using CustomizePlus.Templates.Events;
-using OtterGui.Extensions;
 using Penumbra.GameData.Actors;
 using Penumbra.String;
 
@@ -171,6 +170,45 @@ public partial class CustomizePlusIpc
         return (int)SetProfileStateInternal(uniqueId, false);
     }
 
+    /// <summary>
+    /// Set profile priority by Unique ID. Does not work on temporary profiles.
+    /// </summary>
+    [EzIPC("Profile.SetPriorityByUniqueId")]
+    private int SetProfilePriorityByUniqueId(Guid uniqueId, int priority)
+    {
+        return (int)SetProfileStateInternal(uniqueId, priority);
+    }
+
+    /// <summary>
+    /// General purpose state changer for state and priority by its Unique ID. Does not work on temporary profiles.
+    /// </summary>
+    [EzIPC("Profile.SetStateByUniqueId")]
+    private int SetProfileStateByUniqueId(Guid uniqueId, bool state, int priority)
+    {
+        return (int)SetProfileStateInternal(uniqueId, state, priority);
+    }
+
+    private ErrorCode SetProfileStateInternal(Guid uniqueId, bool state, int priority)
+    {
+        if (uniqueId == Guid.Empty)
+            return ErrorCode.ProfileNotFound;
+
+        try
+        {
+            _profileManager.SetProfileState(uniqueId, state, priority);
+            return ErrorCode.Success;
+        }
+        catch (ProfileNotFoundException)
+        {
+            return ErrorCode.ProfileNotFound;
+        }
+        catch (Exception ex)
+        {
+            _logger.Error($"Exception in SetProfileStateInternal. Unique id: {uniqueId}, state: {state}, priority: {priority}, exception: {ex}.");
+            return ErrorCode.UnknownError;
+        }
+    }
+
     private ErrorCode SetProfileStateInternal(Guid uniqueId, bool state)
     {
         if (uniqueId == Guid.Empty)
@@ -181,13 +219,34 @@ public partial class CustomizePlusIpc
             _profileManager.SetEnabled(uniqueId, state);
             return ErrorCode.Success;
         }
-        catch (ProfileNotFoundException ex)
+        catch (ProfileNotFoundException)
         {
             return ErrorCode.ProfileNotFound;
         }
         catch (Exception ex)
         {
             _logger.Error($"Exception in SetProfileStateInternal. Unique id: {uniqueId}, state: {state}, exception: {ex}.");
+            return ErrorCode.UnknownError;
+        }
+    }
+
+    private ErrorCode SetProfileStateInternal(Guid uniqueId, int priority)
+    {
+        if (uniqueId == Guid.Empty)
+            return ErrorCode.ProfileNotFound;
+
+        try
+        {
+            _profileManager.SetPriority(uniqueId, priority);
+            return ErrorCode.Success;
+        }
+        catch (ProfileNotFoundException)
+        {
+            return ErrorCode.ProfileNotFound;
+        }
+        catch (Exception ex)
+        {
+            _logger.Error($"Exception in SetProfileStateInternal. Unique id: {uniqueId}, priority: {priority}, exception: {ex}.");
             return ErrorCode.UnknownError;
         }
     }

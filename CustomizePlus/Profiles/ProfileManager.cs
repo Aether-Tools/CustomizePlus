@@ -253,12 +253,10 @@ public partial class ProfileManager : IDisposable
     public void SetEnabled(Guid guid, bool value)
     {
         var profile = Profiles.FirstOrDefault(x => x.UniqueId == guid && x.ProfileType == ProfileType.Normal);
-        if (profile != null)
-        {
-            SetEnabled(profile, value);
-        }
-        else
+        if (profile == null)
             throw new ProfileNotFoundException();
+
+        SetEnabled(profile, value);
     }
 
     public void SetPriority(Profile profile, int value)
@@ -274,6 +272,26 @@ public partial class ProfileManager : IDisposable
         SaveProfile(profile);
 
         _event.Invoke(ProfileChanged.Type.PriorityChanged, profile, value);
+    }
+
+    public void SetPriority(Guid guid, int value)
+    {
+        var profile = Profiles.FirstOrDefault(x => x.UniqueId == guid && x.ProfileType == ProfileType.Normal);
+        if (profile == null)
+            throw new ProfileNotFoundException();
+
+        SetPriority(profile, value);
+    }
+
+    public void SetProfileState(Guid guid, bool state, int priority)
+    {
+        var profile = Profiles.FirstOrDefault(x => x.UniqueId == guid && x.ProfileType == ProfileType.Normal);
+        if (profile == null)
+            throw new ProfileNotFoundException();
+        // could do the checks for priority and enabled state in here to avoid a double save,
+        // but assume this is more preferred for clarity.
+        SetEnabled(profile, state);
+        SetPriority(profile, priority);
     }
 
     public void DeleteTemplate(Profile profile, int templateIndex)

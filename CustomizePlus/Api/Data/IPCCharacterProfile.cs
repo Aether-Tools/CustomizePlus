@@ -37,7 +37,10 @@ public class IPCCharacterProfile
                 {
                     Translation = kvPair.Value.Translation,
                     Rotation = kvPair.Value.Rotation,
-                    Scaling = kvPair.Value.Scaling
+                    Scaling = kvPair.Value.Scaling,
+                    PropagateTranslation = kvPair.Value.PropagateTranslation,
+                    PropagateRotation = kvPair.Value.PropagateRotation,
+                    PropagateScale = kvPair.Value.PropagateScale
                 };
             }
         }
@@ -71,7 +74,15 @@ public class IPCCharacterProfile
 
         foreach (var kvPair in profile.Bones)
             template.Bones.Add(kvPair.Key,
-                new BoneTransform { Translation = kvPair.Value.Translation, Rotation = kvPair.Value.Rotation, Scaling = kvPair.Value.Scaling });
+                new BoneTransform
+                {
+                    Translation = kvPair.Value.Translation,
+                    Rotation = kvPair.Value.Rotation,
+                    Scaling = kvPair.Value.Scaling,
+                    PropagateTranslation = kvPair.Value.PropagateTranslation,
+                    PropagateRotation = kvPair.Value.PropagateRotation,
+                    PropagateScale = kvPair.Value.PropagateScale
+                });
 
         fullProfile.Templates.Add(template);
 

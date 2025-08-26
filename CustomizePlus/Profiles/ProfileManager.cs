@@ -250,13 +250,22 @@ public partial class ProfileManager : IDisposable
         _event.Invoke(ProfileChanged.Type.Toggled, profile, value);
     }
     
-    public void SetEnabled(Guid guid, bool value)
+    public void SetEnabled(Guid profileId, bool value)
     {
-        var profile = Profiles.FirstOrDefault(x => x.UniqueId == guid && x.ProfileType == ProfileType.Normal);
+        var profile = Profiles.FirstOrDefault(x => x.UniqueId == profileId && x.ProfileType == ProfileType.Normal);
+
         if (profile != null)
-        {
             SetEnabled(profile, value);
-        }
+        else
+            throw new ProfileNotFoundException();
+    }
+
+    public void SetPriority(Guid profileId, int value)
+    {
+        var profile = Profiles.FirstOrDefault(x => x.UniqueId == profileId && x.ProfileType == ProfileType.Normal);
+
+        if (profile != null)
+            SetPriority(profile, value);
         else
             throw new ProfileNotFoundException();
     }

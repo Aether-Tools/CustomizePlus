@@ -19,6 +19,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Windows.Forms;
+using static CustomizePlus.Core.Data.BoneData;
+using static FFXIVClientStructs.FFXIV.Client.UI.Misc.MinionListModule.Delegates;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 
@@ -55,7 +57,6 @@ public class BoneEditorPanel
 
     // favorite bone stuff
     private HashSet<string> _favoriteBones;
-    private int _favoriteListIdentifier = 0;
 
     private string? _pendingClipboardText;
     private string? _pendingImportText;
@@ -287,7 +288,7 @@ public class BoneEditorPanel
 
             ImGui.Separator();
 
-            using (var table = ImRaii.Table($"BoneEditorContents##{_favoriteListIdentifier}", 6, ImGuiTableFlags.BordersOuterH | ImGuiTableFlags.BordersV | ImGuiTableFlags.ScrollY))
+            using (var table = ImRaii.Table($"BoneEditorContents", 6, ImGuiTableFlags.BordersOuterH | ImGuiTableFlags.BordersV | ImGuiTableFlags.ScrollY))
             {
                 if (!table)
                     return;
@@ -297,7 +298,7 @@ public class BoneEditorPanel
                 var col3Label = _editingAttribute == BoneAttribute.Rotation ? "Yaw" : "Z";
                 var col4Label = _editingAttribute == BoneAttribute.Scale ? "All" : "N/A";
 
-                ImGui.TableSetupColumn("Bones", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthFixed, 4 * CtrlHelper.IconButtonWidth);
+                ImGui.TableSetupColumn("Bones", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthFixed, 5 * CtrlHelper.IconButtonWidth);
 
                 ImGui.TableSetupColumn($"{col1Label}", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthStretch);
                 ImGui.TableSetupColumn($"{col2Label}", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthStretch);
@@ -625,6 +626,38 @@ public class BoneEditorPanel
         return output;
     }
 
+    private bool FavoriteButton(EditRowParams bone)
+    {
+        var isFavorite = _favoriteBones.Contains(bone.BoneCodeName);
+
+        const FontAwesomeIcon icon = FontAwesomeIcon.Star;
+        var id = $"##Favorite{bone.BoneCodeName}";
+
+        if (isFavorite)
+            ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Active);
+
+        var output = ImGuiComponents.IconButton(id, icon);
+
+        if (isFavorite)
+            ImGui.PopStyleColor();
+
+        CtrlHelper.AddHoverText(
+            $"Toggle favorite on '{BoneData.GetBoneDisplayName(bone.BoneCodeName)}' bone");
+
+        if (output)
+        {
+            if (isFavorite)
+                _favoriteBones.Remove(bone.BoneCodeName);
+            else
+                _favoriteBones.Add(bone.BoneCodeName);
+
+            _configuration.EditorConfiguration.FavoriteBones = _favoriteBones.ToHashSet();
+            _configuration.Save();
+        }
+
+        return isFavorite;
+    }
+
     private bool FullBoneSlider(string label, ref Vector3 value)
     {
         var velocity = _editingAttribute == BoneAttribute.Rotation ? 0.1f : 0.001f;
@@ -672,7 +705,6 @@ public class BoneEditorPanel
         var codename = bone.BoneCodeName;
         var displayName = bone.BoneDisplayName;
         var transform = new BoneTransform(bone.Transform);
-        var isFavorite = _favoriteBones.Contains(codename);
 
         var newVector = _editingAttribute switch
         {
@@ -690,6 +722,8 @@ public class BoneEditorPanel
 
         bool valueChanged = false;
 
+        bool isFavorite = false;
+
         using var id = ImRaii.PushId(codename);
         ImGui.TableNextColumn();
         using (var disabled = ImRaii.Disabled(!_isUnlocked))
@@ -703,6 +737,9 @@ public class BoneEditorPanel
 
             if (PropagateCheckbox(bone, ref propagationEnabled))
                 valueChanged = true;
+
+            ImGui.SameLine();
+            isFavorite = FavoriteButton(bone);
 
             // adjusted logic, should only snapshot if there is a change in the value.
             // change da X
@@ -818,36 +855,8 @@ public class BoneEditorPanel
             ImGui.SameLine();
         }
 
-        CtrlHelper.StaticLabel(displayName, CtrlHelper.TextAlignment.Left,
+        CtrlHelper.StaticLabel(!isFavorite ? displayName : $"{displayName} ({boneFamily})", CtrlHelper.TextAlignment.Left,
             BoneData.IsIVCSCompatibleBone(codename) ? $"(IVCS Compatible) {codename}" : codename);
-
-        if (ImGui.BeginPopupContextItem($"bonecontext_{codename}"))
-        {
-            if (ImGui.MenuItem(isFavorite ? "Unfavorite" : "Favorite"))
-            {
-                if (isFavorite)
-                    _favoriteBones.Remove(codename);
-                else
-                    _favoriteBones.Add(codename);
-
-                _configuration.EditorConfiguration.FavoriteBones = new HashSet<string>(_favoriteBones);
-                _configuration.Save();
-
-                _favoriteListIdentifier++;
-            }
-            ImGui.EndPopup();
-        }
-
-        if (isFavorite)
-        {
-            ImGui.SameLine();
-            ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Favorite);
-            ImGui.TextUnformatted("★");
-            ImGui.PopStyleColor();
-
-            if (ImGui.IsItemHovered())
-                CtrlHelper.AddHoverText($"{boneFamily}");
-        }
 
         if (valueChanged)
         {

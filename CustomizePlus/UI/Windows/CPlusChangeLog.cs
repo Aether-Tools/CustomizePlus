@@ -31,6 +31,7 @@ public class CPlusChangeLog
         Add2_0_7_16(Changelog);
         Add2_0_7_23(Changelog);
         Add2_0_7_27(Changelog);
+        Add2_0_7_x(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -46,10 +47,13 @@ public class CPlusChangeLog
     private static void Add2_0_7_x(Changelog log)
         => log.NextVersion("Version 2.0.7.x")
         .RegisterHighlight("Added support for Penumbra PCP files. (by abelfreyja)")
+        .RegisterEntry("This feature is enabled by default and can be disabled in Settings -> Integrations menu.", 1)
+        .RegisterHighlight("Added bone edits propagation. (by d87)")
+        .RegisterEntry("This feature might not work correctly with some bones.", 1)
         .RegisterEntry("Added search filter and undo/redo functionality during bone editing. (by abelfreyja)")
-        .RegisterEntry("Added the ability to copy bone groups to clipboard and import them, also reverted undo/redo changes. (by abelfreyja)")
-        .RegisterEntry("Added the ability to have favorite bones. (by abelfreyja)")
-        .RegisterEntry("Added bone edits propagation. (by d87)");
+        .RegisterEntry("Added the ability to copy bone groups to clipboard and import them. (by abelfreyja)")
+        .RegisterEntry("Right click on group name to access this functionality.", 1)
+        .RegisterEntry("Added the ability to have favorite bones. (by abelfreyja and Risa)");
 
     private static void Add2_0_7_27(Changelog log)
         => log.NextVersion("Version 2.0.7.27")

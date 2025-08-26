@@ -634,7 +634,7 @@ public class BoneEditorPanel
         var id = $"##Favorite{bone.BoneCodeName}";
 
         if (isFavorite)
-            ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Active);
+            ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Favorite);
 
         var output = ImGuiComponents.IconButton(id, icon);
 

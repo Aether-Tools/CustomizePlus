@@ -55,6 +55,9 @@ public class IPCTestTab //: IDisposable
     [EzIPC("Profile.DisableByUniqueId")]
     private readonly Func<Guid, int> _disableProfileByUniqueIdIpcFunc;
 
+    [EzIPC("Profile.SetPriorityByUniqueId")]
+    private readonly Func<Guid, int, int> _setPriorityByUniqueIdIpcFunc;
+
     [EzIPC("Profile.GetActiveProfileIdOnCharacter")]
     private readonly Func<ushort, (int, Guid?)> _getActiveProfileIdOnCharacterIpcFunc;
 
@@ -91,6 +94,7 @@ public class IPCTestTab //: IDisposable
     private string? _targetCharacterName;
 
     private string _targetProfileId = "";
+    private int _targetProfilePriority = 0;
 
     private int _cutsceneActorIdx;
     private int _cutsceneActorParentIdx;
@@ -329,6 +333,28 @@ public class IPCTestTab //: IDisposable
             }
         }
 
+        ImGui.Separator();
+
+        ImGui.Text("Profile priority:");
+        ImGui.SameLine();
+        ImGui.InputInt("##profilepriority", ref _targetProfilePriority);
+
+        if (ImGui.Button("Set profile priority by Unique ID"))
+        {
+            int result = _setPriorityByUniqueIdIpcFunc(Guid.Parse(_targetProfileId), _targetProfilePriority);
+            if (result == 0)
+            {
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionDone);
+            }
+            else
+            {
+                _logger.Error($"Error code {result} while calling SetPriorityByUniqueId");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
+        }
+
+        ImGui.Separator();
+
         if (ImGui.Button("DeleteTemporaryProfileByUniqueId"))
         {
             var actors = _gameObjectService.FindActorsByName(_targetCharacterName).ToList();
@@ -370,6 +396,8 @@ public class IPCTestTab //: IDisposable
                 _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
             }
         }
+
+        ImGui.Separator();
 
         ImGui.Text("Cutscene actor index:");
         ImGui.SameLine();

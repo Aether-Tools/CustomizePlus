@@ -1,25 +1,26 @@
-﻿using CustomizePlus.Profiles.Enums;
+﻿using CustomizePlus.Api.Data;
+using CustomizePlus.Api.Enums;
+using CustomizePlus.Armatures.Data;
+using CustomizePlus.Armatures.Events;
+using CustomizePlus.Core.Extensions;
+using CustomizePlus.GameData.Extensions;
+using CustomizePlus.Profiles.Data;
+using CustomizePlus.Profiles.Enums;
+using CustomizePlus.Profiles.Exceptions;
+using CustomizePlus.Templates.Data;
+using CustomizePlus.Templates.Events;
+using Dalamud.Game.ClientState.Objects.Types;
+using ECommonsLite.EzIpcManager;
+using Newtonsoft.Json;
+using OtterGui.Extensions;
+using Penumbra.GameData.Actors;
+using Penumbra.GameData.Enums;
+using Penumbra.GameData.Structs;
+using Penumbra.String;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ECommonsLite.EzIpcManager;
-using Newtonsoft.Json;
-using CustomizePlus.Api.Data;
-using CustomizePlus.Api.Enums;
-using CustomizePlus.Profiles.Exceptions;
-using CustomizePlus.Profiles.Data;
-using CustomizePlus.Core.Extensions;
-using CustomizePlus.Armatures.Data;
-using CustomizePlus.Armatures.Events;
-using CustomizePlus.GameData.Extensions;
-using Dalamud.Game.ClientState.Objects.Types;
-using Penumbra.GameData.Structs;
-using Penumbra.GameData.Enums;
-using CustomizePlus.Templates.Data;
-using CustomizePlus.Templates.Events;
-using OtterGui.Extensions;
-using Penumbra.GameData.Actors;
-using Penumbra.String;
+using static System.Windows.Forms.AxHost;
 
 namespace CustomizePlus.Api;
 
@@ -189,6 +190,31 @@ public partial class CustomizePlusIpc
         {
             _logger.Error($"Exception in SetProfileStateInternal. Unique id: {uniqueId}, state: {state}, exception: {ex}.");
             return ErrorCode.UnknownError;
+        }
+    }
+
+    /// <summary>
+    /// Set profile priority by Unique ID. Does not work on temporary profiles.
+    /// </summary>
+    [EzIPC("Profile.SetPriorityByUniqueId")]
+    private int SetProfilePriorityByUniqueId(Guid uniqueId, int priority)
+    {
+        if (uniqueId == Guid.Empty)
+            return (int)ErrorCode.ProfileNotFound;
+
+        try
+        {
+            _profileManager.SetPriority(uniqueId, priority);
+            return (int)ErrorCode.Success;
+        }
+        catch (ProfileNotFoundException ex)
+        {
+            return (int)ErrorCode.ProfileNotFound;
+        }
+        catch (Exception ex)
+        {
+            _logger.Error($"Exception in SetProfilePriorityByUniqueId. Unique id: {uniqueId}, priority: {priority}, exception: {ex}.");
+            return (int)ErrorCode.UnknownError;
         }
     }
 

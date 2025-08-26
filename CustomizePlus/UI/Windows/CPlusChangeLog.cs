@@ -31,7 +31,7 @@ public class CPlusChangeLog
         Add2_0_7_16(Changelog);
         Add2_0_7_23(Changelog);
         Add2_0_7_27(Changelog);
-        Add2_0_7_x(Changelog);
+        //Add2_0_7_x(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -53,7 +53,9 @@ public class CPlusChangeLog
         .RegisterEntry("Added search filter and undo/redo functionality during bone editing. (by abelfreyja)")
         .RegisterEntry("Added the ability to copy bone groups to clipboard and import them. (by abelfreyja)")
         .RegisterEntry("Right click on group name to access this functionality.", 1)
-        .RegisterEntry("Added the ability to have favorite bones. (by abelfreyja and Risa)");
+        .RegisterEntry("Added the ability to have favorite bones. (by abelfreyja and Risa)")
+        .RegisterEntry("IPC version updated to 6.3.")
+        .RegisterEntry("Added Profile.SetPriorityByUniqueId IPC endpoint. (by CordeliaMist)", 1);
 
     private static void Add2_0_7_27(Changelog log)
         => log.NextVersion("Version 2.0.7.27")

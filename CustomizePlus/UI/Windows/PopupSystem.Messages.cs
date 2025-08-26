@@ -1,5 +1,4 @@
-﻿using CustomizePlus.Core.Services.Dalamud;
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace CustomizePlus.UI.Windows;
 
@@ -20,6 +19,8 @@ public partial class PopupSystem
         public const string IPCSuccessfullyExecuted = "ipc_successfully_executed";
         public const string IPCEnableProfileByIdDone = "ipc_enable_profile_by_id_done";
         public const string IPCDisableProfileByIdDone = "ipc_disable_profile_by_id_done";
+        public const string IPCSetPriorityByIdDone = "ipc_set_priority_by_id_done";
+        public const string IPCSetStateByIdDone = "ipc_set_state_by_id_done";
 
         public const string TemplateEditorActiveWarning = "template_editor_active_warn";
         public const string ClipboardDataUnsupported = "clipboard_data_unsupported_version";

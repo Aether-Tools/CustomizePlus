@@ -25,7 +25,7 @@ using Penumbra.GameData.Structs;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 
-//todo: buttons for Profile.GetTemplates, Profile.EnableTemplateByUniqueId, Profile.DisableTemplateByUniqueId
+//todo: buttons for Profile.EnableTemplateByUniqueId, Profile.DisableTemplateByUniqueId, Profile.SetPriorityByUniqueId
 public class IPCTestTab //: IDisposable
 {
     private const string _ownedTesProfile = "{\"Bones\":{\"n_root\":{\"Translation\":{\"X\":0.0,\"Y\":0.0,\"Z\":0.0},\"Rotation\":{\"X\":0.0,\"Y\":0.0,\"Z\":0.0},\"Scaling\":{\"X\":2.0,\"Y\":2.0,\"Z\":2.0}}}}";
@@ -78,6 +78,9 @@ public class IPCTestTab //: IDisposable
 
     [EzIPC("Profile.GetByUniqueId")]
     private readonly Func<Guid, (int, string?)> _getProfileByIdIpcFunc;
+
+    [EzIPC("Profile.GetTemplates")]
+    private readonly Func<Guid, (int, List<IPCTemplateStatusTuple>?)> _getProfileTemplatesIpcFunc;
 
     [EzIPC("GameState.GetCutsceneParentIndex")]
     private readonly Func<int, int> _getCutsceneParentIdxIpcFunc;
@@ -393,6 +396,28 @@ public class IPCTestTab //: IDisposable
             else
             {
                 _logger.Error($"Error code {result} while calling RemovePlayerCharacter");
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            }
+        }
+
+        ImGui.Separator();
+
+        if (ImGui.Button("Copy list of templates in profile to clipboard"))
+        {
+            var result = _getProfileTemplatesIpcFunc(Guid.Parse(_targetProfileId));
+
+            if (result.Item1 == 0)
+            {
+                ImGui.SetClipboardText(string.Join("\n",
+                result.Item2!.Select(x => $"{x.UniqueId}, {x.Name}, {x.IsEnabled}," +
+                    $"|| {string.Join("|", x.Bones
+                    .Select(bone => $"{bone.Name}, {bone.Translation} ({bone.PropagateTranslation}), {bone.Rotation} ({bone.PropagateRotation}), {bone.Scale} ({bone.PropagateScale})"))}")));
+
+                _popupSystem.ShowPopup(PopupSystem.Messages.ActionDone);
+            }
+            else
+            {
+                _logger.Error($"Error code {result} while calling Profile.GetTemplates");
                 _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
             }
         }

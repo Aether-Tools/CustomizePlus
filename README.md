@@ -11,17 +11,15 @@ Then search for Customize+ in the plugin manager.
 ## FAQ
 
 ### I need help with using Customize+!
-You can try finding it in support discord server run by volunteers: [Aetherworks](https://discord.gg/KvGJCCnG8t). **Do not ask for help or support in issues section on GitHub.**
-
-⚠ Please note that at the current time the developers do not actively participate in support or discussions on that server.
+Please ask your question at support discord server run by our community: [Aetherworks](https://discord.gg/KvGJCCnG8t). **Do not ask for help or support in issues section on GitHub.**
 
 ### How do I report a bug in Customize+ or leave a suggestion?
-First we ask you join [Aetherworks Discord server](https://discord.gg/KvGJCCnG8t) and consult with volunteer support team about your issue first. It's highly likely that you are not experiencing a bug in Customize+.
+First we ask you join [Aetherworks Discord server](https://discord.gg/KvGJCCnG8t) and consult with community support team about your issue first. It's highly likely that you are not experiencing a bug in Customize+.
 
 Before reporting bug or leaving a suggestion in this GitHub you need to **carefully** read [issue creation guidelines](https://github.com/Aether-Tools/CustomizePlus/issues/11).
 
 ### When will Customize+ be updated?
-This plugin is being worked on when developers have free time and have a desire to do so, therefore update schedule does not exist. Real life and paid employment take priority over this project.
+The updates are released when someone decides to contribute new feature or fix some bug. Please understand that real life and paid employment take priority over this project.
 
 ### IPC
 Customize+ provides IPC for integrations with other plugins. We have opted for inline documentation, so please head over to `CustomizePlus/Api` directory and check source code files to see what kind of functionality is provided.
@@ -29,9 +27,13 @@ Customize+ provides IPC for integrations with other plugins. We have opted for i
 ## Contributing
 **This is important, please read before contributing.**
 
-Before you contribute your code and features we would like to ask you to first discuss your ideas with us so you don't spend your time making something that possibly won't be accepted. It is possible that your idea might be either out of scope for this project or we have a specific vision for how it should be implemented. You can do that in free form using Issues section.
+We believe that letting community help develop the plugin greatly benefits it, but we have several things which we would like everyone to be aware of:
 
-We expect contributed code to adhere to the code style of already existing code and be reasonably well tested. We kindly ask you to be ready to make changes to the code in your Pull Requests if we feel like it needs to be changed.
+* Since Customize+ is one of the major plugins in Dalamud ecosystem some parts of the code should be modified with big care.
+	* We suggest you to consult with fellow community developers over at Aetherworks Discord server before changing anything related to plugin's core functionality and modifying existing IPC endpoints.
+* Our main priority is to not introduce breaking changes unless absolutely necessary. That includes implementing things in a future-proof way when possible. Non-transferrable data (settings, templates and profiles) should be preserved when upgrading to next plugin release no matter the changes in data structures.
+* Since a lot of our UI code is based on Glamourer and OtterGui, we are trying to to keep our UI implementation in line with the way UI is implemented in Glamourer. This gives us an advantage of occasionally getting new UI functionality without doing much changes on our side, but requires us to periodically check Glamourer code for changes in the UI code.
+* We expect contributed code to adhere to the code style of already existing code and be reasonably well tested (i.e. not break existing functionality and, well, actually work). We kindly ask you to be ready to make changes to the code in your Pull Requests if we feel like it needs to be changed.
 
 ## Development team
 * [Risa](https://github.com/RisaDev/) - Author and Lead Developer.
@@ -40,11 +42,11 @@ We expect contributed code to adhere to the code style of already existing code 
 * User interface and general plugin architecture is heavily based on the code written as a part of [Glamourer](https://github.com/Ottermandias/Glamourer) and [OtterGui](https://github.com/Ottermandias/OtterGui/) projects. Original code is licensed under Apache License 2.0.
 * Some of the game object interaction code is copied from [Penumbra](https://github.com/xivdev/Penumbra) and [Glamourer](https://github.com/Ottermandias/Glamourer) projects in order to make Customize+ not rely on Penumbra being installed.
 * GitHub workflows have been taken from [Glamourer](https://github.com/Ottermandias/Glamourer) project.
-* Customize+ makes use of code from [ECommons](https://github.com/NightmareXIV/ECommons) library for IPC functionality.
+* Customize+ is using code from [ECommons](https://github.com/NightmareXIV/ECommons) library for IPC functionality.
 * Some of the bone manipulation code was taken from [Ktisis](https://github.com/ktisis-tools/Ktisis).
-* [Dalamud](https://github.com/goatcorp/Dalamud) team for making plugins possible at all.
-* Special thanks goes to Yuki, Phenrei, Stoia, dendr01d and others for developing and maintaining original version of Customize+.
-* Everyone who contributed code and features through pull requests.
+* Thanks to [Dalamud](https://github.com/goatcorp/Dalamud) team for making plugins possible at all.
+* Special thanks goes to Yuki, Phenrei, Stoia, dendr01d and others for developing and maintaining original (1.0) version of Customize+.
+* Thank you to everyone who contributed new features and bug fixes through pull requests.
 
 ## License
 All files in this repository are licensed under the license listed in LICENSE.md file unless stated otherwise. By contributing the code into this repository you agreeing with licensing submitted code under this license.

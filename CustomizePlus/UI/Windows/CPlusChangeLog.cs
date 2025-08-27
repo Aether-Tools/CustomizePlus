@@ -55,7 +55,8 @@ public class CPlusChangeLog
         .RegisterEntry("Right click on group name to access this functionality.", 1)
         .RegisterEntry("Added the ability to have favorite bones. (by abelfreyja and Risa)")
         .RegisterEntry("IPC version updated to 6.3.")
-        .RegisterEntry("Added Profile.SetPriorityByUniqueId IPC endpoint. (by CordeliaMist)", 1);
+        .RegisterEntry("Added Profile.SetPriorityByUniqueId IPC endpoint. (by CordeliaMist)", 1)
+        .RegisterEntry("Bone propagation settings are now returned where applicable. (by abelfreyja)", 1);
 
     private static void Add2_0_7_27(Changelog log)
         => log.NextVersion("Version 2.0.7.27")

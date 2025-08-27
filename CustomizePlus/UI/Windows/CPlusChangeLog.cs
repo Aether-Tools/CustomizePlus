@@ -31,7 +31,7 @@ public class CPlusChangeLog
         Add2_0_7_16(Changelog);
         Add2_0_7_23(Changelog);
         Add2_0_7_27(Changelog);
-        Add2_0_7_30(Changelog);
+        Add2_0_8_0(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -44,8 +44,8 @@ public class CPlusChangeLog
         _config.Save();
     }
 
-    private static void Add2_0_7_30(Changelog log)
-        => log.NextVersion("Version 2.0.7.30")
+    private static void Add2_0_8_0(Changelog log)
+        => log.NextVersion("Version 2.0.8.0")
         .RegisterHighlight("Added support for Penumbra PCP files. (by abelfreyja)")
         .RegisterEntry("This feature is enabled by default and can be disabled in Settings -> Integrations menu.", 1)
         .RegisterHighlight("Added bone edits propagation. (by d87)")

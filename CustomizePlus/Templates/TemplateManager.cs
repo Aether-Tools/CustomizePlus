@@ -235,9 +235,14 @@ public class TemplateManager : IDisposable
                 _event.Invoke(TemplateChanged.Type.DeletedBone, template, boneName);
             }
 
+            return true;
         }
         else
         {
+
+            if (!transform.IsEdited())
+                return false;
+
             template.Bones[boneName] = new BoneTransform(transform);
 
             _logger.Debug($"Created bone {boneName} on {template.Name}");

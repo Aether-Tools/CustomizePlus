@@ -45,15 +45,9 @@ public class ConfigurationMigrator
             return;
 
         //We no longer support migrations of any versions < 4
-        if (configVersion < 3)
-        {
-            _messageService.NotificationMessage($"Unable to migrate your Customize+ configuration because it is too old. Manually install latest version of Customize+ 1.x to migrate your configuration to supported version first.", NotificationType.Error);
-            return;
-        }
-
         if (configVersion < 4)
         {
-            _messageService.NotificationMessage($"Unable to migrate your Customize+ configuration because it is too old. Manually install Customize+ 2.0.6.5 to migrate your configuration to supported version first.", NotificationType.Error);
+            _messageService.NotificationMessage("Unsupported version of Customize+ configuration data detected. Check FAQ over at https://github.com/Aether-Tools/CustomizePlus for information.", NotificationType.Error);
             return;
         }
 

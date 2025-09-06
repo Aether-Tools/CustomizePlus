@@ -93,7 +93,7 @@ public partial class ProfileManager : IDisposable
 
         CreateProfileFolder(saveService);
 
-        _reverseNameDicts.Awaiter.ContinueWith(_ => LoadProfiles(), TaskScheduler.Default);
+        LoadProfiles();
     }
 
     public void Dispose()

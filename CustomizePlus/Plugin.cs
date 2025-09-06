@@ -28,6 +28,7 @@ public sealed class Plugin : IDalamudPlugin
             InteropAlloc.Init();
 
             _services = ServiceManagerBuilder.CreateProvider(pluginInterface, Logger);
+            _services.EnsureRequiredServices();
 
             _services.GetService<IpcHandler>().Initialize();
             _services.GetService<PcpService>();

@@ -1,18 +1,19 @@
 ﻿using CustomizePlus.Profiles.Data;
 using CustomizePlus.Profiles.Events;
-using CustomizePlus.Templates.Data;
 using CustomizePlus.Templates;
+using CustomizePlus.Templates.Data;
+using Dalamud.Game.ClientState.Objects.Enums;
 using Newtonsoft.Json.Linq;
 using OtterGui.Classes;
 using Penumbra.GameData.Actors;
+using Penumbra.GameData.Gui;
+using Penumbra.GameData.Structs;
+using Penumbra.String;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Penumbra.String;
-using Penumbra.GameData.Structs;
-using Dalamud.Game.ClientState.Objects.Enums;
-using Penumbra.GameData.Gui;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace CustomizePlus.Profiles;
@@ -22,6 +23,11 @@ public partial class ProfileManager : IDisposable
     public void LoadProfiles()
     {
         _logger.Information("Loading profiles...");
+
+        _logger.Debug("[LoadProfiles] Awaiting reverse name dicts...");
+        _reverseNameDicts.Awaiter.Wait();
+
+        _logger.Debug("[LoadProfiles] Started profile loading...");
 
         //todo: hot reload was not tested
         //save temp profiles

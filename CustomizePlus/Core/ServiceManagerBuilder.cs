@@ -198,7 +198,8 @@ public static class ServiceManagerBuilder
     {
         services
             .AddSingleton<GameObjectService>()
-            .AddSingleton<GameStateService>();
+            .AddSingleton<GameStateService>()
+            .AddSingleton<EmoteService>();
 
         return services;
     }

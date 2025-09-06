@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using CustomizePlus.Armatures.Data;
+﻿using CustomizePlus.Armatures.Data;
 using CustomizePlus.Armatures.Events;
 using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Extensions;
@@ -19,6 +15,10 @@ using OtterGui.Log;
 using Penumbra.GameData.Actors;
 using Penumbra.GameData.Enums;
 using Penumbra.GameData.Interop;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
 
 namespace CustomizePlus.Armatures.Services;
 
@@ -35,6 +35,7 @@ public unsafe sealed class ArmatureManager : IDisposable
     private readonly ActorManager _actorManager;
     private readonly GPoseService _gposeService;
     private readonly ArmatureChanged _event;
+    private readonly EmoteService _emoteService;
 
     /// <summary>
     /// This is a movement flag for every object. Used to prevent calls to ApplyRootTranslation from both movement and render hooks.
@@ -55,7 +56,8 @@ public unsafe sealed class ArmatureManager : IDisposable
         ActorObjectManager objectManager,
         ActorManager actorManager,
         GPoseService gposeService,
-        ArmatureChanged @event)
+        ArmatureChanged @event,
+        EmoteService emoteService)
     {
         _profileManager = profileManager;
         _objectTable = objectTable;
@@ -68,6 +70,7 @@ public unsafe sealed class ArmatureManager : IDisposable
         _actorManager = actorManager;
         _gposeService = gposeService;
         _event = @event;
+        _emoteService = emoteService;
 
         _templateChangedEvent.Subscribe(OnTemplateChange, TemplateChanged.Priority.ArmatureManager);
         _profileChangedEvent.Subscribe(OnProfileChange, ProfileChanged.Priority.ArmatureManager);
@@ -180,6 +183,9 @@ public unsafe sealed class ArmatureManager : IDisposable
                 var activeProfile = _profileManager.GetEnabledProfilesByActor(actorIdentifier).FirstOrDefault();
                 Profile? oldProfile = armature.Profile;
                 bool profileChange = activeProfile != armature.Profile;
+                bool oldHadRoot = oldProfile.Templates.Any(x => x.Bones.ContainsKey("n_root"));
+                bool newHasRoot = activeProfile?.Templates.Any(x => x.Bones.ContainsKey("n_root")) ?? false;
+
                 if (profileChange)
                 {
                     if (activeProfile == null)
@@ -187,7 +193,7 @@ public unsafe sealed class ArmatureManager : IDisposable
                         _logger.Debug($"Removing armature {armature} because it doesn't have any active profiles");
                         RemoveArmature(armature, ArmatureChanged.DeletionReason.NoActiveProfiles);
 
-                        if (obj.Value.Objects != null)
+                        if (oldHadRoot && obj.Value.Objects != null)
                         {
                             //Reset root translation
                             foreach (var actor in obj.Value.Objects)
@@ -206,16 +212,23 @@ public unsafe sealed class ArmatureManager : IDisposable
 
                 //warn: might be a bit of a performance hit on profiles with a lot of templates/bones
                 //warn: this must be done after RebuildBoneTemplateBinding or it will not work
-                if (profileChange &&
-                    oldProfile.Templates.Where(x => x.Bones.ContainsKey("n_root")).Any())
+                if (oldHadRoot && (!profileChange || !newHasRoot))
                 {
                     _logger.Debug($"Resetting root transform for {armature} because new profile doesn't have root edits");
 
                     if (obj.Value.Objects != null)
                     {
-                        //Reset root translation
                         foreach (var actor in obj.Value.Objects)
+                        {
+                            if (_emoteService.IsSitting(actor))
+                            {
+                                _logger.Debug($"Skipping root reset for sitting actor {actor.Utf8Name}");
+                                continue;
+                            }
+
+                            _logger.Debug($"Resetting root for {actor.Utf8Name}");
                             ApplyRootTranslation(armature, actor, true);
+                        }
                     }
                 }
 

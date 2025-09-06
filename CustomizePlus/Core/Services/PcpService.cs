@@ -20,6 +20,12 @@ public class PcpService : IRequiredService
     private readonly TemplateManager _templateManager;
     private readonly ActorObjectManager _objects;
     private readonly PluginConfiguration _config;
+    private readonly PenumbraIpcHandler _penumbraIpcHandler;
+
+    private bool _isEnabled;
+
+    public bool IsPenumbraAvailable => _penumbraIpcHandler.Available;
+    public bool IsEnabled => _isEnabled;
 
     public PcpService(
         PenumbraIpcHandler ipc,
@@ -29,22 +35,35 @@ public class PcpService : IRequiredService
         ActorObjectManager objects,
         PluginConfiguration config)
     {
+        _penumbraIpcHandler = ipc;
         _log = log;
         _profileManager = profileManager;
         _templateManager = templateManager;
         _objects = objects;
         _config = config;
 
-        if (ipc.Available)
+        SetEnabled(_config.IntegrationSettings.PenumbraPCPIntegrationEnabled);
+    }
+
+    public void SetEnabled(bool value)
+    {
+        if (value == _isEnabled)
+            return;
+
+        if (value)
         {
-            ipc.PcpCreated += OnPcpCreated;
-            ipc.PcpParsed += OnPcpParsed;
-            _log.Information("[CPlusPCPService] Subscribed to PCP events.");
+            _penumbraIpcHandler.PcpCreated += OnPcpCreated;
+            _penumbraIpcHandler.PcpParsed += OnPcpParsed;
+            _log.Information("[CPlusPCPService] Attached to PCP handling.");
         }
         else
         {
-            _log.Warning("[CPlusPCPService] Penumbra IPC unavailable: PCP events not subscribed.");
+            _penumbraIpcHandler.PcpCreated -= OnPcpCreated;
+            _penumbraIpcHandler.PcpParsed -= OnPcpParsed;
+            _log.Information("[CPlusPCPService] Detached from PCP handling.");
         }
+
+        _isEnabled = value;
     }
 
     private void OnPcpCreated(JObject jObj, ushort index, string path)

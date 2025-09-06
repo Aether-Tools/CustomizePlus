@@ -1,20 +1,20 @@
-﻿using Dalamud.Interface;
-using Dalamud.Interface.Utility;
+﻿using CustomizePlus.Armatures.Services;
+using CustomizePlus.Configuration.Data;
+using CustomizePlus.Core.Data;
+using CustomizePlus.Core.Helpers;
+using CustomizePlus.Core.Services;
+using CustomizePlus.Templates;
 using Dalamud.Bindings.ImGui;
-using OtterGui.Classes;
+using Dalamud.Interface;
+using Dalamud.Interface.ImGuiNotification;
+using Dalamud.Interface.Utility;
+using Dalamud.Plugin;
 using OtterGui;
+using OtterGui.Classes;
 using OtterGui.Raii;
 using OtterGui.Widgets;
 using System.Diagnostics;
 using System.Numerics;
-using CustomizePlus.Core.Services;
-using CustomizePlus.Configuration.Data;
-using CustomizePlus.Profiles;
-using CustomizePlus.Templates;
-using CustomizePlus.Core.Helpers;
-using CustomizePlus.Armatures.Services;
-using Dalamud.Interface.ImGuiNotification;
-using Dalamud.Plugin;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs;
 
@@ -31,6 +31,7 @@ public class SettingsTab
     private readonly CPlusChangeLog _changeLog;
     private readonly MessageService _messageService;
     private readonly SupportLogBuilderService _supportLogBuilderService;
+    private readonly PcpService _pcpService;
 
     public SettingsTab(
         IDalamudPluginInterface pluginInterface,
@@ -40,7 +41,8 @@ public class SettingsTab
         TemplateEditorManager templateEditorManager,
         CPlusChangeLog changeLog,
         MessageService messageService,
-        SupportLogBuilderService supportLogBuilderService)
+        SupportLogBuilderService supportLogBuilderService,
+        PcpService pcpService)
     {
         _pluginInterface = pluginInterface;
         _configuration = configuration;
@@ -50,6 +52,7 @@ public class SettingsTab
         _changeLog = changeLog;
         _messageService = messageService;
         _supportLogBuilderService = supportLogBuilderService;
+        _pcpService = pcpService;
     }
 
     public void Draw()
@@ -317,7 +320,7 @@ public class SettingsTab
 
     #endregion
 
-    #region External Settings
+    #region Integrations
 
     private void DrawExternal()
     {
@@ -334,10 +337,10 @@ public class SettingsTab
         var isChecked = _configuration.IntegrationSettings.PenumbraPCPIntegrationEnabled;
 
         if (CtrlHelper.CheckboxWithTextAndHelp("##pcpintegrationenabled", "Enable Penumbra PCP integration",
-                "Controls whether C+ will add the currently active profile data from an actor to .pcp files upon creation, and construct new profile for said actor upon import.", ref isChecked))
+            "Controls whether C+ will add the currently active profile data from an actor to .pcp files upon creation, and construct new profile for said actor upon import.", ref isChecked))
         {
             _configuration.IntegrationSettings.PenumbraPCPIntegrationEnabled = isChecked;
-
+            _pcpService.SetEnabled(isChecked);
             _configuration.Save();
         }
     }

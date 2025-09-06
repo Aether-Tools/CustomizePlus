@@ -28,10 +28,11 @@ public class CPlusChangeLog
         Add2_0_7_2(Changelog);
         Add2_0_7_9(Changelog);
         Add2_0_7_15(Changelog);
-        Add2_0_7_16(Changelog);
+        Add2_0_7_16(Changelog); 
         Add2_0_7_23(Changelog);
         Add2_0_7_27(Changelog);
         Add2_0_8_0(Changelog);
+        Add2_0_8_2(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -43,6 +44,13 @@ public class CPlusChangeLog
         _config.ChangelogSettings.ChangeLogDisplayType = type;
         _config.Save();
     }
+
+    private static void Add2_0_8_2(Changelog log)
+        => log.NextVersion("Version 2.0.8.2")
+        .RegisterEntry("Fixed issues with penumbra PCP integration. (by abelfreyja)")
+        .RegisterEntry("Customize+ will now show warning in the menu bar if it cannot connect to Penumbra. (by Risa)", 1)
+        .RegisterEntry("Fixed root position reset applying when it shouldn't. (by abelfreyja)")
+        .RegisterEntry("Fixed profile folders resetting. (by Risa)");
 
     private static void Add2_0_8_0(Changelog log)
         => log.NextVersion("Version 2.0.8.0")

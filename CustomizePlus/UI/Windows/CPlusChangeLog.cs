@@ -47,7 +47,7 @@ public class CPlusChangeLog
 
     private static void Add2_0_8_2(Changelog log)
         => log.NextVersion("Version 2.0.8.2")
-        .RegisterEntry("Fixed issues with penumbra PCP integration. (by abelfreyja)")
+        .RegisterEntry("Improved stability of Penumbra PCP integration. (by abelfreyja)")
         .RegisterEntry("Customize+ will now show warning in the menu bar if it cannot connect to Penumbra. (by Risa)", 1)
         .RegisterEntry("Fixed root position reset applying when it shouldn't. (by abelfreyja)")
         .RegisterEntry("Fixed profile folders resetting. (by Risa)");

@@ -220,7 +220,7 @@ public class TemplateManager : IDisposable
             if (boneTransform == transform)
                 return false;
 
-            if (transform.IsEdited())
+            if (transform.HasConfig())
             {
                 template.Bones[boneName].UpdateToMatch(transform);
 
@@ -240,7 +240,7 @@ public class TemplateManager : IDisposable
         else
         {
 
-            if (!transform.IsEdited())
+            if (!transform.HasConfig())
                 return false;
 
             template.Bones[boneName] = new BoneTransform(transform);

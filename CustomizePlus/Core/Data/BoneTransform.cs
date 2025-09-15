@@ -78,6 +78,8 @@ public class BoneTransform
                || !Scaling.IsApproximately(Vector3.One, 0.00001f);
     }
 
+    public bool HasConfig() => PropagateRotation || PropagateScale || PropagateTranslation || this.IsEdited();
+
     public BoneTransform DeepCopy()
     {
         return new BoneTransform

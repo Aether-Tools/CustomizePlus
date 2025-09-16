@@ -66,6 +66,9 @@ public sealed class Template : ISavable
     {
         foreach (var kvp in original.Bones)
         {
+            if (!kvp.Value.IsEdited()) //do not copy unedited bones
+                continue;
+
             Bones[kvp.Key] = new BoneTransform();
             Bones[kvp.Key].UpdateToMatch(kvp.Value);
         }

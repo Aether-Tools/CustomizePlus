@@ -67,7 +67,7 @@ public class TemplateManager : IDisposable
                 if (_templates.Any(f => f.UniqueId == template.UniqueId))
                     throw new Exception($"ID {template.UniqueId} was not unique.");
 
-                PruneIdempotentTransforms(template);
+                PruneUneditedBones(template);
 
                 _templates.Add(template);
             }
@@ -100,7 +100,7 @@ public class TemplateManager : IDisposable
         };
 
         if (template.Bones.Count > 0)
-            PruneIdempotentTransforms(template);
+            PruneUneditedBones(template);
 
         _templates.Add(template);
         _logger.Debug($"Added new template {template.UniqueId}.");
@@ -220,7 +220,7 @@ public class TemplateManager : IDisposable
             if (boneTransform == transform)
                 return false;
 
-            if (transform.IsEdited())
+            if (transform.IsEdited(true)) //true here to allow values of bones with propagations on to cross 0 during editing
             {
                 template.Bones[boneName].UpdateToMatch(transform);
 
@@ -240,7 +240,7 @@ public class TemplateManager : IDisposable
         else
         {
 
-            if (!transform.IsEdited())
+            if (!transform.IsEdited(true)) //true here to allow values of bones with propagations on to cross 0 during editing
                 return false;
 
             template.Bones[boneName] = new BoneTransform(transform);
@@ -263,7 +263,7 @@ public class TemplateManager : IDisposable
         _event.Invoke(TemplateChanged.Type.DeletedBone, template, boneName);
     }
 
-    private static void PruneIdempotentTransforms(Template template)
+    private void PruneUneditedBones(Template template)
     {
         foreach (var kvp in template.Bones)
         {
@@ -276,6 +276,8 @@ public class TemplateManager : IDisposable
 
     private void SaveTemplate(Template template)
     {
+        PruneUneditedBones(template);
+
         template.ModifiedDate = DateTimeOffset.UtcNow;
         _saveService.QueueSave(template);
     }

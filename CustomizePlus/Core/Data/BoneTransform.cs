@@ -71,11 +71,18 @@ public class BoneTransform
         _scaling = ClampToDefaultLimits(_scaling);
     }
 
-    public bool IsEdited()
+    //"considerPropagationAsEdit" only should be true if you know what you are doing
+    //currently is here only to allow bones to be not removed when live editing is off in the editor and propagation is on on the bone
+    public bool IsEdited(bool considerPropagationAsEdit = false)
     {
+        bool propagation = false;
+        if (considerPropagationAsEdit)
+            propagation = PropagateTranslation || PropagateRotation || PropagateScale;
+
         return !Translation.IsApproximately(Vector3.Zero, 0.00001f)
                || !Rotation.IsApproximately(Vector3.Zero, 0.1f)
-               || !Scaling.IsApproximately(Vector3.One, 0.00001f);
+               || !Scaling.IsApproximately(Vector3.One, 0.00001f)
+               || propagation;
     }
 
     public BoneTransform DeepCopy()

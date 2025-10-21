@@ -19,7 +19,8 @@ public sealed class ReverseNameDicts(
     ReverseSearchDictMount _mounts,
     ReverseSearchDictCompanion _companions,
     ReverseSearchDictBNpc _bNpcs,
-    ReverseSearchDictENpc _eNpcs)
+    ReverseSearchDictENpc _eNpcs,
+    ReverseSearchDictOrnament _ornaments)
     : IAsyncService
 {
     /// <summary> Valid Mount ids by name in title case. </summary>
@@ -33,10 +34,13 @@ public sealed class ReverseNameDicts(
 
     /// <summary> Valid ENPC ids by name in title case. </summary>
     public readonly ReverseSearchDictENpc ENpcs = _eNpcs;
+
+    /// <summary> Valid Ornament ids by name in title case. </summary>
+    public readonly ReverseSearchDictOrnament Ornaments = _ornaments;
    
     /// <summary> Finished when all name dictionaries are finished. </summary>
     public Task Awaiter { get; } =
-        Task.WhenAll(_mounts.Awaiter, _companions.Awaiter, _bNpcs.Awaiter, _eNpcs.Awaiter);
+        Task.WhenAll(_mounts.Awaiter, _companions.Awaiter, _bNpcs.Awaiter, _eNpcs.Awaiter, _ornaments.Awaiter);
 
     /// <inheritdoc/>
     public bool Finished
@@ -59,6 +63,7 @@ public sealed class ReverseNameDicts(
             ObjectKind.Companion => Companions.TryGetValue(name, out npcId),
             ObjectKind.BattleNpc => BNpcs.TryGetValue(name, out npcId),
              ObjectKind.EventNpc => ENpcs.TryGetValue(name, out npcId),
+             ObjectKind.Ornament => Ornaments.TryGetValue(name, out npcId), 
             _ => false,
         };
     }

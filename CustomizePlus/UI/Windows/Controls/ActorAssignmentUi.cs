@@ -20,6 +20,7 @@ public class ActorAssignmentUi
     private NpcCombo _companionCombo = null!;
     private NpcCombo _bnpcCombo = null!;
     private NpcCombo _enpcCombo = null!;
+    private NpcCombo _ornamentCombo = null!;
 
     private bool _ready;
 
@@ -89,6 +90,7 @@ public class ActorAssignmentUi
         ObjectKind.EventNpc,
         ObjectKind.Companion,
         ObjectKind.MountType,
+        ObjectKind.Ornament,
     };
 
     private Penumbra.GameData.Gui.NpcCombo GetNpcCombo(ObjectKind kind)
@@ -98,6 +100,7 @@ public class ActorAssignmentUi
             ObjectKind.EventNpc => _enpcCombo,
             ObjectKind.MountType => _mountCombo,
             ObjectKind.Companion => _companionCombo,
+            ObjectKind.Ornament => _ornamentCombo,
             _ => throw new NotImplementedException(),
         };
 
@@ -109,6 +112,7 @@ public class ActorAssignmentUi
         _companionCombo = new Penumbra.GameData.Gui.NpcCombo("##companionCombo", _actorManager.Data.Companions, Plugin.Logger);
         _bnpcCombo = new Penumbra.GameData.Gui.NpcCombo("##bnpcCombo", _actorManager.Data.BNpcs, Plugin.Logger);
         _enpcCombo = new Penumbra.GameData.Gui.NpcCombo("##enpcCombo", _actorManager.Data.ENpcs, Plugin.Logger);
+        _ornamentCombo = new Penumbra.GameData.Gui.NpcCombo("##ornamentCombo", _actorManager.Data.Ornaments, Plugin.Logger);
         _ready = true;
     }
 
@@ -135,6 +139,7 @@ public class ActorAssignmentUi
                     break;
                 case ObjectKind.MountType:
                 case ObjectKind.Companion:
+                case ObjectKind.Ornament:
                     var currentPlayer = _actorManager.GetCurrentPlayer();
                     NpcIdentifier = _actorManager.CreateOwned(currentPlayer.PlayerName, currentPlayer.HomeWorld, _newKind, npcCombo.CurrentSelection.Ids[0]);
                     break;

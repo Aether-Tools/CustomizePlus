@@ -101,7 +101,12 @@ public static class ActorIdentifierExtensions
                 ActorIdentifier.RetainerType.Mannequin => " (Mannequin)",
                 _ => " (Retainer)",
             }}",
-            IdentifierType.Owned => " (Companion/Mount)",
+            IdentifierType.Owned => $" ({identifier.Kind switch {
+                ObjectKind.MountType => "Mount",
+                ObjectKind.Companion => "Companion",
+                ObjectKind.Ornament => "Accessory",
+                _ => $"Owned {identifier.Kind}",
+            }})",
             IdentifierType.Npc => " (NPC)",
             _ => "",
         };
@@ -127,7 +132,8 @@ public static class ActorIdentifierExtensions
                 return
                     identifier.Kind == ObjectKind.BattleNpc ||
                     //identifier.Kind == ObjectKind.MountType ||
-                    identifier.Kind == ObjectKind.Companion;
+                    identifier.Kind == ObjectKind.Companion ||
+                    identifier.Kind == ObjectKind.Ornament;
             default:
                 return false;
         }

@@ -33,6 +33,7 @@ public class CPlusChangeLog
         Add2_0_7_27(Changelog);
         Add2_0_8_0(Changelog);
         Add2_0_8_2(Changelog);
+        Add2_0_8_4(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -44,6 +45,12 @@ public class CPlusChangeLog
         _config.ChangelogSettings.ChangeLogDisplayType = type;
         _config.Save();
     }
+
+    private static void Add2_0_8_4(Changelog log)
+        => log.NextVersion("Version 2.0.8.4")
+        .RegisterEntry("Accessories can now be manipulated by Customize+. (by Caraxi)")
+        .RegisterEntry("The extent of possible manipulations depend on the chosen accessory.", 1)
+        .RegisterEntry("Bones with their values set to 0 will no longer be removed from the editor when \"Show Live Bones\" is off and option to apply transformation to children is on. (by Caraxi and Risa) (2.0.8.3)");
 
     private static void Add2_0_8_2(Changelog log)
         => log.NextVersion("Version 2.0.8.2")

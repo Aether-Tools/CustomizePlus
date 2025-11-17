@@ -333,14 +333,30 @@ public unsafe class ModelBone
         if (access2 == null)
             return;
 
+        var childScaleToUse = access2->Scale.ToVector3();
+
+        if (!CustomizedTransform.ChildScalingLinked)
+        {
+            childScaleToUse = new Vector3(
+                initialScale.X * CustomizedTransform.ChildScaling.X,
+                initialScale.Y * CustomizedTransform.ChildScaling.Y,
+                initialScale.Z * CustomizedTransform.ChildScaling.Z
+            );
+        }
+
+        var shouldPropagateScale = CustomizedTransform.PropagateScale &&
+            (!CustomizedTransform.Scaling.Equals(Vector3.One) ||
+             (!CustomizedTransform.ChildScalingLinked && !CustomizedTransform.ChildScaling.Equals(Vector3.One)));
+
         PropagateChildren(cBase, access2, initialPos, initialRot, initialScale,
             CustomizedTransform.PropagateTranslation && !CustomizedTransform.Translation.Equals(Vector3.Zero),
             CustomizedTransform.PropagateRotation && !CustomizedTransform.Rotation.Equals(Vector3.Zero),
-            CustomizedTransform.PropagateScale && !CustomizedTransform.Scaling.Equals(Vector3.One));
+            shouldPropagateScale,
+            childScaleToUse);
     }
 
 
-    public unsafe void PropagateChildren(CharacterBase* cBase, hkQsTransformf* transform, Vector3 initialPos, Quaternion initialRot, Vector3 initialScale, bool propagateTranslation, bool propagateRotation, bool propagateScale, bool includePartials = true)
+    public unsafe void PropagateChildren(CharacterBase* cBase, hkQsTransformf* transform, Vector3 initialPos, Quaternion initialRot, Vector3 initialScale, bool propagateTranslation, bool propagateRotation, bool propagateScale, Vector3 childScale, bool includePartials = true)
     {
         // Bone parenting
         // Adapted from Anamnesis Studio code shared by Yuki - thank you!
@@ -350,7 +366,8 @@ public unsafe class ModelBone
 
         var deltaRot = transform->Rotation.ToQuaternion() / initialRot;
         var deltaPos = sourcePos - initialPos;
-        var deltaScale = transform->Scale.ToVector3() / initialScale;
+        // Use childScale parameter instead of deltaScale for child transformations
+        var deltaScale = childScale / initialScale;
 
         foreach (var child in GetDescendants())
         {

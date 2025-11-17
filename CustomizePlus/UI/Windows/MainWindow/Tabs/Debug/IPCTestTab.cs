@@ -411,7 +411,7 @@ public class IPCTestTab //: IDisposable
                 ImGui.SetClipboardText(string.Join("\n",
                 result.Item2!.Select(x => $"{x.UniqueId}, {x.Name}, {x.IsEnabled}," +
                     $"|| {string.Join("|", x.Bones
-                    .Select(bone => $"{bone.Name}, {bone.Translation} ({bone.PropagateTranslation}), {bone.Rotation} ({bone.PropagateRotation}), {bone.Scale} ({bone.PropagateScale})"))}")));
+                    .Select(bone => $"{bone.Name}, {bone.Translation} ({bone.PropagateTranslation}), {bone.Rotation} ({bone.Item7.PropagateRotation}), {bone.Scale} ({bone.Item7.PropagateScale}), ChildScale: {bone.ChildScale}"))}")));
 
                 _popupSystem.ShowPopup(PopupSystem.Messages.ActionDone);
             }

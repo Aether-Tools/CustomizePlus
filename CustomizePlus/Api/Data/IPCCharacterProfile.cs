@@ -38,6 +38,7 @@ public class IPCCharacterProfile
                     Translation = kvPair.Value.Translation,
                     Rotation = kvPair.Value.Rotation,
                     Scaling = kvPair.Value.Scaling,
+                    ChildScaling = kvPair.Value.ChildScaling,
                     PropagateTranslation = kvPair.Value.PropagateTranslation,
                     PropagateRotation = kvPair.Value.PropagateRotation,
                     PropagateScale = kvPair.Value.PropagateScale
@@ -79,6 +80,7 @@ public class IPCCharacterProfile
                     Translation = kvPair.Value.Translation,
                     Rotation = kvPair.Value.Rotation,
                     Scaling = kvPair.Value.Scaling,
+                    ChildScaling = kvPair.Value.ChildScaling == Vector3.Zero ? Vector3.One : kvPair.Value.ChildScaling,
                     PropagateTranslation = kvPair.Value.PropagateTranslation,
                     PropagateRotation = kvPair.Value.PropagateRotation,
                     PropagateScale = kvPair.Value.PropagateScale
@@ -111,6 +113,13 @@ public class IPCBoneTransform
     {
         get => _scaling;
         set => _scaling = ClampVector(value);
+    }
+
+    private Vector3 _childScaling;
+    public Vector3 ChildScaling
+    {
+        get => _childScaling;
+        set => _childScaling = ClampVector(value);
     }
 
     /// <summary>

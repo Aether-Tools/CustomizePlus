@@ -51,7 +51,12 @@ public class ConfigurationMigrator
             return;
         }
 
-        throw new NotImplementedException();
+        // V4 to V5: Added ChildScaling field to BoneTransform
+        // No data migration needed - ChildScaling defaults to Vector3.One (backward compatible)
+        if (configVersion == 4)
+        {
+            _logger.Information("Migrating configuration from V4 to V5 (ChildScaling feature)");
+        }
 
         config.Version = Constants.ConfigurationVersion;
         _saveService.ImmediateSave(config);

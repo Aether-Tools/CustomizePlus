@@ -875,6 +875,91 @@ public class BoneEditorPanel
         }
 
         ImGui.TableNextRow();
+
+        if (_editingAttribute == BoneAttribute.Scale && propagationEnabled)
+        {
+            RenderChildScalingRow(bone, transform);
+        }
+    }
+
+    private void RenderChildScalingRow(EditRowParams bone, BoneTransform transform)
+    {
+        var codename = bone.BoneCodeName;
+        var displayName = bone.BoneDisplayName;
+
+        bool isChildScaleLinked = transform.ChildScalingLinked;
+        bool childScaleChanged = false;
+        var childScale = isChildScaleLinked ? transform.Scaling : transform.ChildScaling;
+
+        using var id = ImRaii.PushId($"{codename}_childscale");
+
+        ImGui.TableNextColumn();
+
+        ImGui.Dummy(new Vector2(CtrlHelper.IconButtonWidth * 0.75f, 0));
+        ImGui.SameLine();
+
+        if (!isChildScaleLinked)
+        {
+            ResetBoneButton(bone);
+            ImGui.SameLine();
+        }
+
+        using (var disabled = ImRaii.Disabled(!_isUnlocked))
+        {
+            if (ImGui.Button(isChildScaleLinked ? $"Unlink##{codename}" : $"Link##{codename}"))
+            {
+                isChildScaleLinked = !isChildScaleLinked;
+                if (!isChildScaleLinked)
+                {
+                    childScale = transform.Scaling;
+                }
+                transform.ChildScalingLinked = isChildScaleLinked;
+                childScaleChanged = true;
+            }
+            CtrlHelper.AddHoverText(isChildScaleLinked
+                ? "Click to customize child bone scaling separately from parent bone scaling"
+                : "Click to link child scaling back to parent scaling");
+        }
+
+        using (var disabled = ImRaii.Disabled(!_isUnlocked || isChildScaleLinked))
+        {
+            ImGui.TableNextColumn();
+            if (SingleValueSlider($"##child-{displayName}-X", ref childScale.X))
+                childScaleChanged = true;
+
+            ImGui.TableNextColumn();
+            if (SingleValueSlider($"##child-{displayName}-Y", ref childScale.Y))
+                childScaleChanged = true;
+
+            ImGui.TableNextColumn();
+            if (SingleValueSlider($"##child-{displayName}-Z", ref childScale.Z))
+                childScaleChanged = true;
+
+            ImGui.TableNextColumn();
+            if (FullBoneSlider($"##child-{displayName}-All", ref childScale))
+                childScaleChanged = true;
+        }
+
+        ImGui.TableNextColumn();
+        CtrlHelper.StaticLabel("Child Scale", CtrlHelper.TextAlignment.Left, "Scale applied to child bones");
+
+        if (childScaleChanged)
+        {
+            transform.ChildScaling = childScale;
+            _editorManager.ModifyBoneTransform(codename, transform);
+
+            if (_isMirrorModeEnabled && bone.Basis?.TwinBone != null)
+            {
+                _editorManager.ModifyBoneTransform(
+                    bone.Basis.TwinBone.BoneName,
+                    BoneData.IsIVCSCompatibleBone(codename)
+                        ? transform.GetSpecialReflection()
+                        : transform.GetStandardReflection()
+                );
+            }
+        }
+
+        ImGui.TableNextRow();
     }
 
     private Dictionary<string, BoneTransform> CaptureCurrentState()

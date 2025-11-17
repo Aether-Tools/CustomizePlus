@@ -231,14 +231,14 @@ public partial class CustomizePlusIpc
         var list = new List<IPCTemplateStatusTuple>();
         foreach (var template in profile.Templates)
         {
-            var bones = template.Bones.Select(kvp => new IPCBoneDataTuple(
+            var bones = template.Bones.Select(kvp => (
                 kvp.Key,
                 kvp.Value.Translation,
                 kvp.Value.Rotation,
                 kvp.Value.Scaling,
+                kvp.Value.ChildScaling,
                 kvp.Value.PropagateTranslation,
-                kvp.Value.PropagateRotation,
-                kvp.Value.PropagateScale)).ToList();
+                (kvp.Value.PropagateRotation, kvp.Value.PropagateScale))).ToList();
 
             list.Add(
                 new IPCTemplateStatusTuple(

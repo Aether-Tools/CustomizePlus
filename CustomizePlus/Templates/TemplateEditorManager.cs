@@ -254,7 +254,9 @@ public class TemplateEditorManager : IDisposable
                 break;
             case BoneAttribute.Scale:
                 if ((resetValue == CurrentlyEditedTemplate!.Bones[boneName].Scaling) &&
-                    (defaultPropagationState == CurrentlyEditedTemplate!.Bones[boneName].PropagateScale))
+                    (defaultPropagationState == CurrentlyEditedTemplate!.Bones[boneName].PropagateScale) &&
+                    (Vector3.One == CurrentlyEditedTemplate!.Bones[boneName].ChildScaling) &&
+                    (true == CurrentlyEditedTemplate!.Bones[boneName].ChildScalingLinked))
                     return false;
                 break;
         }

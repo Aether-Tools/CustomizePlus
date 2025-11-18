@@ -64,7 +64,7 @@ public class BoneTransform
     public Vector3 ChildScaling
     {
         get => _childScaling;
-        set => _childScaling = value;
+        set => _childScaling = ClampVector(value);
     }
 
     public bool PropagateTranslation = false;

@@ -298,7 +298,7 @@ public class BoneEditorPanel
                 var col3Label = _editingAttribute == BoneAttribute.Rotation ? "Yaw" : "Z";
                 var col4Label = _editingAttribute == BoneAttribute.Scale ? "All" : "N/A";
 
-                ImGui.TableSetupColumn("Bones", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthFixed, 5 * CtrlHelper.IconButtonWidth);
+                ImGui.TableSetupColumn("Bones", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthFixed, 7 * CtrlHelper.IconButtonWidth);
 
                 ImGui.TableSetupColumn($"{col1Label}", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthStretch);
                 ImGui.TableSetupColumn($"{col2Label}", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthStretch);
@@ -895,7 +895,13 @@ public class BoneEditorPanel
 
         ImGui.TableNextColumn();
 
-        ImGui.Dummy(new Vector2(CtrlHelper.IconButtonWidth * 2.5f, 0));
+        ImGui.Dummy(new Vector2(CtrlHelper.IconButtonWidth * 0.5f, 0));
+        ImGui.SameLine();
+
+        ImGui.InvisibleButton($"##DummyReset{codename}", new Vector2(CtrlHelper.IconButtonWidth, ImGui.GetFrameHeight()));
+        ImGui.SameLine();
+
+        ImGui.InvisibleButton($"##DummyRevert{codename}", new Vector2(CtrlHelper.IconButtonWidth, ImGui.GetFrameHeight()));
         ImGui.SameLine();
 
         using (var disabled = ImRaii.Disabled(!_isUnlocked))
@@ -921,6 +927,33 @@ public class BoneEditorPanel
                 ? "Child scaling is linked to parent scaling. Click to customize independently."
                 : "Child scaling is independent. Click to link back to parent scaling.");
         }
+
+        // Position bracket at right edge of column
+        var drawList = ImGui.GetWindowDrawList();
+        var bracketColor = ImGui.GetColorU32(ImGuiCol.Text);
+        var lineThickness = 2.0f;
+
+        var rowHeight = ImGui.GetFrameHeight();
+        var bracketWidth = CtrlHelper.IconButtonWidth * 0.3f;
+
+        // Get the right edge of the current column
+        var availWidth = ImGui.GetContentRegionAvail().X;
+        var cursorScreenPos = ImGui.GetCursorScreenPos();
+        var rightEdgeX = cursorScreenPos.X + availWidth - bracketWidth;
+
+        // Center the bracket between parent row (above) and child row (current)
+        var bracketCenterY = cursorScreenPos.Y - rowHeight * 1.5f;
+
+        var topRight = new Vector2(rightEdgeX + bracketWidth, bracketCenterY - rowHeight * 0.5f);
+        var topLeft = new Vector2(rightEdgeX, bracketCenterY - rowHeight * 0.5f);
+        var midLeft = new Vector2(rightEdgeX, bracketCenterY);
+        var bottomLeft = new Vector2(rightEdgeX, bracketCenterY + rowHeight * 0.5f);
+        var bottomRight = new Vector2(rightEdgeX + bracketWidth, bracketCenterY + rowHeight * 0.5f);
+
+        drawList.AddLine(topRight, topLeft, bracketColor, lineThickness);
+        drawList.AddLine(topLeft, midLeft, bracketColor, lineThickness);
+        drawList.AddLine(midLeft, bottomLeft, bracketColor, lineThickness);
+        drawList.AddLine(bottomLeft, bottomRight, bracketColor, lineThickness);
 
         using (var disabled = ImRaii.Disabled(!_isUnlocked || isChildScaleLinked))
         {

@@ -54,6 +54,7 @@ public class BoneEditorPanel
     private Dictionary<string, BoneTransform>? _pendingUndoSnapshot = null;
     private float _initialX, _initialY, _initialZ;
     private Vector3 _initialScale;
+    private float _propagateButtonXPos = 0;
 
     // favorite bone stuff
     private HashSet<string> _favoriteBones;
@@ -737,6 +738,7 @@ public class BoneEditorPanel
             RevertBoneButton(bone);
             ImGui.SameLine();
 
+            _propagateButtonXPos = ImGui.GetCursorPosX();
             if (PropagateCheckbox(bone, ref propagationEnabled))
                 valueChanged = true;
 
@@ -896,15 +898,8 @@ public class BoneEditorPanel
         using var id = ImRaii.PushId($"{codename}_childscale");
 
         ImGui.TableNextColumn();
-
-        ImGui.Dummy(new Vector2(CtrlHelper.IconButtonWidth * 0.5f, 0));
-        ImGui.SameLine();
-
-        ImGui.InvisibleButton($"##DummyReset{codename}", new Vector2(CtrlHelper.IconButtonWidth, ImGui.GetFrameHeight()));
-        ImGui.SameLine();
-
-        ImGui.InvisibleButton($"##DummyRevert{codename}", new Vector2(CtrlHelper.IconButtonWidth, ImGui.GetFrameHeight()));
-        ImGui.SameLine();
+        
+        ImGui.SetCursorPosX(_propagateButtonXPos);
 
         using (var disabled = ImRaii.Disabled(!_isUnlocked))
         {

@@ -388,6 +388,8 @@ public class BoneEditorPanel
                                             Translation = boneData.Translation,
                                             Rotation = boneData.Rotation,
                                             Scaling = boneData.Scaling,
+                                            ChildScaling = boneData.ChildScaling,
+                                            ChildScalingLinked = boneData.ChildScalingLinked,
                                             PropagateTranslation = boneData.PropagateTranslation,
                                             PropagateRotation = boneData.PropagateRotation,
                                             PropagateScale = boneData.PropagateScale

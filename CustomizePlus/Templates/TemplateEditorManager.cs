@@ -305,9 +305,16 @@ public class TemplateEditorManager : IDisposable
                 case BoneAttribute.Scale:
                     originalValue = _currentlyEditedTemplateOriginal.Bones[boneName].Scaling;
                     originalPropagationState = _currentlyEditedTemplateOriginal.Bones[boneName].PropagateScale;
+                    var originalChildScaling = _currentlyEditedTemplateOriginal.Bones[boneName].ChildScaling;
+                    var originalChildScalingLinked = _currentlyEditedTemplateOriginal.Bones[boneName].ChildScalingLinked;
                     if ((originalValue == CurrentlyEditedTemplate!.Bones[boneName].Scaling) &&
-                        (originalPropagationState == CurrentlyEditedTemplate!.Bones[boneName].PropagateScale))
+                        (originalPropagationState == CurrentlyEditedTemplate!.Bones[boneName].PropagateScale) &&
+                        (originalChildScaling == CurrentlyEditedTemplate!.Bones[boneName].ChildScaling) &&
+                        (originalChildScalingLinked == CurrentlyEditedTemplate!.Bones[boneName].ChildScalingLinked))
                         return false;
+
+                    CurrentlyEditedTemplate!.Bones[boneName].ChildScaling = originalChildScaling;
+                    CurrentlyEditedTemplate!.Bones[boneName].ChildScalingLinked = originalChildScalingLinked;
                     break;
             }
         }

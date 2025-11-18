@@ -905,7 +905,9 @@ public class BoneEditorPanel
 
         using (var disabled = ImRaii.Disabled(!_isUnlocked))
         {
-            if (isChildScaleLinked)
+            var wasLinked = isChildScaleLinked;
+
+            if (wasLinked)
                 ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Active);
 
             if (ImGuiComponents.IconButton($"##ChildLink{codename}", FontAwesomeIcon.Link))
@@ -923,7 +925,7 @@ public class BoneEditorPanel
                 childScaleChanged = true;
             }
 
-            if (isChildScaleLinked)
+            if (wasLinked)
                 ImGui.PopStyleColor();
 
             CtrlHelper.AddHoverText(isChildScaleLinked

@@ -4,7 +4,7 @@ namespace CustomizePlus.Api;
 
 public partial class CustomizePlusIpc
 {
-    private readonly (int Breaking, int Feature) _apiVersion = (6, 3);
+    private readonly (int Breaking, int Feature) _apiVersion = (6, 4);
 
     /// <summary>
     /// When there are breaking changes the first number is bumped up and second one is reset.

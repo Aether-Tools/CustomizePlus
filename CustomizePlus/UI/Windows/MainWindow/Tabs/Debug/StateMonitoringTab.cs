@@ -184,9 +184,9 @@ public class StateMonitoringTab
         foreach (var kvPair in template.Bones)
         {
 #if !INCOGNIFY_STRINGS
-            ImGui.Text($"{kvPair.Key}: p: {kvPair.Value.Translation} | r: {kvPair.Value.Rotation} | s: {kvPair.Value.Scaling}");
+            ImGui.Text($"{kvPair.Key}: p: {kvPair.Value.Translation} | r: {kvPair.Value.Rotation} | s: {kvPair.Value.Scaling} | cs: {kvPair.Value.ChildScaling}{(kvPair.Value.ChildScalingLinked ? " (link)" : "")}");
 #else
-            ImGui.Text($"{BoneData.GetBoneDisplayName(kvPair.Key)} ({kvPair.Key}): p: {(kvPair.Value.Translation.IsApproximately(Vector3.Zero) ? "Approx. not changed" : "Changed")} | r: {(kvPair.Value.Rotation.IsApproximately(Vector3.Zero) ? "Approx. not changed" : "Changed")} | s: {(kvPair.Value.Scaling.IsApproximately(Vector3.One) ? "Not changed" : "Changed")}");
+            ImGui.Text($"{BoneData.GetBoneDisplayName(kvPair.Key)} ({kvPair.Key}): p: {(kvPair.Value.Translation.IsApproximately(Vector3.Zero) ? "Approx. not changed" : "Changed")} | r: {(kvPair.Value.Rotation.IsApproximately(Vector3.Zero) ? "Approx. not changed" : "Changed")} | s: {(kvPair.Value.Scaling.IsApproximately(Vector3.One) ? "Not changed" : "Changed")} | cs: {(kvPair.Value.ChildScalingLinked ? "Link" : (kvPair.Value.ChildScaling.IsApproximately(Vector3.One) ? "Not changed" : "Changed"))}");
 #endif
         }
     }

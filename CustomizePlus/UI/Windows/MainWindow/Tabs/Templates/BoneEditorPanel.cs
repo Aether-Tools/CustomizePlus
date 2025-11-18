@@ -55,6 +55,7 @@ public class BoneEditorPanel
     private float _initialX, _initialY, _initialZ;
     private Vector3 _initialScale;
     private float _propagateButtonXPos = 0;
+    private float _parentRowScreenPosY = 0;
 
     // favorite bone stuff
     private HashSet<string> _favoriteBones;
@@ -729,6 +730,7 @@ public class BoneEditorPanel
 
         using var id = ImRaii.PushId(codename);
         ImGui.TableNextColumn();
+        _parentRowScreenPosY = ImGui.GetCursorScreenPos().Y;
         using (var disabled = ImRaii.Disabled(!_isUnlocked))
         {
             ImGui.Dummy(new Vector2(CtrlHelper.IconButtonWidth * 0.75f, 0));
@@ -929,32 +931,44 @@ public class BoneEditorPanel
                 : "Child scaling is independent. Click to link back to parent scaling.");
         }
 
-        // Position bracket at right edge of column
+        // Draws a bracket between the two rows.
         var drawList = ImGui.GetWindowDrawList();
-        var bracketColor = ImGui.GetColorU32(ImGuiCol.Text);
+        var bracketColor = ImGui.GetColorU32(ImGuiCol.TextDisabled);
         var lineThickness = 2.0f;
 
         var rowHeight = ImGui.GetFrameHeight();
         var bracketWidth = CtrlHelper.IconButtonWidth * 0.3f;
 
-        // Get the right edge of the current column
         var availWidth = ImGui.GetContentRegionAvail().X;
         var cursorScreenPos = ImGui.GetCursorScreenPos();
         var rightEdgeX = cursorScreenPos.X + availWidth - bracketWidth;
 
-        // Center the bracket between parent row (above) and child row (current)
-        var bracketCenterY = cursorScreenPos.Y - rowHeight * 1.5f;
+        var parentRowCenterY = _parentRowScreenPosY + rowHeight * 0.5f;
+        var childRowCenterY = cursorScreenPos.Y + rowHeight * 0.5f;
+        var bracketCenterY = (parentRowCenterY + childRowCenterY) * 0.5f;
 
-        var topRight = new Vector2(rightEdgeX + bracketWidth, bracketCenterY - rowHeight * 0.5f);
-        var topLeft = new Vector2(rightEdgeX, bracketCenterY - rowHeight * 0.5f);
-        var midLeft = new Vector2(rightEdgeX, bracketCenterY);
-        var bottomLeft = new Vector2(rightEdgeX, bracketCenterY + rowHeight * 0.5f);
-        var bottomRight = new Vector2(rightEdgeX + bracketWidth, bracketCenterY + rowHeight * 0.5f);
+        var topY = parentRowCenterY;
+        var bottomY = bracketCenterY;
+        var heightThird = (topY - bottomY) / 3;
+        var topRightM = new Vector2(rightEdgeX + bracketWidth - 1, topY);
+        var topLeft = new Vector2(rightEdgeX, topY);
+        var bottomLeft = new Vector2(rightEdgeX, bottomY);
+        var bottomLeftM = new Vector2(rightEdgeX - 1, bottomY); // Just works
+        var bottomRight = new Vector2(rightEdgeX + bracketWidth, bottomY);
 
-        drawList.AddLine(topRight, topLeft, bracketColor, lineThickness);
-        drawList.AddLine(topLeft, midLeft, bracketColor, lineThickness);
-        drawList.AddLine(midLeft, bottomLeft, bracketColor, lineThickness);
-        drawList.AddLine(bottomLeft, bottomRight, bracketColor, lineThickness);
+        drawList.AddLine(topRightM, topLeft, bracketColor, lineThickness);   // Top
+        if (isChildScaleLinked)
+        {
+            drawList.AddLine(topLeft, bottomLeft, bracketColor, lineThickness); // Middle
+        }
+        else
+        {
+            var gapStart = new Vector2(rightEdgeX, topY - heightThird);
+            var gapEnd = new Vector2(rightEdgeX, topY - 2 * heightThird);
+            drawList.AddLine(topLeft, gapStart, bracketColor, lineThickness);
+            drawList.AddLine(gapEnd, bottomLeft, bracketColor, lineThickness);
+        }
+        drawList.AddLine(bottomLeftM, bottomRight, bracketColor, lineThickness); // Bottom
 
         using (var disabled = ImRaii.Disabled(!_isUnlocked || isChildScaleLinked))
         {

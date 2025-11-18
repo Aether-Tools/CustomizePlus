@@ -72,6 +72,8 @@ public class BoneTransform
     public bool PropagateScale = false;
     public bool ChildScalingLinked = true;
 
+    public bool ShouldSerializeChildScaling() => !ChildScalingLinked;
+
     [OnDeserialized]
     internal void OnDeserialized(StreamingContext context)
     {
@@ -97,7 +99,7 @@ public class BoneTransform
         return !Translation.IsApproximately(Vector3.Zero, 0.00001f)
                || !Rotation.IsApproximately(Vector3.Zero, 0.1f)
                || !Scaling.IsApproximately(Vector3.One, 0.00001f)
-               || !ChildScaling.IsApproximately(Vector3.One, 0.00001f)
+               || (!ChildScalingLinked && !ChildScaling.IsApproximately(Vector3.One, 0.00001f))
                || propagation;
     }
 
@@ -136,6 +138,11 @@ public class BoneTransform
         {
             Scaling = newValue;
             PropagateScale = shouldPropagate;
+            if (!shouldPropagate)
+            {
+                ChildScaling = Vector3.One;
+                ChildScalingLinked = true;
+            }
         }
     }
 

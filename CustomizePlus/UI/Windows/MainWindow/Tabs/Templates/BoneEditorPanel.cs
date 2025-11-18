@@ -298,7 +298,7 @@ public class BoneEditorPanel
                 var col3Label = _editingAttribute == BoneAttribute.Rotation ? "Yaw" : "Z";
                 var col4Label = _editingAttribute == BoneAttribute.Scale ? "All" : "N/A";
 
-                ImGui.TableSetupColumn("Bones", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthFixed, 7 * CtrlHelper.IconButtonWidth);
+                ImGui.TableSetupColumn("Bones", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthFixed, 6 * CtrlHelper.IconButtonWidth);
 
                 ImGui.TableSetupColumn($"{col1Label}", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthStretch);
                 ImGui.TableSetupColumn($"{col2Label}", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthStretch);
@@ -915,6 +915,10 @@ public class BoneEditorPanel
                 if (!isChildScaleLinked)
                 {
                     childScale = transform.Scaling;
+                }
+                else
+                {
+                    transform.ChildScaling = Vector3.One;
                 }
                 transform.ChildScalingLinked = isChildScaleLinked;
                 childScaleChanged = true;

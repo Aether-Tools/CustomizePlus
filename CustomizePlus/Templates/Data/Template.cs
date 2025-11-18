@@ -106,29 +106,9 @@ public sealed class Template : ISavable
         var version = obj["Version"]?.ToObject<int>() ?? 0;
         return version switch
         {
-            4 => LoadV4(obj),
-            5 => LoadV5(obj),
+            4 or 5 => LoadV5(obj),
             _ => throw new Exception("The design to be loaded has no valid Version."),
         };
-    }
-
-    private static Template LoadV4(JObject obj)
-    {
-        var creationDate = obj["CreationDate"]?.ToObject<DateTimeOffset>() ?? throw new ArgumentNullException("CreationDate");
-
-        var template = new Template()
-        {
-            CreationDate = creationDate,
-            UniqueId = obj["UniqueId"]?.ToObject<Guid>() ?? throw new ArgumentNullException("UniqueId"),
-            Name = new LowerString(obj["Name"]?.ToObject<string>()?.Trim() ?? throw new ArgumentNullException("Name")),
-            ModifiedDate = obj["ModifiedDate"]?.ToObject<DateTimeOffset>() ?? creationDate,
-            Bones = obj["Bones"]?.ToObject<Dictionary<string, BoneTransform>>() ?? throw new ArgumentNullException("Bones"),
-            IsWriteProtected = obj["IsWriteProtected"]?.ToObject<bool>() ?? false
-        };
-        if (template.ModifiedDate < creationDate)
-            template.ModifiedDate = creationDate;
-
-        return template;
     }
 
     private static Template LoadV5(JObject obj)

@@ -80,7 +80,7 @@ public class IPCCharacterProfile
                     Translation = kvPair.Value.Translation,
                     Rotation = kvPair.Value.Rotation,
                     Scaling = kvPair.Value.Scaling,
-                    ChildScaling = kvPair.Value.ChildScaling == Vector3.Zero ? Vector3.One : kvPair.Value.ChildScaling,
+                    ChildScaling = kvPair.Value.ChildScaling,
                     PropagateTranslation = kvPair.Value.PropagateTranslation,
                     PropagateRotation = kvPair.Value.PropagateRotation,
                     PropagateScale = kvPair.Value.PropagateScale

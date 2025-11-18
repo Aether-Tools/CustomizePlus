@@ -895,18 +895,15 @@ public class BoneEditorPanel
 
         ImGui.TableNextColumn();
 
-        ImGui.Dummy(new Vector2(CtrlHelper.IconButtonWidth * 0.75f, 0));
+        ImGui.Dummy(new Vector2(CtrlHelper.IconButtonWidth * 2.5f, 0));
         ImGui.SameLine();
-
-        if (!isChildScaleLinked)
-        {
-            ResetBoneButton(bone);
-            ImGui.SameLine();
-        }
 
         using (var disabled = ImRaii.Disabled(!_isUnlocked))
         {
-            if (ImGui.Button(isChildScaleLinked ? $"Unlink##{codename}" : $"Link##{codename}"))
+            if (isChildScaleLinked)
+                ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Active);
+
+            if (ImGuiComponents.IconButton($"##ChildLink{codename}", FontAwesomeIcon.Link))
             {
                 isChildScaleLinked = !isChildScaleLinked;
                 if (!isChildScaleLinked)
@@ -916,9 +913,13 @@ public class BoneEditorPanel
                 transform.ChildScalingLinked = isChildScaleLinked;
                 childScaleChanged = true;
             }
+
+            if (isChildScaleLinked)
+                ImGui.PopStyleColor();
+
             CtrlHelper.AddHoverText(isChildScaleLinked
-                ? "Click to customize child bone scaling separately from parent bone scaling"
-                : "Click to link child scaling back to parent scaling");
+                ? "Child scaling is linked to parent scaling. Click to customize independently."
+                : "Child scaling is independent. Click to link back to parent scaling.");
         }
 
         using (var disabled = ImRaii.Disabled(!_isUnlocked || isChildScaleLinked))
@@ -941,7 +942,7 @@ public class BoneEditorPanel
         }
 
         ImGui.TableNextColumn();
-        CtrlHelper.StaticLabel("Child Scale", CtrlHelper.TextAlignment.Left, "Scale applied to child bones");
+        CtrlHelper.StaticLabel($"{displayName} - Child Bones", CtrlHelper.TextAlignment.Left, "Scale applied to child bones");
 
         if (childScaleChanged)
         {

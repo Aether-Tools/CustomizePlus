@@ -928,9 +928,8 @@ public class BoneEditorPanel
             if (wasLinked)
                 ImGui.PopStyleColor();
 
-            CtrlHelper.AddHoverText(isChildScaleLinked
-                ? "Child scaling is linked to parent scaling. Click to customize independently."
-                : "Child scaling is independent. Click to link back to parent scaling.");
+            CtrlHelper.AddHoverText(
+                $"Link '{BoneData.GetBoneDisplayName(codename)}' child bone scaling to parent scaling");
         }
 
         // Draws a bracket between the two rows.

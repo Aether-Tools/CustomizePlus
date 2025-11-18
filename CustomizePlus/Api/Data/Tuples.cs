@@ -28,17 +28,17 @@ global using IPCProfileDataTuple = (
     bool IsEnabled);
 
 global using IPCBoneDataTuple = (
-    string Name, 
-    System.Numerics.Vector3 Translation, 
-    System.Numerics.Vector3 Rotation, 
-    System.Numerics.Vector3 Scale, 
-    System.Numerics.Vector3 ChildScale, 
+    string Name,
+    System.Numerics.Vector3 Translation,
+    System.Numerics.Vector3 Rotation,
+    System.Numerics.Vector3 Scale,
     bool PropagateTranslation,
-    bool PropagateRotation, 
-    bool PropagateScale);
+    bool PropagateRotation,
+    bool PropagateScale,
+    System.Numerics.Vector3 ChildScale);
 
 global using IPCTemplateStatusTuple = (
     System.Guid UniqueId,
     string Name,
-    System.Collections.Generic.List<(string Name, System.Numerics.Vector3 Translation, System.Numerics.Vector3 Rotation, System.Numerics.Vector3 Scale, System.Numerics.Vector3 ChildScale, bool PropagateTranslation, bool PropagateRotation, bool PropagateScale)> Bones,
+    System.Collections.Generic.List<(string Name, System.Numerics.Vector3 Translation, System.Numerics.Vector3 Rotation, System.Numerics.Vector3 Scale, bool PropagateTranslation, bool PropagateRotation, bool PropagateScale, System.Numerics.Vector3 ChildScale)> Bones,
     bool IsEnabled);    

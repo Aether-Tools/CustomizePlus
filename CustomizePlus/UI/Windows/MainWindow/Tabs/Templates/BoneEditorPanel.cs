@@ -742,7 +742,10 @@ public class BoneEditorPanel
 
             _propagateButtonXPos = ImGui.GetCursorPosX();
             if (PropagateCheckbox(bone, ref propagationEnabled))
+            {
+                SaveStateForUndo(CaptureCurrentState());
                 valueChanged = true;
+            }
 
             ImGui.SameLine();
             isFavorite = FavoriteButton(bone);

@@ -931,8 +931,14 @@ public class BoneEditorPanel
             if (wasLinked)
                 ImGui.PopStyleColor();
 
+            if (isChildScaleLinked)
+                ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Active);
+
             CtrlHelper.AddHoverText(
                 $"Link '{BoneData.GetBoneDisplayName(codename)}' child bone scaling to parent scaling");
+
+            if (isChildScaleLinked)
+                ImGui.PopStyleColor();
         }
 
         // Draws a bracket between the two rows.

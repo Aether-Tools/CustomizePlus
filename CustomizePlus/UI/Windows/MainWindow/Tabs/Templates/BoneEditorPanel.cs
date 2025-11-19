@@ -915,6 +915,8 @@ public class BoneEditorPanel
 
             if (ImGuiComponents.IconButton($"##ChildLink{codename}", FontAwesomeIcon.Link))
             {
+                SaveStateForUndo(CaptureCurrentState());
+
                 isChildScaleLinked = !isChildScaleLinked;
                 if (!isChildScaleLinked)
                 {

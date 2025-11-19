@@ -50,6 +50,7 @@ We believe that letting community help develop the plugin greatly benefits it, b
 * Our main priority is to not introduce breaking changes unless absolutely necessary. That includes implementing things in a future-proof way when possible. Non-transferrable data (settings, templates and profiles) should be preserved when upgrading to next plugin release no matter the changes in data structures.
 * Since a lot of our UI code is based on Glamourer and OtterGui, we are trying to to keep our UI implementation in line with the way UI is implemented in Glamourer. This gives us an advantage of occasionally getting new UI functionality without doing much changes on our side, but requires us to periodically check Glamourer code for changes in the UI code.
 * We expect contributed code to adhere to the code style of already existing code and be reasonably well tested (i.e. not break existing functionality and, well, actually work). We kindly ask you to be ready to make changes to the code in your Pull Requests if we feel like it needs to be changed.
+* Vibe coded or any other contributions where it is suspected that AI use was considerably high and without much oversight and/or understanding of Customize+ code are highly discouraged and might be rejected.
 
 ## Development team
 * [Risa](https://github.com/RisaDev/) - Author and Lead Developer.

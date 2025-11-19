@@ -54,6 +54,8 @@ public class BoneEditorPanel
     private Dictionary<string, BoneTransform>? _pendingUndoSnapshot = null;
     private float _initialX, _initialY, _initialZ;
     private Vector3 _initialScale;
+    private float _initialChildX, _initialChildY, _initialChildZ;
+    private Vector3 _initialChildScale;
     private float _propagateButtonXPos = 0;
     private float _parentRowScreenPosY = 0;
 
@@ -985,20 +987,88 @@ public class BoneEditorPanel
         using (var disabled = ImRaii.Disabled(!_isUnlocked || isChildScaleLinked))
         {
             ImGui.TableNextColumn();
-            if (SingleValueSlider($"##child-{displayName}-X", ref childScale.X))
+            float tempChildX = childScale.X;
+            if (ImGui.IsItemActivated())
+            {
+                _initialChildX = tempChildX;
+                if (_pendingUndoSnapshot == null)
+                    _pendingUndoSnapshot = CaptureCurrentState();
+            }
+            if (SingleValueSlider($"##child-{displayName}-X", ref tempChildX))
+            {
+                childScale.X = tempChildX;
                 childScaleChanged = true;
+            }
+            if (ImGui.IsItemDeactivatedAfterEdit())
+            {
+                if (_pendingUndoSnapshot != null && _initialChildX != childScale.X)
+                {
+                    SaveStateForUndo(_pendingUndoSnapshot);
+                    _pendingUndoSnapshot = null;
+                }
+            }
 
             ImGui.TableNextColumn();
-            if (SingleValueSlider($"##child-{displayName}-Y", ref childScale.Y))
+            float tempChildY = childScale.Y;
+            if (ImGui.IsItemActivated())
+            {
+                _initialChildY = tempChildY;
+                if (_pendingUndoSnapshot == null)
+                    _pendingUndoSnapshot = CaptureCurrentState();
+            }
+            if (SingleValueSlider($"##child-{displayName}-Y", ref tempChildY))
+            {
+                childScale.Y = tempChildY;
                 childScaleChanged = true;
+            }
+            if (ImGui.IsItemDeactivatedAfterEdit())
+            {
+                if (_pendingUndoSnapshot != null && _initialChildY != childScale.Y)
+                {
+                    SaveStateForUndo(_pendingUndoSnapshot);
+                    _pendingUndoSnapshot = null;
+                }
+            }
 
             ImGui.TableNextColumn();
-            if (SingleValueSlider($"##child-{displayName}-Z", ref childScale.Z))
+            float tempChildZ = childScale.Z;
+            if (ImGui.IsItemActivated())
+            {
+                _initialChildZ = tempChildZ;
+                if (_pendingUndoSnapshot == null)
+                    _pendingUndoSnapshot = CaptureCurrentState();
+            }
+            if (SingleValueSlider($"##child-{displayName}-Z", ref tempChildZ))
+            {
+                childScale.Z = tempChildZ;
                 childScaleChanged = true;
+            }
+            if (ImGui.IsItemDeactivatedAfterEdit())
+            {
+                if (_pendingUndoSnapshot != null && _initialChildZ != childScale.Z)
+                {
+                    SaveStateForUndo(_pendingUndoSnapshot);
+                    _pendingUndoSnapshot = null;
+                }
+            }
 
             ImGui.TableNextColumn();
+            if (ImGui.IsItemActivated())
+            {
+                _initialChildScale = childScale;
+                if (_pendingUndoSnapshot == null)
+                    _pendingUndoSnapshot = CaptureCurrentState();
+            }
             if (FullBoneSlider($"##child-{displayName}-All", ref childScale))
                 childScaleChanged = true;
+            if (ImGui.IsItemDeactivatedAfterEdit())
+            {
+                if (_pendingUndoSnapshot != null && _initialChildScale != childScale)
+                {
+                    SaveStateForUndo(_pendingUndoSnapshot);
+                    _pendingUndoSnapshot = null;
+                }
+            }
         }
 
         ImGui.TableNextColumn();

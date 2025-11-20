@@ -82,7 +82,7 @@ public class BoneTransform
         _rotation = ClampAngles(_rotation);
         _scaling = ClampToDefaultLimits(_scaling);
 
-        if (_childScaling == Vector3.Zero)
+        if (_childScaling == Vector3.Zero && ChildScalingLinked)
             _childScaling = Vector3.One;
         else
             _childScaling = ClampToDefaultLimits(_childScaling);

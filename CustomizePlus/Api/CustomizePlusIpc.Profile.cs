@@ -239,7 +239,8 @@ public partial class CustomizePlusIpc
                 kvp.Value.PropagateTranslation,
                 kvp.Value.PropagateRotation,
                 kvp.Value.PropagateScale,
-                kvp.Value.ChildScaling)).ToList();
+                kvp.Value.ChildScaling,
+                kvp.Value.ChildScalingLinked)).ToList();
 
             list.Add(
                 new IPCTemplateStatusTuple(

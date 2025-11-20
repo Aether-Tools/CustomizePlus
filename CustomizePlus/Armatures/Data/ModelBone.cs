@@ -366,7 +366,6 @@ public unsafe class ModelBone
 
         var deltaRot = transform->Rotation.ToQuaternion() / initialRot;
         var deltaPos = sourcePos - initialPos;
-        // Use childScale parameter instead of deltaScale for child transformations
         var deltaScale = childScale / initialScale;
 
         foreach (var child in GetDescendants())

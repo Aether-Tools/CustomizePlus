@@ -81,6 +81,7 @@ public class IPCCharacterProfile
                     Rotation = kvPair.Value.Rotation,
                     Scaling = kvPair.Value.Scaling,
                     ChildScaling = kvPair.Value.ChildScaling,
+                    ChildScalingLinked = false,
                     PropagateTranslation = kvPair.Value.PropagateTranslation,
                     PropagateRotation = kvPair.Value.PropagateRotation,
                     PropagateScale = kvPair.Value.PropagateScale

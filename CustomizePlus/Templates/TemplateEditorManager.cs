@@ -256,7 +256,7 @@ public class TemplateEditorManager : IDisposable
                 if ((resetValue == CurrentlyEditedTemplate!.Bones[boneName].Scaling) &&
                     (defaultPropagationState == CurrentlyEditedTemplate!.Bones[boneName].PropagateScale) &&
                     (Vector3.One == CurrentlyEditedTemplate!.Bones[boneName].ChildScaling) &&
-                    (true == CurrentlyEditedTemplate!.Bones[boneName].ChildScalingLinked))
+                    (false == CurrentlyEditedTemplate!.Bones[boneName].ChildScalingIndependent))
                     return false;
                 break;
         }
@@ -306,15 +306,15 @@ public class TemplateEditorManager : IDisposable
                     originalValue = _currentlyEditedTemplateOriginal.Bones[boneName].Scaling;
                     originalPropagationState = _currentlyEditedTemplateOriginal.Bones[boneName].PropagateScale;
                     var originalChildScaling = _currentlyEditedTemplateOriginal.Bones[boneName].ChildScaling;
-                    var originalChildScalingLinked = _currentlyEditedTemplateOriginal.Bones[boneName].ChildScalingLinked;
+                    var originalChildScalingIndependent = _currentlyEditedTemplateOriginal.Bones[boneName].ChildScalingIndependent;
                     if ((originalValue == CurrentlyEditedTemplate!.Bones[boneName].Scaling) &&
                         (originalPropagationState == CurrentlyEditedTemplate!.Bones[boneName].PropagateScale) &&
                         (originalChildScaling == CurrentlyEditedTemplate!.Bones[boneName].ChildScaling) &&
-                        (originalChildScalingLinked == CurrentlyEditedTemplate!.Bones[boneName].ChildScalingLinked))
+                        (originalChildScalingIndependent == CurrentlyEditedTemplate!.Bones[boneName].ChildScalingIndependent))
                         return false;
 
                     CurrentlyEditedTemplate!.Bones[boneName].ChildScaling = originalChildScaling;
-                    CurrentlyEditedTemplate!.Bones[boneName].ChildScalingLinked = originalChildScalingLinked;
+                    CurrentlyEditedTemplate!.Bones[boneName].ChildScalingIndependent = originalChildScalingIndependent;
                     break;
             }
         }

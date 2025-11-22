@@ -393,7 +393,7 @@ public class BoneEditorPanel
                                             Rotation = boneData.Rotation,
                                             Scaling = boneData.Scaling,
                                             ChildScaling = boneData.ChildScaling,
-                                            ChildScalingLinked = boneData.ChildScalingLinked,
+                                            ChildScalingIndependent = boneData.ChildScalingIndependent,
                                             PropagateTranslation = boneData.PropagateTranslation,
                                             PropagateRotation = boneData.PropagateRotation,
                                             PropagateScale = boneData.PropagateScale
@@ -898,9 +898,9 @@ public class BoneEditorPanel
         var codename = bone.BoneCodeName;
         var displayName = bone.BoneDisplayName;
 
-        bool isChildScaleLinked = transform.ChildScalingLinked;
+        bool isChildScaleIndependent = transform.ChildScalingIndependent;
         bool childScaleChanged = false;
-        var childScale = isChildScaleLinked ? transform.Scaling : transform.ChildScaling;
+        var childScale = isChildScaleIndependent ? transform.ChildScaling : transform.Scaling;
 
         using var id = ImRaii.PushId($"{codename}_childscale");
 
@@ -910,7 +910,7 @@ public class BoneEditorPanel
 
         using (var disabled = ImRaii.Disabled(!_isUnlocked))
         {
-            var wasLinked = isChildScaleLinked;
+            var wasLinked = !isChildScaleIndependent;
 
             if (wasLinked)
                 ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Active);
@@ -919,8 +919,8 @@ public class BoneEditorPanel
             {
                 SaveStateForUndo(CaptureCurrentState());
 
-                isChildScaleLinked = !isChildScaleLinked;
-                if (!isChildScaleLinked)
+                isChildScaleIndependent = !isChildScaleIndependent;
+                if (isChildScaleIndependent)
                 {
                     childScale = transform.Scaling;
                 }
@@ -928,20 +928,20 @@ public class BoneEditorPanel
                 {
                     transform.ChildScaling = Vector3.One;
                 }
-                transform.ChildScalingLinked = isChildScaleLinked;
+                transform.ChildScalingIndependent = isChildScaleIndependent;
                 childScaleChanged = true;
             }
 
             if (wasLinked)
                 ImGui.PopStyleColor();
 
-            if (isChildScaleLinked)
+            if (!isChildScaleIndependent)
                 ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Active);
 
             CtrlHelper.AddHoverText(
                 $"Link '{BoneData.GetBoneDisplayName(codename)}' child bone scaling to parent scaling");
 
-            if (isChildScaleLinked)
+            if (!isChildScaleIndependent)
                 ImGui.PopStyleColor();
         }
 
@@ -971,7 +971,7 @@ public class BoneEditorPanel
         var bottomRight = new Vector2(rightEdgeX + bracketWidth, bottomY);
 
         drawList.AddLine(topRightM, topLeft, bracketColor, lineThickness);   // Top
-        if (isChildScaleLinked)
+        if (!isChildScaleIndependent)
         {
             drawList.AddLine(topLeft, bottomLeft, bracketColor, lineThickness); // Middle
         }
@@ -984,7 +984,7 @@ public class BoneEditorPanel
         }
         drawList.AddLine(bottomLeftM, bottomRight, bracketColor, lineThickness); // Bottom
 
-        using (var disabled = ImRaii.Disabled(!_isUnlocked || isChildScaleLinked))
+        using (var disabled = ImRaii.Disabled(!_isUnlocked || !isChildScaleIndependent))
         {
             ImGui.TableNextColumn();
             float tempChildX = childScale.X;

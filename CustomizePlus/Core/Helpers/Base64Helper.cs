@@ -17,7 +17,7 @@ public class BoneTransformData // literally not cooking
     public Vector3 Rotation { get; set; }
     public Vector3 Scaling { get; set; }
     public Vector3 ChildScaling { get; set; }
-    public bool ChildScalingLinked { get; set; }
+    public bool ChildScalingIndependent { get; set; }
     public bool PropagateTranslation { get; set; }
     public bool PropagateRotation { get; set; }
     public bool PropagateScale { get; set; }
@@ -87,7 +87,7 @@ public static class Base64Helper
                 Rotation = b.Transform.Rotation,
                 Scaling = b.Transform.Scaling,
                 ChildScaling = b.Transform.ChildScaling,
-                ChildScalingLinked = b.Transform.ChildScalingLinked,
+                ChildScalingIndependent = b.Transform.ChildScalingIndependent,
                 PropagateTranslation = b.Transform.PropagateTranslation,
                 PropagateRotation = b.Transform.PropagateRotation,
                 PropagateScale = b.Transform.PropagateScale

@@ -335,7 +335,7 @@ public unsafe class ModelBone
 
         var childScaleToUse = access2->Scale.ToVector3();
 
-        if (!CustomizedTransform.ChildScalingLinked)
+        if (CustomizedTransform.ChildScalingIndependent)
         {
             childScaleToUse = new Vector3(
                 initialScale.X * CustomizedTransform.ChildScaling.X,
@@ -346,7 +346,7 @@ public unsafe class ModelBone
 
         var shouldPropagateScale = CustomizedTransform.PropagateScale &&
             (!CustomizedTransform.Scaling.Equals(Vector3.One) ||
-             (!CustomizedTransform.ChildScalingLinked && !CustomizedTransform.ChildScaling.Equals(Vector3.One)));
+             (CustomizedTransform.ChildScalingIndependent && !CustomizedTransform.ChildScaling.Equals(Vector3.One)));
 
         PropagateChildren(cBase, access2, initialPos, initialRot, initialScale,
             CustomizedTransform.PropagateTranslation && !CustomizedTransform.Translation.Equals(Vector3.Zero),

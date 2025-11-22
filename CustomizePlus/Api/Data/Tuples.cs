@@ -36,10 +36,10 @@ global using IPCBoneDataTuple = (
     bool PropagateRotation,
     bool PropagateScale,
     System.Numerics.Vector3 ChildScale,
-    bool ChildScaleLinked);
+    bool ChildScaleIndependent);
 
 global using IPCTemplateStatusTuple = (
     System.Guid UniqueId,
     string Name,
-    System.Collections.Generic.List<(string Name, System.Numerics.Vector3 Translation, System.Numerics.Vector3 Rotation, System.Numerics.Vector3 Scale, bool PropagateTranslation, bool PropagateRotation, bool PropagateScale, System.Numerics.Vector3 ChildScale, bool ChildScaleLinked)> Bones,
+    System.Collections.Generic.List<(string Name, System.Numerics.Vector3 Translation, System.Numerics.Vector3 Rotation, System.Numerics.Vector3 Scale, bool PropagateTranslation, bool PropagateRotation, bool PropagateScale, System.Numerics.Vector3 ChildScale, bool ChildScaleIndependent)> Bones,
     bool IsEnabled);    

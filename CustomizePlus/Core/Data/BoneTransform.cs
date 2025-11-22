@@ -70,9 +70,9 @@ public class BoneTransform
     public bool PropagateTranslation = false;
     public bool PropagateRotation = false;
     public bool PropagateScale = false;
-    public bool ChildScalingLinked = true;
+    public bool ChildScalingIndependent = false;
 
-    public bool ShouldSerializeChildScaling() => !ChildScalingLinked;
+    public bool ShouldSerializeChildScaling() => ChildScalingIndependent;
 
     [OnDeserialized]
     internal void OnDeserialized(StreamingContext context)
@@ -82,7 +82,7 @@ public class BoneTransform
         _rotation = ClampAngles(_rotation);
         _scaling = ClampToDefaultLimits(_scaling);
 
-        if (_childScaling == Vector3.Zero && ChildScalingLinked)
+        if (_childScaling == Vector3.Zero && !ChildScalingIndependent)
             _childScaling = Vector3.One;
         else
             _childScaling = ClampToDefaultLimits(_childScaling);
@@ -99,7 +99,7 @@ public class BoneTransform
         return !Translation.IsApproximately(Vector3.Zero, 0.00001f)
                || !Rotation.IsApproximately(Vector3.Zero, 0.1f)
                || !Scaling.IsApproximately(Vector3.One, 0.00001f)
-               || (!ChildScalingLinked && !ChildScaling.IsApproximately(Vector3.One, 0.00001f))
+               || (ChildScalingIndependent && !ChildScaling.IsApproximately(Vector3.One, 0.00001f))
                || propagation;
     }
 
@@ -114,7 +114,7 @@ public class BoneTransform
             PropagateRotation = PropagateRotation,
             PropagateScale = PropagateScale,
             ChildScaling = ChildScaling,
-            ChildScalingLinked = ChildScalingLinked
+            ChildScalingIndependent = ChildScalingIndependent
         };
     }
 
@@ -141,7 +141,7 @@ public class BoneTransform
             if (!shouldPropagate)
             {
                 ChildScaling = Vector3.One;
-                ChildScalingLinked = true;
+                ChildScalingIndependent = false;
             }
         }
     }
@@ -155,7 +155,7 @@ public class BoneTransform
         PropagateTranslation = newValues.PropagateTranslation;
         PropagateRotation = newValues.PropagateRotation;
         PropagateScale = newValues.PropagateScale;
-        ChildScalingLinked = newValues.ChildScalingLinked;
+        ChildScalingIndependent = newValues.ChildScalingIndependent;
     }
 
     /// <summary>
@@ -173,7 +173,7 @@ public class BoneTransform
             PropagateTranslation = PropagateTranslation,
             PropagateRotation = PropagateRotation,
             PropagateScale = PropagateScale,
-            ChildScalingLinked = ChildScalingLinked
+            ChildScalingIndependent = ChildScalingIndependent
         };
     }
 
@@ -192,7 +192,7 @@ public class BoneTransform
             PropagateTranslation = PropagateTranslation,
             PropagateRotation = PropagateRotation,
             PropagateScale = PropagateScale,
-            ChildScalingLinked = ChildScalingLinked
+            ChildScalingIndependent = ChildScalingIndependent
         };
     }
 

@@ -195,6 +195,7 @@ public class TemplateFileSystemSelector : FileSystemSelector<Template, TemplateS
                     2 => GetTemplateFromV2Profile(json),
                     3 => GetTemplateFromV3Profile(json),
                     4 => JsonConvert.DeserializeObject<Template>(json),
+                    5 => JsonConvert.DeserializeObject<Template>(json),
                     _ => null
                 };
                 if (template is Template tpl && tpl != null)

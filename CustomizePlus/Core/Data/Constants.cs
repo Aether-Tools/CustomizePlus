@@ -11,7 +11,7 @@ internal static class Constants
     /// <summary>
     /// Version of the configuration file, when increased a converter should be implemented if necessary.
     /// </summary>
-    public const int ConfigurationVersion = 4;
+    public const int ConfigurationVersion = 5;
 
     /// <summary>
     /// The name of the root bone.

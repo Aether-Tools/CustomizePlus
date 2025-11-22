@@ -54,6 +54,10 @@ public class BoneEditorPanel
     private Dictionary<string, BoneTransform>? _pendingUndoSnapshot = null;
     private float _initialX, _initialY, _initialZ;
     private Vector3 _initialScale;
+    private float _initialChildX, _initialChildY, _initialChildZ;
+    private Vector3 _initialChildScale;
+    private float _propagateButtonXPos = 0;
+    private float _parentRowScreenPosY = 0;
 
     // favorite bone stuff
     private HashSet<string> _favoriteBones;
@@ -298,7 +302,7 @@ public class BoneEditorPanel
                 var col3Label = _editingAttribute == BoneAttribute.Rotation ? "Yaw" : "Z";
                 var col4Label = _editingAttribute == BoneAttribute.Scale ? "All" : "N/A";
 
-                ImGui.TableSetupColumn("Bones", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthFixed, 5 * CtrlHelper.IconButtonWidth);
+                ImGui.TableSetupColumn("Bones", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthFixed, 6 * CtrlHelper.IconButtonWidth);
 
                 ImGui.TableSetupColumn($"{col1Label}", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthStretch);
                 ImGui.TableSetupColumn($"{col2Label}", ImGuiTableColumnFlags.NoReorder | ImGuiTableColumnFlags.WidthStretch);
@@ -388,6 +392,8 @@ public class BoneEditorPanel
                                             Translation = boneData.Translation,
                                             Rotation = boneData.Rotation,
                                             Scaling = boneData.Scaling,
+                                            ChildScaling = boneData.ChildScaling,
+                                            ChildScalingLinked = boneData.ChildScalingLinked,
                                             PropagateTranslation = boneData.PropagateTranslation,
                                             PropagateRotation = boneData.PropagateRotation,
                                             PropagateScale = boneData.PropagateScale
@@ -726,6 +732,7 @@ public class BoneEditorPanel
 
         using var id = ImRaii.PushId(codename);
         ImGui.TableNextColumn();
+        _parentRowScreenPosY = ImGui.GetCursorScreenPos().Y;
         using (var disabled = ImRaii.Disabled(!_isUnlocked))
         {
             ImGui.Dummy(new Vector2(CtrlHelper.IconButtonWidth * 0.75f, 0));
@@ -735,8 +742,12 @@ public class BoneEditorPanel
             RevertBoneButton(bone);
             ImGui.SameLine();
 
+            _propagateButtonXPos = ImGui.GetCursorPosX();
             if (PropagateCheckbox(bone, ref propagationEnabled))
+            {
+                SaveStateForUndo(CaptureCurrentState());
                 valueChanged = true;
+            }
 
             ImGui.SameLine();
             isFavorite = FavoriteButton(bone);
@@ -861,6 +872,211 @@ public class BoneEditorPanel
         if (valueChanged)
         {
             transform.UpdateAttribute(_editingAttribute, newVector, propagationEnabled);
+            _editorManager.ModifyBoneTransform(codename, transform);
+
+            if (_isMirrorModeEnabled && bone.Basis?.TwinBone != null)
+            {
+                _editorManager.ModifyBoneTransform(
+                    bone.Basis.TwinBone.BoneName,
+                    BoneData.IsIVCSCompatibleBone(codename)
+                        ? transform.GetSpecialReflection()
+                        : transform.GetStandardReflection()
+                );
+            }
+        }
+
+        ImGui.TableNextRow();
+
+        if (_editingAttribute == BoneAttribute.Scale && propagationEnabled)
+        {
+            RenderChildScalingRow(bone, transform);
+        }
+    }
+
+    private void RenderChildScalingRow(EditRowParams bone, BoneTransform transform)
+    {
+        var codename = bone.BoneCodeName;
+        var displayName = bone.BoneDisplayName;
+
+        bool isChildScaleLinked = transform.ChildScalingLinked;
+        bool childScaleChanged = false;
+        var childScale = isChildScaleLinked ? transform.Scaling : transform.ChildScaling;
+
+        using var id = ImRaii.PushId($"{codename}_childscale");
+
+        ImGui.TableNextColumn();
+        
+        ImGui.SetCursorPosX(_propagateButtonXPos);
+
+        using (var disabled = ImRaii.Disabled(!_isUnlocked))
+        {
+            var wasLinked = isChildScaleLinked;
+
+            if (wasLinked)
+                ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Active);
+
+            if (ImGuiComponents.IconButton($"##ChildLink{codename}", FontAwesomeIcon.Link))
+            {
+                SaveStateForUndo(CaptureCurrentState());
+
+                isChildScaleLinked = !isChildScaleLinked;
+                if (!isChildScaleLinked)
+                {
+                    childScale = transform.Scaling;
+                }
+                else
+                {
+                    transform.ChildScaling = Vector3.One;
+                }
+                transform.ChildScalingLinked = isChildScaleLinked;
+                childScaleChanged = true;
+            }
+
+            if (wasLinked)
+                ImGui.PopStyleColor();
+
+            if (isChildScaleLinked)
+                ImGui.PushStyleColor(ImGuiCol.Text, Constants.Colors.Active);
+
+            CtrlHelper.AddHoverText(
+                $"Link '{BoneData.GetBoneDisplayName(codename)}' child bone scaling to parent scaling");
+
+            if (isChildScaleLinked)
+                ImGui.PopStyleColor();
+        }
+
+        // Draws a bracket between the two rows.
+        var drawList = ImGui.GetWindowDrawList();
+        var bracketColor = ImGui.GetColorU32(ImGuiCol.TextDisabled);
+        var lineThickness = 2.0f;
+
+        var rowHeight = ImGui.GetFrameHeight();
+        var bracketWidth = CtrlHelper.IconButtonWidth * 0.3f;
+
+        var availWidth = ImGui.GetContentRegionAvail().X;
+        var cursorScreenPos = ImGui.GetCursorScreenPos();
+        var rightEdgeX = cursorScreenPos.X + availWidth - bracketWidth;
+
+        var parentRowCenterY = _parentRowScreenPosY + rowHeight * 0.5f;
+        var childRowCenterY = cursorScreenPos.Y + rowHeight * 0.5f;
+        var bracketCenterY = (parentRowCenterY + childRowCenterY) * 0.5f;
+
+        var topY = parentRowCenterY;
+        var bottomY = bracketCenterY;
+        var heightThird = (topY - bottomY) / 3;
+        var topRightM = new Vector2(rightEdgeX + bracketWidth - 1, topY);
+        var topLeft = new Vector2(rightEdgeX, topY);
+        var bottomLeft = new Vector2(rightEdgeX, bottomY);
+        var bottomLeftM = new Vector2(rightEdgeX - 1, bottomY); // Just works
+        var bottomRight = new Vector2(rightEdgeX + bracketWidth, bottomY);
+
+        drawList.AddLine(topRightM, topLeft, bracketColor, lineThickness);   // Top
+        if (isChildScaleLinked)
+        {
+            drawList.AddLine(topLeft, bottomLeft, bracketColor, lineThickness); // Middle
+        }
+        else
+        {
+            var gapStart = new Vector2(rightEdgeX, topY - heightThird);
+            var gapEnd = new Vector2(rightEdgeX, topY - 2 * heightThird);
+            drawList.AddLine(topLeft, gapStart, bracketColor, lineThickness);
+            drawList.AddLine(gapEnd, bottomLeft, bracketColor, lineThickness);
+        }
+        drawList.AddLine(bottomLeftM, bottomRight, bracketColor, lineThickness); // Bottom
+
+        using (var disabled = ImRaii.Disabled(!_isUnlocked || isChildScaleLinked))
+        {
+            ImGui.TableNextColumn();
+            float tempChildX = childScale.X;
+            if (ImGui.IsItemActivated())
+            {
+                _initialChildX = tempChildX;
+                if (_pendingUndoSnapshot == null)
+                    _pendingUndoSnapshot = CaptureCurrentState();
+            }
+            if (SingleValueSlider($"##child-{displayName}-X", ref tempChildX))
+            {
+                childScale.X = tempChildX;
+                childScaleChanged = true;
+            }
+            if (ImGui.IsItemDeactivatedAfterEdit())
+            {
+                if (_pendingUndoSnapshot != null && _initialChildX != childScale.X)
+                {
+                    SaveStateForUndo(_pendingUndoSnapshot);
+                    _pendingUndoSnapshot = null;
+                }
+            }
+
+            ImGui.TableNextColumn();
+            float tempChildY = childScale.Y;
+            if (ImGui.IsItemActivated())
+            {
+                _initialChildY = tempChildY;
+                if (_pendingUndoSnapshot == null)
+                    _pendingUndoSnapshot = CaptureCurrentState();
+            }
+            if (SingleValueSlider($"##child-{displayName}-Y", ref tempChildY))
+            {
+                childScale.Y = tempChildY;
+                childScaleChanged = true;
+            }
+            if (ImGui.IsItemDeactivatedAfterEdit())
+            {
+                if (_pendingUndoSnapshot != null && _initialChildY != childScale.Y)
+                {
+                    SaveStateForUndo(_pendingUndoSnapshot);
+                    _pendingUndoSnapshot = null;
+                }
+            }
+
+            ImGui.TableNextColumn();
+            float tempChildZ = childScale.Z;
+            if (ImGui.IsItemActivated())
+            {
+                _initialChildZ = tempChildZ;
+                if (_pendingUndoSnapshot == null)
+                    _pendingUndoSnapshot = CaptureCurrentState();
+            }
+            if (SingleValueSlider($"##child-{displayName}-Z", ref tempChildZ))
+            {
+                childScale.Z = tempChildZ;
+                childScaleChanged = true;
+            }
+            if (ImGui.IsItemDeactivatedAfterEdit())
+            {
+                if (_pendingUndoSnapshot != null && _initialChildZ != childScale.Z)
+                {
+                    SaveStateForUndo(_pendingUndoSnapshot);
+                    _pendingUndoSnapshot = null;
+                }
+            }
+
+            ImGui.TableNextColumn();
+            if (ImGui.IsItemActivated())
+            {
+                _initialChildScale = childScale;
+                if (_pendingUndoSnapshot == null)
+                    _pendingUndoSnapshot = CaptureCurrentState();
+            }
+            if (FullBoneSlider($"##child-{displayName}-All", ref childScale))
+                childScaleChanged = true;
+            if (ImGui.IsItemDeactivatedAfterEdit())
+            {
+                if (_pendingUndoSnapshot != null && _initialChildScale != childScale)
+                {
+                    SaveStateForUndo(_pendingUndoSnapshot);
+                    _pendingUndoSnapshot = null;
+                }
+            }
+        }
+
+        ImGui.TableNextColumn();
+        CtrlHelper.StaticLabel($"{displayName} - Child Bones", CtrlHelper.TextAlignment.Left, "Scale applied to child bones");
+
+        if (childScaleChanged)
+        {
+            transform.ChildScaling = childScale;
             _editorManager.ModifyBoneTransform(codename, transform);
 
             if (_isMirrorModeEnabled && bone.Basis?.TwinBone != null)

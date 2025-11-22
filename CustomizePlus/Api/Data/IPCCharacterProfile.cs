@@ -38,6 +38,8 @@ public class IPCCharacterProfile
                     Translation = kvPair.Value.Translation,
                     Rotation = kvPair.Value.Rotation,
                     Scaling = kvPair.Value.Scaling,
+                    ChildScaling = kvPair.Value.ChildScaling,
+                    ChildScaleLinked = kvPair.Value.ChildScalingLinked,
                     PropagateTranslation = kvPair.Value.PropagateTranslation,
                     PropagateRotation = kvPair.Value.PropagateRotation,
                     PropagateScale = kvPair.Value.PropagateScale
@@ -79,6 +81,8 @@ public class IPCCharacterProfile
                     Translation = kvPair.Value.Translation,
                     Rotation = kvPair.Value.Rotation,
                     Scaling = kvPair.Value.Scaling,
+                    ChildScaling = kvPair.Value.ChildScaling,
+                    ChildScalingLinked = kvPair.Value.ChildScaleLinked,
                     PropagateTranslation = kvPair.Value.PropagateTranslation,
                     PropagateRotation = kvPair.Value.PropagateRotation,
                     PropagateScale = kvPair.Value.PropagateScale
@@ -113,6 +117,13 @@ public class IPCBoneTransform
         set => _scaling = ClampVector(value);
     }
 
+    private Vector3 _childScaling;
+    public Vector3 ChildScaling
+    {
+        get => _childScaling;
+        set => _childScaling = ClampVector(value);
+    }
+
     /// <summary>
     /// Reserved for future use
     /// </summary>
@@ -127,6 +138,8 @@ public class IPCBoneTransform
     /// Reserved for future use
     /// </summary>
     public bool PropagateScale { get; set; }
+
+    public bool ChildScaleLinked { get; set; } = false;
 
     /// <summary>
     /// Clamp all vector values to be within allowed limits.

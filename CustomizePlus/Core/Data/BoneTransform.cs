@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Numerics;
 using System.Runtime.Serialization;
 using CustomizePlus.Core.Extensions;
@@ -14,7 +14,8 @@ public enum BoneAttribute
     //hard-coding the backing values for legacy purposes
     Position = 0,
     Rotation = 1,
-    Scale = 2
+    Scale = 2,
+    ChildScaling = 3
 }
 
 [Serializable]
@@ -30,6 +31,7 @@ public class BoneTransform
         Translation = Vector3.Zero;
         Rotation = Vector3.Zero;
         Scaling = Vector3.One;
+        ChildScaling = Vector3.One;
     }
 
     public BoneTransform(BoneTransform original)
@@ -58,9 +60,19 @@ public class BoneTransform
         set => _scaling = ClampVector(value);
     }
 
+    private Vector3 _childScaling;
+    public Vector3 ChildScaling
+    {
+        get => _childScaling;
+        set => _childScaling = ClampVector(value);
+    }
+
     public bool PropagateTranslation = false;
     public bool PropagateRotation = false;
     public bool PropagateScale = false;
+    public bool ChildScalingLinked = true;
+
+    public bool ShouldSerializeChildScaling() => !ChildScalingLinked;
 
     [OnDeserialized]
     internal void OnDeserialized(StreamingContext context)
@@ -69,6 +81,11 @@ public class BoneTransform
         _translation = ClampToDefaultLimits(_translation);
         _rotation = ClampAngles(_rotation);
         _scaling = ClampToDefaultLimits(_scaling);
+
+        if (_childScaling == Vector3.Zero && ChildScalingLinked)
+            _childScaling = Vector3.One;
+        else
+            _childScaling = ClampToDefaultLimits(_childScaling);
     }
 
     //"considerPropagationAsEdit" only should be true if you know what you are doing
@@ -82,6 +99,7 @@ public class BoneTransform
         return !Translation.IsApproximately(Vector3.Zero, 0.00001f)
                || !Rotation.IsApproximately(Vector3.Zero, 0.1f)
                || !Scaling.IsApproximately(Vector3.One, 0.00001f)
+               || (!ChildScalingLinked && !ChildScaling.IsApproximately(Vector3.One, 0.00001f))
                || propagation;
     }
 
@@ -94,7 +112,9 @@ public class BoneTransform
             Scaling = Scaling,
             PropagateTranslation = PropagateTranslation,
             PropagateRotation = PropagateRotation,
-            PropagateScale = PropagateScale
+            PropagateScale = PropagateScale,
+            ChildScaling = ChildScaling,
+            ChildScalingLinked = ChildScalingLinked
         };
     }
 
@@ -110,10 +130,19 @@ public class BoneTransform
             Rotation = newValue;
             PropagateRotation = shouldPropagate;
         }
+        else if (which == BoneAttribute.ChildScaling)
+        {
+            ChildScaling = newValue;
+        }
         else
         {
             Scaling = newValue;
             PropagateScale = shouldPropagate;
+            if (!shouldPropagate)
+            {
+                ChildScaling = Vector3.One;
+                ChildScalingLinked = true;
+            }
         }
     }
 
@@ -122,9 +151,11 @@ public class BoneTransform
         Translation = newValues.Translation;
         Rotation = newValues.Rotation;
         Scaling = newValues.Scaling;
+        ChildScaling = newValues.ChildScaling;
         PropagateTranslation = newValues.PropagateTranslation;
         PropagateRotation = newValues.PropagateRotation;
         PropagateScale = newValues.PropagateScale;
+        ChildScalingLinked = newValues.ChildScalingLinked;
     }
 
     /// <summary>
@@ -138,9 +169,11 @@ public class BoneTransform
             Translation = new Vector3(Translation.X, Translation.Y, -1 * Translation.Z),
             Rotation = new Vector3(-1 * Rotation.X, -1 * Rotation.Y, Rotation.Z),
             Scaling = Scaling,
+            ChildScaling = ChildScaling,
             PropagateTranslation = PropagateTranslation,
             PropagateRotation = PropagateRotation,
-            PropagateScale = PropagateScale
+            PropagateScale = PropagateScale,
+            ChildScalingLinked = ChildScalingLinked
         };
     }
 
@@ -155,9 +188,11 @@ public class BoneTransform
             Translation = new Vector3(Translation.X, -1 * Translation.Y, Translation.Z),
             Rotation = new Vector3(Rotation.X, -1 * Rotation.Y, -1 * Rotation.Z),
             Scaling = Scaling,
+            ChildScaling = ChildScaling,
             PropagateTranslation = PropagateTranslation,
             PropagateRotation = PropagateRotation,
-            PropagateScale = PropagateScale
+            PropagateScale = PropagateScale,
+            ChildScalingLinked = ChildScalingLinked
         };
     }
 
@@ -169,6 +204,7 @@ public class BoneTransform
         _translation = ClampVector(_translation);
         _rotation = ClampAngles(_rotation);
         _scaling = ClampVector(_scaling);
+        _childScaling = _childScaling == Vector3.Zero ? Vector3.One : ClampVector(_childScaling);
     }
 
     /// <summary>

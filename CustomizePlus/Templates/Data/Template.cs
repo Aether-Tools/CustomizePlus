@@ -106,13 +106,12 @@ public sealed class Template : ISavable
         var version = obj["Version"]?.ToObject<int>() ?? 0;
         return version switch
         {
-            //Did not exist before v4
-            4 => LoadV4(obj),
+            4 or 5 => LoadV5(obj),
             _ => throw new Exception("The design to be loaded has no valid Version."),
         };
     }
 
-    private static Template LoadV4(JObject obj)
+    private static Template LoadV5(JObject obj)
     {
         var creationDate = obj["CreationDate"]?.ToObject<DateTimeOffset>() ?? throw new ArgumentNullException("CreationDate");
 

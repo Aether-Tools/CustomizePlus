@@ -139,7 +139,7 @@ public class IPCBoneTransform
     /// </summary>
     public bool PropagateScale { get; set; }
 
-    public bool ChildScaleLinked { get; set; } = false;
+    public bool ChildScaleLinked { get; set; } = true;
 
     /// <summary>
     /// Clamp all vector values to be within allowed limits.

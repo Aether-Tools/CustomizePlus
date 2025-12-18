@@ -3,6 +3,12 @@ using OtterGui.Widgets;
 
 namespace CustomizePlus.UI.Windows;
 
+//Versioning concept (X.Y.Z.W):
+//X - major version, changes only during major rewrites of the plugin
+//Y - major feature version, changes when new major features are introduced (also can be changed with major game patches)
+//Z - minor feature version, changes when new minor features are introduced
+//W - bugfix version, changes when the update only contains bugfixes.
+
 public class CPlusChangeLog
 {
     public const int LastChangelogVersion = 0;
@@ -35,6 +41,7 @@ public class CPlusChangeLog
         Add2_0_8_2(Changelog);
         Add2_0_8_4(Changelog);
         Add2_0_9_0(Changelog);
+        Add2_1_0_0(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -46,6 +53,11 @@ public class CPlusChangeLog
         _config.ChangelogSettings.ChangeLogDisplayType = type;
         _config.Save();
     }
+
+    private static void Add2_1_0_0(Changelog log)
+        => log.NextVersion("Version 2.1.0.0")
+        .RegisterImportant("Support for 7.4 and Dalamud API 14. (by Risa)");
+
     private static void Add2_0_9_0(Changelog log)
         => log.NextVersion("Version 2.0.9.0")
         .RegisterEntry("Added ability to apply separate scaling to child bones when propagation is enabled on a bone. (by Midona)")

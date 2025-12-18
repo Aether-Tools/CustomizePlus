@@ -22,6 +22,7 @@ public class DalamudServices
             .AddDalamudService<ICommandManager>(pi)
             .AddDalamudService<IChatGui>(pi)
             .AddDalamudService<IClientState>(pi)
+            .AddDalamudService<IPlayerState>(pi)
             .AddDalamudService<IGameGui>(pi)
             .AddDalamudService<IGameInteropProvider>(pi)
             .AddDalamudService<IKeyState>(pi)

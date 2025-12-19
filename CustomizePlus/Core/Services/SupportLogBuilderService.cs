@@ -56,6 +56,9 @@ public class SupportLogBuilderService
         sb.Append($"> **`Cards:                          `** {_configuration.ProfileApplicationSettings.ApplyInCards}\n");
         sb.Append($"> **`Inspect:                        `** {_configuration.ProfileApplicationSettings.ApplyInInspect}\n");
         sb.Append($"> **`Lobby:                          `** {_configuration.ProfileApplicationSettings.ApplyInLobby}\n");
+        sb.AppendLine("**Dalamud**");
+        sb.Append($"> **`Dalamud Version:                `** {_dalamudPluginInterface.GetDalamudVersion().Version}\n");
+        sb.Append($"> **`Branch:                         `** {_dalamudPluginInterface.GetDalamudVersion().BetaTrack ?? "Release"}\n");
         sb.AppendLine("**Relevant plugins**");
         GatherRelevantPlugins(sb);
         sb.AppendLine("**Integrations**");

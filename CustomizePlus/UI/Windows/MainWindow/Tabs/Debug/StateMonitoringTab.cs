@@ -13,6 +13,10 @@ using Penumbra.GameData.Interop;
 using System;
 using System.Linq;
 
+#if INCOGNIFY_STRINGS
+using System.Numerics;
+#endif
+
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 
 public class StateMonitoringTab

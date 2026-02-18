@@ -1,5 +1,9 @@
 ﻿using CustomizePlus.Core.Data;
 using CustomizePlus.Templates.Data;
+using CustomizePlus.Api.Data;
+using CustomizePlus.Profiles;
+using CustomizePlus.Profiles.Data;
+using CustomizePlus.Templates;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -44,6 +48,33 @@ public static class Base64Helper
 
             return Convert.ToBase64String(compressedStream.ToArray());
         }
+        catch
+        {
+            return string.Empty;
+        }
+    }
+
+    public static string ExportProfileToBase64(Profile profile)
+    {
+        // Does the same thing as before above method but turns the profile into a template first via IPCCharacterProfile
+        // same as is done over in the PCP Service functionality
+        try
+        {
+            var ipcProfile = IPCCharacterProfile.FromFullProfile(profile);
+            var template = new Template(ipcProfile);
+
+            var json = template.JsonSerialize();
+            var bytes = Encoding.UTF8.GetBytes(json.ToString(Formatting.None));
+            using var compressedStream = new MemoryStream();
+            using (var zipStream = new GZipStream(compressedStream, CompressionMode.Compress))
+            {
+                zipStream.WriteByte(Template.Version);
+                zipStream.Write(bytes, 0, bytes.Length);
+            }
+
+            return Convert.ToBase64String(compressedStream.ToArray());
+        }
+
         catch
         {
             return string.Empty;

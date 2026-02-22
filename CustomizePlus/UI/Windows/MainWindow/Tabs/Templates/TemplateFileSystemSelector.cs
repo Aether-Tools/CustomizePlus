@@ -315,7 +315,7 @@ public class TemplateFileSystemSelector : FileSystemSelector<Template, TemplateS
 
         try
         {
-            _clipboardText = ImGui.GetClipboardText();
+            _clipboardText = ImUtf8.GetClipboardText();
             ImGui.OpenPopup("##NewTemplate");
         }
         catch

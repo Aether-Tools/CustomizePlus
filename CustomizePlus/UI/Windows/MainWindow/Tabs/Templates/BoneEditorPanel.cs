@@ -14,6 +14,7 @@ using Dalamud.Interface.Utility;
 using OtterGui;
 using OtterGui.Log;
 using OtterGui.Raii;
+using OtterGui.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -477,7 +478,7 @@ public class BoneEditorPanel
 
                             if (ImGui.MenuItem("Import Group"))
                             {
-                                var clipboardText = Clipboard.GetText();
+                                var clipboardText = ImUtf8.GetClipboardText();
                                 if (!string.IsNullOrEmpty(clipboardText))
                                     _pendingImportText = clipboardText;
                             }
@@ -504,7 +505,7 @@ public class BoneEditorPanel
         {
             try
             {
-                Clipboard.SetText(_pendingClipboardText);
+                ImUtf8.SetClipboardText(_pendingClipboardText);
                 _logger.Debug("copied to clipboard: " + _pendingClipboardText);
             }
             catch (Exception ex)
@@ -525,7 +526,7 @@ public class BoneEditorPanel
         }
 
         var viewportSize = ImGui.GetWindowViewport().Size;
-        ImGui.SetNextWindowSize(new Vector2(viewportSize.X / 4, viewportSize.Y / 12));
+        ImGui.SetNextWindowSize(new Vector2(viewportSize.X / 3, viewportSize.Y / 12));
         ImGui.SetNextWindowPos(viewportSize / 2, ImGuiCond.Always, new Vector2(0.5f));
         using var popup = ImRaii.Popup("SavePopup", ImGuiWindowFlags.Modal);
         if (!popup)

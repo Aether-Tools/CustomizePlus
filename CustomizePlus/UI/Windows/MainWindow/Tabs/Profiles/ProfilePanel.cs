@@ -5,6 +5,7 @@ using OtterGui;
 using OtterGui.Raii;
 using OtterGui.Extensions;
 using OtterGui.Log;
+using OtterGui.Text;
 using System;
 using System.Linq;
 using System.Numerics;
@@ -23,7 +24,6 @@ using CustomizePlus.GameData.Extensions;
 using CustomizePlus.Core.Extensions;
 using Dalamud.Interface.Components;
 using OtterGui.Extensions;
-using System.Windows.Forms;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 
@@ -110,7 +110,7 @@ public class ProfilePanel
          => _selector.Selected == null
         ? HeaderDrawer.Button.Invisible
         :new HeaderDrawer.Button {
-            Description = "Copy the current profile to your clipboard.",
+            Description = "Copy the current profile combined into one template to your clipboard.",
             Icon = FontAwesomeIcon.Copy,
             OnClick = ExportToClipboard,
             Visible = _selector.Selected != null,
@@ -272,8 +272,7 @@ public class ProfilePanel
     {
         try
         {
-            var data = Base64Helper.ExportProfileToBase64(_selector.Selected!);
-            Clipboard.SetText(data);
+            ImUtf8.SetClipboardText(Base64Helper.ExportProfileToBase64(_selector.Selected!));
             _popupSystem.ShowPopup(PopupSystem.Messages.ClipboardDataNotLongTerm);
         }
         catch (Exception ex)

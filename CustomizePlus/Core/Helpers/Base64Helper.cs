@@ -30,6 +30,23 @@ public class BoneTransformData // literally not cooking
 //this is jank but I don't have time to rewrite it
 public static class Base64Helper
 {
+    public static string ExportProfileToBase64(Profile profile)
+    {
+        // Does the same thing as ExportTemplateToBase64 but turns the profile into a template first via IPCCharacterProfile
+        // same as is done over in the PCP Service functionality
+        try
+        {
+            var ipcProfile = IPCCharacterProfile.FromFullProfile(profile);
+            var template = new Template(ipcProfile);
+
+            return ExportTemplateToBase64(template);
+        }
+        catch
+        {
+            return string.Empty;
+        }
+    }
+
     // Compress any type to a base64 encoding of its compressed json representation, prepended with a version byte.
     // Returns an empty string on failure.
     // Original by Ottermandias: OtterGui <3
@@ -48,33 +65,6 @@ public static class Base64Helper
 
             return Convert.ToBase64String(compressedStream.ToArray());
         }
-        catch
-        {
-            return string.Empty;
-        }
-    }
-
-    public static string ExportProfileToBase64(Profile profile)
-    {
-        // Does the same thing as before above method but turns the profile into a template first via IPCCharacterProfile
-        // same as is done over in the PCP Service functionality
-        try
-        {
-            var ipcProfile = IPCCharacterProfile.FromFullProfile(profile);
-            var template = new Template(ipcProfile);
-
-            var json = template.JsonSerialize();
-            var bytes = Encoding.UTF8.GetBytes(json.ToString(Formatting.None));
-            using var compressedStream = new MemoryStream();
-            using (var zipStream = new GZipStream(compressedStream, CompressionMode.Compress))
-            {
-                zipStream.WriteByte(Template.Version);
-                zipStream.Write(bytes, 0, bytes.Length);
-            }
-
-            return Convert.ToBase64String(compressedStream.ToArray());
-        }
-
         catch
         {
             return string.Empty;

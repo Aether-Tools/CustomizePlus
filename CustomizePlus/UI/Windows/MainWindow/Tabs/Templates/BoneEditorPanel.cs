@@ -523,7 +523,7 @@ public class BoneEditorPanel
         }
 
         var viewportSize = ImGui.GetWindowViewport().Size;
-        ImGui.SetNextWindowSize(new Vector2(viewportSize.X / 3, viewportSize.Y / 12));
+        ImGui.SetNextWindowSize(new Vector2(viewportSize.X / 4, viewportSize.Y / 12));
         ImGui.SetNextWindowPos(viewportSize / 2, ImGuiCond.Always, new Vector2(0.5f));
         using var popup = ImRaii.Popup("SavePopup", ImGuiWindowFlags.Modal);
         if (!popup)

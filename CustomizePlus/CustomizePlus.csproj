@@ -7,7 +7,7 @@
     <Description>Customize+</Description>
     <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/Aether-Tools/CustomizePlus</PackageProjectUrl>
-    <UseWindowsForms>true</UseWindowsForms>
+    <UseWindowsForms>false</UseWindowsForms>
   </PropertyGroup>
 
   <PropertyGroup>

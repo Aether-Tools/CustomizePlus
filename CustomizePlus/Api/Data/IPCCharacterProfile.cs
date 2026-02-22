@@ -1,17 +1,9 @@
-﻿using CustomizePlus.Configuration.Data.Version3;
-using CustomizePlus.Core.Data;
-using CustomizePlus.Game.Services;
-using CustomizePlus.GameData.Extensions;
+﻿using CustomizePlus.Core.Data;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Templates.Data;
-using Penumbra.GameData.Enums;
-using Penumbra.GameData.Structs;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CustomizePlus.Api.Data;
 

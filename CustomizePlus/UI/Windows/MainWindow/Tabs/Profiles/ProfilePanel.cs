@@ -18,12 +18,8 @@ using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.Templates.Events;
 using Penumbra.GameData.Actors;
-using Penumbra.String;
-using static FFXIVClientStructs.FFXIV.Client.LayoutEngine.ILayoutInstance;
 using CustomizePlus.GameData.Extensions;
-using CustomizePlus.Core.Extensions;
 using Dalamud.Interface.Components;
-using OtterGui.Extensions;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 

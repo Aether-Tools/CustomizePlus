@@ -1,7 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Penumbra.GameData.Actors;
 using Penumbra.GameData.Enums;
-using Penumbra.GameData.Interop;
 using PenumbraExtensions = Penumbra.GameData.Actors.ActorIdentifierExtensions;
 
 namespace CustomizePlus.GameData.Extensions;

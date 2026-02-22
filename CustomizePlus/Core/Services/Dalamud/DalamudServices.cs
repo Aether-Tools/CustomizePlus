@@ -1,9 +1,5 @@
-﻿using Dalamud.Game;
-using Dalamud.Game.ClientState.Objects;
-using Dalamud.IoC;
-using Dalamud.Plugin;
+﻿using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
-using Microsoft.Extensions.DependencyInjection;
 using OtterGui.Services;
 
 namespace CustomizePlus.Core.Services.Dalamud;

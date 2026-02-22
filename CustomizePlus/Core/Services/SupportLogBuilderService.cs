@@ -6,7 +6,6 @@ using CustomizePlus.Configuration.Data;
 using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Extensions;
 using CustomizePlus.Core.Helpers;
-using CustomizePlus.Core.Services.Dalamud;
 using CustomizePlus.Profiles;
 using CustomizePlus.Templates;
 using Dalamud.Plugin;

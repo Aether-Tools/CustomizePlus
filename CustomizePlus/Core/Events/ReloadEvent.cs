@@ -1,5 +1,4 @@
 ﻿using OtterGui.Classes;
-using System;
 
 namespace CustomizePlus.Core.Events;
 

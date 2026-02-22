@@ -1,9 +1,7 @@
 ﻿using CustomizePlus.Core.Data;
 using CustomizePlus.Templates.Data;
 using CustomizePlus.Api.Data;
-using CustomizePlus.Profiles;
 using CustomizePlus.Profiles.Data;
-using CustomizePlus.Templates;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

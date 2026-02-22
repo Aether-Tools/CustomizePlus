@@ -1,6 +1,5 @@
 ﻿using CustomizePlus.Templates.Data;
 using OtterGui.Classes;
-using System;
 
 namespace CustomizePlus.Templates.Events;
 

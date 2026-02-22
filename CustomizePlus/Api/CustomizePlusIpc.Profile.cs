@@ -12,7 +12,6 @@ using CustomizePlus.Templates.Events;
 using Dalamud.Game.ClientState.Objects.Types;
 using ECommonsLite.EzIpcManager;
 using Newtonsoft.Json;
-using OtterGui.Extensions;
 using Penumbra.GameData.Actors;
 using Penumbra.GameData.Enums;
 using Penumbra.GameData.Structs;
@@ -20,7 +19,6 @@ using Penumbra.String;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static System.Windows.Forms.AxHost;
 
 namespace CustomizePlus.Api;
 

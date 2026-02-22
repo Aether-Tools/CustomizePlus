@@ -9,14 +9,11 @@ using CustomizePlus.Profiles;
 using CustomizePlus.Game.Services;
 using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 using CustomizePlus.UI.Windows.MainWindow;
-using static System.Windows.Forms.AxHost;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Configuration.Data;
 using Dalamud.Interface.ImGuiNotification;
 using CustomizePlus.GameData.Extensions;
 using System.Collections.Generic;
-using ECommonsLite;
-using CustomizePlus.Core.Helpers;
 
 namespace CustomizePlus.Core.Services;
 

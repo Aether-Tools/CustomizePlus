@@ -7,7 +7,6 @@ using OtterGui.Text;
 using System;
 using System.Linq;
 using System.Numerics;
-using CustomizePlus.Core.Data;
 using CustomizePlus.Templates;
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Core.Helpers;

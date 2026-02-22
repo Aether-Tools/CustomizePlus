@@ -1,6 +1,5 @@
 ﻿using CustomizePlus.Profiles.Data;
 using OtterGui.Classes;
-using System;
 
 namespace CustomizePlus.Profiles.Events;
 

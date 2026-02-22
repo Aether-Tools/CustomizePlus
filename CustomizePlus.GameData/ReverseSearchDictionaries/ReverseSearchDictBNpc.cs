@@ -1,7 +1,6 @@
 ﻿using Dalamud.Plugin.Services;
 using Dalamud.Plugin;
 using OtterGui.Log;
-using Penumbra.GameData.Data;
 using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
 using CustomizePlus.GameData.ReverseSearchDictionaries.Bases;

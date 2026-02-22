@@ -17,7 +17,6 @@ using OtterGui.Text;
 using System;
 using System.Linq;
 using System.Numerics;
-using System.Reflection;
 using static CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles.ProfileFileSystemSelector;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;

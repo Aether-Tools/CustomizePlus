@@ -1,17 +1,11 @@
 ﻿using Dalamud.Plugin.Services;
 using Dalamud.Plugin;
-using FFXIVClientStructs.FFXIV.Common.Lua;
 using OtterGui.Log;
 using Penumbra.GameData.Data;
 using Penumbra.GameData.DataContainers.Bases;
 using Penumbra.GameData.Structs;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CustomizePlus.GameData.ReverseSearchDictionaries.Bases;
 

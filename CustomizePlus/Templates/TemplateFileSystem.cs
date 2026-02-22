@@ -2,9 +2,7 @@
 using OtterGui.Filesystem;
 using OtterGui.Log;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
 using CustomizePlus.Core.Services;
 using CustomizePlus.Templates.Events;

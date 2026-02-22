@@ -3,8 +3,6 @@ using CustomizePlus.Core.Services;
 using CustomizePlus.Game.Services;
 using CustomizePlus.GameData.Services;
 using CustomizePlus.Profiles;
-using CustomizePlus.Profiles.Events;
-using CustomizePlus.Templates.Data;
 using CustomizePlus.Templates.Events;
 using Dalamud.Plugin;
 using ECommonsLite.EzIpcManager;

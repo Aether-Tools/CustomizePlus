@@ -3,7 +3,6 @@ using CustomizePlus.Armatures.Data;
 using CustomizePlus.Core;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.Core.Services;
-using CustomizePlus.Interop.Ipc;
 using CustomizePlus.UI;
 using Dalamud.Plugin;
 using ECommonsLite;

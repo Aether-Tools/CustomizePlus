@@ -1,15 +1,8 @@
 ﻿using CustomizePlus.GameData.ReverseSearchDictionaries;
 using Dalamud.Game.ClientState.Objects.Enums;
 using OtterGui.Services;
-using Penumbra.GameData.DataContainers;
-using Penumbra.GameData.Structs;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CustomizePlus.GameData.Data;
 

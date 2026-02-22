@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Numerics;
 using CustomizePlus.Core.Data;
-using FFXIVClientStructs.Havok;
 using FFXIVClientStructs.Havok.Common.Base.Math.QsTransform;
 using FFXIVClientStructs.Havok.Common.Base.Math.Vector;
 

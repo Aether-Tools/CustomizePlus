@@ -5,7 +5,6 @@ using Penumbra.GameData.Data;
 using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
 using CustomizePlus.GameData.ReverseSearchDictionaries.Bases;
-using Dalamud.Utility;
 using Lumina.Excel.Sheets;
 
 namespace CustomizePlus.GameData.ReverseSearchDictionaries;

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Dalamud.Utility;
-using Newtonsoft.Json.Linq;
 using OtterGui.Log;
 using OtterGui.Filesystem;
 using Penumbra.GameData.Actors;
@@ -19,15 +17,12 @@ using CustomizePlus.Templates.Events;
 using CustomizePlus.Profiles.Events;
 using CustomizePlus.Templates.Data;
 using CustomizePlus.GameData.Data;
-using CustomizePlus.GameData.Services;
 using CustomizePlus.GameData.Extensions;
 using CustomizePlus.Profiles.Enums;
 using CustomizePlus.Profiles.Exceptions;
 using Penumbra.GameData.Enums;
 using Penumbra.GameData.Interop;
-using System.Runtime.Serialization;
 using CustomizePlus.Game.Services;
-using System.Threading.Tasks;
 using OtterGui.Classes;
 
 namespace CustomizePlus.Profiles;

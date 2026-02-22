@@ -1,10 +1,8 @@
 ﻿using System;
 using CustomizePlus.Core.Helpers;
-using CustomizePlus.Core.Services.Dalamud;
 using CustomizePlus.Game.Services;
 using CustomizePlus.UI.Windows;
 using Dalamud.Plugin.Services;
-using FFXIVClientStructs.FFXIV.Client.UI;
 
 namespace CustomizePlus.Core.Services;
 

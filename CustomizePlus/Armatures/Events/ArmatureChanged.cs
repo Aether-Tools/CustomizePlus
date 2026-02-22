@@ -1,6 +1,5 @@
 ﻿using CustomizePlus.Armatures.Data;
 using OtterGui.Classes;
-using System;
 
 namespace CustomizePlus.Armatures.Events;
 

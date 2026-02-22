@@ -9,7 +9,6 @@ using OtterGui.Raii;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using CustomizePlus.Templates;
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Profiles;

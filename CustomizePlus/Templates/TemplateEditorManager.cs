@@ -1,24 +1,18 @@
 ﻿using CustomizePlus.Configuration.Data;
 using CustomizePlus.Core.Data;
-using CustomizePlus.Game.Events;
 using CustomizePlus.Game.Services;
 using CustomizePlus.GameData.Extensions;
-using CustomizePlus.Profiles;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Profiles.Enums;
 using CustomizePlus.Templates.Data;
 using CustomizePlus.Templates.Events;
 using Dalamud.Plugin.Services;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
-using OtterGui.Classes;
 using OtterGui.Log;
 using Penumbra.GameData.Actors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Windows.Forms;
 
 namespace CustomizePlus.Templates;
 

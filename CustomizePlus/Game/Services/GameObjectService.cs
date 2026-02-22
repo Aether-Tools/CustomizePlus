@@ -7,8 +7,6 @@ using Penumbra.GameData.Enums;
 using Penumbra.GameData.Interop;
 using DalamudGameObject = Dalamud.Game.ClientState.Objects.Types.IGameObject;
 using CustomizePlus.Configuration.Data;
-using FFXIVClientStructs.FFXIV.Client.Game.Object;
-using Penumbra.GameData.Files.ShaderStructs;
 
 namespace CustomizePlus.Game.Services;
 

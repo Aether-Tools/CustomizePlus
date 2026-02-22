@@ -1,5 +1,4 @@
-﻿using CustomizePlus.Core.Services.Dalamud;
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace CustomizePlus.UI.Windows;
 

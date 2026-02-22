@@ -1,15 +1,9 @@
-﻿using Newtonsoft.Json;
-using OtterGui.Classes;
+﻿using OtterGui.Classes;
 using OtterGui.Log;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Services;
-using CustomizePlus.Configuration.Helpers;
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Core.Events;
-using CustomizePlus.Configuration.Data.Version3;
 using Dalamud.Interface.ImGuiNotification;
 
 namespace CustomizePlus.Configuration.Services;

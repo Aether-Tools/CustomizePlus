@@ -1,10 +1,8 @@
 ﻿using OtterGui.Filesystem;
 using OtterGui.Log;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.RegularExpressions;
 using System;
-using System.Linq;
 using OtterGui.Classes;
 using CustomizePlus.Core.Services;
 using CustomizePlus.Profiles.Data;

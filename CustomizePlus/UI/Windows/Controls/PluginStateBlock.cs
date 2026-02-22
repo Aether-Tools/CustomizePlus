@@ -9,7 +9,6 @@ using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.Api;
 using CustomizePlus.Core.Data;
-using CustomizePlus.Core.Services.Dalamud;
 
 namespace CustomizePlus.UI.Windows.Controls;
 

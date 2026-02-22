@@ -2,17 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using CustomizePlus.Configuration.Data.Version3;
 using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Extensions;
 using CustomizePlus.Templates.Data;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
-using FFXIVClientStructs.Havok;
-using FFXIVClientStructs.Havok.Animation.Rig;
 using FFXIVClientStructs.Havok.Common.Base.Math.QsTransform;
-using OtterGui.Text.EndObjects;
-using Penumbra.GameData;
-using static CustomizePlus.Anamnesis.Data.PoseFile;
 using static FFXIVClientStructs.Havok.Animation.Rig.hkaPose;
 
 namespace CustomizePlus.Armatures.Data;

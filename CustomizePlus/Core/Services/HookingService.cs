@@ -1,5 +1,4 @@
-﻿using Dalamud.Game;
-using Dalamud.Hooking;
+﻿using Dalamud.Hooking;
 using Dalamud.Plugin.Services;
 using System;
 using System.Runtime.InteropServices;
@@ -9,11 +8,7 @@ using CustomizePlus.Game.Services;
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Profiles;
 using CustomizePlus.Armatures.Services;
-using CustomizePlus.GameData.Data;
 using Penumbra.GameData.Interop;
-using Dalamud.Plugin;
-using CustomizePlus.Core.Helpers;
-using CustomizePlus.Core.Services.Dalamud;
 
 namespace CustomizePlus.Core.Services;
 

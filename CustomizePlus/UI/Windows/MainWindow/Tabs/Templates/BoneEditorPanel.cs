@@ -523,23 +523,39 @@ public class BoneEditorPanel
         }
 
         var viewportSize = ImGui.GetWindowViewport().Size;
-        ImGui.SetNextWindowSize(new Vector2(viewportSize.X / 4, viewportSize.Y / 12));
+        var scale = ImGuiHelpers.GlobalScale;
+
+        var buttonWidth = 150 * scale;
+        var spacing = ImGui.GetStyle().ItemSpacing.X;
+        var windowPaddingX = ImGui.GetStyle().WindowPadding.X;
+        var windowPaddingY = ImGui.GetStyle().WindowPadding.Y;
+
+        var popupWidth = (4 * buttonWidth) + (3 * spacing) + (windowPaddingX * 2) + (20 * scale);
+        popupWidth = Math.Max(popupWidth, viewportSize.X / 4f);
+
+        var message = "You have unsaved changes in current template, what would you like to do?";
+        var textSize = ImGui.CalcTextSize(message, false, popupWidth - windowPaddingX * 2);
+        var popupHeight = windowPaddingY * 2 + textSize.Y + ImGui.GetStyle().ItemSpacing.Y * 2 + ImGui.GetFrameHeight();
+        popupHeight = Math.Max(popupHeight, viewportSize.Y / 12f);
+
+        ImGui.SetNextWindowSize(new Vector2(popupWidth, popupHeight));
         ImGui.SetNextWindowPos(viewportSize / 2, ImGuiCond.Always, new Vector2(0.5f));
         using var popup = ImRaii.Popup("SavePopup", ImGuiWindowFlags.Modal);
         if (!popup)
             return;
 
-        ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth() / 4 - 40, ImGui.GetWindowHeight() / 4));
-        ImGuiUtil.TextWrapped("You have unsaved changes in current template, what would you like to do?");
+        ImGui.SetCursorPosX(Math.Max(windowPaddingX, (ImGui.GetWindowWidth() - textSize.X) / 2f));
+        ImGuiUtil.TextWrapped(message);
 
-        var buttonWidth = new Vector2(150 * ImGuiHelpers.GlobalScale, 0);
-        var yPos = ImGui.GetWindowHeight() - 2 * ImGui.GetFrameHeight();
-        var xPos = (ImGui.GetWindowWidth() - ImGui.GetStyle().ItemSpacing.X) / 4 - buttonWidth.X;
-        ImGui.SetCursorPos(new Vector2(xPos, yPos));
+        ImGui.Spacing();
+
+        var totalButtonsWidth = (4 * buttonWidth) + (3 * spacing);
+        ImGui.SetCursorPosX((ImGui.GetWindowWidth() - totalButtonsWidth) / 2f);
 
         var ExitedEditor = false;
+        var btnSize = new Vector2(buttonWidth, 0);
 
-        if (ImGui.Button("Save", buttonWidth))
+        if (ImGui.Button("Save", btnSize))
         {
             _editorManager.SaveChangesAndDisableEditor();
             ExitedEditor = true;
@@ -547,7 +563,7 @@ public class BoneEditorPanel
         }
 
         ImGui.SameLine();
-        if (ImGui.Button("Save as a copy", buttonWidth))
+        if (ImGui.Button("Save as a copy", btnSize))
         {
             _editorManager.SaveChangesAndDisableEditor(true);
             ExitedEditor = true;
@@ -555,7 +571,7 @@ public class BoneEditorPanel
         }
 
         ImGui.SameLine();
-        if (ImGui.Button("Do not save", buttonWidth))
+        if (ImGui.Button("Do not save", btnSize))
         {
             _editorManager.DisableEditor();
             ExitedEditor = true;
@@ -563,7 +579,7 @@ public class BoneEditorPanel
         }
 
         ImGui.SameLine();
-        if (ImGui.Button("Keep editing", buttonWidth))
+        if (ImGui.Button("Keep editing", btnSize))
         {
             ImGui.CloseCurrentPopup();
         }

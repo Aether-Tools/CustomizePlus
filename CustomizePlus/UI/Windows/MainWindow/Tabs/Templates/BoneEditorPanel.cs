@@ -531,12 +531,10 @@ public class BoneEditorPanel
         var windowPaddingY = ImGui.GetStyle().WindowPadding.Y;
 
         var popupWidth = (4 * buttonWidth) + (3 * spacing) + (windowPaddingX * 2) + (20 * scale);
-        popupWidth = Math.Max(popupWidth, viewportSize.X / 4f);
 
         var message = "You have unsaved changes in current template, what would you like to do?";
         var textSize = ImGui.CalcTextSize(message, false, popupWidth - windowPaddingX * 2);
         var popupHeight = windowPaddingY * 2 + textSize.Y + ImGui.GetStyle().ItemSpacing.Y * 2 + ImGui.GetFrameHeight();
-        popupHeight = Math.Max(popupHeight, viewportSize.Y / 12f);
 
         ImGui.SetNextWindowSize(new Vector2(popupWidth, popupHeight));
         ImGui.SetNextWindowPos(viewportSize / 2, ImGuiCond.Always, new Vector2(0.5f));

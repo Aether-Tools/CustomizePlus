@@ -1,0 +1,43 @@
+﻿using CustomizePlus.Core.Helpers;
+using CustomizePlus.Templates;
+using CustomizePlus.Templates.Data;
+using Dalamud.Interface.ImGuiNotification;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using static FFXIVClientStructs.FFXIV.Client.UI.AddonItemDetailCompare;
+using static System.Collections.Specialized.BitVector32;
+
+namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates.Controls;
+
+public sealed class ExportToClipboardButton(TemplateFileSystem fileSystem, PopupSystem popupSystem) : BaseIconButton<AwesomeIcon>
+{
+    public override bool IsVisible
+        => fileSystem.Selection.Selection is not null;
+
+    public override AwesomeIcon Icon
+        => LunaStyle.ToClipboardIcon;
+
+    public override bool HasTooltip
+        => true;
+
+    public override void DrawTooltip()
+        => Im.Text("Copy the current template to your clipboard."u8);
+
+    public override void OnClick()
+    {
+        var template = (Template)fileSystem.Selection.Selection!.Value;
+
+        try
+        {
+            var text = Base64Helper.ExportTemplateToBase64(template);
+            Im.Clipboard.Set(text);
+            popupSystem.ShowPopup(PopupSystem.Messages.ClipboardDataNotLongTerm);
+        }
+        catch (Exception ex)
+        {
+           // _logger.Error($"Could not copy data from template {Selection.UniqueId} to clipboard: {ex}"); todo
+            popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+        }
+    }
+}

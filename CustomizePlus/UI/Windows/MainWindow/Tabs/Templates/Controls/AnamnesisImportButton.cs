@@ -7,18 +7,16 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
+namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates.Controls;
 
 public sealed class AnamnesisImportButton(
     TemplateManager templateManager,
     TemplateEditorManager editorManager,
     PopupSystem popupSystem,
     MessageService messageService,
-    PoseFileBoneLoader poseFileBoneLoader) : BaseIconButton<AwesomeIcon>
+    PoseFileBoneLoader poseFileBoneLoader,
+    FileDialogManager fileDialogManager) : BaseIconButton<AwesomeIcon>
 {
-
-    private readonly FileDialogManager _importFilePicker = new();
-
     public override AwesomeIcon Icon
         => LunaStyle.DuplicateIcon;
 
@@ -39,7 +37,7 @@ public sealed class AnamnesisImportButton(
             return;
         }
 
-        _importFilePicker.OpenFileDialog("Import Pose File", ".pose", (isSuccess, path) =>
+        fileDialogManager.OpenFileDialog("Import Pose File", ".pose", (isSuccess, path) =>
         {
             if (isSuccess)
             {

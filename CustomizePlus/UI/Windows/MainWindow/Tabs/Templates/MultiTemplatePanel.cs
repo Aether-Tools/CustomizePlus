@@ -1,0 +1,126 @@
+﻿using CustomizePlus.Configuration.Data;
+using CustomizePlus.Templates;
+using CustomizePlus.Templates.Data;
+using Penumbra.GameData.Enums;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
+
+public sealed class MultiTemplatePanel(
+    TemplateFileSystem fileSystem,
+    TemplateManager templateManager,
+    PluginConfiguration configuration) : IUiService
+{
+    public void Draw()
+    {
+        if (fileSystem.Selection.OrderedNodes.Count is 0)
+            return;
+
+        var treeNodePos = Im.Cursor.Position;
+        DrawDesignList();
+        DrawCounts(treeNodePos);
+        var offset = DrawMultiLock(out var width);
+    }
+
+    private void DrawCounts(Vector2 treeNodePos)
+    {
+        var startPos = Im.Cursor.Position;
+        var numTemplates = fileSystem.Selection.DataNodes.Count;
+        var numFolders = fileSystem.Selection.Folders.Count;
+        Im.Cursor.Position = treeNodePos;
+        ImEx.TextRightAligned((numTemplates, numFolders) switch
+        {
+            (0, 0) => StringU8.Empty, // should not happen
+            ( > 0, 0) => $"{numTemplates} Templates",
+            (0, > 0) => $"{numFolders} Folders",
+            _ => $"{numTemplates} Templates, {numFolders} Folders",
+        });
+        Im.Cursor.Position = startPos;
+    }
+
+    private void ResetCounts()
+    {
+        _numDesignsLocked = 0;
+    }
+
+    private void CountLeaves(IFileSystemNode path)
+    {
+        if (path is not IFileSystemData<Template> l)
+            return;
+
+        if (l.Value.IsWriteProtected)
+            ++_numDesignsLocked;
+    }
+
+    private void DrawDesignList()
+    {
+        ResetCounts();
+        using var tree = Im.Tree.Node("Currently Selected Objects"u8, TreeNodeFlags.DefaultOpen | TreeNodeFlags.NoTreePushOnOpen);
+        Im.Separator();
+        if (!tree)
+            return;
+
+        var sizeType = new Vector2(Im.Style.FrameHeight);
+        var availableSizePercent = (Im.ContentRegion.Available.X - sizeType.X - 4 * Im.Style.CellPadding.X) / 100;
+        var sizeTemplates = availableSizePercent * 35;
+        var sizeFolders = availableSizePercent * 65;
+
+        using (var table = Im.Table.Begin("templates"u8, 3, TableFlags.RowBackground))
+        {
+            if (!table)
+                return;
+
+            table.SetupColumn("type"u8, TableColumnFlags.WidthFixed, sizeType.X);
+            table.SetupColumn("templates"u8, TableColumnFlags.WidthFixed, sizeTemplates);
+            table.SetupColumn("path"u8, TableColumnFlags.WidthFixed, sizeFolders);
+
+            foreach (var (index, node) in fileSystem.Selection.OrderedNodes.Index())
+            {
+                using var id = Im.Id.Push(index);
+                var (icon, text) = node is IFileSystemData<Template> l
+                    ? (LunaStyle.RemoveFileIcon, configuration.UISettings.IncognitoMode ? l.Value.Incognito : l.Value.Name)
+                    : (LunaStyle.RemoveFolderIcon, string.Empty);
+                table.NextColumn();
+                if (ImEx.Icon.Button(icon, "Remove from selection."u8, sizeType))
+                    fileSystem.Selection.RemoveFromSelection(node);
+
+                table.DrawFrameColumn(text);
+                table.DrawFrameColumn(configuration.UISettings.IncognitoMode ? "Incognito mode" : node.FullPath);
+
+                CountLeaves(node);
+            }
+        }
+
+        Im.Separator();
+    }
+
+    private int _numDesignsLocked;
+
+    private float DrawMultiLock(out Vector2 width)
+    {
+        ImEx.TextFrameAligned("Multi Lock:"u8);
+        Im.Line.Same();
+        width = new Vector2((Im.ContentRegion.Available.X - Im.Style.ItemInnerSpacing.X) / 2, 0);
+        var offset = Im.Item.Size.X + Im.Style.WindowPadding.X;
+        Im.Item.SetNextWidth(width.X);
+        var diff = fileSystem.Selection.DataNodes.Count - _numDesignsLocked;
+        if (ImEx.Button("Turn Write-Protected"u8, width, diff is 0
+                ? $"All {fileSystem.Selection.DataNodes.Count} selected templates are already write protected."
+                : $"Write-protect all {fileSystem.Selection.DataNodes.Count} templates. Changes {diff} templates.", diff is 0))
+            foreach (var template in fileSystem.Selection.DataNodes)
+                templateManager.SetWriteProtection(template.GetValue<Template>()!, true);
+
+        Im.Line.SameInner();
+        if (ImEx.Button("Remove Write-Protection"u8, width, _numDesignsLocked is 0
+                    ? $"None of the {fileSystem.Selection.DataNodes.Count} selected templates are write-protected."
+                    : $"Remove the write protection of the {fileSystem.Selection.DataNodes.Count} selected templates. Changes {_numDesignsLocked} templates.",
+                _numDesignsLocked is 0))
+            foreach (var template in fileSystem.Selection.DataNodes)
+                templateManager.SetWriteProtection(template.GetValue<Template>()!, false);
+        Im.Separator();
+
+        return offset;
+    }
+}

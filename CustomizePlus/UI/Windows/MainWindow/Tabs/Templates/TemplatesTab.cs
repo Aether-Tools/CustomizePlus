@@ -1,5 +1,6 @@
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Configuration.Services;
+using CustomizePlus.Templates;
 using Dalamud.Interface.ImGuiNotification;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Render;
 using static FFXIVClientStructs.FFXIV.Client.Game.Character.ActionEffectHandler;
@@ -10,10 +11,18 @@ namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 public class TemplatesTab : TwoPanelLayout, ITab<MainTabType>
 {
     private readonly PluginConfiguration _configuration;
+    private readonly TemplateEditorManager _templateEditorManager;
 
-    public TemplatesTab(TemplateFileSystemDrawer drawer, TemplatePanel panel, TemplateHeader header, PluginConfiguration configuration)
+    public TemplatesTab(
+        TemplateFileSystemDrawer drawer,
+        TemplatePanel panel,
+        TemplateHeader header,
+        PluginConfiguration configuration,
+        TemplateEditorManager templateEditorManager)
     {
         _configuration = configuration;
+        _templateEditorManager = templateEditorManager;
+
         LeftHeader = drawer.Header;
         LeftFooter = drawer.Footer;
         LeftPanel = drawer;
@@ -29,17 +38,11 @@ public class TemplatesTab : TwoPanelLayout, ITab<MainTabType>
     public MainTabType Identifier
         => MainTabType.Templates;
 
-    /*    protected override void DrawLeftGroup(in TwoPanelWidth width)
-        {
-            base.DrawLeftGroup(in width);
-            if (_importService.CreateCharaTarget(out var designBase, out var name))
-            {
-                var newDesign = _manager.CreateClone(designBase, name, true);
-                Glamourer.Messager.NotificationMessage($"Imported Anamnesis .chara file {name} as new design {newDesign.Name}",
-                    NotificationType.Success, false);
-            }
-            _importService.CreateCharaSource();
-        }*/
+    protected override void DrawLeftGroup(in TwoPanelWidth width)
+    {
+        using(var disabled = Im.Disabled(_templateEditorManager.IsEditorActive))
+            base.DrawLeftGroup(width);
+    }
 
     protected override float MinimumWidth
         => LeftFooter.MinimumWidth;

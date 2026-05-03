@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Text;
 using static FFXIVClientStructs.FFXIV.Client.UI.AddonItemDetailCompare;
 
-namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
+namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates.Controls;
 
 public sealed class ImportTemplateButton(
     TemplateManager templateManager,

@@ -19,6 +19,7 @@ public class TemplatePanel : IPanel, IDisposable
     private readonly MessageService _messageService;
     private readonly PopupSystem _popupSystem;
     private readonly Logger _logger;
+    private readonly MultiTemplatePanel _multiTemplatePanel;
 
     private readonly TemplateEditorEvent _editorEvent;
 
@@ -50,7 +51,8 @@ public class TemplatePanel : IPanel, IDisposable
         MessageService messageService,
         PopupSystem popupSystem,
         Logger logger,
-        TemplateEditorEvent editorEvent)
+        TemplateEditorEvent editorEvent,
+        MultiTemplatePanel multiTemplatePanel)
     {
         _fileSystem = fileSystem;
         _manager = manager;
@@ -59,12 +61,13 @@ public class TemplatePanel : IPanel, IDisposable
         _messageService = messageService;
         _popupSystem = popupSystem;
         _logger = logger;
+        _multiTemplatePanel = multiTemplatePanel;
 
         _editorEvent = editorEvent;
 
         _editorEvent.Subscribe(OnEditorEvent, TemplateEditorEvent.Priority.TemplatePanel);
 
-      //  _selector.SelectionChanged += SelectorSelectionChanged;
+        //  _selector.SelectionChanged += SelectorSelectionChanged; todo
     }
 
     private Template Selection
@@ -74,7 +77,7 @@ public class TemplatePanel : IPanel, IDisposable
     {
         if (_fileSystem.Selection.OrderedNodes.Count > 1) //todo
         {
-            // DrawMultiSelection();
+            _multiTemplatePanel.Draw();
             return;
         }
 
@@ -84,74 +87,13 @@ public class TemplatePanel : IPanel, IDisposable
             return;
     }
 
-   /* public void Draw(Vector2 size)
-        => DrawHeader();
-   */
     public void Dispose()
     {
         _editorEvent.Unsubscribe(OnEditorEvent);
     }
-    
-  /*  private HeaderDrawer.Button ExportToClipboardButton()
-        => new()
-        {
-            Description = "Copy the current template to your clipboard.",
-            Icon = FontAwesomeIcon.Copy,
-            OnClick = ExportToClipboard,
-            Visible = _selector.Selected != null,
-            Disabled = _boneEditor.IsEditorActive
-        };
-
-    private void DrawHeader()
-        => HeaderDrawer.Draw(SelectionName, 0, Im.Color.Get(ImGuiColor.FrameBackground).Color,
-            1, ExportToClipboardButton(), LockButton(),
-            HeaderDrawer.Button.IncognitoButton(_selector.IncognitoMode, v => _selector.IncognitoMode = v));
-  */
-   /* private void DrawMultiSelection()
-    {
-        if (_selector.SelectedPaths.Count == 0)
-            return;
-
-        var sizeType = Im.Style.FrameHeight;
-        var availableSizePercent = (Im.ContentRegion.Available.X - sizeType - 4 * Im.Style.CellPadding.X) / 100;
-        var sizeMods = availableSizePercent * 35;
-        var sizeFolders = availableSizePercent * 65;
-
-        Im.Line.New();
-        Im.Text("Currently Selected Templates"u8);
-        Im.Separator();
-        using var table = Im.Table.Begin("templates"u8, 3, TableFlags.RowBackground);
-        if (!table)
-            return;
-
-        table.SetupColumn("btn"u8, TableColumnFlags.WidthFixed, sizeType);
-        table.SetupColumn("Name"u8, TableColumnFlags.WidthFixed, sizeMods);
-        table.SetupColumn("path"u8, TableColumnFlags.WidthFixed, sizeFolders);
-
-        var i = 0;
-        foreach (var (fullName, path) in _selector.SelectedPaths.Select(p => (p.FullPath, p))
-                     .OrderBy(p => p.Item1, StringComparer.OrdinalIgnoreCase))
-        {
-            using var id = Im.Id.Push(i++);
-            table.NextColumn();
-            var icon = path is IFileSystemData<Template> ? FontAwesomeIcon.FileCircleMinus : FontAwesomeIcon.FolderMinus;
-            if (UiHelpers.DrawIconButton(icon, new Vector2(sizeType), "Remove from selection.", false))
-                _selector.RemovePathFromMultiSelection(path);
-
-            table.NextColumn();
-            Im.Cursor.FrameAlign();
-            Im.Text(path is IFileSystemData<Template> data ? _selector.IncognitoMode ? data.Value.Incognito : data.Value.Name : string.Empty);
-
-            table.NextColumn();
-            Im.Cursor.FrameAlign();
-            Im.Text(_selector.IncognitoMode ? "Incognito is active" : fullName);
-        }
-    }*/
-
     private void DrawPanel()
     {
-        using var table = Im.Table.Begin("##Panel"u8, 1, TableFlags.ScrollY, Im.ContentRegion.Available);
-        if (!table || _fileSystem.Selection.Selection is null)
+        if (_fileSystem.Selection.Selection is null)
             return;
 
         using (var disabled = Im.Disabled(Selection.IsWriteProtected))
@@ -162,21 +104,6 @@ public class TemplatePanel : IPanel, IDisposable
         _boneEditor.Draw();
     }
 
-    private void DrawEditorToggle()
-    {
-        (bool isEditorAllowed, bool isEditorActive) = CanToggleEditor();
-
-        var width = MathF.Min(180 * ImGuiHelpers.GlobalScale, Im.ContentRegion.Available.X);
-        if (UiHelpers.DrawDisabledButton($"{(_boneEditor.IsEditorActive ? "Finish" : "Start")} bone editing", new Vector2(width, 0),
-            "Toggle the bone editor for this template", !isEditorAllowed))
-        {
-            if (!isEditorActive)
-                _boneEditor.EnableEditor(Selection);
-            else
-                _boneEditor.DisableEditor();
-        }
-    }
-
     private (bool isEditorAllowed, bool isEditorActive) CanToggleEditor()
     {
         return ((_fileSystem.Selection.Selection is not null ? !Selection.IsWriteProtected : false) || _configuration.PluginEnabled, _boneEditor.IsEditorActive);
@@ -184,22 +111,14 @@ public class TemplatePanel : IPanel, IDisposable
 
     private void DrawBasicSettings()
     {
-        using (var table = Im.Table.Begin("BasicSettings"u8, 2))
+        using (Im.Group())
         {
-            if (!table)
-                return;
-
-            table.SetupColumn("Label"u8, TableColumnFlags.WidthFixed, 110 * ImGuiHelpers.GlobalScale);
-            table.SetupColumn("Control"u8, TableColumnFlags.WidthStretch);
-
-            table.NextRow();
             UiHelpers.DrawPropertyLabel("Template Name");
-            table.NextColumn();
+            Im.Line.Same();
             DrawTemplateNameControl();
 
-            table.NextRow();
             UiHelpers.DrawPropertyLabel("Bone Editor");
-            table.NextColumn();
+            Im.Line.Same();
             DrawEditorToggle();
         }
     }
@@ -231,17 +150,18 @@ public class TemplatePanel : IPanel, IDisposable
         }
     }
 
-    private void ExportToClipboard()
+    private void DrawEditorToggle()
     {
-        try
+        (bool isEditorAllowed, bool isEditorActive) = CanToggleEditor();
+
+        var width = MathF.Min(180 * ImGuiHelpers.GlobalScale, Im.ContentRegion.Available.X);
+        if (UiHelpers.DrawDisabledButton($"{(_boneEditor.IsEditorActive ? "Finish" : "Start")} bone editing", new Vector2(width, 0),
+            "Toggle the bone editor for this template", !isEditorAllowed))
         {
-            Im.Clipboard.Set(Base64Helper.ExportTemplateToBase64(Selection));
-            _popupSystem.ShowPopup(PopupSystem.Messages.ClipboardDataNotLongTerm);
-        }
-        catch (Exception ex)
-        {
-            _logger.Error($"Could not copy data from template {Selection.UniqueId} to clipboard: {ex}");
-            _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
+            if (!isEditorActive)
+                _boneEditor.EnableEditor(Selection);
+            else
+                _boneEditor.DisableEditor();
         }
     }
 

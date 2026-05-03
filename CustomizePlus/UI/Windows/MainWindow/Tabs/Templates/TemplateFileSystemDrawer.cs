@@ -2,6 +2,8 @@
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Templates;
 using CustomizePlus.Templates.Events;
+using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates.Controls;
+using Dalamud.Interface.ImGuiFileDialog;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,6 +15,8 @@ public sealed class TemplateFileSystemDrawer : FileSystemDrawer<TemplateFileSyst
     internal readonly TemplateChanged TemplateChanged;
     internal readonly TemplateManager TemplateManager;
     internal readonly PluginConfiguration Configuration;
+
+    private readonly FileDialogManager fileDialogManager = new();
 
     public TemplateFileSystemDrawer(MessageService messager,
         TemplateFileSystem fileSystem,
@@ -30,7 +34,7 @@ public sealed class TemplateFileSystemDrawer : FileSystemDrawer<TemplateFileSyst
         Configuration = configuration;
 
         Footer.Buttons.AddButton(new NewTemplateButton(templateManager, editorManager, popupSystem), 1000);
-        Footer.Buttons.AddButton(new AnamnesisImportButton(templateManager, editorManager, popupSystem, messageService, poseFileBoneLoader), 800);
+        Footer.Buttons.AddButton(new AnamnesisImportButton(templateManager, editorManager, popupSystem, messageService, poseFileBoneLoader, fileDialogManager), 800);
         Footer.Buttons.AddButton(new ImportTemplateButton(templateManager, editorManager, popupSystem), 800);
         Footer.Buttons.AddButton(new DuplicateTemplatesButton(fileSystem, templateManager, editorManager, popupSystem), 700);
         Footer.Buttons.AddButton(new DeleteTemplateButton(fileSystem, templateManager, editorManager, popupSystem, configuration), -100);
@@ -44,6 +48,13 @@ public sealed class TemplateFileSystemDrawer : FileSystemDrawer<TemplateFileSyst
     public void Dispose()
     {
 
+    }
+
+    public override void Draw()
+    {
+        base.Draw();
+
+        fileDialogManager.Draw();
     }
 
     //todo: can change selection

@@ -2,6 +2,7 @@
 using CustomizePlus.Templates;
 using CustomizePlus.Templates.Data;
 using CustomizePlus.Templates.Events;
+using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates.Controls;
 using Penumbra.GameData.Interop;
 using System;
 using System.Collections.Generic;
@@ -24,19 +25,15 @@ public sealed class TemplateHeader : SplitButtonHeader, IDisposable
         TemplateChanged templateChanged,
         PluginConfiguration config,
         TemplateManager manager,
-        ActorObjectManager objects)
+        ActorObjectManager objects,
+        PopupSystem popupSystem)
     {
         _fileSystem = fileSystem;
         _templateChanged = templateChanged;
         _config = config;
 
-        //todo
-      /*  LeftButtons.AddButton(new SetFromClipboardButton(fileSystem, converter, manager), 100);
-        LeftButtons.AddButton(new DesignUndoButton(fileSystem, manager), 90);
-        LeftButtons.AddButton(new ExportToClipboardButton(fileSystem, converter), 80);
-        LeftButtons.AddButton(new ApplyCharacterButton(fileSystem, manager, objects, stateManager, converter), 70);
-        LeftButtons.AddButton(new UndoButton(fileSystem, history), 60);
-      */
+        LeftButtons.AddButton(new ExportToClipboardButton(fileSystem, popupSystem), 100);
+
         RightButtons.AddButton(incognito, 50);
         RightButtons.AddButton(new LockedButton(fileSystem, manager), 100);
         _fileSystem.Selection.Changed += OnSelectionChanged;

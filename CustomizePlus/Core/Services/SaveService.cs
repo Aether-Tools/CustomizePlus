@@ -5,21 +5,7 @@ namespace CustomizePlus.Core.Services;
 /// <summary>
 /// Any file type that we want to save via SaveService.
 /// </summary>
-public interface ISavable : ISavable<FilenameService>
-{
-    string ToFilename(FilenameService fileNames);
-
-    void Save(StreamWriter writer);
-
-    string ISavable<FilenameService>.ToFilePath(FilenameService fileNames)
-        => ToFilename(fileNames);
-
-    void ISavable<FilenameService>.Save(Stream stream)
-    {
-        using var writer = new StreamWriter(stream, new UTF8Encoding(false), leaveOpen: true);
-        Save(writer);
-    }
-}
+public interface ISavable : ISavable<FilenameService>;
 
 public sealed class SaveService : BaseSaveService<FilenameService>
 {

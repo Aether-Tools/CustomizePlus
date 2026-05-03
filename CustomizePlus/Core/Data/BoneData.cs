@@ -612,7 +612,7 @@ public static class BoneData //todo: DI, do not show IVCS unless IVCS is install
             }
             catch (Exception e)
             {
-                Plugin.Logger.Error($"Failed to dynamically parse bones for hairstyle of '{boneNames[index]}'");
+                CustomizePlus.Logger.Error($"Failed to dynamically parse bones for hairstyle of '{boneNames[index]}'");
             }
 
             index++;

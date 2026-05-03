@@ -4,6 +4,7 @@ using CustomizePlus.Core.Extensions;
 using CustomizePlus.Core.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using static FFXIVClientStructs.FFXIV.Client.LayoutEngine.ILayoutInstance;
 
 namespace CustomizePlus.Templates.Data;
 
@@ -26,9 +27,6 @@ public sealed class Template : ISavable, IFileSystemValue<Template>
 
     public string Incognito
         => UniqueId.ToString()[..8];
-
-    public string Identifier
-        => UniqueId.ToString();
 
     public int Index { get; internal set; }
 
@@ -114,12 +112,12 @@ public sealed class Template : ISavable, IFileSystemValue<Template>
         var version = obj["Version"]?.ToObject<int>() ?? 0;
         return version switch
         {
-            4 or 5 => LoadV5(obj),
-            _ => throw new Exception("The design to be loaded has no valid Version."),
+            4 or 5 or 6 => LoadV6(obj),
+            _ => throw new Exception("The template to be loaded has no valid Version."),
         };
     }
 
-    private static Template LoadV5(JObject obj)
+    private static Template LoadV6(JObject obj)
     {
         var creationDate = obj["CreationDate"]?.ToObject<DateTimeOffset>() ?? throw new ArgumentNullException("CreationDate");
 
@@ -144,11 +142,12 @@ public sealed class Template : ISavable, IFileSystemValue<Template>
 
     #region ISavable
 
-    public string ToFilename(FilenameService fileNames)
+    public string ToFilePath(FilenameService fileNames)
         => fileNames.TemplateFile(this);
 
-    public void Save(StreamWriter writer)
+    public void Save(Stream stream)
     {
+        using var writer = new StreamWriter(stream);
         using var j = new JsonTextWriter(writer)
         {
             Formatting = Formatting.Indented,
@@ -159,9 +158,12 @@ public sealed class Template : ISavable, IFileSystemValue<Template>
     }
 
     public string LogName(string fileName)
-        => global::System.IO.Path.GetFileNameWithoutExtension(fileName);
+        => System.IO.Path.GetFileNameWithoutExtension(fileName);
 
     #endregion
+
+    string IFileSystemValue.Identifier
+        => UniqueId.ToString();
 
     private static void ReadFileSystemPath(JObject obj, DataPath path)
     {

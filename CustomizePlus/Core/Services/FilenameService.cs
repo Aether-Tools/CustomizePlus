@@ -6,28 +6,42 @@ namespace CustomizePlus.Core.Services;
 public class FilenameService(IDalamudPluginInterface pi) : BaseFilePathProvider(pi)
 {
     public new readonly string ConfigDirectory = pi.ConfigDirectory.FullName;
-    public new readonly string ConfigFile = pi.ConfigFile.FullName;
+
     public readonly string ProfileDirectory = Path.Combine(pi.ConfigDirectory.FullName, "profiles");
     public readonly string LegacyProfileSortOrder = Path.Combine(pi.ConfigDirectory.FullName, "profile_sort_order.json");
     public readonly string ProfileOrganization = Path.Combine(pi.ConfigDirectory.FullName, "profile_organization.json");
     public readonly string ProfileLockedNodes = Path.Combine(pi.ConfigDirectory.FullName, "profile_locked_nodes.json");
     public readonly string ProfileSelectedNodes = Path.Combine(pi.ConfigDirectory.FullName, "profile_selected_nodes.json");
     public readonly string ProfileExpandedFolders = Path.Combine(pi.ConfigDirectory.FullName, "profile_expanded_folders.json");
+
     public readonly string TemplateDirectory = Path.Combine(pi.ConfigDirectory.FullName, "templates");
     public readonly string LegacyTemplateSortOrder = Path.Combine(pi.ConfigDirectory.FullName, "template_sort_order.json");
     public readonly string TemplateOrganization = Path.Combine(pi.ConfigDirectory.FullName, "template_organization.json");
     public readonly string TemplateLockedNodes = Path.Combine(pi.ConfigDirectory.FullName, "template_locked_nodes.json");
     public readonly string TemplateSelectedNodes = Path.Combine(pi.ConfigDirectory.FullName, "template_selected_nodes.json");
     public readonly string TemplateExpandedFolders = Path.Combine(pi.ConfigDirectory.FullName, "template_expanded_folders.json");
+
     public readonly string UiConfigurationFile = Path.Combine(pi.ConfigDirectory.FullName, "ui_config.json");
+
+    public readonly string MigrationTemplateFileSystemEmptyFolders =
+        Path.Combine(pi.ConfigDirectory.FullName, "template_filesystem", "empty_folders.json");
+
+    public readonly string MigrationTemplateFileSystem = Path.Combine(pi.ConfigDirectory.FullName, "template_sort_order.json");
+
+    public readonly string MigrationProfileFileSystemEmptyFolders =
+        Path.Combine(pi.ConfigDirectory.FullName, "profile_filesystem", "empty_folders.json");
+    public readonly string MigrationProfileFileSystem = Path.Combine(pi.ConfigDirectory.FullName, "profile_sort_order.json");
 
     public override List<FileInfo> GetBackupFiles()
     {
         var list = new List<FileInfo>()
         {
-            new(ConfigFile),
+            new(ConfigurationFile),
             new(TemplateLockedNodes),
             new(ProfileLockedNodes),
+            new(UiConfigurationFile),
+            new(MigrationTemplateFileSystemEmptyFolders),
+            new(MigrationProfileFileSystemEmptyFolders)
         };
 
         list.AddRange(Templates());

@@ -58,7 +58,7 @@ public class DalamudConfigService : IService
         }
         catch (Exception e)
         {
-            Plugin.Logger.Error($"Error while fetching Dalamud Config {fieldName}:\n{e}");
+            CustomizePlus.Logger.Error($"Error while fetching Dalamud Config {fieldName}:\n{e}");
             return false;
         }
     }

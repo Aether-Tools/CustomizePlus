@@ -54,7 +54,7 @@ public static class ServiceManagerBuilder
         services.AddDalamudServices(pi);
 
         services.AddIServices(typeof(EquipItem).Assembly);
-        services.AddIServices(typeof(Plugin).Assembly);
+        services.AddIServices(typeof(CustomizePlus).Assembly);
         services.AddIServices(typeof(CutsceneService).Assembly);
         services.AddIServices(typeof(MessageService).Assembly);
 

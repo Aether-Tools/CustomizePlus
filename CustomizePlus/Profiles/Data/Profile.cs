@@ -144,15 +144,16 @@ public sealed class Profile : ISavable, IFileSystemValue<Profile>
 
     #region ISavable
 
-    public string ToFilename(FilenameService fileNames)
+    public string ToFilePath(FilenameService fileNames)
         => fileNames.ProfileFile(this);
 
-    public void Save(StreamWriter writer)
+    public void Save(Stream stream)
     {
         //saving of temporary profiles is not allowed
         if (IsTemporary)
             return;
 
+        using var writer = new StreamWriter(stream);
         using var j = new JsonTextWriter(writer)
         {
             Formatting = Formatting.Indented,

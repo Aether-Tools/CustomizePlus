@@ -61,11 +61,11 @@ public sealed class TemplateFilter : TokenizedFilter<TemplateFilterTokenType, Te
         if (cacheItem.Node.FullPath.Contains(needle, StringComparison.OrdinalIgnoreCase))
             return true;
 
-        var design = cacheItem.Node.Value;
-        if (design.Name.Contains(needle, StringComparison.OrdinalIgnoreCase))
+        var template = cacheItem.Node.Value;
+        if (template.Name.Contains(needle, StringComparison.OrdinalIgnoreCase))
             return true;
 
-        if (design.Identifier.ToString().Contains(needle, StringComparison.OrdinalIgnoreCase))
+        if (template.UniqueId.ToString().Contains(needle, StringComparison.OrdinalIgnoreCase))
             return true;
 
         return false;

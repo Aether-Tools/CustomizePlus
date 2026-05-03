@@ -314,7 +314,7 @@ public class TemplateManager : IDisposable
         }
         catch (Exception ex)
         {
-            Plugin.Logger.Error($"Could not create template directory {ret}:\n{ex}");
+            CustomizePlus.Logger.Error($"Could not create template directory {ret}:\n{ex}");
         }
     }
 

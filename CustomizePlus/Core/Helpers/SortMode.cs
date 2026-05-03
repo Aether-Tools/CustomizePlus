@@ -1,10 +1,11 @@
-﻿using CustomizePlus.Templates.Data;
+﻿using CustomizePlus.Profiles.Data;
+using CustomizePlus.Templates.Data;
 using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CustomizePlus.Templates;
+namespace CustomizePlus.Core.Helpers;
 
 public readonly struct CreationDate : ISortMode
 {
@@ -20,6 +21,7 @@ public readonly struct CreationDate : ISortMode
         => ISortMode.GetFolderLike(f).Concat(ISortMode.GetLeaveLike(f).OrderBy(l => l switch
         {
             IFileSystemData<Template> d => d.Value.CreationDate.ToUnixTimeMilliseconds(),
+            IFileSystemData<Profile> d => d.Value.CreationDate.ToUnixTimeMilliseconds(),
             IFileSystemSeparator s => s.CreationDate,
             _ => 0L,
         }));
@@ -58,6 +60,7 @@ public readonly struct InverseCreationDate : ISortMode
         => ISortMode.GetFolderLike(f).Concat(ISortMode.GetLeaveLike(f).OrderByDescending(l => l switch
         {
             IFileSystemData<Template> d => d.Value.CreationDate.ToUnixTimeMilliseconds(),
+            IFileSystemData<Profile> d => d.Value.CreationDate.ToUnixTimeMilliseconds(),
             IFileSystemSeparator s => s.CreationDate,
             _ => 0L,
         }));
@@ -77,6 +80,7 @@ public readonly struct InverseUpdateDate : ISortMode
         => ISortMode.GetFolderLike(f).Concat(ISortMode.GetLeaveLike(f).OrderByDescending(l => l switch
         {
             IFileSystemData<Template> d => d.Value.ModifiedDate.ToUnixTimeMilliseconds(),
+            IFileSystemData<Profile> d => d.Value.ModifiedDate.ToUnixTimeMilliseconds(),
             IFileSystemSeparator s => s.CreationDate,
             _ => 0L,
         }));

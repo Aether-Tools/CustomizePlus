@@ -1,5 +1,6 @@
 ﻿using CustomizePlus.Api;
 using CustomizePlus.Armatures.Data;
+using CustomizePlus.Configuration.Data;
 using CustomizePlus.Core;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.Core.Services;
@@ -9,13 +10,13 @@ using Penumbra.GameData.Actors;
 
 namespace CustomizePlus;
 
-public sealed class Plugin : IDalamudPlugin
+public sealed class CustomizePlus : IDalamudPlugin
 {
     private readonly ServiceManager _services;
 
     public static readonly Logger Logger = new(); //for loggin in static classes/methods
 
-    public Plugin(IDalamudPluginInterface pluginInterface)
+    public CustomizePlus(IDalamudPluginInterface pluginInterface)
     {
         try
         {
@@ -23,7 +24,12 @@ public sealed class Plugin : IDalamudPlugin
             InteropAlloc.Init();
 
             _services = ServiceManagerBuilder.CreateProvider(pluginInterface, Logger);
+            foreach (var _ in _services.GetServicesImplementing<IHookService>())
+                ;
+            _ = _services.GetService<ImSharpDalamudContext>();
             _services.EnsureRequiredServices();
+
+            _services.GetService<PluginConfiguration>(); //initialize early
 
             _services.GetService<IpcHandler>().Initialize();
             _services.GetService<PcpService>();

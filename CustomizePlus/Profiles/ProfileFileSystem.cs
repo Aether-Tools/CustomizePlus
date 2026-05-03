@@ -1,7 +1,10 @@
 using CustomizePlus.Core.Services;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Profiles.Events;
+using CustomizePlus.Templates;
+using CustomizePlus.Templates.Events;
 using Dalamud.Interface.ImGuiNotification;
+using Serilog;
 
 namespace CustomizePlus.Profiles;
 
@@ -10,30 +13,23 @@ public sealed class ProfileFileSystem : BaseFileSystem, IDisposable
     private readonly ProfileManager _profileManager;
     private readonly ProfileChanged _profileChanged;
     private readonly MessageService _messageService;
-    private readonly FileSystemSaveService<Profile> _saver;
+
+    private readonly ProfileFileSystemSaver _saver;
 
     public ProfileFileSystem(
-        ProfileManager profileManager,
+        LunaLogger log,
         SaveService saveService,
+        ProfileManager profileManager,
         ProfileChanged profileChanged,
-        MessageService messageService,
-        Logger logger)
-        : base("ProfileFileSystem", logger, true)
+        MessageService messageService/*, TabSelected tabSelected*/)
+        : base("ProfileFileSystem", log, true)
     {
         _profileManager = profileManager;
         _profileChanged = profileChanged;
         _messageService = messageService;
-        _saver = new FileSystemSaveService<Profile>(
-            logger,
-            this,
-            saveService,
-            _profileManager.Profiles.Where(p => !p.IsTemporary),
-            ProfileFromIdentifier,
-            fileNames => fileNames.ProfileLockedNodes,
-            fileNames => fileNames.ProfileExpandedFolders,
-            fileNames => fileNames.ProfileSelectedNodes,
-            fileNames => fileNames.ProfileOrganization,
-            fileNames => fileNames.LegacyProfileSortOrder);
+
+
+        _saver = new ProfileFileSystemSaver(log, this, saveService, profileManager);
 
         _profileChanged.Subscribe(OnProfileChange, ProfileChanged.Priority.ProfileFileSystem);
         _saver.Load();
@@ -46,44 +42,42 @@ public sealed class ProfileFileSystem : BaseFileSystem, IDisposable
         Selection.Dispose();
     }
 
-    private Profile? ProfileFromIdentifier(string identifier)
-        => Guid.TryParse(identifier, out var id)
-            ? _profileManager.Profiles.FirstOrDefault(profile => profile.UniqueId == id && !profile.IsTemporary)
-            : null;
-
-    private void OnProfileChange(in ProfileChanged.Arguments args)
+    private void OnProfileChange(in ProfileChanged.Arguments arguments)
     {
-        var (type, profile, data) = args;
-        switch (type)
+        switch (arguments.Type)
         {
-            case ProfileChanged.Type.Created when profile is not null:
+            case ProfileChanged.Type.ReloadedAll: _saver.Load(); break;
+            case ProfileChanged.Type.Created:
                 var parent = Root;
-                if (data is string path)
-                {
+                var folder = arguments.Profile!.Path.Folder;
+                if (folder.Length > 0)
                     try
                     {
-                        parent = FindOrCreateAllFolders(path);
+                        parent = FindOrCreateAllFolders(folder);
                     }
                     catch (Exception ex)
                     {
-                        _messageService.NotificationMessage(ex, $"Could not move profile to {path} because the folder could not be created.", NotificationType.Error);
+                        /* Glamourer.Messager.NotificationMessage(ex,
+                             $"Could not move design to {folder} because the folder could not be created.",
+                             NotificationType.Error);*/ //todo
                     }
+
+                var (data, _) = CreateDuplicateDataNode(parent, arguments.Profile!.Path.SortName ?? arguments.Profile.Name, arguments.Profile);
+                Selection.Select(data, true);
+                break;
+            case ProfileChanged.Type.Deleted:
+                if (arguments.Profile!.Node is { } node)
+                {
+                    if (node.Selected)
+                        Selection.UnselectAll();
+                    Delete(node);
                 }
 
-                CreateDuplicateDataNode(parent, profile.Name, profile);
-                return;
-            case ProfileChanged.Type.Deleted when profile?.Node is { } node:
-                Delete(node);
-                return;
-            case ProfileChanged.Type.ReloadedAll:
-                _saver.Load();
-                return;
-            case ProfileChanged.Type.Renamed when profile?.Node is { } node && data is string oldName:
-                var old = oldName.FixName();
-                var name = node.Name.ToString();
-                if (old == name || (name.IsDuplicateName(out var baseName, out _) && baseName == old))
-                    RenameWithDuplicates(node, profile.Name);
-                return;
+                break;
+            case ProfileChanged.Type.Renamed when arguments.Profile!.Path.SortName is null:
+                RenameWithDuplicates(arguments.Profile.Node!, arguments.Profile.Path.GetIntendedName(arguments.Profile.Name));
+                break;
+                // TODO: Maybe add path changes?
         }
     }
 }

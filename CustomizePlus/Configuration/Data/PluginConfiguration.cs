@@ -8,6 +8,7 @@ using Dalamud.Interface.ImGuiNotification;
 using Newtonsoft.Json;
 using Penumbra.GameData.Actors;
 using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
+using CustomizePlus.Templates;
 
 namespace CustomizePlus.Configuration.Data;
 
@@ -87,6 +88,8 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
 
         public bool BoneMirroringEnabled { get; set; } = false;
 
+        [JsonConverter(typeof(ActorIdentifierJsonConverter))]
+
         public ActorIdentifier PreviewCharacter { get; set; } = ActorIdentifier.Invalid;
 
         public int EditorValuesPrecision { get; set; } = 3;
@@ -128,6 +131,10 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
 
     public IntegrationSettingsEntries IntegrationSettings { get; set; } = new();
 
+    [JsonConverter(typeof(SortModeConverter))]
+    [JsonProperty(Order = int.MaxValue)]
+    public ISortMode SortMode { get; set; } = ISortMode.FoldersFirst;
+
     [JsonIgnore]
     public LunaUiConfiguration LunaUiConfiguration { get; internal set; }
 
@@ -154,17 +161,17 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
     {
         static void HandleDeserializationError(object? sender, ErrorEventArgs errorArgs)
         {
-            Plugin.Logger.Error(
+            CustomizePlus.Logger.Error(
                 $"Error parsing configuration at {errorArgs.ErrorContext.Path}, using default or migrating:\n{errorArgs.ErrorContext.Error}");
             errorArgs.ErrorContext.Handled = true;
         }
 
-        if (!File.Exists(_saveService.FileNames.ConfigFile))
+        if (!File.Exists(_saveService.FileNames.ConfigurationFile))
             return;
 
         try
         {
-            var text = File.ReadAllText(_saveService.FileNames.ConfigFile);
+            var text = File.ReadAllText(_saveService.FileNames.ConfigurationFile);
             JsonConvert.PopulateObject(text, this, new JsonSerializerSettings
             {
                 Error = HandleDeserializationError,
@@ -181,17 +188,37 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
         migrator.Migrate(this);
     }
 
-    public string ToFilename(FilenameService fileNames)
-        => fileNames.ConfigFile;
+    public string ToFilePath(FilenameService fileNames)
+        => fileNames.ConfigurationFile;
 
-    public void Save(StreamWriter writer)
+    public void Save(Stream stream)
     {
-        using var jWriter = new JsonTextWriter(writer) { Formatting = Formatting.Indented };
+        using var writer = new StreamWriter(stream);
+        using var jWriter = new JsonTextWriter(writer);
+        jWriter.Formatting = Formatting.Indented;
         var serializer = new JsonSerializer { Formatting = Formatting.Indented };
-        serializer.Converters.Add(new ActorIdentifierJsonConverter());
         serializer.Serialize(jWriter, this);
     }
 
     public void Save()
         => _saveService.DelaySave(this);
+
+    /// <summary> Convert SortMode Types to their name. </summary>
+    private class SortModeConverter : JsonConverter<ISortMode>
+    {
+        public override void WriteJson(JsonWriter writer, ISortMode? value, JsonSerializer serializer)
+        {
+            value ??= ISortMode.FoldersFirst;
+            serializer.Serialize(writer, value.GetType().Name);
+        }
+
+        public override ISortMode ReadJson(JsonReader reader, Type objectType, ISortMode? existingValue, bool hasExistingValue,
+            JsonSerializer serializer)
+        {
+            if (serializer.Deserialize<string>(reader) is { } name)
+                return ISortMode.Valid.GetValueOrDefault(name, existingValue ?? ISortMode.FoldersFirst);
+
+            return existingValue ?? ISortMode.FoldersFirst;
+        }
+    }
 }

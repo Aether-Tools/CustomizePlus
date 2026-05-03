@@ -685,7 +685,7 @@ public partial class ProfileManager : IDisposable
         }
         catch (Exception ex)
         {
-            Plugin.Logger.Error($"Could not create profile directory {ret}:\n{ex}");
+            CustomizePlus.Logger.Error($"Could not create profile directory {ret}:\n{ex}");
         }
     }
 

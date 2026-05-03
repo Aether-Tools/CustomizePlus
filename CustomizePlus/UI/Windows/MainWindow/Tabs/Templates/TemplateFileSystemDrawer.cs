@@ -7,12 +7,15 @@ using Dalamud.Interface.ImGuiFileDialog;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using CustomizePlus.Core.Helpers;
+using CustomizePlus.Profiles.Events;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 
 public sealed class TemplateFileSystemDrawer : FileSystemDrawer<TemplateFileSystemCache.TemplateData>, IDisposable
 {
     internal readonly TemplateChanged TemplateChanged;
+    internal readonly ProfileChanged ProfileChanged;
     internal readonly TemplateManager TemplateManager;
     internal readonly PluginConfiguration Configuration;
 
@@ -21,6 +24,7 @@ public sealed class TemplateFileSystemDrawer : FileSystemDrawer<TemplateFileSyst
     public TemplateFileSystemDrawer(MessageService messager,
         TemplateFileSystem fileSystem,
         TemplateChanged templateChanged,
+        ProfileChanged profileChanged,
         TemplateManager templateManager,
         TemplateEditorManager editorManager,
         PopupSystem popupSystem,
@@ -30,6 +34,7 @@ public sealed class TemplateFileSystemDrawer : FileSystemDrawer<TemplateFileSyst
         : base(messager, fileSystem, new TemplateFilter(configuration))
     {
         TemplateChanged = templateChanged;
+        ProfileChanged = profileChanged;
         TemplateManager = templateManager;
         Configuration = configuration;
 
@@ -42,7 +47,7 @@ public sealed class TemplateFileSystemDrawer : FileSystemDrawer<TemplateFileSyst
         DataContext.AddButton(new RenameTemplateInput(this), -1001);
         DataContext.AddButton(new MoveTemplateInput(this), -1000);
 
-        SortMode = ISortMode.FoldersFirst; //todo?
+        SortMode = configuration.SortMode;
     }
 
     public void Dispose()
@@ -56,8 +61,6 @@ public sealed class TemplateFileSystemDrawer : FileSystemDrawer<TemplateFileSyst
 
         fileDialogManager.Draw();
     }
-
-    //todo: can change selection
 
     public override Vector4 ExpandedFolderColor
         => ColorId.FolderExpanded.Value().ToVector();

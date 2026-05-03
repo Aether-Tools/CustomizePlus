@@ -1,4 +1,5 @@
-﻿using CustomizePlus.Templates.Data;
+﻿using CustomizePlus.Profiles.Events;
+using CustomizePlus.Templates.Data;
 using CustomizePlus.Templates.Events;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ public sealed class TemplateFileSystemCache : FileSystemCache<TemplateFileSystem
     : base(parent)
     {
         parent.TemplateChanged.Subscribe(OnTemplateChanged, TemplateChanged.Priority.TemplateFileSystemSelector);
+        parent.ProfileChanged.Subscribe(OnProfileChanged, ProfileChanged.Priority.TemplateFileSystemSelector);
     }
 
     private void OnColorChanged()
@@ -34,6 +36,24 @@ public sealed class TemplateFileSystemCache : FileSystemCache<TemplateFileSystem
 
         if (arguments.Template?.Node is { } node && AllNodes.TryGetValue(node, out var cache))
             cache.Dirty = true;
+    }
+
+    private void OnProfileChanged(in ProfileChanged.Arguments arguments)
+    {
+        switch (arguments.Type)
+        {
+            case ProfileChanged.Type.Created:
+            case ProfileChanged.Type.Deleted:
+            case ProfileChanged.Type.AddedTemplate:
+            case ProfileChanged.Type.ChangedTemplate:
+            case ProfileChanged.Type.RemovedTemplate:
+            case ProfileChanged.Type.ReloadedAll:
+                VisibleDirty = true;
+                break;
+        }
+
+        /*if (arguments.Template?.Node is { } node && AllNodes.TryGetValue(node, out var cache))
+            cache.Dirty = true;*/
     }
 
     private new TemplateFileSystemDrawer Parent

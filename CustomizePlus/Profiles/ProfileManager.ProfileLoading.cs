@@ -78,7 +78,7 @@ public partial class ProfileManager : IDisposable
         {
             //Ignore everything below v4
              4 => LoadV4(obj),
-             5 => LoadV5(obj),
+             5 or 6 => LoadV6(obj),
             _ => throw new Exception("The profile to be loaded has no valid Version."),
         };
     }
@@ -126,7 +126,7 @@ public partial class ProfileManager : IDisposable
         return profile;
     }
 
-    private Profile LoadV5(JObject obj)
+    private Profile LoadV6(JObject obj)
     {
         var profile = LoadProfileV4V5(obj);
 

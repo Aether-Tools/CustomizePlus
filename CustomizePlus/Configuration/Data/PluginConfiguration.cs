@@ -45,7 +45,7 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
     [Serializable]
     public class UISettingsEntries
     {
-        public DoubleModifier DeleteTemplateModifier { get; set; } = new(ModifierHotkey.Control, ModifierHotkey.Shift);
+        public DoubleModifier DeleteModifier { get; set; } = new(ModifierHotkey.Control, ModifierHotkey.Shift);
 
         public bool FoldersDefaultOpen { get; set; } = true;
 

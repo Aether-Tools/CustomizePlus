@@ -40,6 +40,8 @@ public partial class ProfileManager : IDisposable
                 if (Profiles.Any(f => f.UniqueId == profile.UniqueId))
                     throw new Exception($"ID {profile.UniqueId} was not unique.");
 
+                profile.Index = Profiles.Count;
+
                 Profiles.Add(profile);
             }
             catch (Exception ex)

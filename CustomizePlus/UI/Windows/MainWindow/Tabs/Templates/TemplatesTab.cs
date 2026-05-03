@@ -53,34 +53,6 @@ public class TemplatesTab : TwoPanelLayout, ITab<MainTabType>
     protected override void SetWidth(float width, ScalingMode mode)
         => _configuration.LunaUiConfiguration.TemplatesTabScale = new TwoPanelWidth(width, mode);
 
-
     public void DrawContent()
         => Draw(_configuration.LunaUiConfiguration.TemplatesTabScale);
-
-    /*    public override ReadOnlySpan<byte> Label
-        => "TemplatesTab"u8;
-
-    public void Draw()
-        => Draw(new TwoPanelWidth(_configuration.UISettings.CurrentTemplateSelectorWidth, ScalingMode.Absolute));
-
-    protected override void SetWidth(float width, ScalingMode mode)
-    {
-        var adaptedSize = MathF.Round(width / Im.Style.GlobalScale);
-        if (Math.Abs(adaptedSize - _configuration.UISettings.CurrentTemplateSelectorWidth) < 0.1f)
-            return;
-
-        _configuration.UISettings.CurrentTemplateSelectorWidth = adaptedSize;
-        _configuration.Save();
-    }
-
-    protected override void DrawPopups()
-        => _selector.DrawSelectorPopups();
-
-    protected override float MinimumWidth
-        => Im.ContentRegion.Available.X * _configuration.UISettings.TemplateSelectorMinimumScale;
-
-    protected override float MaximumWidth
-        => MathF.Max(MinimumWidth, MathF.Min(
-            Im.ContentRegion.Available.X * _configuration.UISettings.TemplateSelectorMaximumScale,
-            Im.ContentRegion.Available.X - 470 * Im.Style.GlobalScale));*/
 }

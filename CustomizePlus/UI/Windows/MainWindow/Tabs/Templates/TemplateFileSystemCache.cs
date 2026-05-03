@@ -16,6 +16,7 @@ public sealed class TemplateFileSystemCache : FileSystemCache<TemplateFileSystem
         parent.ProfileChanged.Subscribe(OnProfileChanged, ProfileChanged.Priority.TemplateFileSystemSelector);
     }
 
+    //todo: colors
     private void OnColorChanged()
     {
         foreach (var node in AllNodes.Values)
@@ -78,6 +79,7 @@ public sealed class TemplateFileSystemCache : FileSystemCache<TemplateFileSystem
     {
         base.Dispose(disposing);
         Parent.TemplateChanged.Unsubscribe(OnTemplateChanged);
+        Parent.ProfileChanged.Unsubscribe(OnProfileChanged);
     }
 
     public sealed class TemplateData(IFileSystemData<Template> node) : BaseFileSystemNodeCache<TemplateData>

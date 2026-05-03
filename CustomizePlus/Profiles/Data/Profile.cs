@@ -54,8 +54,7 @@ public sealed class Profile : ISavable, IFileSystemValue<Profile>
     public string Incognito
         => UniqueId.ToString()[..8];
 
-    public string Identifier
-        => UniqueId.ToString();
+    public int Index { get; internal set; }
 
     public DataPath Path { get; } = new();
 
@@ -164,9 +163,12 @@ public sealed class Profile : ISavable, IFileSystemValue<Profile>
     }
 
     public string LogName(string fileName)
-        => global::System.IO.Path.GetFileNameWithoutExtension(fileName);
+        => System.IO.Path.GetFileNameWithoutExtension(fileName);
 
     #endregion
+
+    public string Identifier
+        => UniqueId.ToString();
 
     internal static void ReadFileSystemPath(JObject obj, DataPath path)
     {

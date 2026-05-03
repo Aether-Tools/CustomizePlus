@@ -29,7 +29,6 @@ public sealed class TemplateFileSystemDrawer : FileSystemDrawer<TemplateFileSyst
         TemplateEditorManager editorManager,
         PopupSystem popupSystem,
         PoseFileBoneLoader poseFileBoneLoader,
-        MessageService messageService,
         PluginConfiguration configuration)
         : base(messager, fileSystem, new TemplateFilter(configuration))
     {
@@ -39,9 +38,9 @@ public sealed class TemplateFileSystemDrawer : FileSystemDrawer<TemplateFileSyst
         Configuration = configuration;
 
         Footer.Buttons.AddButton(new NewTemplateButton(templateManager, editorManager, popupSystem), 1000);
-        Footer.Buttons.AddButton(new AnamnesisImportButton(templateManager, editorManager, popupSystem, messageService, poseFileBoneLoader, fileDialogManager), 800);
+        Footer.Buttons.AddButton(new AnamnesisImportButton(templateManager, editorManager, popupSystem, messager, poseFileBoneLoader, fileDialogManager), 800);
         Footer.Buttons.AddButton(new ImportTemplateButton(templateManager, editorManager, popupSystem), 800);
-        Footer.Buttons.AddButton(new DuplicateTemplatesButton(fileSystem, templateManager, editorManager, popupSystem), 700);
+        Footer.Buttons.AddButton(new DuplicateTemplateButton(fileSystem, templateManager, editorManager, popupSystem), 700);
         Footer.Buttons.AddButton(new DeleteTemplateButton(fileSystem, templateManager, editorManager, popupSystem, configuration), -100);
 
         DataContext.AddButton(new RenameTemplateInput(this), -1001);

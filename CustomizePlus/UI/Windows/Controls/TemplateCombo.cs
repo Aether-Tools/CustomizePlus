@@ -179,9 +179,9 @@ public sealed class TemplateCombo : TemplateComboBase
         _profileManager = profileManager;
     }
 
-    public bool Draw(Utf8StringHandler<LabelStringHandlerBuffer> label, float width, Profile profile, Template? template, int templateIndex)
+    public bool Draw(Profile profile, Template? template, int templateIndex)
     {
-        if (!base.Draw(label, template, out var newTemplate, width))
+        if (!base.Draw("##c"u8, template, out var newTemplate, Im.ContentRegion.Available.X) || newTemplate is null)
             return false;
 
         if (templateIndex >= 0)

@@ -37,9 +37,10 @@ public sealed class ProfileChanged(LunaLogger log)
     {
         ProfileFileSystemSelector = -2,
         TemplateFileSystemSelector = -1,
-        ProfileFileSystem,
-        ArmatureManager,
-        TemplateManager,
-        CustomizePlusLegacyIpc
+        ProfileFileSystem = 0,
+        DesignHeader = 0,
+        ArmatureManager = 1,
+        TemplateManager = 2,
+        CustomizePlusLegacyIpc = 3
     }
 }

@@ -10,6 +10,7 @@ public sealed class TemplateFilter : TokenizedFilter<TemplateFilterTokenType, Te
 {
     public TemplateFilter(PluginConfiguration configuration)
     {
+        //todo
         /*if (config.RememberDesignFilter)
             Set(config.Filters.DesignFilter);
         FilterChanged += () => config.Filters.DesignFilter = Text;*/

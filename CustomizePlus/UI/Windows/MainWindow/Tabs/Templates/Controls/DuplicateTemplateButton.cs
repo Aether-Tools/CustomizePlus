@@ -6,7 +6,7 @@ using System.Text;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates.Controls;
 
-public sealed class DuplicateTemplatesButton(
+public sealed class DuplicateTemplateButton(
     TemplateFileSystem fileSystem,
     TemplateManager templateManager,
     TemplateEditorManager editorManager,
@@ -43,8 +43,8 @@ public sealed class DuplicateTemplatesButton(
         if (!InputPopup.OpenName("##CloneTemplate"u8, out var newName))
             return;
 
-        if (_template.TryGetTarget(out var design))
-            templateManager.Clone(design, newName, true);
+        if (_template.TryGetTarget(out var template))
+            templateManager.Clone(template, newName, true);
 
         _template.SetTarget(null!);
     }

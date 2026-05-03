@@ -8,18 +8,16 @@ public class FilenameService(IDalamudPluginInterface pi) : BaseFilePathProvider(
     public new readonly string ConfigDirectory = pi.ConfigDirectory.FullName;
 
     public readonly string ProfileDirectory = Path.Combine(pi.ConfigDirectory.FullName, "profiles");
-    public readonly string LegacyProfileSortOrder = Path.Combine(pi.ConfigDirectory.FullName, "profile_sort_order.json");
-    public readonly string ProfileOrganization = Path.Combine(pi.ConfigDirectory.FullName, "profile_organization.json");
-    public readonly string ProfileLockedNodes = Path.Combine(pi.ConfigDirectory.FullName, "profile_locked_nodes.json");
-    public readonly string ProfileSelectedNodes = Path.Combine(pi.ConfigDirectory.FullName, "profile_selected_nodes.json");
-    public readonly string ProfileExpandedFolders = Path.Combine(pi.ConfigDirectory.FullName, "profile_expanded_folders.json");
+    public readonly string ProfileOrganization = Path.Combine(pi.ConfigDirectory.FullName, "profile_filesystem", "organization.json");
+    public readonly string ProfileLockedNodes = Path.Combine(pi.ConfigDirectory.FullName, "profile_filesystem", "locked_nodes.json");
+    public readonly string ProfileSelectedNodes = Path.Combine(pi.ConfigDirectory.FullName, "profile_filesystem", "selected_nodes.json");
+    public readonly string ProfileExpandedFolders = Path.Combine(pi.ConfigDirectory.FullName, "profile_filesystem", "expanded_folders.json");
 
     public readonly string TemplateDirectory = Path.Combine(pi.ConfigDirectory.FullName, "templates");
-    public readonly string LegacyTemplateSortOrder = Path.Combine(pi.ConfigDirectory.FullName, "template_sort_order.json");
-    public readonly string TemplateOrganization = Path.Combine(pi.ConfigDirectory.FullName, "template_organization.json");
-    public readonly string TemplateLockedNodes = Path.Combine(pi.ConfigDirectory.FullName, "template_locked_nodes.json");
-    public readonly string TemplateSelectedNodes = Path.Combine(pi.ConfigDirectory.FullName, "template_selected_nodes.json");
-    public readonly string TemplateExpandedFolders = Path.Combine(pi.ConfigDirectory.FullName, "template_expanded_folders.json");
+    public readonly string TemplateOrganization = Path.Combine(pi.ConfigDirectory.FullName, "template_filesystem", "organization.json");
+    public readonly string TemplateLockedNodes = Path.Combine(pi.ConfigDirectory.FullName, "template_filesystem", "locked_nodes.json");
+    public readonly string TemplateSelectedNodes = Path.Combine(pi.ConfigDirectory.FullName, "template_filesystem", "selected_nodes.json");
+    public readonly string TemplateExpandedFolders = Path.Combine(pi.ConfigDirectory.FullName, "template_filesystem", "expanded_folders.json");
 
     public readonly string UiConfigurationFile = Path.Combine(pi.ConfigDirectory.FullName, "ui_config.json");
 

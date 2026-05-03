@@ -6,17 +6,21 @@ using CustomizePlus.GameData.Extensions;
 using CustomizePlus.Profiles;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Templates;
+using CustomizePlus.Templates.Data;
 using CustomizePlus.Templates.Events;
 using CustomizePlus.UI.Windows.Controls;
+using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility;
 using Penumbra.GameData.Actors;
+using static System.Collections.Specialized.BitVector32;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 
-public class ProfilePanel : IHeader, IPanel
+public class ProfilePanel : IPanel
 {
-   // private readonly ProfileFileSystemSelector _selector;
+    // private readonly ProfileFileSystemSelector _selector;
+    private readonly ProfileFileSystem _fileSystem;
     private readonly ProfileManager _manager;
     private readonly PluginConfiguration _configuration;
     private readonly TemplateCombo _templateCombo;
@@ -26,6 +30,7 @@ public class ProfilePanel : IHeader, IPanel
     private readonly TemplateEditorEvent _templateEditorEvent;
     private readonly PopupSystem _popupSystem;
     private readonly Logger _logger;
+    private readonly MultiProfilePanel _multiProfilePanel;
 
     private string? _newName;
     private int? _newPriority;
@@ -51,7 +56,7 @@ public class ProfilePanel : IHeader, IPanel
         => false;
 
     public ProfilePanel(
-        //ProfileFileSystemSelector selector,
+        ProfileFileSystem fileSystem,
         ProfileManager manager,
         PluginConfiguration configuration,
         TemplateCombo templateCombo,
@@ -60,9 +65,11 @@ public class ProfilePanel : IHeader, IPanel
         ActorManager actorManager,
         TemplateEditorEvent templateEditorEvent,
         PopupSystem popupSystem,
-        Logger logger)
+        Logger logger,
+        MultiProfilePanel multiProfilePanel)
     {
         //_selector = selector;
+        _fileSystem = fileSystem;
         _manager = manager;
         _configuration = configuration;
         _templateCombo = templateCombo;
@@ -72,18 +79,21 @@ public class ProfilePanel : IHeader, IPanel
         _templateEditorEvent = templateEditorEvent;
         _popupSystem = popupSystem;
         _logger = logger;
+        _multiProfilePanel = multiProfilePanel;
     }
+
+    private Profile Selection
+        => (Profile)_fileSystem.Selection.Selection!.Value;
 
     public void Draw()
     {
-     /*   if (_selector.SelectedPaths.Count > 1)
+        if (_fileSystem.Selection.OrderedNodes.Count > 1)
         {
-            DrawMultiSelection();
+            _multiProfilePanel.Draw();
+            return;
         }
-        else
-        {
-            DrawPanel();
-        }*/
+
+        DrawPanel();
     }
 
     public void Draw(Vector2 size)
@@ -162,18 +172,18 @@ public class ProfilePanel : IHeader, IPanel
             Im.Cursor.FrameAlign();
             Im.Text(_selector.IncognitoMode ? "Incognito is active" : fullName);
         }
-    }
+    }*/
 
     private void DrawPanel()
     {
-        if (_selector.Selected == null)
+        if (_fileSystem.Selection.Selection is null)
             return;
 
         DrawBasicSettings();
 
         Im.Separator();
 
-        using (var disabled = Im.Disabled(_selector.Selected?.IsWriteProtected ?? true))
+        using (var disabled = Im.Disabled(Selection.IsWriteProtected))
         {
             var isShouldDraw = Im.Tree.Header("Add character"u8);
 
@@ -219,11 +229,11 @@ public class ProfilePanel : IHeader, IPanel
 
     private void DrawEnabledControl()
     {
-        var enabled = _selector.Selected?.Enabled ?? false;
+        var enabled = Selection.Enabled;
         using (Im.Disabled(_templateEditorManager.IsEditorActive || _templateEditorManager.IsEditorPaused))
         {
             if (Im.Checkbox("##Enabled"u8, ref enabled))
-                _manager.SetEnabled(_selector.Selected!, enabled);
+                _manager.SetEnabled(Selection, enabled);
         }
 
         Im.Line.Same();
@@ -232,16 +242,16 @@ public class ProfilePanel : IHeader, IPanel
 
     private void DrawProfileNameControl()
     {
-        using var disabled = Im.Disabled(_selector.Selected?.IsWriteProtected ?? true);
-        var name = _newName ?? _selector.Selected!.Name;
+        using var disabled = Im.Disabled(Selection.IsWriteProtected);
+        var name = _newName ?? Selection.Name;
         Im.Item.SetNextWidthFull();
 
-        if (!_selector.IncognitoMode)
+        if (!_configuration.UISettings.IncognitoMode)
         {
             if (Im.Input.Text("##ProfileName"u8, ref name, maxLength: 128))
             {
                 _newName = name;
-                _changedProfile = _selector.Selected;
+                _changedProfile = Selection;
             }
 
             if (Im.Item.DeactivatedAfterEdit && _changedProfile != null)
@@ -254,20 +264,20 @@ public class ProfilePanel : IHeader, IPanel
         else
         {
             Im.Cursor.FrameAlign();
-            Im.Text(_selector.Selected!.Incognito);
+            Im.Text(Selection.Incognito);
         }
     }
 
     private void DrawPriorityControl()
     {
-        using var disabled = Im.Disabled(_selector.Selected?.IsWriteProtected ?? true);
-        var priority = _newPriority ?? _selector.Selected!.Priority;
+        using var disabled = Im.Disabled(Selection.IsWriteProtected);
+        var priority = _newPriority ?? Selection.Priority;
 
         Im.Item.SetNextWidth(90 * ImGuiHelpers.GlobalScale);
         if (Im.Input.Scalar("##Priority"u8, ref priority, "%d"u8, 0, 0))
         {
             _newPriority = priority;
-            _changedProfile = _selector.Selected;
+            _changedProfile = Selection;
         }
 
         if (Im.Item.DeactivatedAfterEdit && _changedProfile != null)
@@ -286,12 +296,12 @@ public class ProfilePanel : IHeader, IPanel
     {
         try
         {
-            Im.Clipboard.Set(Base64Helper.ExportProfileToBase64(_selector.Selected!));
+            Im.Clipboard.Set(Base64Helper.ExportProfileToBase64(Selection));
             _popupSystem.ShowPopup(PopupSystem.Messages.ClipboardDataNotLongTerm);
         }
         catch (Exception ex)
         {
-            _logger.Error($"Could not copy data from profile {_selector.Selected!.UniqueId} to clipboard: {ex}");
+            _logger.Error($"Could not copy data from profile {Selection.UniqueId} to clipboard: {ex}");
             _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
         }
     }
@@ -304,7 +314,7 @@ public class ProfilePanel : IHeader, IPanel
 
             Im.Item.SetNextWidth(width.X);
 
-            bool appliesToMultiple = _manager.DefaultProfile == _selector.Selected || _manager.DefaultLocalPlayerProfile == _selector.Selected;
+            bool appliesToMultiple = _manager.DefaultProfile == Selection || _manager.DefaultLocalPlayerProfile == Selection;
             using (Im.Disabled(appliesToMultiple))
             {
                 _actorAssignmentUi.DrawWorldCombo(width.X / 2);
@@ -314,21 +324,21 @@ public class ProfilePanel : IHeader, IPanel
                 var buttonWidth = new Vector2(165 * ImGuiHelpers.GlobalScale - Im.Style.ItemSpacing.X / 2, 0);
 
                 if (UiHelpers.DrawDisabledButton("Apply to player character", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetPlayer))
-                    _manager.AddCharacter(_selector.Selected!, _actorAssignmentUi.PlayerIdentifier);
+                    _manager.AddCharacter(Selection, _actorAssignmentUi.PlayerIdentifier);
 
                 Im.Line.Same();
 
                 if (UiHelpers.DrawDisabledButton("Apply to retainer", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetRetainer))
-                    _manager.AddCharacter(_selector.Selected!, _actorAssignmentUi.RetainerIdentifier);
+                    _manager.AddCharacter(Selection, _actorAssignmentUi.RetainerIdentifier);
 
                 Im.Line.Same();
 
                 if (UiHelpers.DrawDisabledButton("Apply to mannequin", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetMannequin))
-                    _manager.AddCharacter(_selector.Selected!, _actorAssignmentUi.MannequinIdentifier);
+                    _manager.AddCharacter(Selection, _actorAssignmentUi.MannequinIdentifier);
 
                 var currentPlayer = _actorManager.GetCurrentPlayer().CreatePermanent();
                 if (UiHelpers.DrawDisabledButton("Apply to current character", buttonWidth, string.Empty, !currentPlayer.IsValid))
-                    _manager.AddCharacter(_selector.Selected!, currentPlayer);
+                    _manager.AddCharacter(Selection, currentPlayer);
 
                 Im.Separator();
 
@@ -337,19 +347,19 @@ public class ProfilePanel : IHeader, IPanel
                 _actorAssignmentUi.DrawNpcInput(width.X / 2);
 
                 if (UiHelpers.DrawDisabledButton("Apply to selected NPC", buttonWidth, string.Empty, !_actorAssignmentUi.CanSetNpc))
-                    _manager.AddCharacter(_selector.Selected!, _actorAssignmentUi.NpcIdentifier);
+                    _manager.AddCharacter(Selection, _actorAssignmentUi.NpcIdentifier);
             }
         }
     }
 
     private void DrawCharacterListArea()
     {
-        var isDefaultLP = _manager.DefaultLocalPlayerProfile == _selector.Selected;
-        var isDefaultLPOrCurrentProfilesEnabled = (_manager.DefaultLocalPlayerProfile?.Enabled ?? false) || (_selector.Selected?.Enabled ?? false);
+        var isDefaultLP = _manager.DefaultLocalPlayerProfile == Selection;
+        var isDefaultLPOrCurrentProfilesEnabled = (_manager.DefaultLocalPlayerProfile?.Enabled ?? false) || Selection.Enabled;
         using (Im.Disabled(isDefaultLPOrCurrentProfilesEnabled))
         {
             if (Im.Checkbox("##DefaultLocalPlayerProfile"u8, ref isDefaultLP))
-                _manager.SetDefaultLocalPlayerProfile(isDefaultLP ? _selector.Selected! : null);
+                _manager.SetDefaultLocalPlayerProfile(isDefaultLP ? Selection : null);
             LunaStyle.DrawAlignedHelpMarkerLabel("Apply to any character you are logged in with"u8,
                 "Whether the templates in this profile should be applied to any character you are currently logged in with.\r\nTakes priority over the next option for said character.\r\nThis setting cannot be applied to multiple profiles."u8);
         }
@@ -366,12 +376,12 @@ public class ProfilePanel : IHeader, IPanel
             Im.Button("##splitter"u8, new Vector2(1, Im.Style.FrameHeight));
         Im.Line.Same();
 
-        var isDefault = _manager.DefaultProfile == _selector.Selected;
-        var isDefaultOrCurrentProfilesEnabled = (_manager.DefaultProfile?.Enabled ?? false) || (_selector.Selected?.Enabled ?? false);
+        var isDefault = _manager.DefaultProfile == Selection;
+        var isDefaultOrCurrentProfilesEnabled = (_manager.DefaultProfile?.Enabled ?? false) || Selection.Enabled;
         using (Im.Disabled(isDefaultOrCurrentProfilesEnabled))
         {
             if (Im.Checkbox("##DefaultProfile"u8, ref isDefault))
-                _manager.SetDefaultProfile(isDefault ? _selector.Selected! : null);
+                _manager.SetDefaultProfile(isDefault ? Selection : null);
             LunaStyle.DrawAlignedHelpMarkerLabel("Apply to all players and retainers"u8,
                 "Whether the templates in this profile are applied to all players and retainers without a specific profile.\r\nThis setting cannot be applied to multiple profiles."u8);
         }
@@ -382,7 +392,7 @@ public class ProfilePanel : IHeader, IPanel
             UiHelpers.DrawIcon(FontAwesomeIcon.ExclamationTriangle);
             UiHelpers.DrawHoverTooltip("Can only be changed when both currently selected and profile where this checkbox is checked are disabled.");
         }
-        bool appliesToMultiple = _manager.DefaultProfile == _selector.Selected || _manager.DefaultLocalPlayerProfile == _selector.Selected;
+        bool appliesToMultiple = _manager.DefaultProfile == Selection || _manager.DefaultLocalPlayerProfile == Selection;
 
         Im.Separator();
 
@@ -406,7 +416,7 @@ public class ProfilePanel : IHeader, IPanel
 
         //warn: .ToList() might be performance critical at some point
         //the copying via ToList is done because manipulations with .Templates list result in "Collection was modified" exception here
-        var charas = _selector.Selected!.Characters.Select((character, idx) => (character, idx)).ToList();
+        var charas = Selection.Characters.Select((character, idx) => (character, idx)).ToList();
 
         if (charas.Count == 0)
         {
@@ -420,16 +430,16 @@ public class ProfilePanel : IHeader, IPanel
         {
             using var id = Im.Id.Push(idx);
             table.NextColumn();
-            var keyValid = _configuration.UISettings.DeleteTemplateModifier.IsActive();
+            var keyValid = _configuration.UISettings.DeleteModifier.IsActive();
             var tt = keyValid
                 ? "Remove this character from the profile."
-                : $"Remove this character from the profile.\nHold {_configuration.UISettings.DeleteTemplateModifier} to remove.";
+                : $"Remove this character from the profile.\nHold {_configuration.UISettings.DeleteModifier} to remove.";
 
             if (UiHelpers.DrawIconButton(FontAwesomeIcon.Trash, new Vector2(Im.Style.FrameHeight), tt, !keyValid))
-                _endAction = () => _manager.DeleteCharacter(_selector.Selected!, character);
+                _endAction = () => _manager.DeleteCharacter(Selection, character);
             table.NextColumn();
             Im.Cursor.FrameAlign();
-            Im.Text(!_selector.IncognitoMode ? $"{character.ToNameWithoutOwnerName()}{character.TypeToString()}" : "Incognito");
+            Im.Text(!_configuration.UISettings.IncognitoMode ? $"{character.ToNameWithoutOwnerName()}{character.TypeToString()}" : "Incognito");
 
             var profiles = _manager.GetEnabledProfilesByActor(character).ToList();
             if (profiles.Count > 1)
@@ -441,7 +451,7 @@ public class ProfilePanel : IHeader, IPanel
                     using var color = ImGuiColor.Text.Push(Constants.Colors.Error);
                     UiHelpers.DrawIcon(FontAwesomeIcon.Lock);
                 }
-                else if (profiles[0] != _selector.Selected!)
+                else if (profiles[0] != Selection)
                 {
                     using var color = ImGuiColor.Text.Push(Constants.Colors.Warning);
                     UiHelpers.DrawIcon(FontAwesomeIcon.ExclamationTriangle);
@@ -455,7 +465,7 @@ public class ProfilePanel : IHeader, IPanel
                 if (profiles.Any(x => x.IsTemporary))
                     UiHelpers.DrawHoverTooltip("This character is being affected by temporary profile set by external plugin. This profile will not be applied!");
                 else
-                    UiHelpers.DrawHoverTooltip(profiles[0] != _selector.Selected! ? "Several profiles are trying to affect this character. This profile will not be applied!" :
+                    UiHelpers.DrawHoverTooltip(profiles[0] != Selection ? "Several profiles are trying to affect this character. This profile will not be applied!" :
                         "Several profiles are trying to affect this character. This profile is being applied.");
             }
         }
@@ -482,32 +492,32 @@ public class ProfilePanel : IHeader, IPanel
 
         //warn: .ToList() might be performance critical at some point
         //the copying via ToList is done because manipulations with .Templates list result in "Collection was modified" exception here
-        foreach (var (template, idx) in _selector.Selected!.Templates.Select((template, idx) => (template, idx)).ToList())
+        foreach (var (template, idx) in Selection.Templates.Select((template, idx) => (template, idx)).ToList())
         {
             using var id = Im.Id.Push(idx);
             table.NextColumn();
-            var keyValid = _configuration.UISettings.DeleteTemplateModifier.IsActive();
+            var keyValid = _configuration.UISettings.DeleteModifier.IsActive();
             var tt = keyValid
                 ? "Remove this template from the profile."
-                : $"Remove this template from the profile.\nHold {_configuration.UISettings.DeleteTemplateModifier} to remove.";
+                : $"Remove this template from the profile.\nHold {_configuration.UISettings.DeleteModifier} to remove.";
 
             if (UiHelpers.DrawIconButton(FontAwesomeIcon.Trash, new Vector2(Im.Style.FrameHeight), tt, !keyValid))
-                _endAction = () => _manager.DeleteTemplate(_selector.Selected!, idx);
+                _endAction = () => _manager.DeleteTemplate(Selection, idx);
             table.NextColumn();
             Im.Selectable($"#{idx + 1:D2}");
-            DrawDragDrop(_selector.Selected!, idx);
+            DrawDragDrop(Selection, idx);
 
             table.NextColumn();
-            var enabled = !_selector.Selected!.DisabledTemplates.Contains(template.UniqueId);
+            var enabled = !Selection.DisabledTemplates.Contains(template.UniqueId);
             if (Im.Checkbox("##EnableCheckbox"u8, ref enabled))
-                _manager.ToggleTemplate(_selector.Selected!, idx);
+                _manager.ToggleTemplate(Selection, idx);
             UiHelpers.DrawHoverTooltip("Whether this template is applied to the profile.");
 
             table.NextColumn();
 
-            //_templateCombo.Draw(_selector.Selected!, template, idx); todo
+            _templateCombo.Draw(Selection, template, idx);
 
-            DrawDragDrop(_selector.Selected!, idx);
+            DrawDragDrop(Selection, idx);
 
             table.NextColumn();
 
@@ -532,7 +542,7 @@ public class ProfilePanel : IHeader, IPanel
         Im.Cursor.FrameAlign();
         Im.Text("New"u8);
         table.NextColumn();
-        _templateCombo.Draw(_selector.Selected!, null, -1);
+        _templateCombo.Draw(Selection, null, -1);
         table.NextRow();
 
         _endAction?.Invoke();
@@ -568,9 +578,4 @@ public class ProfilePanel : IHeader, IPanel
             }
         }
     }
-
-    private void UpdateIdentifiers()
-    {
-
-    }*/
 }

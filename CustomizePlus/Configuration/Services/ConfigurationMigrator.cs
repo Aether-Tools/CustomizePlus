@@ -61,7 +61,7 @@ public class ConfigurationMigrator
 
                 var modifier1 = deleteModifier["Modifier1"]?["Modifier"]?.Value<ushort>() ?? (ushort)VirtualKey.CONTROL;
                 var modifier2 = deleteModifier["Modifier2"]?["Modifier"]?.Value<ushort>() ?? (ushort)VirtualKey.SHIFT;
-                config.UISettings.DeleteTemplateModifier = new DoubleModifier((VirtualKey)modifier1, (VirtualKey)modifier2);
+                config.UISettings.DeleteModifier = new DoubleModifier((VirtualKey)modifier1, (VirtualKey)modifier2);
 
                 config.Save();
             }

@@ -105,7 +105,8 @@ public partial class ProfileManager : IDisposable
             CreationDate = DateTimeOffset.UtcNow,
             ModifiedDate = DateTimeOffset.UtcNow,
             UniqueId = CreateNewGuid(),
-            Name = actualName
+            Name = actualName,
+            Index = Profiles.Count
         };
 
         Profiles.Add(profile);
@@ -131,7 +132,8 @@ public partial class ProfileManager : IDisposable
             ModifiedDate = DateTimeOffset.UtcNow,
             UniqueId = CreateNewGuid(),
             Name = actualName,
-            Enabled = false
+            Enabled = false,
+            Index = Profiles.Count
         };
 
         Profiles.Add(profile);
@@ -205,7 +207,13 @@ public partial class ProfileManager : IDisposable
     /// <param name="profile"></param>
     public void Delete(Profile profile)
     {
-        Profiles.Remove(profile);
+        foreach (var prof in Profiles.Skip(profile.Index + 1))
+        {
+            --prof.Index;
+        }
+
+        Profiles.RemoveAt(profile.Index);
+
         _saveService.ImmediateDelete(profile);
         _event.Invoke(new ProfileChanged.Arguments(ProfileChanged.Type.Deleted, profile, null));
     }

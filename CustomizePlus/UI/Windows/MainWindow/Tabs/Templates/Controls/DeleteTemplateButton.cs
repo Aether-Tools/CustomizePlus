@@ -32,12 +32,12 @@ public sealed class DeleteTemplateButton(
             ? "Delete the currently selected templates entirely from your drive\nThis can not be undone."u8
             : "No templates selected."u8);
         if (!modifier)
-            Im.Text($"\nHold {config.UISettings.DeleteTemplateModifier} while clicking to delete the templates.");
+            Im.Text($"\nHold {config.UISettings.DeleteModifier} while clicking to delete the templates.");
     }
 
     /// <inheritdoc/>
     public override bool Enabled
-        => config.UISettings.DeleteTemplateModifier.IsActive() && fileSystem.Selection.DataNodes.Count > 0;
+        => config.UISettings.DeleteModifier.IsActive() && fileSystem.Selection.DataNodes.Count > 0;
 
     /// <inheritdoc/>
     public override void OnClick()
@@ -48,9 +48,9 @@ public sealed class DeleteTemplateButton(
             return;
         }
 
-        var designs = fileSystem.Selection.DataNodes.Select(n => n.Value).OfType<Template>().ToList();
+        var templates = fileSystem.Selection.DataNodes.Select(n => n.Value).OfType<Template>().ToList();
         fileSystem.Selection.UnselectAll();
-        foreach (var design in designs)
-            templateManager.Delete(design);
+        foreach (var template in templates)
+            templateManager.Delete(template);
     }
 }

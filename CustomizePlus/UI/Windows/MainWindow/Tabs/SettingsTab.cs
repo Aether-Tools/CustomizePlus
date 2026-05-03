@@ -237,7 +237,7 @@ public class SettingsTab : ITab<MainTabType>
 
         if (KeySelector.DoubleModifier("Template Deletion Modifier"u8,
             "A modifier you need to hold while clicking the Delete Template button for it to take effect."u8, 100 * ImGuiHelpers.GlobalScale,
-            _configuration.UISettings.DeleteTemplateModifier, v => _configuration.UISettings.DeleteTemplateModifier = v))
+            _configuration.UISettings.DeleteModifier, v => _configuration.UISettings.DeleteModifier = v))
             _configuration.Save();
     }
 

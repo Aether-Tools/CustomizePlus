@@ -1,16 +1,17 @@
 ﻿using CustomizePlus.Configuration.Data;
+using CustomizePlus.Profiles;
+using CustomizePlus.Profiles.Data;
 using CustomizePlus.Templates;
 using CustomizePlus.Templates.Data;
-using Penumbra.GameData.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
+namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 
-public sealed class MultiTemplatePanel(
-    TemplateFileSystem fileSystem,
-    TemplateManager templateManager,
+public sealed class MultiProfilePanel(
+    ProfileFileSystem fileSystem,
+    ProfileManager profileManager,
     PluginConfiguration configuration) : IUiService
 {
     public void Draw()
@@ -27,15 +28,15 @@ public sealed class MultiTemplatePanel(
     private void DrawCounts(Vector2 treeNodePos)
     {
         var startPos = Im.Cursor.Position;
-        var numTemplates = fileSystem.Selection.DataNodes.Count;
+        var numProfiles = fileSystem.Selection.DataNodes.Count;
         var numFolders = fileSystem.Selection.Folders.Count;
         Im.Cursor.Position = treeNodePos;
-        ImEx.TextRightAligned((numTemplates, numFolders) switch
+        ImEx.TextRightAligned((numProfiles, numFolders) switch
         {
             (0, 0) => StringU8.Empty, // should not happen
-            ( > 0, 0) => $"{numTemplates} Templates",
+            ( > 0, 0) => $"{numProfiles} Profiles",
             (0, > 0) => $"{numFolders} Folders",
-            _ => $"{numTemplates} Templates, {numFolders} Folders",
+            _ => $"{numProfiles} Profiles, {numFolders} Folders",
         });
         Im.Cursor.Position = startPos;
     }
@@ -47,7 +48,7 @@ public sealed class MultiTemplatePanel(
 
     private void CountLeaves(IFileSystemNode path)
     {
-        if (path is not IFileSystemData<Template> l)
+        if (path is not IFileSystemData<Profile> l)
             return;
 
         if (l.Value.IsWriteProtected)
@@ -67,19 +68,19 @@ public sealed class MultiTemplatePanel(
         var sizeTemplates = availableSizePercent * 35;
         var sizeFolders = availableSizePercent * 65;
 
-        using (var table = Im.Table.Begin("templates"u8, 3, TableFlags.RowBackground))
+        using (var table = Im.Table.Begin("profiles"u8, 3, TableFlags.RowBackground))
         {
             if (!table)
                 return;
 
             table.SetupColumn("type"u8, TableColumnFlags.WidthFixed, sizeType.X);
-            table.SetupColumn("templates"u8, TableColumnFlags.WidthFixed, sizeTemplates);
+            table.SetupColumn("profiles"u8, TableColumnFlags.WidthFixed, sizeTemplates);
             table.SetupColumn("path"u8, TableColumnFlags.WidthFixed, sizeFolders);
 
             foreach (var (index, node) in fileSystem.Selection.OrderedNodes.Index())
             {
                 using var id = Im.Id.Push(index);
-                var (icon, text) = node is IFileSystemData<Template> l
+                var (icon, text) = node is IFileSystemData<Profile> l
                     ? (LunaStyle.RemoveFileIcon, configuration.UISettings.IncognitoMode ? l.Value.Incognito : l.Value.Name)
                     : (LunaStyle.RemoveFolderIcon, string.Empty);
                 table.NextColumn();
@@ -107,18 +108,18 @@ public sealed class MultiTemplatePanel(
         Im.Item.SetNextWidth(width.X);
         var diff = fileSystem.Selection.DataNodes.Count - _numProfilesLocked;
         if (ImEx.Button("Turn Write-Protected"u8, width, diff is 0
-                ? $"All {fileSystem.Selection.DataNodes.Count} selected templates are already write protected."
-                : $"Write-protect all {fileSystem.Selection.DataNodes.Count} templates. Changes {diff} templates.", diff is 0))
-            foreach (var template in fileSystem.Selection.DataNodes)
-                templateManager.SetWriteProtection(template.GetValue<Template>()!, true);
+                ? $"All {fileSystem.Selection.DataNodes.Count} selected profiles are already write protected."
+                : $"Write-protect all {fileSystem.Selection.DataNodes.Count} profiles. Changes {diff} templates.", diff is 0))
+            foreach (var profile in fileSystem.Selection.DataNodes)
+                profileManager.SetWriteProtection(profile.GetValue<Profile>()!, true);
 
         Im.Line.SameInner();
         if (ImEx.Button("Remove Write-Protection"u8, width, _numProfilesLocked is 0
-                    ? $"None of the {fileSystem.Selection.DataNodes.Count} selected templates are write-protected."
-                    : $"Remove the write protection of the {fileSystem.Selection.DataNodes.Count} selected templates. Changes {_numProfilesLocked} templates.",
+                    ? $"None of the {fileSystem.Selection.DataNodes.Count} selected profiles are write-protected."
+                    : $"Remove the write protection of the {fileSystem.Selection.DataNodes.Count} selected profiles. Changes {_numProfilesLocked} profiles.",
                 _numProfilesLocked is 0))
-            foreach (var template in fileSystem.Selection.DataNodes)
-                templateManager.SetWriteProtection(template.GetValue<Template>()!, false);
+            foreach (var profile in fileSystem.Selection.DataNodes)
+                profileManager.SetWriteProtection(profile.GetValue<Profile>()!, false);
         Im.Separator();
 
         return offset;

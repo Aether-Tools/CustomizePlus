@@ -1,52 +1,55 @@
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Configuration.Services;
+using CustomizePlus.Templates;
+using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 
 public class ProfilesTab : TwoPanelLayout, ITab<MainTabType>
 {
     private readonly PluginConfiguration _configuration;
-    //private readonly ProfileFileSystemSelector _selector;
+    private readonly TemplateEditorManager _templateEditorManager;
 
-    public ProfilesTab(/*ProfileFileSystemSelector selector, */ProfilePanel panel, PluginConfiguration configuration)
+    public ProfilesTab(
+        ProfileFileSystemDrawer drawer,
+        ProfilePanel panel,
+        ProfileHeader header,
+        PluginConfiguration configuration,
+        TemplateEditorManager templateEditorManager)
     {
         _configuration = configuration;
-       /* _selector = selector;
-        LeftHeader = selector.Header;
-        LeftFooter = selector.Footer;
-        LeftPanel = selector;*/
-        RightHeader = panel;
+        _templateEditorManager = templateEditorManager;
+
+        LeftHeader = drawer.Header;
+        LeftFooter = drawer.Footer;
+        LeftPanel = drawer;
+
+        RightHeader = header;
         RightFooter = EmptyHeaderFooter.Instance;
         RightPanel = panel;
     }
 
     public override ReadOnlySpan<byte> Label
-        => "ProfilesTab"u8;
+        => "Profiles"u8;
 
     public MainTabType Identifier
         => MainTabType.Profiles;
 
-    public void DrawContent()
-        => Draw(new TwoPanelWidth(_configuration.UISettings.CurrentProfileSelectorWidth, ScalingMode.Absolute));
-
-    protected override void SetWidth(float width, ScalingMode mode)
+    /*protected override void DrawLeftGroup(in TwoPanelWidth width)
     {
-        var adaptedSize = MathF.Round(width / Im.Style.GlobalScale);
-        if (Math.Abs(adaptedSize - _configuration.UISettings.CurrentProfileSelectorWidth) < 0.1f)
-            return;
-
-        _configuration.UISettings.CurrentProfileSelectorWidth = adaptedSize;
-        _configuration.Save();
-    }
-
-   /* protected override void DrawPopups()
-        => _selector.DrawSelectorPopups();*/
+        using (var disabled = Im.Disabled(_templateEditorManager.IsEditorActive))
+            base.DrawLeftGroup(width);
+    }*/
 
     protected override float MinimumWidth
-        => Im.ContentRegion.Available.X * _configuration.UISettings.ProfileSelectorMinimumScale;
+        => LeftFooter.MinimumWidth;
 
     protected override float MaximumWidth
-        => MathF.Max(MinimumWidth, MathF.Min(
-            Im.ContentRegion.Available.X * _configuration.UISettings.ProfileSelectorMaximumScale,
-            Im.ContentRegion.Available.X - 470 * Im.Style.GlobalScale));
+        => Im.Window.Width - 500 * Im.Style.GlobalScale;
+
+    protected override void SetWidth(float width, ScalingMode mode)
+        => _configuration.LunaUiConfiguration.ProfilesTabScale = new TwoPanelWidth(width, mode);
+
+    public void DrawContent()
+        => Draw(_configuration.LunaUiConfiguration.ProfilesTabScale);
 }

@@ -75,22 +75,20 @@ public class TemplatePanel : IPanel, IDisposable
 
     public void Draw()
     {
-        if (_fileSystem.Selection.OrderedNodes.Count > 1) //todo
+        if (_fileSystem.Selection.OrderedNodes.Count > 1)
         {
             _multiTemplatePanel.Draw();
             return;
         }
 
         DrawPanel();
-
-        if (_fileSystem.Selection.Selection is null || Selection.IsWriteProtected)
-            return;
     }
 
     public void Dispose()
     {
         _editorEvent.Unsubscribe(OnEditorEvent);
     }
+
     private void DrawPanel()
     {
         if (_fileSystem.Selection.Selection is null)

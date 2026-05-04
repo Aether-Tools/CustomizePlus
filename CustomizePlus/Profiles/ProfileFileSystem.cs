@@ -10,24 +10,17 @@ namespace CustomizePlus.Profiles;
 
 public sealed class ProfileFileSystem : BaseFileSystem, IDisposable
 {
-    private readonly ProfileManager _profileManager;
     private readonly ProfileChanged _profileChanged;
-    private readonly MessageService _messageService;
-
     private readonly ProfileFileSystemSaver _saver;
 
     public ProfileFileSystem(
         LunaLogger log,
         SaveService saveService,
         ProfileManager profileManager,
-        ProfileChanged profileChanged,
-        MessageService messageService/*, TabSelected tabSelected*/)
+        ProfileChanged profileChanged,)
         : base("ProfileFileSystem", log, true)
     {
-        _profileManager = profileManager;
         _profileChanged = profileChanged;
-        _messageService = messageService;
-
 
         _saver = new ProfileFileSystemSaver(log, this, saveService, profileManager);
 

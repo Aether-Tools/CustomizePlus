@@ -2,10 +2,12 @@ using CustomizePlus.Profiles.Data;
 using CustomizePlus.Profiles.Events;
 using CustomizePlus.Templates.Data;
 using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Interface.ImGuiNotification;
 using Newtonsoft.Json.Linq;
 using Penumbra.GameData.Actors;
 using Penumbra.GameData.Structs;
 using Penumbra.String;
+using static FFXIVClientStructs.FFXIV.Client.LayoutEngine.LayoutManager;
 
 namespace CustomizePlus.Profiles;
 
@@ -186,13 +188,22 @@ public partial class ProfileManager : IDisposable
         {
             if (templateObj is not JObject templateObjCast)
             {
-                //todo: warning
+                CustomizePlus.Messager.NotificationMessage(
+                    $"Profile {profile.Name} contains an invalid template.",
+                    NotificationType.Warning);
+
                 continue;
             }
 
             var templateId = templateObjCast["TemplateId"]?.ToObject<Guid>();
             if (templateId == null)
-                continue; //todo: error
+            {
+                CustomizePlus.Messager.NotificationMessage(
+                    $"Profile {profile.Name} contains an invalid template.",
+                    NotificationType.Warning);
+
+                continue;
+            }
 
             var template = _templateManager.GetTemplate((Guid)templateId);
             if (template == null)

@@ -11,7 +11,6 @@ namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 
 public class TemplatePanel : IPanel, IDisposable
 {
-    //private readonly TemplateFileSystemSelector _selector;
     private readonly TemplateFileSystem _fileSystem;
     private readonly TemplateManager _manager;
     private readonly BoneEditorPanel _boneEditor;
@@ -52,8 +51,6 @@ public class TemplatePanel : IPanel, IDisposable
 
         _editorEvent.Subscribe(OnEditorEvent, TemplateEditorEvent.Priority.TemplatePanel);
 
-        //todo
-        //  _selector.SelectionChanged += SelectorSelectionChanged; todo
         fileSystem.Selection.Changed += SelectorSelectionChanged;
     }
 
@@ -157,7 +154,8 @@ public class TemplatePanel : IPanel, IDisposable
 
         _isEditorEnablePending = false;
 
-        //Ugly hack, I don't like it, but I'm dealing with rewriting the entire UI right now, this isn't a priority.
+        //Ugly hack because selection isn't yet changed at the time this is executed.
+        //I don't like it, but I'm dealing with rewriting the entire UI right now, this isn't a priority.
         _frameworkManager.RegisterDelayed("editorenable", () => _boneEditor.EnableEditor(Selection), TimeSpan.FromMilliseconds(500));
     }
 

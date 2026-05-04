@@ -103,22 +103,22 @@ public abstract class TemplateComboBase : FilterComboBase<TemplateCacheItem>, ID
     }
 
     //todo: is this needed?
-   /* private static void DrawRightAligned(string leftText, string text, Rgba32 color)
-    {
-        var start = Im.Item.Bounds.Minimum;
-        var pos = start.X + Im.Font.CalculateSize(leftText).X;
-        var maxSize = Im.Window.Position.X + Im.Window.MaximumContentRegion.X;
-        var remainingSpace = maxSize - pos;
-        var requiredSize = Im.Font.CalculateSize(text).X + Im.Style.ItemInnerSpacing.X;
-        var offset = remainingSpace - requiredSize;
-        if (Im.Scroll.MaximumY == 0)
-            offset -= Im.Style.ItemInnerSpacing.X;
+    /* private static void DrawRightAligned(string leftText, string text, Rgba32 color)
+     {
+         var start = Im.Item.Bounds.Minimum;
+         var pos = start.X + Im.Font.CalculateSize(leftText).X;
+         var maxSize = Im.Window.Position.X + Im.Window.MaximumContentRegion.X;
+         var remainingSpace = maxSize - pos;
+         var requiredSize = Im.Font.CalculateSize(text).X + Im.Style.ItemInnerSpacing.X;
+         var offset = remainingSpace - requiredSize;
+         if (Im.Scroll.MaximumY == 0)
+             offset -= Im.Style.ItemInnerSpacing.X;
 
-        if (offset < Im.Style.ItemSpacing.X)
-            UiHelpers.DrawHoverTooltip(text);
-        else
-            Im.Window.DrawList.Text(start with { X = pos + offset }, color, text);
-    }*/
+         if (offset < Im.Style.ItemSpacing.X)
+             UiHelpers.DrawHoverTooltip(text);
+         else
+             Im.Window.DrawList.Text(start with { X = pos + offset }, color, text);
+     }*/
 
     protected sealed class TemplateFilter : Utf8FilterBase<TemplateCacheItem>
     {

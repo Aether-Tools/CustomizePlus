@@ -16,7 +16,6 @@ public sealed class TemplateFileSystemCache : FileSystemCache<TemplateFileSystem
         parent.ProfileChanged.Subscribe(OnProfileChanged, ProfileChanged.Priority.TemplateFileSystemSelector);
     }
 
-    //todo: colors
     private void OnColorChanged()
     {
         foreach (var node in AllNodes.Values)
@@ -53,8 +52,30 @@ public sealed class TemplateFileSystemCache : FileSystemCache<TemplateFileSystem
                 break;
         }
 
-        /*if (arguments.Template?.Node is { } node && AllNodes.TryGetValue(node, out var cache))
-            cache.Dirty = true;*/
+        if (arguments.Profile == null) //not sure this will ever be the case, just a failsafe
+        {
+            OnColorChanged();
+            return;
+        }
+
+        if(arguments.Type == ProfileChanged.Type.AddedTemplate || arguments.Type == ProfileChanged.Type.RemovedTemplate)
+        {
+            var template = (Template)arguments.Data!;
+
+            if (template.Node is { } node && AllNodes.TryGetValue(node, out var cache))
+                cache.Dirty = true;
+        }
+
+        if(arguments.Type == ProfileChanged.Type.ChangedTemplate)
+        {
+            var data = ((int idx, Template newTemplate, Template oldTemplate))arguments.Data;
+
+            if (data.newTemplate.Node is { } node && AllNodes.TryGetValue(node, out var cache))
+                cache.Dirty = true;
+
+            if (data.oldTemplate.Node is { } node2 && AllNodes.TryGetValue(node2, out var cache2))
+                cache2.Dirty = true;
+        }
     }
 
     private new TemplateFileSystemDrawer Parent
@@ -92,7 +113,7 @@ public sealed class TemplateFileSystemCache : FileSystemCache<TemplateFileSystem
         public override void Update(FileSystemCache cache, IFileSystemNode node)
         {
             var drawer = (TemplateFileSystemDrawer)cache.Parent;
-            Color = ColorId.UnusedTemplate.Value().ToVector(); //todo //drawer.DesignColors.GetColor(Node.Value).ToVector();
+            Color = drawer.ColorsService.GetTemplateColor(Node.Value).ToVector();
             Name = new StringU8(Node.Value.Name);
         }
 

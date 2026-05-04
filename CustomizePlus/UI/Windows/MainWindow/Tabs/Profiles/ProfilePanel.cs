@@ -40,15 +40,6 @@ public class ProfilePanel : IPanel
 
     private int _dragIndex = -1;
 
-    private string SelectionName
-        => "todo";/*_selector.SelectedPaths.Count > 1
-            ? "Multiple Profiles"
-            : _selector.Selected == null
-                ? "No Selection"
-                : _selector.IncognitoMode
-                    ? _selector.Selected.Incognito
-                    : _selector.Selected.Name;*/
-
     public ReadOnlySpan<byte> Id
         => "ProfilePanel"u8;
 
@@ -95,84 +86,6 @@ public class ProfilePanel : IPanel
 
         DrawPanel();
     }
-
-    public void Draw(Vector2 size)
-        => DrawHeader();
-    /*
-    private HeaderDrawer.Button LockButton()
-        => _selector.Selected == null
-            ? HeaderDrawer.Button.Invisible
-            : _selector.Selected.IsWriteProtected
-                ? new HeaderDrawer.Button
-                {
-                    Description = "Make this profile editable.",
-                    Icon = FontAwesomeIcon.Lock,
-                    OnClick = () => _manager.SetWriteProtection(_selector.Selected!, false)
-                }
-                : new HeaderDrawer.Button
-                {
-                    Description = "Write-protect this profile.",
-                    Icon = FontAwesomeIcon.LockOpen,
-                    OnClick = () => _manager.SetWriteProtection(_selector.Selected!, true)
-                };
-
-    private HeaderDrawer.Button ExportToClipboardButton()
-         => _selector.Selected == null
-        ? HeaderDrawer.Button.Invisible
-        :new HeaderDrawer.Button {
-            Description = "Copy the current profile combined into one template to your clipboard.",
-            Icon = FontAwesomeIcon.Copy,
-            OnClick = ExportToClipboard,
-            Visible = _selector.Selected != null,
-            Disabled = false
-        };
-    */
-    private void DrawHeader()
-    { }
-      /*  => HeaderDrawer.Draw(SelectionName, 0, Im.Color.Get(ImGuiColor.FrameBackground).Color,
-            1, ExportToClipboardButton(), LockButton(),
-            HeaderDrawer.Button.IncognitoButton(_selector.IncognitoMode, v => _selector.IncognitoMode = v));*/
-    /*
-    private void DrawMultiSelection()
-    {
-        if (_selector.SelectedPaths.Count == 0)
-            return;
-
-        var sizeType = Im.Style.FrameHeight;
-        var availableSizePercent = (Im.ContentRegion.Available.X - sizeType - 4 * Im.Style.CellPadding.X) / 100;
-        var sizeMods = availableSizePercent * 35;
-        var sizeFolders = availableSizePercent * 65;
-
-        Im.Line.New();
-        Im.Text("Currently Selected Profiles"u8);
-        Im.Separator();
-        using var table = Im.Table.Begin("profile"u8, 3, TableFlags.RowBackground);
-        if (!table)
-            return;
-
-        table.SetupColumn("btn"u8, TableColumnFlags.WidthFixed, sizeType);
-        table.SetupColumn("name"u8, TableColumnFlags.WidthFixed, sizeMods);
-        table.SetupColumn("path"u8, TableColumnFlags.WidthFixed, sizeFolders);
-
-        var i = 0;
-        foreach (var (fullName, path) in _selector.SelectedPaths.Select(p => (p.FullPath, p))
-                     .OrderBy(p => p.Item1, StringComparer.OrdinalIgnoreCase))
-        {
-            using var id = Im.Id.Push(i++);
-            table.NextColumn();
-            var icon = path is IFileSystemData<Profile> ? FontAwesomeIcon.FileCircleMinus : FontAwesomeIcon.FolderMinus;
-            if (UiHelpers.DrawIconButton(icon, new Vector2(sizeType), "Remove from selection.", false))
-                _selector.RemovePathFromMultiSelection(path);
-
-            table.NextColumn();
-            Im.Cursor.FrameAlign();
-            Im.Text(path is IFileSystemData<Profile> data ? _selector.IncognitoMode ? data.Value.Incognito : data.Value.Name : string.Empty);
-
-            table.NextColumn();
-            Im.Cursor.FrameAlign();
-            Im.Text(_selector.IncognitoMode ? "Incognito is active" : fullName);
-        }
-    }*/
 
     private void DrawPanel()
     {

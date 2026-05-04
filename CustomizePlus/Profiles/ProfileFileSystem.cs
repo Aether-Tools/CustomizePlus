@@ -57,9 +57,9 @@ public sealed class ProfileFileSystem : BaseFileSystem, IDisposable
                     }
                     catch (Exception ex)
                     {
-                        /* Glamourer.Messager.NotificationMessage(ex,
-                             $"Could not move design to {folder} because the folder could not be created.",
-                             NotificationType.Error);*/ //todo
+                        CustomizePlus.Messager.NotificationMessage(ex,
+                            $"Could not move profile to {folder} because the folder could not be created.",
+                            NotificationType.Error);
                     }
 
                 var (data, _) = CreateDuplicateDataNode(parent, arguments.Profile!.Path.SortName ?? arguments.Profile.Name, arguments.Profile);

@@ -28,6 +28,7 @@ public class IPCTestTab : ITab<MainTabType> //: IDisposable
     private readonly ActorObjectManager _objectManager;
     private readonly ActorManager _actorManager;
     private readonly Logger _logger;
+    private readonly PluginConfiguration _configuration;
 
     [EzIPC("General.GetApiVersion")] 
     private readonly Func<(int, int)> _getApiVersionIpcFunc;
@@ -110,6 +111,7 @@ public class IPCTestTab : ITab<MainTabType> //: IDisposable
         _gameObjectService = gameObjectService;
         _actorManager = actorManager;
         _logger = logger;
+        _configuration = configuration;
 
         if(configuration.DebuggingModeEnabled)
             EzIPC.Init(this, "CustomizePlus"); //do not init EzIPC if debugging disabled so no debug event hook is created
@@ -124,6 +126,7 @@ public class IPCTestTab : ITab<MainTabType> //: IDisposable
     public MainTabType Identifier
         => MainTabType.IPCTest;
 
+    public bool IsVisible => _configuration.DebuggingModeEnabled;
 
     public void DrawContent()
     {

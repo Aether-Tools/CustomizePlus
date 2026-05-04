@@ -45,9 +45,9 @@ public sealed class TemplateFileSystem : BaseFileSystem, IDisposable, IRequiredS
                     }
                     catch (Exception ex)
                     {
-                       /* Glamourer.Messager.NotificationMessage(ex,
-                            $"Could not move design to {folder} because the folder could not be created.",
-                            NotificationType.Error);*/ //todo
+                        CustomizePlus.Messager.NotificationMessage(ex,
+                            $"Could not move template to {folder} because the folder could not be created.",
+                            NotificationType.Error);
                     }
 
                 var (data, _) = CreateDuplicateDataNode(parent, arguments.Template!.Path.SortName ?? arguments.Template.Name, arguments.Template);

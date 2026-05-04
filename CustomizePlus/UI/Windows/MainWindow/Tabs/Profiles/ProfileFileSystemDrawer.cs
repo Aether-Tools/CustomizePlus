@@ -1,6 +1,7 @@
 ﻿using CustomizePlus.Anamnesis;
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Core.Helpers;
+using CustomizePlus.Core.Services;
 using CustomizePlus.Game.Services;
 using CustomizePlus.Profiles;
 using CustomizePlus.Profiles.Events;
@@ -22,23 +23,23 @@ public sealed class ProfileFileSystemDrawer : FileSystemDrawer<ProfileFileSystem
     internal readonly ProfileChanged ProfileChanged;
     internal readonly ProfileManager ProfileManager;
     internal readonly PluginConfiguration Configuration;
-    internal readonly GameObjectService GameObjectService; //todo
     internal readonly IClientState ClientState;
+    internal readonly ColorsService ColorsService;
 
     public ProfileFileSystemDrawer(MessageService messager,
         ProfileFileSystem fileSystem,
         ProfileChanged profileChanged,
         ProfileManager profileManager,
         PluginConfiguration configuration,
-        GameObjectService gameObjectService,
-        IClientState clientState)
+        IClientState clientState,
+        ColorsService colorsService)
         : base(messager, fileSystem, new ProfileFilter(configuration))
     {
         ProfileChanged = profileChanged;
         ProfileManager = profileManager;
         Configuration = configuration;
-        GameObjectService = gameObjectService;
         ClientState = clientState;
+        ColorsService = colorsService;
 
         Footer.Buttons.AddButton(new NewProfileButton(profileManager), 1000);
         Footer.Buttons.AddButton(new DuplicateProfileButton(fileSystem, profileManager), 700);

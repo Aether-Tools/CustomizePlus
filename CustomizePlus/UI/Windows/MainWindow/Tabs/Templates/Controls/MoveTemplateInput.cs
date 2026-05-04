@@ -10,8 +10,6 @@ public sealed class MoveTemplateInput(TemplateFileSystemDrawer fileSystem) : Bas
     public override ReadOnlySpan<byte> Label(in IFileSystemData _)
         => "##Move"u8;
 
-    //todo: block when editor is active
-
     /// <summary> Replaces the normal menu item handling for a text input, so the other fields are not used. </summary>
     /// <inheritdoc/>
     public override bool DrawMenuItem(in IFileSystemData data)

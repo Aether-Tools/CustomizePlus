@@ -36,7 +36,7 @@ public sealed class ExportToClipboardButton(TemplateFileSystem fileSystem, Popup
         }
         catch (Exception ex)
         {
-           // _logger.Error($"Could not copy data from template {Selection.UniqueId} to clipboard: {ex}"); todo
+            CustomizePlus.Logger.Error($"Could not copy data from template {template.UniqueId} to clipboard: {ex}");
             popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
         }
     }

@@ -1,5 +1,8 @@
 ﻿using CustomizePlus.Anamnesis;
 using CustomizePlus.Configuration.Data;
+using CustomizePlus.Core.Helpers;
+using CustomizePlus.Core.Services;
+using CustomizePlus.Profiles.Events;
 using CustomizePlus.Templates;
 using CustomizePlus.Templates.Events;
 using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates.Controls;
@@ -7,8 +10,6 @@ using Dalamud.Interface.ImGuiFileDialog;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using CustomizePlus.Core.Helpers;
-using CustomizePlus.Profiles.Events;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 
@@ -18,6 +19,7 @@ public sealed class TemplateFileSystemDrawer : FileSystemDrawer<TemplateFileSyst
     internal readonly ProfileChanged ProfileChanged;
     internal readonly TemplateManager TemplateManager;
     internal readonly PluginConfiguration Configuration;
+    internal readonly ColorsService ColorsService;
 
     private readonly FileDialogManager fileDialogManager = new();
 
@@ -29,13 +31,15 @@ public sealed class TemplateFileSystemDrawer : FileSystemDrawer<TemplateFileSyst
         TemplateEditorManager editorManager,
         PopupSystem popupSystem,
         PoseFileBoneLoader poseFileBoneLoader,
-        PluginConfiguration configuration)
+        PluginConfiguration configuration,
+        ColorsService colorsService)
         : base(messager, fileSystem, new TemplateFilter(configuration))
     {
         TemplateChanged = templateChanged;
         ProfileChanged = profileChanged;
         TemplateManager = templateManager;
         Configuration = configuration;
+        ColorsService = colorsService;
 
         Footer.Buttons.AddButton(new NewTemplateButton(templateManager, editorManager, popupSystem), 1000);
         Footer.Buttons.AddButton(new AnamnesisImportButton(templateManager, editorManager, popupSystem, messager, poseFileBoneLoader, fileDialogManager), 800);

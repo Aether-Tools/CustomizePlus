@@ -16,10 +16,8 @@ public class TemplatePanel : IPanel, IDisposable
     private readonly TemplateManager _manager;
     private readonly BoneEditorPanel _boneEditor;
     private readonly PluginConfiguration _configuration;
-    private readonly MessageService _messageService;
-    private readonly PopupSystem _popupSystem;
-    private readonly Logger _logger;
     private readonly MultiTemplatePanel _multiTemplatePanel;
+    private readonly FrameworkManager _frameworkManager;
 
     private readonly TemplateEditorEvent _editorEvent;
 
@@ -31,15 +29,6 @@ public class TemplatePanel : IPanel, IDisposable
     /// </summary>
     private bool _isEditorEnablePending = false;
 
-  /*  private string SelectionName
-        => _selector.SelectedPaths.Count > 1
-            ? "Multiple Templates"
-            : _selector.Selected == null
-                ? "No Selection"
-                : _selector.IncognitoMode
-                    ? _selector.Selected.Incognito
-                    : _selector.Selected.Name;*/
-
     public ReadOnlySpan<byte> Id
         => "TemplatePanel"u8;
 
@@ -48,26 +37,24 @@ public class TemplatePanel : IPanel, IDisposable
         TemplateManager manager,
         BoneEditorPanel boneEditor,
         PluginConfiguration configuration,
-        MessageService messageService,
-        PopupSystem popupSystem,
-        Logger logger,
         TemplateEditorEvent editorEvent,
-        MultiTemplatePanel multiTemplatePanel)
+        MultiTemplatePanel multiTemplatePanel,
+        FrameworkManager frameworkManager)
     {
         _fileSystem = fileSystem;
         _manager = manager;
         _boneEditor = boneEditor;
         _configuration = configuration;
-        _messageService = messageService;
-        _popupSystem = popupSystem;
-        _logger = logger;
         _multiTemplatePanel = multiTemplatePanel;
+        _frameworkManager = frameworkManager;
 
         _editorEvent = editorEvent;
 
         _editorEvent.Subscribe(OnEditorEvent, TemplateEditorEvent.Priority.TemplatePanel);
 
+        //todo
         //  _selector.SelectionChanged += SelectorSelectionChanged; todo
+        fileSystem.Selection.Changed += SelectorSelectionChanged;
     }
 
     private Template Selection
@@ -163,16 +150,16 @@ public class TemplatePanel : IPanel, IDisposable
         }
     }
 
-
-  /*  private void SelectorSelectionChanged(Template? oldSelection, Template? newSelection, in TemplateFileSystemSelector.TemplateState state)
+    private void SelectorSelectionChanged()
     {
         if (!_isEditorEnablePending)
             return;
 
         _isEditorEnablePending = false;
 
-        _boneEditor.EnableEditor(Selection);
-    }*/
+        //Ugly hack, I don't like it, but I'm dealing with rewriting the entire UI right now, this isn't a priority.
+        _frameworkManager.RegisterDelayed("editorenable", () => _boneEditor.EnableEditor(Selection), TimeSpan.FromMilliseconds(500));
+    }
 
     private void OnEditorEvent(in TemplateEditorEvent.Arguments args)
     {
@@ -188,12 +175,11 @@ public class TemplatePanel : IPanel, IDisposable
         if (!isEditorAllowed || isEditorActive)
             return;
 
-        if(Selection != template)
+        if(_fileSystem.Selection.Selection == null || Selection != template)
         {
-            //_selector.SelectByValue(template);
-            //todo: change selection
-
             _isEditorEnablePending = true;
+
+            _fileSystem.Selection.Select(template.Node!, true);
         }
         else
             _boneEditor.EnableEditor(Selection);

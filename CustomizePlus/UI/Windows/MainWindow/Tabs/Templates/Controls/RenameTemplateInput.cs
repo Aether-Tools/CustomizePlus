@@ -11,8 +11,6 @@ public sealed class RenameTemplateInput(TemplateFileSystemDrawer fileSystem) : B
     public override ReadOnlySpan<byte> Label(in IFileSystemData _)
         => "##Rename"u8;
 
-    //todo: disable when editor is active
-
     /// <summary> Replaces the normal menu item handling for a text input, so the other fields are not used. </summary>
     /// <inheritdoc/>
     public override bool DrawMenuItem(in IFileSystemData data)

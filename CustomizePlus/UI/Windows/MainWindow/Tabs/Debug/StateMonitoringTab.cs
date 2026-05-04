@@ -1,5 +1,6 @@
 using CustomizePlus.Armatures.Data;
 using CustomizePlus.Armatures.Services;
+using CustomizePlus.Configuration.Data;
 using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Extensions;
 using CustomizePlus.Game.Services;
@@ -25,19 +26,22 @@ public class StateMonitoringTab : ITab<MainTabType>
     private readonly ArmatureManager _armatureManager;
     private readonly ActorObjectManager _objectManager;
     private readonly GameObjectService _gameObjectService;
+    private readonly PluginConfiguration _configuration;
 
     public StateMonitoringTab(
         ProfileManager profileManager,
         TemplateManager templateManager,
         ArmatureManager armatureManager,
         ActorObjectManager objectManager,
-        GameObjectService gameObjectService)
+        GameObjectService gameObjectService,
+        PluginConfiguration configuration)
     {
         _profileManager = profileManager;
         _templateManager = templateManager;
         _armatureManager = armatureManager;
         _objectManager = objectManager;
         _gameObjectService = gameObjectService;
+        _configuration = configuration;
     }
 
     public ReadOnlySpan<byte> Label
@@ -45,6 +49,8 @@ public class StateMonitoringTab : ITab<MainTabType>
 
     public MainTabType Identifier
         => MainTabType.StateMonitoring;
+
+    public bool IsVisible => _configuration.DebuggingModeEnabled;
 
     public void DrawContent()
     {

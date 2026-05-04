@@ -14,7 +14,8 @@ public sealed class CustomizePlus : IDalamudPlugin
 {
     private readonly ServiceManager _services;
 
-    public static readonly Logger Logger = new(); //for loggin in static classes/methods
+    public static readonly MainLogger Logger = new("CustomizePlus"); //for loggin in static classes/methods
+    public static MessageService Messager { get; private set; } = null!;
 
     public CustomizePlus(IDalamudPluginInterface pluginInterface)
     {
@@ -24,6 +25,7 @@ public sealed class CustomizePlus : IDalamudPlugin
             InteropAlloc.Init();
 
             _services = ServiceManagerBuilder.CreateProvider(pluginInterface, Logger);
+            Messager = _services.GetService<MessageService>();
             foreach (var _ in _services.GetServicesImplementing<IHookService>())
                 ;
             _ = _services.GetService<ImSharpDalamudContext>();

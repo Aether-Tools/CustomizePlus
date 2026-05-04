@@ -35,12 +35,6 @@ public class ProfilesTab : TwoPanelLayout, ITab<MainTabType>
     public MainTabType Identifier
         => MainTabType.Profiles;
 
-    /*protected override void DrawLeftGroup(in TwoPanelWidth width)
-    {
-        using (var disabled = Im.Disabled(_templateEditorManager.IsEditorActive))
-            base.DrawLeftGroup(width);
-    }*/
-
     protected override float MinimumWidth
         => LeftFooter.MinimumWidth;
 

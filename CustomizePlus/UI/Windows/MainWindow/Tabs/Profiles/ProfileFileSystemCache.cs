@@ -44,34 +44,20 @@ public sealed class ProfileFileSystemCache : FileSystemCache<ProfileFileSystemCa
                 break;
         }
 
-        /*if (arguments.Template?.Node is { } node && AllNodes.TryGetValue(node, out var cache))
-            cache.Dirty = true;*/
+        if (arguments.Profile?.Node is { } node && AllNodes.TryGetValue(node, out var cache))
+            cache.Dirty = true;
     }
 
-    //todo: colors
-    /*
-        //Do not display temporary profiles;
-        if (profile.IsTemporary)
-        {
-            state.Color = ColorId.DisabledProfile;
-            return false;
-        }
-
-        //todo: priority check
-        var identifier = _gameObjectService.GetCurrentPlayerActorIdentifier();
-        if (profile.Enabled)
-            state.Color = profile.Characters.Any(x => x.MatchesIgnoringOwnership(identifier)) ? ColorId.LocalCharacterEnabledProfile : ColorId.EnabledProfile;
-        else
-            state.Color = profile.Characters.Any(x => x.MatchesIgnoringOwnership(identifier)) ? ColorId.LocalCharacterDisabledProfile : ColorId.DisabledProfile;
-    */
     private void OnLogin()
     {
         VisibleDirty = true;
+        OnColorChanged();
     }
 
     private void OnLogout(int type, int code)
     {
         VisibleDirty = true;
+        OnColorChanged();
     }
 
     private new ProfileFileSystemDrawer Parent
@@ -108,7 +94,7 @@ public sealed class ProfileFileSystemCache : FileSystemCache<ProfileFileSystemCa
         public override void Update(FileSystemCache cache, IFileSystemNode node)
         {
             var drawer = (ProfileFileSystemDrawer)cache.Parent;
-            Color = ColorId.UnusedTemplate.Value().ToVector(); //todo //drawer.DesignColors.GetColor(Node.Value).ToVector();
+            Color = drawer.ColorsService.GetProfileColor(Node.Value).ToVector();
             Name = new StringU8(Node.Value.Name);
         }
 

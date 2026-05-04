@@ -46,6 +46,7 @@ public abstract class TemplateComboBase : FilterComboBase<TemplateCacheItem>, ID
     protected override bool IsSelected(TemplateCacheItem item, int globalIndex)
         => item.Template == CurrentTemplate;
 
+    //todo: is this needed?
     /*  protected override bool DrawItem(in SimpleCacheItem<TemplateCacheItem> item, int globalIndex, bool selected)
       {
           using var color = Im.Color.Push(ImGuiColor.Text, item.TextColor);
@@ -101,7 +102,8 @@ public abstract class TemplateComboBase : FilterComboBase<TemplateCacheItem>, ID
             CacheManager.Instance.SetDirty(CurrentId);
     }
 
-    private static void DrawRightAligned(string leftText, string text, Rgba32 color)
+    //todo: is this needed?
+   /* private static void DrawRightAligned(string leftText, string text, Rgba32 color)
     {
         var start = Im.Item.Bounds.Minimum;
         var pos = start.X + Im.Font.CalculateSize(leftText).X;
@@ -116,7 +118,7 @@ public abstract class TemplateComboBase : FilterComboBase<TemplateCacheItem>, ID
             UiHelpers.DrawHoverTooltip(text);
         else
             Im.Window.DrawList.Text(start with { X = pos + offset }, color, text);
-    }
+    }*/
 
     protected sealed class TemplateFilter : Utf8FilterBase<TemplateCacheItem>
     {

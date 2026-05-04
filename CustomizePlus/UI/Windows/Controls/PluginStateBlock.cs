@@ -137,6 +137,8 @@ public class PluginStateBlock
             if (hasVisibleMessage)
             {
                 Im.Line.Same();
+
+                Im.Cursor.Position = new Vector2(x + 25, yPos + Im.Style.FramePadding.Y);
                 Im.Text(visibleMessage);
             }
         }

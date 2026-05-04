@@ -1,6 +1,5 @@
 ﻿using CustomizePlus.Api;
 using CustomizePlus.Configuration.Data;
-using CustomizePlus.Configuration.Services;
 using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.Core.Services;
@@ -41,7 +40,7 @@ public class PluginStateBlock
         string? message = null;
         string? hoverInfo = null;
 
-        if(_hookingService.RenderHookFailed || _hookingService.MovementHookFailed)
+        if (_hookingService.RenderHookFailed || _hookingService.MovementHookFailed)
         {
             severity = PluginStateSeverity.Error;
             message = "Detected failure in game hooks. Customize+ disabled.";
@@ -63,7 +62,7 @@ public class PluginStateBlock
                 if (_boneEditorPanel.HasChanges)
                     severity = PluginStateSeverity.Warning;
 
-                message = $"Editor is active.{(_boneEditorPanel.HasChanges ? " You have unsaved changes, finish template bone editing to open save/revert dialog." : "")}";
+                message = $"Editor is active.{(_boneEditorPanel.HasChanges ? " You have unsaved changes, finish template bone editing to open save/revert dialog." : string.Empty)}";
             }
         }
         else if (_gameStateService.GameInPosingMode())

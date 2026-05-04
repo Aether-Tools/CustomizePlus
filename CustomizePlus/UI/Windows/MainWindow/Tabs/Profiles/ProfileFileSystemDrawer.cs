@@ -1,20 +1,10 @@
-﻿using CustomizePlus.Anamnesis;
-using CustomizePlus.Configuration.Data;
+﻿using CustomizePlus.Configuration.Data;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.Core.Services;
-using CustomizePlus.Game.Services;
 using CustomizePlus.Profiles;
 using CustomizePlus.Profiles.Events;
-using CustomizePlus.Templates;
-using CustomizePlus.Templates.Events;
 using CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles.Controls;
-using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
-using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates.Controls;
-using Dalamud.Interface.ImGuiFileDialog;
 using Dalamud.Plugin.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 

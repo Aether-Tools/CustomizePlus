@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace CustomizePlus.UI.Windows;
+﻿namespace CustomizePlus.UI.Windows;
 
 public partial class PopupSystem
 {

@@ -8,7 +8,6 @@ using Dalamud.Interface.ImGuiNotification;
 using Newtonsoft.Json;
 using Penumbra.GameData.Actors;
 using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
-using CustomizePlus.Templates;
 
 namespace CustomizePlus.Configuration.Data;
 

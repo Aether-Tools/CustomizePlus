@@ -1,12 +1,10 @@
-﻿using System;
-using System.Numerics;
-using System.Runtime.InteropServices;
-
-using FFXIVClientStructs.FFXIV.Client.System.Memory;
+﻿using FFXIVClientStructs.FFXIV.Client.System.Memory;
 using FFXIVClientStructs.Havok.Common.Base.Math.Matrix;
 using FFXIVClientStructs.Havok.Common.Base.Math.QsTransform;
+using System.Runtime.InteropServices;
 
 namespace CustomizePlus.Armatures.Data;
+
 internal static class InteropAlloc
 {
     // Allocations

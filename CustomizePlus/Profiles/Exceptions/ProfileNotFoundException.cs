@@ -1,7 +1,7 @@
-﻿using System;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace CustomizePlus.Profiles.Exceptions;
+
 internal class ProfileNotFoundException : ProfileException
 {
     public ProfileNotFoundException()

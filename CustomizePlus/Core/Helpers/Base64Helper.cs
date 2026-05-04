@@ -1,17 +1,13 @@
-﻿using CustomizePlus.Core.Data;
-using CustomizePlus.Templates.Data;
-using CustomizePlus.Api.Data;
+﻿using CustomizePlus.Api.Data;
+using CustomizePlus.Core.Data;
 using CustomizePlus.Profiles.Data;
+using CustomizePlus.Templates.Data;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Numerics;
 using System.Text;
 
 namespace CustomizePlus.Core.Helpers;
+
 public class BoneTransformData // literally not cooking
 {
     public string BoneCodeName { get; set; }

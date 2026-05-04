@@ -30,7 +30,7 @@ public class IPCTestTab : ITab<MainTabType> //: IDisposable
     private readonly Logger _logger;
     private readonly PluginConfiguration _configuration;
 
-    [EzIPC("General.GetApiVersion")] 
+    [EzIPC("General.GetApiVersion")]
     private readonly Func<(int, int)> _getApiVersionIpcFunc;
 
     [EzIPC("General.IsValid")]
@@ -86,7 +86,7 @@ public class IPCTestTab : ITab<MainTabType> //: IDisposable
 
     private string? _targetCharacterName;
 
-    private string _targetProfileId = "";
+    private string _targetProfileId = string.Empty;
     private int _targetProfilePriority = 0;
 
     private int _cutsceneActorIdx;
@@ -113,7 +113,7 @@ public class IPCTestTab : ITab<MainTabType> //: IDisposable
         _logger = logger;
         _configuration = configuration;
 
-        if(configuration.DebuggingModeEnabled)
+        if (configuration.DebuggingModeEnabled)
             EzIPC.Init(this, "CustomizePlus"); //do not init EzIPC if debugging disabled so no debug event hook is created
 
         if (_getApiVersionIpcFunc != null)
@@ -138,7 +138,7 @@ public class IPCTestTab : ITab<MainTabType> //: IDisposable
         Im.Text($"IsValid: {_validResult} ({_lastValidCheckAt} UTC)");
 
         Im.Line.Same();
-        if(Im.Button("Check IPC validity"u8) || _lastValidCheckAt == DateTime.MinValue)
+        if (Im.Button("Check IPC validity"u8) || _lastValidCheckAt == DateTime.MinValue)
         {
             _validResult = _isValidIpcFunc();
             _lastValidCheckAt = DateTime.UtcNow;
@@ -149,7 +149,7 @@ public class IPCTestTab : ITab<MainTabType> //: IDisposable
         if (Im.Button("Owned Actors Temporary Profile Test"u8))
         {
             bool found = false;
-            foreach(var obj  in _objectManager.Objects)
+            foreach (var obj in _objectManager.Objects)
             {
                 if (!obj.Identifier(_actorManager, out var ownedIdent) ||
                     ownedIdent.Type != Penumbra.GameData.Enums.IdentifierType.Owned ||
@@ -173,7 +173,7 @@ public class IPCTestTab : ITab<MainTabType> //: IDisposable
                 break;
             }
 
-            if(!found)
+            if (!found)
             {
                 _logger.Error($"No characters found for Owned Test");
                 _popupSystem.ShowPopup(PopupSystem.Messages.ActionError);
@@ -213,7 +213,7 @@ public class IPCTestTab : ITab<MainTabType> //: IDisposable
 
             (int result, Guid? uniqueId) = _getActiveProfileIdOnCharacterIpcFunc(actors[0].Item2.Index.Index);
 
-            if(result == 0)
+            if (result == 0)
             {
                 Im.Clipboard.Set($"{uniqueId}");
                 _popupSystem.ShowPopup(PopupSystem.Messages.IPCCopiedToClipboard);
@@ -267,7 +267,7 @@ public class IPCTestTab : ITab<MainTabType> //: IDisposable
 
         if (Im.Button("Copy user profile list to clipboard"u8))
         {
-            Im.Clipboard.Set(string.Join("\n", 
+            Im.Clipboard.Set(string.Join("\n",
                 _getProfileListIpcFunc().Select(x => $"{x.UniqueId}, {x.Name}, {x.VirtualPath}," +
                     $"|| {string.Join("|", x.Characters.Select(chr => $"{chr.Name}, {chr.WorldId}, {chr.CharacterType}, {chr.CharacterSubType}"))} ||, {x.Priority}, {x.IsEnabled}")));
             _popupSystem.ShowPopup(PopupSystem.Messages.IPCCopiedToClipboard);

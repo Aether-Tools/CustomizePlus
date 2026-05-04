@@ -2,8 +2,6 @@
 using CustomizePlus.Core.Data;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Templates.Data;
-using System;
-using System.Collections.Generic;
 
 namespace CustomizePlus.Configuration.Helpers;
 

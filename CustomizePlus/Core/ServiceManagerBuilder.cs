@@ -88,7 +88,7 @@ public static class ServiceManagerBuilder
             .AddSingleton<SettingsTab>()
             // template
             .AddSingleton<TemplatesTab>()
-           // .AddSingleton<TemplateFileSystemSelector>()
+            // .AddSingleton<TemplateFileSystemSelector>()
             .AddSingleton<TemplatePanel>()
             .AddSingleton<BoneEditorPanel>()
             // /template
@@ -219,7 +219,7 @@ public static class ServiceManagerBuilder
         services
             .AddSingleton<ActorManager>()
             .AddSingleton<CutsceneService>()
-            .AddSingleton(p => new CutsceneResolver(idx => (short)p.GetRequiredService<CutsceneService>().GetParentIndex(idx)))
+            .AddSingleton(p => new CutsceneResolver(idx => p.GetRequiredService<CutsceneService>().GetParentIndex(idx)))
             .AddSingleton<ActorObjectManager>();
 
         return services;

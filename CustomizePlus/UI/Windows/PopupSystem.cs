@@ -1,5 +1,4 @@
 using CustomizePlus.Configuration.Data;
-using CustomizePlus.Configuration.Services;
 using Dalamud.Interface.Utility;
 using LunaWindow = Luna.Window;
 using WindowSizeConstraints = Dalamud.Interface.Windowing.WindowSizeConstraints;

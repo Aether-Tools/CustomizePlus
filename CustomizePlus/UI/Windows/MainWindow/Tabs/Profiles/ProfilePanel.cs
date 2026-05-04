@@ -1,19 +1,15 @@
 using CustomizePlus.Configuration.Data;
-using CustomizePlus.Configuration.Services;
 using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.GameData.Extensions;
 using CustomizePlus.Profiles;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Templates;
-using CustomizePlus.Templates.Data;
 using CustomizePlus.Templates.Events;
 using CustomizePlus.UI.Windows.Controls;
-using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility;
 using Penumbra.GameData.Actors;
-using static System.Collections.Specialized.BitVector32;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 
@@ -205,7 +201,7 @@ public class ProfilePanel : IPanel
             "Profiles with a higher number here take precedence before profiles with a lower number.\nThat means if two or more profiles affect same character, profile with higher priority will be applied to that character."u8);
     }
 
-     private void ExportToClipboard()
+    private void ExportToClipboard()
     {
         try
         {
@@ -285,7 +281,7 @@ public class ProfilePanel : IPanel
         }
 
         Im.Line.Same();
-        using(Im.Disabled(true))
+        using (Im.Disabled(true))
             Im.Button("##splitter"u8, new Vector2(1, Im.Style.FrameHeight));
         Im.Line.Same();
 
@@ -314,8 +310,8 @@ public class ProfilePanel : IPanel
         if (!table)
             return;
 
-            table.SetupColumn("##charaDel"u8, TableColumnFlags.WidthFixed, Im.Style.FrameHeight);
-            table.SetupColumn("Character"u8, TableColumnFlags.WidthFixed, 320 * ImGuiHelpers.GlobalScale);
+        table.SetupColumn("##charaDel"u8, TableColumnFlags.WidthFixed, Im.Style.FrameHeight);
+        table.SetupColumn("Character"u8, TableColumnFlags.WidthFixed, 320 * ImGuiHelpers.GlobalScale);
         table.HeaderRow();
 
         if (appliesToMultiple)

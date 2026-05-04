@@ -1,10 +1,7 @@
 using CustomizePlus.Configuration.Data;
-using CustomizePlus.Configuration.Services;
-using CustomizePlus.Core.Helpers;
 using CustomizePlus.Templates;
 using CustomizePlus.Templates.Data;
 using CustomizePlus.Templates.Events;
-using Dalamud.Interface;
 using Dalamud.Interface.Utility;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
@@ -165,7 +162,7 @@ public class TemplatePanel : IPanel, IDisposable
         if (type != TemplateEditorEvent.Type.EditorEnableRequestedStage2)
             return;
 
-        if(template == null)
+        if (template == null)
             return;
 
         (bool isEditorAllowed, bool isEditorActive) = CanToggleEditor();
@@ -173,7 +170,7 @@ public class TemplatePanel : IPanel, IDisposable
         if (!isEditorAllowed || isEditorActive)
             return;
 
-        if(_fileSystem.Selection.Selection == null || Selection != template)
+        if (_fileSystem.Selection.Selection == null || Selection != template)
         {
             _isEditorEnablePending = true;
 

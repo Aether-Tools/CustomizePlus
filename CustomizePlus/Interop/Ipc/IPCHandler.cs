@@ -1,6 +1,4 @@
 ﻿using CustomizePlus.Interop.Ipc;
-using System.Linq;
-using System.Collections.Generic;
 
 public sealed class IpcHandler
 {

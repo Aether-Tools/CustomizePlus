@@ -1,6 +1,4 @@
 ﻿using CustomizePlus.Core.Data;
-using System;
-using System.Collections.Generic;
 
 namespace CustomizePlus.Configuration.Data.Version3;
 

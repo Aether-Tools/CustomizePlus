@@ -1,13 +1,5 @@
 ﻿using CustomizePlus.Profiles.Data;
 using CustomizePlus.Profiles.Events;
-using CustomizePlus.Templates.Data;
-using CustomizePlus.Templates.Events;
-using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
-using Dalamud.Plugin.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using static FFXIVClientStructs.FFXIV.Client.UI.Misc.BannerHelper.Delegates;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 

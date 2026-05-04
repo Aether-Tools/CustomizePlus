@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace CustomizePlus.UI;
+﻿namespace CustomizePlus.UI;
 
 public enum ColorId
 {

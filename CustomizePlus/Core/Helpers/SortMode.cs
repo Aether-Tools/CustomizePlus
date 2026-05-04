@@ -1,9 +1,6 @@
 ﻿using CustomizePlus.Profiles.Data;
 using CustomizePlus.Templates.Data;
-using System;
 using System.Collections.Frozen;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CustomizePlus.Core.Helpers;
 

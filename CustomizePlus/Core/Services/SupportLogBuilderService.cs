@@ -1,14 +1,11 @@
 ﻿using CustomizePlus.Armatures.Services;
 using CustomizePlus.Configuration.Data;
-using CustomizePlus.Configuration.Services;
 using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Extensions;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.Profiles;
 using CustomizePlus.Templates;
 using Dalamud.Plugin;
-using System;
-using System.Linq;
 using System.Text;
 
 namespace CustomizePlus.Core.Services;

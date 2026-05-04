@@ -1,7 +1,6 @@
-﻿using System;
-using Newtonsoft.Json;
-using Penumbra.GameData.Actors;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Penumbra.GameData.Actors;
 
 namespace CustomizePlus.Core.Helpers;
 

@@ -114,8 +114,8 @@ public partial class CustomizePlusIpc
         var playerIdentifier = _actorManager.CreatePlayer(byteString, worldId);
         if (playerIdentifier == ActorIdentifier.Invalid)
             return (int)ErrorCode.InvalidCharacter;
-        
-        if(!_profileManager.AddCharacter(profile, playerIdentifier))
+
+        if (!_profileManager.AddCharacter(profile, playerIdentifier))
             return (int)ErrorCode.InvalidArgument; //Returned if character is already associated with provided profile
 
         return (int)ErrorCode.Success;
@@ -140,8 +140,8 @@ public partial class CustomizePlusIpc
         var playerIdentifier = _actorManager.CreatePlayer(byteString, worldId);
         if (playerIdentifier == ActorIdentifier.Invalid)
             return (int)ErrorCode.InvalidCharacter;
-        
-        if(!_profileManager.DeleteCharacter(profile, playerIdentifier))
+
+        if (!_profileManager.DeleteCharacter(profile, playerIdentifier))
             return (int)ErrorCode.InvalidArgument; //Returned if character is not associated with provided profile
 
         return (int)ErrorCode.Success;
@@ -360,10 +360,10 @@ public partial class CustomizePlusIpc
             _profileManager.RemoveTemporaryProfile(actor.Value);
             return (int)ErrorCode.Success;
         }
-        catch(ProfileException ex)
+        catch (ProfileException ex)
         {
-            switch(ex)
-            { 
+            switch (ex)
+            {
                 case ActorNotFoundException _:
                     return (int)ErrorCode.InvalidCharacter;
                 case ProfileNotFoundException:
@@ -373,7 +373,7 @@ public partial class CustomizePlusIpc
                     return (int)ErrorCode.UnknownError;
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             _logger.Error($"Exception in DeleteTemporaryProfileOnCharacter. Character: {actor.Value.Utf8Name.ToString().Incognify()}. Exception: {ex}");
             return (int)ErrorCode.UnknownError;

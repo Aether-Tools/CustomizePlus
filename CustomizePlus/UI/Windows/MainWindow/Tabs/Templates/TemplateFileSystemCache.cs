@@ -1,9 +1,6 @@
 ﻿using CustomizePlus.Profiles.Events;
 using CustomizePlus.Templates.Data;
 using CustomizePlus.Templates.Events;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 
@@ -58,7 +55,7 @@ public sealed class TemplateFileSystemCache : FileSystemCache<TemplateFileSystem
             return;
         }
 
-        if(arguments.Type == ProfileChanged.Type.AddedTemplate || arguments.Type == ProfileChanged.Type.RemovedTemplate)
+        if (arguments.Type == ProfileChanged.Type.AddedTemplate || arguments.Type == ProfileChanged.Type.RemovedTemplate)
         {
             var template = (Template)arguments.Data!;
 
@@ -66,7 +63,7 @@ public sealed class TemplateFileSystemCache : FileSystemCache<TemplateFileSystem
                 cache.Dirty = true;
         }
 
-        if(arguments.Type == ProfileChanged.Type.ChangedTemplate)
+        if (arguments.Type == ProfileChanged.Type.ChangedTemplate)
         {
             var data = ((int idx, Template newTemplate, Template oldTemplate))arguments.Data;
 

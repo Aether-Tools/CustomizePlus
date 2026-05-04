@@ -7,7 +7,6 @@ using Newtonsoft.Json.Linq;
 using Penumbra.GameData.Actors;
 using Penumbra.GameData.Structs;
 using Penumbra.String;
-using static FFXIVClientStructs.FFXIV.Client.LayoutEngine.LayoutManager;
 
 namespace CustomizePlus.Profiles;
 
@@ -81,8 +80,8 @@ public partial class ProfileManager : IDisposable
         return version switch
         {
             //Ignore everything below v4
-             4 => LoadV4(obj),
-             5 or 6 => LoadV6(obj),
+            4 => LoadV4(obj),
+            5 or 6 => LoadV6(obj),
             _ => throw new Exception("The profile to be loaded has no valid Version."),
         };
     }
@@ -104,10 +103,10 @@ public partial class ProfileManager : IDisposable
             var currentPlayer = _actorManager.GetCurrentPlayer();
             profile.Characters.Add(_actorManager.CreateOwned(currentPlayer.PlayerName, currentPlayer.HomeWorld, ObjectKind.Companion, new NpcId(id)));
         }
-                else if (_reverseNameDicts.TryGetID(ObjectKind.Mount, characterName, out id))
+        else if (_reverseNameDicts.TryGetID(ObjectKind.Mount, characterName, out id))
         {
             var currentPlayer = _actorManager.GetCurrentPlayer();
-                    profile.Characters.Add(_actorManager.CreateOwned(currentPlayer.PlayerName, currentPlayer.HomeWorld, ObjectKind.Mount, new NpcId(id)));
+            profile.Characters.Add(_actorManager.CreateOwned(currentPlayer.PlayerName, currentPlayer.HomeWorld, ObjectKind.Mount, new NpcId(id)));
         }
         else if (_reverseNameDicts.TryGetID(ObjectKind.EventNpc, characterName, out id))
             profile.Characters.Add(_actorManager.CreateNpc(ObjectKind.EventNpc, new NpcId(id)));
@@ -139,7 +138,7 @@ public partial class ProfileManager : IDisposable
         if (obj["Characters"] is not JArray characterArray)
             return profile;
 
-        foreach(var characterObj in characterArray)
+        foreach (var characterObj in characterArray)
         {
             if (characterObj is not JObject characterObjCast)
             {
@@ -149,7 +148,7 @@ public partial class ProfileManager : IDisposable
 
             var character = _actorManager.FromJson(characterObjCast);
 
-            if(!character.IsValid)
+            if (!character.IsValid)
             {
                 //todo: warning
                 continue;

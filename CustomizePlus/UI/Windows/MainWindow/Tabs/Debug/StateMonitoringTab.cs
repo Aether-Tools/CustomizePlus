@@ -10,8 +10,6 @@ using CustomizePlus.Profiles.Data;
 using CustomizePlus.Templates;
 using CustomizePlus.Templates.Data;
 using Penumbra.GameData.Interop;
-using System;
-using System.Linq;
 
 #if INCOGNIFY_STRINGS
 using System.Numerics;
@@ -188,7 +186,7 @@ public class StateMonitoringTab : ITab<MainTabType>
         name = name.Incognify();
 #endif
 
-        var show = Im.Tree.Header($"{name} [{template.UniqueId}]{(additionalText != null ? additionalText : "")}###{prefix}-template-{template.UniqueId}");
+        var show = Im.Tree.Header($"{name} [{template.UniqueId}]{(additionalText != null ? additionalText : string.Empty)}###{prefix}-template-{template.UniqueId}");
 
         if (!show)
             return;
@@ -199,7 +197,7 @@ public class StateMonitoringTab : ITab<MainTabType>
         foreach (var kvPair in template.Bones)
         {
 #if !INCOGNIFY_STRINGS
-            Im.Text($"{kvPair.Key}: p: {kvPair.Value.Translation} | r: {kvPair.Value.Rotation} | s: {kvPair.Value.Scaling} | cs: {kvPair.Value.ChildScaling}{(!kvPair.Value.ChildScalingIndependent ? " (link)" : "")}");
+            Im.Text($"{kvPair.Key}: p: {kvPair.Value.Translation} | r: {kvPair.Value.Rotation} | s: {kvPair.Value.Scaling} | cs: {kvPair.Value.ChildScaling}{(!kvPair.Value.ChildScalingIndependent ? " (link)" : string.Empty)}");
 #else
             Im.Text($"{BoneData.GetBoneDisplayName(kvPair.Key)} ({kvPair.Key}): p: {(kvPair.Value.Translation.IsApproximately(Vector3.Zero) ? "Approx. not changed" : "Changed")} | r: {(kvPair.Value.Rotation.IsApproximately(Vector3.Zero) ? "Approx. not changed" : "Changed")} | s: {(kvPair.Value.Scaling.IsApproximately(Vector3.One) ? "Not changed" : "Changed")} | cs: {(!kvPair.Value.ChildScalingIndependent ? "Link" : (kvPair.Value.ChildScaling.IsApproximately(Vector3.One) ? "Not changed" : "Changed"))}");
 #endif
@@ -246,7 +244,7 @@ public class StateMonitoringTab : ITab<MainTabType>
 
         foreach (var bone in bones)
         {
-            Im.Text($"{(bone.IsActive ? "[A] " : "")}{BoneData.GetBoneDisplayName(bone.BoneName)} [{bone.BoneName}] ({bone.PartialSkeletonIndex}-{bone.BoneIndex})");
+            Im.Text($"{(bone.IsActive ? "[A] " : string.Empty)}{BoneData.GetBoneDisplayName(bone.BoneName)} [{bone.BoneName}] ({bone.PartialSkeletonIndex}-{bone.BoneIndex})");
         }
     }
 }

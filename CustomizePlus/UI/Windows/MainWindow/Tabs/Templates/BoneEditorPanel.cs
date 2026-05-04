@@ -1,6 +1,5 @@
 using CustomizePlus.Armatures.Data;
 using CustomizePlus.Configuration.Data;
-using CustomizePlus.Configuration.Services;
 using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.Game.Services;
@@ -71,7 +70,7 @@ public class BoneEditorPanel
     public bool IsCharacterFound => _editorManager.IsCharacterFound;
 
     public BoneEditorPanel(
-       // TemplateFileSystemSelector templateFileSystemSelector,
+        // TemplateFileSystemSelector templateFileSystemSelector,
         TemplateFileSystem fileSystem,
         TemplateEditorManager editorManager,
         PluginConfiguration configuration,
@@ -80,7 +79,7 @@ public class BoneEditorPanel
         PopupSystem popupSystem,
         Logger logger)
     {
-     //   _templateFileSystemSelector = templateFileSystemSelector;
+        //   _templateFileSystemSelector = templateFileSystemSelector;
         _fileSystem = fileSystem;
         _editorManager = editorManager;
         _configuration = configuration;
@@ -285,7 +284,7 @@ public class BoneEditorPanel
 
                 Im.Table.NextColumn();
 
-                if (Im.Slider("##Precision"u8, ref _precision, $"{_precision} Place{(_precision == 1 ? "" : "s")}", 0, 6))
+                if (Im.Slider("##Precision"u8, ref _precision, $"{_precision} Place{(_precision == 1 ? string.Empty : "s")}", 0, 6))
                 {
                     _configuration.EditorConfiguration.EditorValuesPrecision = _precision;
                     _configuration.Save();
@@ -412,7 +411,7 @@ public class BoneEditorPanel
                                 }
                             }
                         }
-                        catch {  }
+                        catch { }
                         finally
                         {
                             _pendingImportText = null;
@@ -1022,7 +1021,7 @@ public class BoneEditorPanel
 
         SetEditedRowBackground(rowEdited);
         Im.Table.NextColumn();
-        
+
         Im.Cursor.X = _propagateButtonXPos;
 
         using (var disabled = Im.Disabled(!_isUnlocked))

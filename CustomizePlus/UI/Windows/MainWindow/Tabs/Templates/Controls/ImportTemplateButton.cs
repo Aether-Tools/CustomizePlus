@@ -4,12 +4,7 @@ using CustomizePlus.Configuration.Helpers;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.Templates;
 using CustomizePlus.Templates.Data;
-using Dalamud.Interface.ImGuiNotification;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using static FFXIVClientStructs.FFXIV.Client.UI.AddonItemDetailCompare;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates.Controls;
 
@@ -75,7 +70,7 @@ public sealed class ImportTemplateButton(
                 popupSystem.ShowPopup(PopupSystem.Messages.ClipboardDataUnsupported);
 
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Logger.GlobalPluginLogger.Error($"Error while performing clipboard/clone/create template action: {ex}");
             popupSystem.ShowPopup(PopupSystem.Messages.ActionError);

@@ -7,9 +7,6 @@ using CustomizePlus.Templates;
 using CustomizePlus.Templates.Events;
 using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates.Controls;
 using Dalamud.Interface.ImGuiFileDialog;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 

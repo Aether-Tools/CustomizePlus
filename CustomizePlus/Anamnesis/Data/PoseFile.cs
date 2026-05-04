@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
 using System.Globalization;
-using Newtonsoft.Json;
 
 namespace CustomizePlus.Anamnesis.Data;
 

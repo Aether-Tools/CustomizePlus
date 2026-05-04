@@ -1,5 +1,4 @@
 ﻿using CustomizePlus.Configuration.Data;
-using CustomizePlus.Configuration.Services;
 
 namespace CustomizePlus.UI.Windows;
 
@@ -34,7 +33,7 @@ public class CPlusChangeLog
         Add2_0_7_2(Changelog);
         Add2_0_7_9(Changelog);
         Add2_0_7_15(Changelog);
-        Add2_0_7_16(Changelog); 
+        Add2_0_7_16(Changelog);
         Add2_0_7_23(Changelog);
         Add2_0_7_27(Changelog);
         Add2_0_8_0(Changelog);
@@ -68,7 +67,7 @@ public class CPlusChangeLog
         => log.NextVersion("Version 2.0.9.0"u8)
         .RegisterEntry("Added ability to apply separate scaling to child bones when propagation is enabled on a bone. (by Midona)"u8)
         .RegisterEntry("When enabling transformations propagation on \"Scale\" option you will now see an additional \"Child Bones\" entry appear which gives you finer control over scale of the bones. This can be especially useful for modifying shape of character tail."u8, 1);
-    
+
     private static void Add2_0_8_4(Changelog log)
         => log.NextVersion("Version 2.0.8.4"u8)
         .RegisterEntry("Accessories can now be manipulated by Customize+. (by Caraxi)"u8)
@@ -281,7 +280,7 @@ public class CPlusChangeLog
             .RegisterEntry("Fixed settings migration failing completely if one of the profiles is corrupted."u8)
             .RegisterEntry("Improved error handling."u8)
             .RegisterHighlight("Customize+ window will now display warning message if plugin encounters a critical error."u8, 1);
-   
+
     private static void Add2_0_0_0(Changelog log)
         => log.NextVersion("Version 2.0.0.0"u8)
             .RegisterHighlight("Major rework of the entire plugin."u8)

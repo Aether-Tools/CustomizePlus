@@ -1,16 +1,9 @@
 using CustomizePlus.Configuration.Data;
-using CustomizePlus.Configuration.Services;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.Core.Services;
 using CustomizePlus.Templates;
 using CustomizePlus.Templates.Events;
 using CustomizePlus.UI.Windows.Controls;
-using CustomizePlus.UI.Windows.MainWindow.Tabs;
-using CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
-using CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
-using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
-using Dalamud.Interface.Colors;
-using ECommonsLite.ImGuiMethods;
 using ECommonsLite.Schedulers;
 using LunaWindow = Luna.Window;
 using WindowSizeConstraints = Dalamud.Interface.Windowing.WindowSizeConstraints;

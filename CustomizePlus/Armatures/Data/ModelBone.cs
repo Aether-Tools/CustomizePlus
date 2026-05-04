@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using CustomizePlus.Core.Data;
+﻿using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Extensions;
 using CustomizePlus.Templates.Data;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;

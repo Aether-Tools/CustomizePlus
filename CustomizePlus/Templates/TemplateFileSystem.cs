@@ -1,8 +1,6 @@
 using CustomizePlus.Core.Services;
-using CustomizePlus.Templates.Data;
 using CustomizePlus.Templates.Events;
 using Dalamud.Interface.ImGuiNotification;
-using static FFXIVClientStructs.FFXIV.Client.UI.AddonItemDetailCompare;
 
 namespace CustomizePlus.Templates;
 

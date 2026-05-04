@@ -1,9 +1,6 @@
 ﻿using CustomizePlus.Core.Data;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Templates.Data;
-using System;
-using System.Collections.Generic;
-using System.Numerics;
 
 namespace CustomizePlus.Api.Data;
 

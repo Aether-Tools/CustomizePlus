@@ -133,7 +133,7 @@ public class ActorAssignmentUi
                 case ObjectKind.EventNpc:
                     NpcIdentifier = _actorManager.CreateNpc(_newKind, npcCombo.Selected.Ids[0]);
                     break;
-                    case ObjectKind.Mount:
+                case ObjectKind.Mount:
                 case ObjectKind.Companion:
                 case ObjectKind.Ornament:
                     var currentPlayer = _actorManager.GetCurrentPlayer();

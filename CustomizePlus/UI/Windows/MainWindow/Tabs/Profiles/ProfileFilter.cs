@@ -1,8 +1,4 @@
 ﻿using CustomizePlus.Configuration.Data;
-using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 

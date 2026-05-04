@@ -1,6 +1,5 @@
 ﻿using CustomizePlus.Api.Data;
 using CustomizePlus.Configuration.Data;
-using CustomizePlus.Configuration.Services;
 using CustomizePlus.Interop.Ipc;
 using CustomizePlus.Profiles;
 using CustomizePlus.Templates;

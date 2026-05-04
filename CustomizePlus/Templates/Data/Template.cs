@@ -4,7 +4,6 @@ using CustomizePlus.Core.Extensions;
 using CustomizePlus.Core.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using static FFXIVClientStructs.FFXIV.Client.LayoutEngine.ILayoutInstance;
 
 namespace CustomizePlus.Templates.Data;
 

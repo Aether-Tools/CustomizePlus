@@ -2,14 +2,8 @@
 using CustomizePlus.Profiles;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Profiles.Events;
-using CustomizePlus.Templates;
 using CustomizePlus.Templates.Data;
-using CustomizePlus.Templates.Events;
-using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates.Controls;
 using Penumbra.GameData.Interop;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 

@@ -1,10 +1,7 @@
-﻿using CustomizePlus.Core.Services;
+﻿using CustomizePlus.Core.Helpers;
+using CustomizePlus.Core.Services;
 using CustomizePlus.Templates.Data;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
-using CustomizePlus.Core.Helpers;
 
 namespace CustomizePlus.Templates;
 

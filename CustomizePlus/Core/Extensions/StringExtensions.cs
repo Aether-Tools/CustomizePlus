@@ -1,5 +1,4 @@
 ﻿using Dalamud.Utility;
-using System;
 
 namespace CustomizePlus.Core.Extensions;
 
@@ -32,7 +31,7 @@ internal static class StringExtensions
 
     private static string GetCutString(this string str, int maxLength = 5)
     {
-        if(str.Length > maxLength)
+        if (str.Length > maxLength)
             return $"{str[..maxLength]}...";
         else
             return str[0..Math.Min(str.Length, maxLength)];

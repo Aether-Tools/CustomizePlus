@@ -1,10 +1,5 @@
 using CustomizePlus.Configuration.Data;
-using CustomizePlus.Configuration.Services;
 using CustomizePlus.Templates;
-using Dalamud.Interface.ImGuiNotification;
-using FFXIVClientStructs.FFXIV.Client.Graphics.Render;
-using static FFXIVClientStructs.FFXIV.Client.Game.Character.ActionEffectHandler;
-using static FFXIVClientStructs.FFXIV.Client.UI.AddonItemDetailCompare;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 
@@ -40,7 +35,7 @@ public class TemplatesTab : TwoPanelLayout, ITab<MainTabType>
 
     protected override void DrawLeftGroup(in TwoPanelWidth width)
     {
-        using(var disabled = Im.Disabled(_templateEditorManager.IsEditorActive))
+        using (var disabled = Im.Disabled(_templateEditorManager.IsEditorActive))
             base.DrawLeftGroup(width);
     }
 

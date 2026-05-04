@@ -1,5 +1,4 @@
 using CustomizePlus.Configuration.Data;
-using CustomizePlus.Configuration.Services;
 using CustomizePlus.Core.Data;
 using CustomizePlus.Game.Services;
 using CustomizePlus.GameData.Extensions;
@@ -9,10 +8,6 @@ using CustomizePlus.Templates.Data;
 using CustomizePlus.Templates.Events;
 using Dalamud.Plugin.Services;
 using Penumbra.GameData.Actors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
 
 namespace CustomizePlus.Templates;
 

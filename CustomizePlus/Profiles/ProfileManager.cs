@@ -1,6 +1,5 @@
 using CustomizePlus.Armatures.Events;
 using CustomizePlus.Configuration.Data;
-using CustomizePlus.Configuration.Services;
 using CustomizePlus.Core.Events;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.Core.Services;
@@ -245,7 +244,7 @@ public partial class ProfileManager : IDisposable
 
         _event.Invoke(new ProfileChanged.Arguments(ProfileChanged.Type.Toggled, profile, value));
     }
-    
+
     public void SetEnabled(Guid profileId, bool value)
     {
         var profile = Profiles.FirstOrDefault(x => x.UniqueId == profileId && x.ProfileType == ProfileType.Normal);
@@ -517,7 +516,7 @@ public partial class ProfileManager : IDisposable
 
         var profile = query.OrderByDescending(x => x.Priority).FirstOrDefault();
 
-        if(profile == null)
+        if (profile == null)
         {
             if (DefaultLocalPlayerProfile?.Enabled == true)
                 return DefaultLocalPlayerProfile;
@@ -556,9 +555,9 @@ public partial class ProfileManager : IDisposable
 
             if (actorIdentifier.Type == IdentifierType.Owned)
             {
-                if(profile.IsTemporary)
+                if (profile.IsTemporary)
                     return profile.Characters.Any(x => x.Matches(actorIdentifier));
-                else if(!actorIdentifier.IsOwnedByLocalPlayer())
+                else if (!actorIdentifier.IsOwnedByLocalPlayer())
                     return false;
             }
 
@@ -570,14 +569,14 @@ public partial class ProfileManager : IDisposable
 
         foreach (var profile in Profiles.OrderByDescending(x => x.Priority))
         {
-            if(profile.Enabled && IsProfileAppliesToCurrentActor(profile))
+            if (profile.Enabled && IsProfileAppliesToCurrentActor(profile))
                 yield return profile;
         }
 
         if (DefaultLocalPlayerProfile != null && DefaultLocalPlayerProfile.Enabled)
         {
             var currentPlayer = _actorManager.GetCurrentPlayer();
-            if(_objectManager.IsInLobby || (currentPlayer.IsValid && currentPlayer.Matches(actorIdentifier)))
+            if (_objectManager.IsInLobby || (currentPlayer.IsValid && currentPlayer.Matches(actorIdentifier)))
                 yield return DefaultLocalPlayerProfile;
         }
 

@@ -1,11 +1,7 @@
 ﻿using CustomizePlus.Anamnesis;
 using CustomizePlus.Templates;
-using CustomizePlus.Templates.Data;
 using Dalamud.Interface.ImGuiFileDialog;
 using Dalamud.Interface.ImGuiNotification;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates.Controls;
 

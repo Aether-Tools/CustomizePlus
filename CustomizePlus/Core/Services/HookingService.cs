@@ -1,6 +1,5 @@
 ﻿using CustomizePlus.Armatures.Services;
 using CustomizePlus.Configuration.Data;
-using CustomizePlus.Configuration.Services;
 using CustomizePlus.Core.Data;
 using CustomizePlus.Game.Services;
 using CustomizePlus.Profiles;

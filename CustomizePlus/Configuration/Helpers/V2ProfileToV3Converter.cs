@@ -1,7 +1,6 @@
 ﻿using CustomizePlus.Configuration.Data.Version2;
 using CustomizePlus.Configuration.Data.Version3;
 using CustomizePlus.Core.Data;
-using System.Numerics;
 
 namespace CustomizePlus.Configuration.Helpers;
 

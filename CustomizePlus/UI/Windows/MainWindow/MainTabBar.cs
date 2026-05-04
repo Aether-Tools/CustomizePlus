@@ -2,9 +2,6 @@
 using CustomizePlus.UI.Windows.MainWindow.Tabs.Debug;
 using CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 using CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CustomizePlus.UI.Windows.MainWindow;
 

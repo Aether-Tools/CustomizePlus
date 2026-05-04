@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
-using Penumbra.GameData.Actors;
-using CustomizePlus.Core.Data;
+﻿using CustomizePlus.Core.Data;
+using CustomizePlus.GameData.Extensions;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Templates.Data;
-using CustomizePlus.GameData.Extensions;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
+using Penumbra.GameData.Actors;
 
 namespace CustomizePlus.Armatures.Data;
 
@@ -183,16 +180,16 @@ public unsafe class Armature
             }
 
             //handle hair separately because different hairstyles can have the same amount of bones.
-            if(cBase->Skeleton->PartialSkeletonCount > 2)
+            if (cBase->Skeleton->PartialSkeletonCount > 2)
             {
                 var newPose = cBase->Skeleton->PartialSkeletons[2].GetHavokPose(Constants.TruePoseIndex);
 
-                if(newPose != null)
+                if (newPose != null)
                 {
-                    if(newPose->Skeleton->Bones.Length != _partialSkeletons[2].Length)
+                    if (newPose->Skeleton->Bones.Length != _partialSkeletons[2].Length)
                         return true;
 
-                    for(var i = 0; i < newPose->Skeleton->Bones.Length; i++)
+                    for (var i = 0; i < newPose->Skeleton->Bones.Length; i++)
                     {
                         if (newPose->Skeleton->Bones[i].Name.String != _partialSkeletons[2][i].BoneName)
                             return true;
@@ -240,7 +237,7 @@ public unsafe class Armature
     /// </summary>
     public void UpdateLastSeen(DateTime? dateTime = null)
     {
-        if(dateTime == null)
+        if (dateTime == null)
             dateTime = DateTime.UtcNow;
 
         LastSeen = (DateTime)dateTime;

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
+﻿namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 
 public enum ProfileFilterTokenType
 {

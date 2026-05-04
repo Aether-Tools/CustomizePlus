@@ -1,10 +1,6 @@
 ﻿using CustomizePlus.Configuration.Data;
 using CustomizePlus.Templates;
 using CustomizePlus.Templates.Data;
-using Penumbra.GameData.Enums;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates;
 

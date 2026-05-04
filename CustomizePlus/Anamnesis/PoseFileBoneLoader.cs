@@ -2,10 +2,6 @@
 using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Extensions;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Numerics;
 
 namespace CustomizePlus.Anamnesis;
 

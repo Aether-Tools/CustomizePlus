@@ -16,19 +16,19 @@ internal static class VersionHelper
 
     static VersionHelper()
     {
-        #if DEBUG
-            Version = $"{ThisAssembly.Git.Commit}+{ThisAssembly.Git.Sha} [DEBUG]";
-            IsDebug = true;
-        #else
+#if DEBUG
+        Version = $"{ThisAssembly.Git.Commit}+{ThisAssembly.Git.Sha} [DEBUG]";
+        IsDebug = true;
+#else
             Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? string.Empty;
-        #endif
+#endif
 
         if (ThisAssembly.Git.BaseTag.ToLowerInvariant().Contains("testing"))
             IsTesting = true;
 
-        #if VALIDATE_BUILD
+#if VALIDATE_BUILD
         IsValidate = true;
-        #endif
+#endif
 
         if (IsTesting)
             Version += " [TESTING BUILD]";

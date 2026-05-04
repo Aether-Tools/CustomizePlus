@@ -1,12 +1,6 @@
 ﻿using CustomizePlus.Core.Helpers;
 using CustomizePlus.Templates;
 using CustomizePlus.Templates.Data;
-using Dalamud.Interface.ImGuiNotification;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using static FFXIVClientStructs.FFXIV.Client.UI.AddonItemDetailCompare;
-using static System.Collections.Specialized.BitVector32;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates.Controls;
 

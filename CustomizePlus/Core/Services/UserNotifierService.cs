@@ -1,5 +1,4 @@
-﻿using System;
-using CustomizePlus.Core.Helpers;
+﻿using CustomizePlus.Core.Helpers;
 using CustomizePlus.Game.Services;
 using CustomizePlus.UI.Windows;
 using Dalamud.Plugin.Services;

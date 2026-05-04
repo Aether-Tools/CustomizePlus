@@ -1,13 +1,9 @@
 using CustomizePlus.Configuration.Data;
-using CustomizePlus.Configuration.Services;
 using CustomizePlus.Profiles;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Templates;
 using CustomizePlus.Templates.Data;
 using CustomizePlus.Templates.Events;
-using CustomizePlus.UI;
-using ImSharp;
-using System.Reflection.Emit;
 
 namespace CustomizePlus.UI.Windows.Controls;
 

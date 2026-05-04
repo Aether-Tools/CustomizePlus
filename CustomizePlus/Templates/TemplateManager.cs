@@ -5,10 +5,6 @@ using CustomizePlus.Core.Services;
 using CustomizePlus.Templates.Data;
 using CustomizePlus.Templates.Events;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace CustomizePlus.Templates;
 
@@ -170,7 +166,7 @@ public class TemplateManager : IDisposable
     /// <param name="template"></param>
     public void Delete(Template template)
     {
-        foreach(var tpl in _templates.Skip(template.Index + 1))
+        foreach (var tpl in _templates.Skip(template.Index + 1))
         {
             --tpl.Index;
         }

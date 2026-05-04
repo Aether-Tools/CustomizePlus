@@ -9,7 +9,7 @@
     "TestingAssemblyVersion": "2.1.1.2",
     "RepoUrl": "https://github.com/Aether-Tools/CustomizePlus",
     "ApplicableVersion": "any",
-    "DalamudApiLevel": 15,
+    "DalamudApiLevel": 14,
     "TestingDalamudApiLevel": 15,
     "IsHide": "False",
     "IsTestingExclusive": "False",

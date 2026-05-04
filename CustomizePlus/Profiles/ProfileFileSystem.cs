@@ -1,10 +1,6 @@
 using CustomizePlus.Core.Services;
-using CustomizePlus.Profiles.Data;
 using CustomizePlus.Profiles.Events;
-using CustomizePlus.Templates;
-using CustomizePlus.Templates.Events;
 using Dalamud.Interface.ImGuiNotification;
-using Serilog;
 
 namespace CustomizePlus.Profiles;
 
@@ -17,7 +13,7 @@ public sealed class ProfileFileSystem : BaseFileSystem, IDisposable
         LunaLogger log,
         SaveService saveService,
         ProfileManager profileManager,
-        ProfileChanged profileChanged,)
+        ProfileChanged profileChanged)
         : base("ProfileFileSystem", log, true)
     {
         _profileChanged = profileChanged;

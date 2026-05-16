@@ -43,6 +43,7 @@ public class CPlusChangeLog
         Add2_1_0_0(Changelog);
         Add2_1_1_0(Changelog);
         Add2_2_0_0(Changelog);
+        Add2_2_0_1(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -55,6 +56,12 @@ public class CPlusChangeLog
         _configuration.Save();
     }
 
+
+    private static void Add2_2_0_1(Changelog log)
+        => log.NextVersion("Version 2.2.0.1"u8)
+        .RegisterEntry("Fixed profile export button missing. (by Risa)"u8)
+        .RegisterEntry("Fixed incorrect profile caption behavior on Profiles tab. (by Risa)"u8)
+        .RegisterEntry("Fixed incorrect tracking of temporary profiles. (by Risa)"u8);
 
     private static void Add2_2_0_0(Changelog log)
         => log.NextVersion("Version 2.2.0.0"u8)

@@ -1,22 +1,18 @@
 using CustomizePlus.Configuration.Data;
-using CustomizePlus.Templates;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
 
 public class ProfilesTab : TwoPanelLayout, ITab<MainTabType>
 {
     private readonly PluginConfiguration _configuration;
-    private readonly TemplateEditorManager _templateEditorManager;
 
     public ProfilesTab(
         ProfileFileSystemDrawer drawer,
         ProfilePanel panel,
         ProfileHeader header,
-        PluginConfiguration configuration,
-        TemplateEditorManager templateEditorManager)
+        PluginConfiguration configuration)
     {
         _configuration = configuration;
-        _templateEditorManager = templateEditorManager;
 
         LeftHeader = drawer.Header;
         LeftFooter = drawer.Footer;

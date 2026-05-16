@@ -73,6 +73,11 @@ public class StateMonitoringTab : ITab<MainTabType>
 
             if (showObjectManager)
                 DrawObjectManager();
+
+            var showProfileManager = Im.Tree.Header($"Profile manager ({_profileManager.Profiles.Count})###profilemanager_header");
+
+            if (showProfileManager)
+                DrawProfileManager();
         }
     }
 
@@ -146,6 +151,40 @@ public class StateMonitoringTab : ITab<MainTabType>
         }
     }
 
+    private void DrawProfileManager()
+    {
+        int enabled = 0;
+        int temporary = 0;
+        int withArmatures = 0;
+        List<Profile> invalidProfiles = new List<Profile>(_profileManager.Profiles.Count);
+
+        foreach (var profile in _profileManager.Profiles)
+        {
+            if (profile.Enabled)
+                enabled++;
+
+            if (profile.IsTemporary)
+                temporary++;
+
+            if (profile.Armatures.Count > 0)
+                withArmatures++;
+
+            if (profile.Index >= _profileManager.Profiles.Count || profile.Index < 0 || _profileManager.Profiles[profile.Index] != profile)
+                invalidProfiles.Add(profile);
+        }
+
+        Im.Text($"Profiles count: {_profileManager.Profiles.Count}");
+        Im.Text($"Enabled profiles count: {enabled}");
+        Im.Text($"Temporary profiles count: {temporary}");
+        Im.Text($"Profiles with armatures: {withArmatures}");
+        Im.Text($"Invalid profiles: {invalidProfiles.Count}");
+
+        foreach (var profile in invalidProfiles)
+        {
+            DrawSingleProfile("pm-invalid", profile);
+        }
+    }
+
     private void DrawSingleProfile(string prefix, Profile profile)
     {
         string name = profile.Name;
@@ -156,12 +195,13 @@ public class StateMonitoringTab : ITab<MainTabType>
         //characterName = characterName.Incognify();
 #endif
 
-        var show = Im.Tree.Header($"[{(profile.Enabled ? "E" : "D")}] [P:{profile.Priority}] {name} on {characterName} [{profile.ProfileType}] [{profile.UniqueId}]###{prefix}-profile-{profile.UniqueId}");
+        var show = Im.Tree.Header($"[{profile.Index}][{(profile.Enabled ? "E" : "D")}] [P:{profile.Priority}] {name} on {characterName} [{profile.ProfileType}] [{profile.UniqueId}]###{prefix}-profile-{profile.UniqueId}");
 
         if (!show)
             return;
 
         Im.Text($"ID: {profile.UniqueId}");
+        Im.Text($"Index: {profile.Index} (Valid: {profile.Index == _profileManager.Profiles.IndexOf(profile)})");
         Im.Text($"Enabled: {(profile.Enabled ? "Enabled" : "Disabled")}");
         Im.Text($"State : {(profile.IsTemporary ? "Temporary" : "Permanent")}");
         var showTemplates = Im.Tree.Header($"Templates###{prefix}-profile-{profile.UniqueId}-templates");

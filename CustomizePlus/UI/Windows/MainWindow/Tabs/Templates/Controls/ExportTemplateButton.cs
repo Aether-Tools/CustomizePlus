@@ -4,7 +4,7 @@ using CustomizePlus.Templates.Data;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Templates.Controls;
 
-public sealed class ExportToClipboardButton(TemplateFileSystem fileSystem, PopupSystem popupSystem) : BaseIconButton<AwesomeIcon>
+public sealed class ExportTemplateButton(TemplateFileSystem fileSystem, PopupSystem popupSystem) : BaseIconButton<AwesomeIcon>
 {
     public override bool IsVisible
         => fileSystem.Selection.Selection is not null;

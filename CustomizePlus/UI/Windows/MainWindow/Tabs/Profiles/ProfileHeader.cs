@@ -2,7 +2,7 @@
 using CustomizePlus.Profiles;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Profiles.Events;
-using CustomizePlus.Templates.Data;
+using CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles.Controls;
 using Penumbra.GameData.Interop;
 
 namespace CustomizePlus.UI.Windows.MainWindow.Tabs.Profiles;
@@ -29,6 +29,8 @@ public sealed class ProfileHeader : SplitButtonHeader, IDisposable
         _profileChanged = profileChanged;
         _config = config;
 
+        LeftButtons.AddButton(new ExportProfileButton(fileSystem, popupSystem), 100);
+
         RightButtons.AddButton(incognito, 50);
         RightButtons.AddButton(new LockedButton(fileSystem, manager), 100);
         _fileSystem.Selection.Changed += OnSelectionChanged;
@@ -49,7 +51,7 @@ public sealed class ProfileHeader : SplitButtonHeader, IDisposable
 
     private void OnSelectionChanged()
     {
-        if (_fileSystem.Selection.Selection?.GetValue<Template>() is { } selection)
+        if (_fileSystem.Selection.Selection?.GetValue<Profile>() is { } selection)
         {
             _header = new StringU8(selection.Name);
             _incognito = new StringU8(selection.Incognito);

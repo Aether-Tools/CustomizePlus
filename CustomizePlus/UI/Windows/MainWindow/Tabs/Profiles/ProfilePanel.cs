@@ -55,7 +55,6 @@ public class ProfilePanel : IPanel
         Logger logger,
         MultiProfilePanel multiProfilePanel)
     {
-        //_selector = selector;
         _fileSystem = fileSystem;
         _manager = manager;
         _configuration = configuration;

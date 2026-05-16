@@ -373,6 +373,10 @@ public partial class CustomizePlusIpc
                     return (int)ErrorCode.UnknownError;
             }
         }
+        catch (InvalidOperationException)
+        {
+            return (int)ErrorCode.InvalidArgument; //Sanity check therefore should never be returned, but if returned means that profile associated with character is not temporary
+        }
         catch (Exception ex)
         {
             _logger.Error($"Exception in DeleteTemporaryProfileOnCharacter. Character: {actor.Value.Utf8Name.ToString().Incognify()}. Exception: {ex}");
@@ -406,6 +410,10 @@ public partial class CustomizePlusIpc
                     _logger.Error($"Exception in DeleteTemporaryProfileOnCharacter. Unique id: {uniqueId}. Exception: {ex}");
                     return (int)ErrorCode.UnknownError;
             }
+        }
+        catch (InvalidOperationException)
+        {
+            return (int)ErrorCode.InvalidArgument; //Sanity check therefore should never be returned, but if returned means that profile is not temporary
         }
         catch (Exception ex)
         {

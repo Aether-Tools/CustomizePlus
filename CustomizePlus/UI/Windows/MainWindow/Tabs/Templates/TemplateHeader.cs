@@ -29,7 +29,7 @@ public sealed class TemplateHeader : SplitButtonHeader, IDisposable
         _templateChanged = templateChanged;
         _config = config;
 
-        LeftButtons.AddButton(new ExportToClipboardButton(fileSystem, popupSystem), 100);
+        LeftButtons.AddButton(new ExportTemplateButton(fileSystem, popupSystem), 100);
 
         RightButtons.AddButton(incognito, 50);
         RightButtons.AddButton(new LockedButton(fileSystem, manager), 100);

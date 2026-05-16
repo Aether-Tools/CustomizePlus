@@ -206,15 +206,10 @@ public partial class ProfileManager : IDisposable
     /// <param name="profile"></param>
     public void Delete(Profile profile)
     {
-        foreach (var prof in Profiles.Skip(profile.Index + 1))
-        {
-            --prof.Index;
-        }
+        if (profile.IsTemporary)
+            throw new InvalidOperationException("Cannot delete temporary profile using Delete method, use RemoveTemporaryProfile instead.");
 
-        Profiles.RemoveAt(profile.Index);
-
-        _saveService.ImmediateDelete(profile);
-        _event.Invoke(new ProfileChanged.Arguments(ProfileChanged.Type.Deleted, profile, null));
+        DeleteProfile(profile);
     }
 
     /// <summary>
@@ -445,6 +440,7 @@ public partial class ProfileManager : IDisposable
         profile.Enabled = true;
         profile.ProfileType = ProfileType.Temporary;
         profile.Priority = int.MaxValue; //Make sure temporary profile is always at max priority
+        profile.Index = Profiles.Count;
 
         var permanentIdentifier = identifier.CreatePermanent();
         profile.Characters.Clear();
@@ -454,8 +450,7 @@ public partial class ProfileManager : IDisposable
         if (existingProfile != null)
         {
             _logger.Debug($"Temporary profile for {permanentIdentifier.Incognito(null)} already exists, removing...");
-            Profiles.Remove(existingProfile);
-            _event.Invoke(new ProfileChanged.Arguments(ProfileChanged.Type.TemporaryProfileDeleted, existingProfile, null));
+            DeleteProfile(existingProfile);
         }
 
         Profiles.Add(profile);
@@ -464,26 +459,16 @@ public partial class ProfileManager : IDisposable
         _event.Invoke(new ProfileChanged.Arguments(ProfileChanged.Type.TemporaryProfileAdded, profile, null));
     }
 
-    public void RemoveTemporaryProfile(Profile profile)
-    {
-        if (!profile.IsTemporary)
-            return;
-
-        if (!Profiles.Remove(profile))
-            throw new ProfileNotFoundException();
-
-        _logger.Debug($"Removed temporary profile for {profile.Characters[0].Incognito(null)}");
-
-        _event.Invoke(new ProfileChanged.Arguments(ProfileChanged.Type.TemporaryProfileDeleted, profile, null));
-    }
-
     public void RemoveTemporaryProfile(Guid profileId)
     {
         var profile = Profiles.FirstOrDefault(x => x.UniqueId == profileId && x.IsTemporary);
         if (profile == null)
             throw new ProfileNotFoundException();
 
-        RemoveTemporaryProfile(profile);
+        if (!profile.IsTemporary) //sanity check, should never reach this point with non-temporary profile
+            throw new InvalidOperationException("This method can only be used to delete temporary profiles.");
+
+        DeleteProfile(profile);
     }
 
     public void RemoveTemporaryProfile(Actor actor)
@@ -495,7 +480,10 @@ public partial class ProfileManager : IDisposable
         if (profile == null)
             throw new ProfileNotFoundException();
 
-        RemoveTemporaryProfile(profile);
+        if (!profile.IsTemporary) //sanity check, should never reach this point with non-temporary profile
+            throw new InvalidOperationException("This method can only be used to delete temporary profiles.");
+
+        DeleteProfile(profile);
     }
 
     /// <summary>
@@ -609,6 +597,33 @@ public partial class ProfileManager : IDisposable
         _saveService.QueueSave(profile);
     }
 
+    private bool DeleteProfile(Profile profile)
+    {
+        if (profile.Index >= Profiles.Count || profile.Index < 0 || Profiles[profile.Index] != profile)
+            return false;
+
+        foreach (var prof in Profiles.Skip(profile.Index + 1))
+        {
+            --prof.Index;
+        }
+
+        Profiles.RemoveAt(profile.Index);
+
+        if (!profile.IsTemporary)
+        {
+            _saveService.ImmediateDelete(profile);
+            _event.Invoke(new ProfileChanged.Arguments(ProfileChanged.Type.Deleted, profile, null));
+        }
+        else
+        {
+            _logger.Debug($"Removed temporary profile for {profile.Characters[0].Incognito(null)}");
+
+            _event.Invoke(new ProfileChanged.Arguments(ProfileChanged.Type.TemporaryProfileDeleted, profile, null));
+        }
+
+        return true;
+    }
+
     private void OnTemplateChange(in TemplateChanged.Arguments args)
     {
         var (type, template, arg3) = args;
@@ -670,13 +685,11 @@ public partial class ProfileManager : IDisposable
                 return;
 
             //todo: TemporaryProfileDeleted ends up calling this again, fix this.
-            //Profiles.Remove check won't allow for infinite loop but this isn't good anyway
-            if (!Profiles.Remove(profile))
+            //DeleteProfile won't allow for infinite loop but this isn't good anyway
+            if (!DeleteProfile(profile))
                 return;
 
             _logger.Debug($"ProfileManager.OnArmatureChange: Removed unused temporary profile for {profile.Characters[0].Incognito(null)}");
-
-            _event.Invoke(new ProfileChanged.Arguments(ProfileChanged.Type.TemporaryProfileDeleted, profile, null));
         }
     }
 

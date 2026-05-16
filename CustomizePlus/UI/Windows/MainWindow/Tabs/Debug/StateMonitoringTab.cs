@@ -174,8 +174,8 @@ public class StateMonitoringTab : ITab<MainTabType>
         }
 
         Im.Text($"Profiles count: {_profileManager.Profiles.Count}");
-        Im.Text($"Enabled profiles count: {enabled}");
-        Im.Text($"Temporary profiles count: {temporary}");
+        Im.Text($"Enabled profiles: {enabled}");
+        Im.Text($"Temporary profiles: {temporary}");
         Im.Text($"Profiles with armatures: {withArmatures}");
         Im.Text($"Invalid profiles: {invalidProfiles.Count}");
 
@@ -195,7 +195,7 @@ public class StateMonitoringTab : ITab<MainTabType>
         //characterName = characterName.Incognify();
 #endif
 
-        var show = Im.Tree.Header($"[{profile.Index}][{(profile.Enabled ? "E" : "D")}] [P:{profile.Priority}] {name} on {characterName} [{profile.ProfileType}] [{profile.UniqueId}]###{prefix}-profile-{profile.UniqueId}");
+        var show = Im.Tree.Header($"[{profile.Index}] [{(profile.Enabled ? "E" : "D")}] [P:{profile.Priority}] {name} on {characterName} [{profile.ProfileType}] [{profile.UniqueId}]###{prefix}-profile-{profile.UniqueId}");
 
         if (!show)
             return;

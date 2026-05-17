@@ -440,7 +440,6 @@ public partial class ProfileManager : IDisposable
         profile.Enabled = true;
         profile.ProfileType = ProfileType.Temporary;
         profile.Priority = int.MaxValue; //Make sure temporary profile is always at max priority
-        profile.Index = Profiles.Count;
 
         var permanentIdentifier = identifier.CreatePermanent();
         profile.Characters.Clear();
@@ -453,6 +452,7 @@ public partial class ProfileManager : IDisposable
             DeleteProfile(existingProfile);
         }
 
+        profile.Index = Profiles.Count; // capture index *after* potential DeleteProfile() above
         Profiles.Add(profile);
 
         _logger.Debug($"Added temporary profile for {permanentIdentifier}");

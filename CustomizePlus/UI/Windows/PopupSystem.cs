@@ -34,6 +34,7 @@ public partial class PopupSystem : LunaWindow
 
         IsOpen = true;
         RespectCloseHotkey = false;
+        DisableWindowSounds = true;
         Collapsed = false;
         SizeConstraints = new WindowSizeConstraints
         {

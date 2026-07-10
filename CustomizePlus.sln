@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.31911.260
@@ -27,6 +27,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Luna", "submodules\Luna\Luna\Luna.csproj", "{DFF4DE5D-924D-4602-A723-CBAF05BFCD2A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Luna.Generators", "submodules\Luna\Luna.Generators\Luna.Generators.csproj", "{5FDDD49F-C9E6-45A7-A922-78208B2A5ECA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomizePlus.Tests", "CustomizePlus.Tests\CustomizePlus.Tests.csproj", "{A04698A9-793A-4864-A0DF-D70438A690D0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -185,6 +187,24 @@ Global
 		{5FDDD49F-C9E6-45A7-A922-78208B2A5ECA}.ReleaseValidate|Any CPU.Build.0 = Debug|x64
 		{5FDDD49F-C9E6-45A7-A922-78208B2A5ECA}.ReleaseValidate|x86.ActiveCfg = Debug|x64
 		{5FDDD49F-C9E6-45A7-A922-78208B2A5ECA}.ReleaseValidate|x86.Build.0 = Debug|x64
+		{A04698A9-793A-4864-A0DF-D70438A690D0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A04698A9-793A-4864-A0DF-D70438A690D0}.Debug|x64.Build.0 = Debug|Any CPU
+		{A04698A9-793A-4864-A0DF-D70438A690D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A04698A9-793A-4864-A0DF-D70438A690D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A04698A9-793A-4864-A0DF-D70438A690D0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A04698A9-793A-4864-A0DF-D70438A690D0}.Debug|x86.Build.0 = Debug|Any CPU
+		{A04698A9-793A-4864-A0DF-D70438A690D0}.Release|x64.ActiveCfg = Release|Any CPU
+		{A04698A9-793A-4864-A0DF-D70438A690D0}.Release|x64.Build.0 = Release|Any CPU
+		{A04698A9-793A-4864-A0DF-D70438A690D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A04698A9-793A-4864-A0DF-D70438A690D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A04698A9-793A-4864-A0DF-D70438A690D0}.Release|x86.ActiveCfg = Release|Any CPU
+		{A04698A9-793A-4864-A0DF-D70438A690D0}.Release|x86.Build.0 = Release|Any CPU
+		{A04698A9-793A-4864-A0DF-D70438A690D0}.ReleaseValidate|x64.ActiveCfg = Debug|Any CPU
+		{A04698A9-793A-4864-A0DF-D70438A690D0}.ReleaseValidate|x64.Build.0 = Debug|Any CPU
+		{A04698A9-793A-4864-A0DF-D70438A690D0}.ReleaseValidate|Any CPU.ActiveCfg = Debug|Any CPU
+		{A04698A9-793A-4864-A0DF-D70438A690D0}.ReleaseValidate|Any CPU.Build.0 = Debug|Any CPU
+		{A04698A9-793A-4864-A0DF-D70438A690D0}.ReleaseValidate|x86.ActiveCfg = Debug|Any CPU
+		{A04698A9-793A-4864-A0DF-D70438A690D0}.ReleaseValidate|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

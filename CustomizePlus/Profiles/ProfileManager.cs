@@ -1,5 +1,6 @@
 using CustomizePlus.Armatures.Events;
 using CustomizePlus.Configuration.Data;
+using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Events;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.Core.Services;
@@ -587,11 +588,25 @@ public partial class ProfileManager : IDisposable
             yield return _templateEditorManager.EditorProfile;
     }
 
-    private void SaveProfile(Profile profile)
+    /// <summary>
+    /// Set profile's source and save
+    /// </summary>
+    internal void SetSource(Profile profile, DataSource source)
+    {
+        if (profile.Source == source)
+            return;
+
+        SaveProfile(profile, source);
+    }
+
+    private void SaveProfile(Profile profile, DataSource source = DataSource.User)
     {
         //disallow saving special profiles
         if (profile.ProfileType != ProfileType.Normal)
             return;
+
+        if (profile.Source != source)
+            profile.Source = source;
 
         profile.ModifiedDate = DateTimeOffset.UtcNow;
         _saveService.QueueSave(profile);

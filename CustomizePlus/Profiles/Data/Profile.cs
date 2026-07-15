@@ -1,4 +1,5 @@
 using CustomizePlus.Armatures.Data;
+using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Extensions;
 using CustomizePlus.Core.Services;
 using CustomizePlus.Profiles.Enums;
@@ -15,7 +16,7 @@ namespace CustomizePlus.Profiles.Data;
 /// </summary>
 public sealed class Profile : ISavable, IFileSystemValue<Profile>
 {
-    public const int Version = 5;
+    public const int Version = Constants.ProfileVersion;
 
     private static int _nextGlobalId;
 
@@ -44,6 +45,11 @@ public sealed class Profile : ISavable, IFileSystemValue<Profile>
     /// Profile priority when there are several profiles affecting same character
     /// </summary>
     public int Priority { get; set; }
+
+    /// <summary>
+    /// Source of this profile
+    /// </summary>
+    public DataSource Source { get; internal set; } = DataSource.User;
 
     /// <summary>
     /// Tells us if this profile is not persistent (ex. was made via IPC calls) and should have specific treatement like not being shown in UI, etc.
@@ -107,6 +113,7 @@ public sealed class Profile : ISavable, IFileSystemValue<Profile>
             ["Enabled"] = Enabled,
             ["IsWriteProtected"] = IsWriteProtected,
             ["Priority"] = Priority,
+            ["Source"] = (int)Source,
             ["Templates"] = SerializeTemplates()
         };
 

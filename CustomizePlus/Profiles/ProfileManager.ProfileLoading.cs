@@ -1,3 +1,4 @@
+using CustomizePlus.Core.Data;
 using CustomizePlus.Profiles.Data;
 using CustomizePlus.Profiles.Events;
 using CustomizePlus.Templates.Data;
@@ -82,6 +83,7 @@ public partial class ProfileManager : IDisposable
             //Ignore everything below v4
             4 => LoadV4(obj),
             5 or 6 => LoadV6(obj),
+            7 => LoadV7(obj),
             _ => throw new Exception("The profile to be loaded has no valid Version."),
         };
     }
@@ -125,6 +127,15 @@ public partial class ProfileManager : IDisposable
             _logger.Debug($"Upgraded profile \"{profile.Name}\" to V5: {characterName} -> {profile.Characters[0]}. Save queued.");
             _saveService.QueueSave(profile);
         }
+
+        return profile;
+    }
+
+    private Profile LoadV7(JObject obj)
+    {
+        var profile = LoadV6(obj);
+
+        profile.Source = obj["Source"]?.ToObject<DataSource>() ?? throw new ArgumentNullException("Source");
 
         return profile;
     }

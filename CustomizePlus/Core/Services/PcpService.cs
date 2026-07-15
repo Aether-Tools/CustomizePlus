@@ -1,5 +1,6 @@
 ﻿using CustomizePlus.Api.Data;
 using CustomizePlus.Configuration.Data;
+using CustomizePlus.Core.Data;
 using CustomizePlus.Interop.Ipc;
 using CustomizePlus.Profiles;
 using CustomizePlus.Templates;
@@ -149,8 +150,13 @@ public class PcpService : IRequiredService
         _profileManager.AddTemplate(profile, newTemplate);
         _profileManager.SetEnabled(profile, true);
 
+        _templateManager.SetWriteProtection(newTemplate, true);
+        _profileManager.SetWriteProtection(profile, true);
+
+        //Should be done last or otherwise source will be overwritten with default value
+        _templateManager.SetSource(newTemplate, DataSource.PCPImport);
+        _profileManager.SetSource(profile, DataSource.PCPImport);
+
         _log.Debug($"[CPlusPCPService] Loaded CustomizePlus template '{newTemplate.Name}' with {newTemplate.Bones.Count} bones.");
     }
-
-
 }

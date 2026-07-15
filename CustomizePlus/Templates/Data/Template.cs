@@ -13,7 +13,7 @@ namespace CustomizePlus.Templates.Data;
 /// </summary>
 public sealed class Template : ISavable, IFileSystemValue<Template>
 {
-    public const int Version = Constants.ConfigurationVersion;
+    public const int Version = Constants.TemplateVersion;
 
     public string Name { get; internal set; } = "Template";
 
@@ -23,6 +23,11 @@ public sealed class Template : ISavable, IFileSystemValue<Template>
     public Guid UniqueId { get; internal set; } = Guid.NewGuid();
 
     public bool IsWriteProtected { get; internal set; }
+
+    /// <summary>
+    /// Source of this template
+    /// </summary>
+    public DataSource Source { get; internal set; } = DataSource.User;
 
     public string Incognito
         => UniqueId.ToString()[..8];
@@ -96,7 +101,8 @@ public sealed class Template : ISavable, IFileSystemValue<Template>
             ["ModifiedDate"] = ModifiedDate,
             ["Name"] = Name,
             ["Bones"] = JObject.FromObject(Bones),
-            ["IsWriteProtected"] = IsWriteProtected
+            ["IsWriteProtected"] = IsWriteProtected,
+            ["Source"] = (int)Source
         };
 
         return ret;
@@ -112,8 +118,18 @@ public sealed class Template : ISavable, IFileSystemValue<Template>
         return version switch
         {
             4 or 5 or 6 => LoadV6(obj),
+            7 => LoadV7(obj),
             _ => throw new Exception("The template to be loaded has no valid Version."),
         };
+    }
+
+    private static Template LoadV7(JObject obj)
+    {
+        var template = LoadV6(obj);
+
+        template.Source = obj["Source"]?.ToObject<DataSource>() ?? throw new ArgumentNullException("Source");
+
+        return template;
     }
 
     private static Template LoadV6(JObject obj)

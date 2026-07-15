@@ -12,6 +12,16 @@ internal static class Constants
     public const int ConfigurationVersion = 6;
 
     /// <summary>
+    /// Version of the profile files, when increased new loading/saving code should be implemented.
+    /// </summary>
+    public const int ProfileVersion = 6;
+
+    /// <summary>
+    /// Version of the template files, when increased new loading/saving code should be implemented.
+    /// </summary>
+    public const int TemplateVersion = 7;
+
+    /// <summary>
     /// The name of the root bone.
     /// </summary>
     public const string RootBoneName = "n_root";

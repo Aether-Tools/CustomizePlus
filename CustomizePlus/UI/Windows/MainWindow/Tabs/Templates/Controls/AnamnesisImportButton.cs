@@ -1,4 +1,5 @@
 ﻿using CustomizePlus.Anamnesis;
+using CustomizePlus.Core.Data;
 using CustomizePlus.Templates;
 using Dalamud.Interface;
 using Dalamud.Interface.ImGuiFileDialog;
@@ -52,7 +53,8 @@ public sealed class AnamnesisImportButton(
                         return;
                     }
 
-                    templateManager.Create(Path.GetFileNameWithoutExtension(selectedFilePath), bones, false);
+                    var template = templateManager.Create(Path.GetFileNameWithoutExtension(selectedFilePath), bones, false);
+                    templateManager.SetSource(template, DataSource.PoseImport);
                 }
                 else
                 {

@@ -38,7 +38,7 @@ public sealed class ProfileFileSystem : BaseFileSystem, IDisposable
             case ProfileChanged.Type.ReloadedAll: _saver.Load(); break;
             case ProfileChanged.Type.Created:
                 var parent = Root;
-                var folder = arguments.Profile!.Path.Folder;
+                var folder = arguments.Data as string ?? arguments.Profile!.Path.Folder;
                 if (folder.Length > 0)
                     try
                     {

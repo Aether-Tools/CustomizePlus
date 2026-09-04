@@ -204,6 +204,7 @@ public class StateMonitoringTab : ITab<MainTabType>
         Im.Text($"Index: {profile.Index} (Valid: {profile.Index == _profileManager.Profiles.IndexOf(profile)})");
         Im.Text($"Enabled: {(profile.Enabled ? "Enabled" : "Disabled")}");
         Im.Text($"State : {(profile.IsTemporary ? "Temporary" : "Permanent")}");
+        Im.Text($"Source : {profile.Source}");
         var showTemplates = Im.Tree.Header($"Templates###{prefix}-profile-{profile.UniqueId}-templates");
 
         if (showTemplates)
@@ -235,6 +236,7 @@ public class StateMonitoringTab : ITab<MainTabType>
             return;
 
         Im.Text($"ID: {template.UniqueId}");
+        Im.Text($"Source : {template.Source}");
 
         Im.Text($"Bones:");
         foreach (var kvPair in template.Bones)

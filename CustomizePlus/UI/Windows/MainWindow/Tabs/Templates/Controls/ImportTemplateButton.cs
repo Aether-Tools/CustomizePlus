@@ -1,6 +1,7 @@
 ﻿using CustomizePlus.Configuration.Data.Version2;
 using CustomizePlus.Configuration.Data.Version3;
 using CustomizePlus.Configuration.Helpers;
+using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.Templates;
 using CustomizePlus.Templates.Data;
@@ -59,12 +60,16 @@ public sealed class ImportTemplateButton(
             {
                 2 => GetTemplateFromV2Profile(json),
                 3 => GetTemplateFromV3Profile(json),
-                4 or 5 or 6 => JsonConvert.DeserializeObject<Template>(json),
+                4 or 5 or 6 or 7 => JsonConvert.DeserializeObject<Template>(json),
                 _ => null
             };
 
             if (template is Template tpl && tpl != null)
-                templateManager.Clone(tpl, newName, true);
+
+            {
+                var createdTpl = templateManager.Clone(tpl, newName, true);
+                templateManager.SetSource(createdTpl, DataSource.ClipboardImport);
+            }
             else
                 popupSystem.ShowPopup(PopupSystem.Messages.ClipboardDataUnsupported);
 

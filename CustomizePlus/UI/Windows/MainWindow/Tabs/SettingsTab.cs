@@ -15,6 +15,7 @@ public class SettingsTab : ITab<MainTabType>
 {
     private const uint DiscordColor = 0xFFDA8972;
     private const uint DonateColor = 0xFF5B5EFF;
+    private const uint DeleteColor = 0xFF0000FF;
 
     private readonly IDalamudPluginInterface _pluginInterface;
     private readonly PluginConfiguration _configuration;
@@ -328,10 +329,10 @@ public class SettingsTab : ITab<MainTabType>
         if (!isShouldDraw)
             return;
 
-        DrawHandlePCP();
+        DrawPenumbraIntegrationSettings();
     }
 
-    private void DrawHandlePCP()
+    public void DrawPenumbraIntegrationSettings()
     {
         var isChecked = _configuration.IntegrationSettings.PenumbraPCPIntegrationEnabled;
 
@@ -342,6 +343,17 @@ public class SettingsTab : ITab<MainTabType>
             _pcpService.SetEnabled(isChecked);
             _configuration.Save();
         }
+
+        var active = _configuration.UISettings.DeleteModifier.IsActive();
+        Im.Line.Same();
+        if (ImEx.Button("Delete all imported PCP data"u8, default,
+            "Deletes all imported PCP data. This action cannot be undone. Any modified PCP templates or profiles will not be deleted."u8, !active))
+        {
+            _pcpService.DeletePCPData();
+        }
+
+        if (!active)
+            Im.Tooltip.OnHover(HoveredFlags.AllowWhenDisabled, $"\nHold {_configuration.UISettings.DeleteModifier} while clicking.");
     }
 
     #endregion

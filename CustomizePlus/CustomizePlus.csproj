@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 
 <Project Sdk="Dalamud.NET.Sdk/15.0.0">
   <PropertyGroup>
@@ -49,6 +49,10 @@
     <None Include="CustomizePlus.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="CustomizePlus.Tests" />
   </ItemGroup>
 
   <!--<PropertyGroup Condition="'$(Configuration)'=='Debug'">

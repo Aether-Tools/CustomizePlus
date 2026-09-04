@@ -26,7 +26,7 @@ public sealed class TemplateFileSystem : BaseFileSystem, IDisposable, IRequiredS
             case TemplateChanged.Type.ReloadedAll: _saver.Load(); break;
             case TemplateChanged.Type.Created:
                 var parent = Root;
-                var folder = arguments.Template!.Path.Folder;
+                var folder = arguments.Data as string ?? arguments.Template!.Path.Folder;
                 if (folder.Length > 0)
                     try
                     {

@@ -257,6 +257,17 @@ public class TemplateManager : IDisposable
         return true;
     }
 
+    /// <summary>
+    /// Set template's source and save
+    /// </summary>
+    internal void SetSource(Template template, DataSource source)
+    {
+        if (template.Source == source)
+            return;
+
+        SaveTemplate(template, source);
+    }
+
     private void DeleteBoneTransform(Template template, string boneName)
     {
         if (!template.Bones.ContainsKey(boneName))
@@ -279,9 +290,12 @@ public class TemplateManager : IDisposable
         }
     }
 
-    private void SaveTemplate(Template template)
+    private void SaveTemplate(Template template, DataSource source = DataSource.User)
     {
         PruneUneditedBones(template);
+
+        if (template.Source != source)
+            template.Source = source;
 
         template.ModifiedDate = DateTimeOffset.UtcNow;
         _saveService.QueueSave(template);

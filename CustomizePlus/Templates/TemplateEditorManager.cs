@@ -19,6 +19,8 @@ public class TemplateEditorManager : IDisposable
     private readonly TemplateManager _templateManager;
     private readonly IClientState _clientState;
     private readonly PluginConfiguration _configuration;
+    private readonly TemplateEditorHistory _history = new();
+    private TemplateEditorSnapshot? _sessionBaseline;
 
     /// <summary>
     /// Reference to the original template which is currently being edited, should not be edited!
@@ -52,6 +54,10 @@ public class TemplateEditorManager : IDisposable
     /// Indicates if there are any changes in current editing session or not
     /// </summary>
     public bool HasChanges { get; private set; }
+
+    public bool CanUndo => IsEditorActive && !IsEditorPaused && _history.CanUndo;
+
+    public bool CanRedo => IsEditorActive && !IsEditorPaused && _history.CanRedo;
 
     /// <summary>
     /// Name of the preview character for the editor
@@ -133,6 +139,8 @@ public class TemplateEditorManager : IDisposable
         EditorProfile.Templates.Clear(); //safeguard
         EditorProfile.Templates.Add(CurrentlyEditedTemplate);
         EditorProfile.Enabled = true;
+        _history.Reset();
+        _sessionBaseline = CaptureEditorState();
         HasChanges = false;
         IsEditorActive = true;
 
@@ -157,6 +165,8 @@ public class TemplateEditorManager : IDisposable
 
         CurrentlyEditedTemplateId = Guid.Empty;
         CurrentlyEditedTemplate = null;
+        _history.Reset();
+        _sessionBaseline = null;
         EditorProfile.Enabled = false;
         EditorProfile.Templates.Clear();
         IsEditorActive = false;
@@ -253,7 +263,7 @@ public class TemplateEditorManager : IDisposable
 
         CurrentlyEditedTemplate!.Bones[boneName].UpdateAttribute(attribute, resetValue, defaultPropagationState);
 
-        if (!HasChanges)
+        if (!HasChanges) //todo: safeguard, can be removed once/if this function itself is wrapped in historical edit calls
             HasChanges = true;
 
         return true;
@@ -316,7 +326,7 @@ public class TemplateEditorManager : IDisposable
 
         CurrentlyEditedTemplate!.Bones[boneName].UpdateAttribute(attribute, originalValue.Value, originalPropagationState);
 
-        if (!HasChanges)
+        if (!HasChanges) //todo: safeguard, can be removed once/if this function itself is wrapped in historical edit calls
             HasChanges = true;
 
         return true;
@@ -330,10 +340,98 @@ public class TemplateEditorManager : IDisposable
         if (!_templateManager.ModifyBoneTransform(CurrentlyEditedTemplate!, boneName, transform))
             return false;
 
-        if (!HasChanges)
+        if (!HasChanges) //todo: safeguard, can be removed once/if this function itself is wrapped in historical edit calls
             HasChanges = true;
 
         return true;
+    }
+
+    /// <summary>
+    /// Occurs when user starts editing a bone value, should be called before any changes are made to it for undo/redo functionality.
+    /// </summary>
+    public void BeginEdit()
+    {
+        if (!CanModifyEditor())
+            return;
+
+        _history.BeginEdit(CaptureEditorState());
+    }
+
+    /// <summary>
+    /// Occurs when user finishes editing a bone value, should be called after all changes are made to it for undo/redo functionality.
+    /// </summary>
+    public void EndEdit()
+    {
+        if (!CanModifyEditor())
+            return;
+
+        _history.EndEdit(CaptureEditorState());
+        RefreshHasChanges();
+    }
+
+    /// <summary>
+    /// Executes a single atomic edit, recording the state before and after the edit for undo/redo functionality.
+    /// </summary>
+    public void ExecuteAtomicEdit(Action edit)
+    {
+        if (!CanModifyEditor())
+            return;
+
+        var before = CaptureEditorState();
+        edit();
+        var after = CaptureEditorState();
+        _history.RecordEdit(before, after);
+        RefreshHasChanges(after);
+    }
+
+    public bool Undo()
+    {
+        if (!CanModifyEditor())
+            return false;
+
+        var current = CaptureEditorState();
+        if (!_history.TryUndo(current, out var target))
+            return false;
+
+        RestoreEditorState(target);
+        return true;
+    }
+
+    public bool Redo()
+    {
+        if (!CanModifyEditor())
+            return false;
+
+        var current = CaptureEditorState();
+        if (!_history.TryRedo(current, out var target))
+            return false;
+
+        RestoreEditorState(target);
+        return true;
+    }
+
+    private bool CanModifyEditor()
+        => IsEditorActive && !IsEditorPaused && CurrentlyEditedTemplate != null;
+
+    private TemplateEditorSnapshot CaptureEditorState()
+        => TemplateEditorSnapshot.Capture(CurrentlyEditedTemplate!.Bones);
+
+    private void RestoreEditorState(TemplateEditorSnapshot snapshot)
+    {
+        var template = CurrentlyEditedTemplate!;
+        foreach (var boneName in template.Bones.Keys.Except(snapshot.Bones.Keys).ToList())
+            _templateManager.ModifyBoneTransform(template, boneName, new BoneTransform());
+
+        foreach (var (boneName, transform) in snapshot.CreateTransforms())
+            _templateManager.ModifyBoneTransform(template, boneName, transform);
+
+        RefreshHasChanges(snapshot);
+    }
+
+    private void RefreshHasChanges(TemplateEditorSnapshot? current = null)
+    {
+        current ??= CaptureEditorState();
+        HasChanges = _sessionBaseline != null && !_sessionBaseline.Equals(current);
     }
 
     private void OnLogin()

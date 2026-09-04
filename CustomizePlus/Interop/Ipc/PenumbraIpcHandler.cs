@@ -9,9 +9,14 @@ public sealed class PenumbraIpcHandler : IIpcSubscriber
 {
     private readonly Logger _log;
     private readonly ApiVersion _version;
+    private readonly IDalamudPluginInterface _pluginInterface;
 
     private readonly EventSubscriber<JObject, ushort, string> _pcpCreated;
     private readonly EventSubscriber<JObject, string, Guid> _pcpParsed;
+
+    private RegisterSettingsSection? _registerSettingsSection;
+    private UnregisterSettingsSection? _unregisterSettingsSection;
+
     private readonly IDisposable _penumbraInit;
     private readonly IDisposable _penumbraDisp;
 
@@ -29,6 +34,7 @@ public sealed class PenumbraIpcHandler : IIpcSubscriber
     {
         _log = log;
         _version = new ApiVersion(pi);
+        _pluginInterface = pi;
 
         _pcpCreated = CreatingPcp.Subscriber(pi);
         _pcpParsed = ParsingPcp.Subscriber(pi);
@@ -50,6 +56,8 @@ public sealed class PenumbraIpcHandler : IIpcSubscriber
         add => _pcpParsed.Event += value;
         remove => _pcpParsed.Event -= value;
     }
+
+    public event Action? DrawSettingsSection;
 
     public bool CheckApiVersion()
     {
@@ -85,8 +93,14 @@ public sealed class PenumbraIpcHandler : IIpcSubscriber
         _pcpCreated.Enable();
         _pcpParsed.Enable();
 
+        _registerSettingsSection = new RegisterSettingsSection(_pluginInterface);
+        _unregisterSettingsSection = new UnregisterSettingsSection(_pluginInterface);
+
+        _registerSettingsSection.Invoke(DrawSettings);
+
         _log.Information($"Penumbra IPC initialized. Version {CurrentMajor}.{CurrentMinor}.");
     }
+
     public void Disable()
     {
         if (!_available)
@@ -96,8 +110,14 @@ public sealed class PenumbraIpcHandler : IIpcSubscriber
         _pcpCreated.Disable();
         _pcpParsed.Disable();
 
+        _unregisterSettingsSection?.Invoke(DrawSettings);
+
+        _registerSettingsSection = null;
+        _unregisterSettingsSection = null;
+
         _log.Information("Penumbra IPC disabled.");
     }
+
     public void Dispose()
     {
         Disable();
@@ -108,4 +128,7 @@ public sealed class PenumbraIpcHandler : IIpcSubscriber
 
         _log.Information("Penumbra IPC disposed.");
     }
+
+    private void DrawSettings()
+        => DrawSettingsSection?.Invoke();
 }

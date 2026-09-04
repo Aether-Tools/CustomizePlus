@@ -1,6 +1,7 @@
 using CustomizePlus.Configuration.Data;
 using CustomizePlus.Core.Helpers;
 using CustomizePlus.Core.Services;
+using CustomizePlus.Interop.Ipc;
 using CustomizePlus.Templates;
 using CustomizePlus.Templates.Events;
 using CustomizePlus.UI.Windows.Controls;
@@ -21,6 +22,8 @@ public class MainWindow : LunaWindow, IDisposable
 
     private readonly MainTabBar _mainTabBar;
 
+    private readonly PenumbraIpcHandler _penumbraIpcHander;
+
     /// <summary>
     /// Used to force the main window to switch to specific tab
     /// </summary>
@@ -34,7 +37,8 @@ public class MainWindow : LunaWindow, IDisposable
         TemplateEditorManager templateEditorManager,
         PluginConfiguration configuration,
         HookingService hookingService,
-        TemplateEditorEvent templateEditorEvent
+        TemplateEditorEvent templateEditorEvent,
+        PenumbraIpcHandler penumbraIpcHandler
         ) : base($"Customize+ {VersionHelper.Version}###CPlusMainWindow")
     {
         _mainTabBar = mainTabBar;
@@ -47,6 +51,9 @@ public class MainWindow : LunaWindow, IDisposable
         _templateEditorEvent = templateEditorEvent;
 
         _templateEditorEvent.Subscribe(OnTemplateEditorEvent, TemplateEditorEvent.Priority.MainWindow);
+
+        _penumbraIpcHander = penumbraIpcHandler;
+        _penumbraIpcHander.DrawSettingsSection += _mainTabBar.Settings.DrawPenumbraIntegrationSettings;
 
         SizeConstraints = new WindowSizeConstraints()
         {
@@ -64,6 +71,8 @@ public class MainWindow : LunaWindow, IDisposable
     public void Dispose()
     {
         _templateEditorEvent.Unsubscribe(OnTemplateEditorEvent);
+
+        _penumbraIpcHander.DrawSettingsSection -= _mainTabBar.Settings.DrawPenumbraIntegrationSettings;
     }
 
     public override void Draw()

@@ -47,7 +47,7 @@ public sealed class Profile : ISavable, IFileSystemValue<Profile>
     public int Priority { get; set; }
 
     /// <summary>
-    /// Source of this profile
+    /// Source of this profile. This is changed to User on save unless overriden.
     /// </summary>
     public DataSource Source { get; internal set; } = DataSource.User;
 

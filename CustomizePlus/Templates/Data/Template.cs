@@ -25,7 +25,7 @@ public sealed class Template : ISavable, IFileSystemValue<Template>
     public bool IsWriteProtected { get; internal set; }
 
     /// <summary>
-    /// Source of this template
+    /// Source of this template. This is changed to User on save unless overriden.
     /// </summary>
     public DataSource Source { get; internal set; } = DataSource.User;
 

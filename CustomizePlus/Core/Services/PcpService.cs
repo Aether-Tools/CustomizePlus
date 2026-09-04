@@ -13,7 +13,7 @@ namespace CustomizePlus.Core.Services;
 
 public class PcpService : IRequiredService
 {
-    private readonly Logger _log;
+    private readonly Logger _logger;
     private readonly ProfileManager _profileManager;
     private readonly TemplateManager _templateManager;
     private readonly ActorObjectManager _objects;
@@ -27,14 +27,14 @@ public class PcpService : IRequiredService
 
     public PcpService(
         PenumbraIpcHandler ipc,
-        Logger log,
+        Logger logger,
         ProfileManager profileManager,
         TemplateManager templateManager,
         ActorObjectManager objects,
         PluginConfiguration configuration)
     {
         _penumbraIpcHandler = ipc;
-        _log = log;
+        _logger = logger;
         _profileManager = profileManager;
         _templateManager = templateManager;
         _objects = objects;
@@ -52,16 +52,42 @@ public class PcpService : IRequiredService
         {
             _penumbraIpcHandler.PcpCreated += OnPcpCreated;
             _penumbraIpcHandler.PcpParsed += OnPcpParsed;
-            _log.Information("[CPlusPCPService] Attached to PCP handling.");
+            _logger.Debug("[CPlusPCPService] Attached to PCP handling.");
         }
         else
         {
             _penumbraIpcHandler.PcpCreated -= OnPcpCreated;
             _penumbraIpcHandler.PcpParsed -= OnPcpParsed;
-            _log.Information("[CPlusPCPService] Detached from PCP handling.");
+            _logger.Debug("[CPlusPCPService] Detached from PCP handling.");
         }
 
         _isEnabled = value;
+    }
+
+    /// <summary>
+    /// Deletes all PCP data imported into the plugin except for any that was modified by the user (DataSource = User)
+    /// </summary>
+    public void DeletePCPData()
+    {
+        _logger.Debug("[CPlusPCPService] Deleting all PCP data imported into the plugin.");
+
+        var profiles = _profileManager.Profiles.Where(p => p.Source == DataSource.PCPImport).ToList();
+        _logger.Information($"[CPlusPCPService] {profiles.Count} PCP profiles is about to be deleted");
+
+        foreach (var profile in profiles)
+        {
+            _logger.Information($"[CPlusPCPService] Deleting PCP profile: {profile}");
+            _profileManager.Delete(profile);
+        }
+
+        var templates = _templateManager.Templates.Where(t => t.Source == DataSource.PCPImport).ToList();
+        _logger.Information($"[CPlusPCPService] {templates.Count} PCP templates is about to be deleted");
+
+        foreach (var template in templates)
+        {
+            _logger.Information($"[CPlusPCPService] Deleting PCP template: {template}");
+            _templateManager.Delete(template);
+        }
     }
 
     private void OnPcpCreated(JObject jObj, ushort index, string path)
@@ -69,26 +95,26 @@ public class PcpService : IRequiredService
         if (!_configuration.IntegrationSettings.PenumbraPCPIntegrationEnabled)
             return;
 
-        _log.Debug($"[CPlusPCPService] PcpCreated: Index={index}, Path='{path}'");
+        _logger.Debug($"[CPlusPCPService] PcpCreated: Index={index}, Path='{path}'");
 
         var actorIdentifier = _objects.Actors.FromJson(jObj["Actor"] as JObject);
         if (!actorIdentifier.IsValid)
         {
-            _log.Debug("[CPlusPCPService] Invalid actor identifier.");
+            _logger.Debug("[CPlusPCPService] Invalid actor identifier.");
             return;
         }
 
         var actor = _objects.Objects[(int)index];
         if (!actor.Valid)
         {
-            _log.Debug($"[CPlusPCPService] Actor index: '{index}' is invalid.");
+            _logger.Debug($"[CPlusPCPService] Actor index: '{index}' is invalid.");
             return;
         }
 
         var profile = _profileManager.GetActiveProfileByActor(actor);
         if (profile == null)
         {
-            _log.Debug("[CPlusPCPService] No active profile found for actor.");
+            _logger.Debug("[CPlusPCPService] No active profile found for actor.");
             return;
         }
 
@@ -100,7 +126,7 @@ public class PcpService : IRequiredService
             ["Template"] = template.JsonSerialize()
         };
 
-        _log.Debug("[CPlusPCPService] Successfully added template data to character.json.");
+        _logger.Debug("[CPlusPCPService] Successfully added template data to character.json.");
     }
 
     private void OnPcpParsed(JObject jObj, string modDirectory, Guid collection)
@@ -108,17 +134,17 @@ public class PcpService : IRequiredService
         if (!_configuration.IntegrationSettings.PenumbraPCPIntegrationEnabled)
             return;
 
-        _log.Debug($"[CPlusPCPService] PcpParsed: ModDirectory='{modDirectory}', Collection={collection}");
+        _logger.Debug($"[CPlusPCPService] PcpParsed: ModDirectory='{modDirectory}', Collection={collection}");
 
         if (jObj["CustomizePlus"] is not JObject cpp)
         {
-            _log.Debug("[CPlusPCPService] No CustomizePlus data found in .pcp");
+            _logger.Debug("[CPlusPCPService] No CustomizePlus data found in .pcp");
             return;
         }
 
         if (cpp["Template"] is not JObject templateObj)
         {
-            _log.Debug("[CPlusPCPService] No Template data found in .pcp");
+            _logger.Debug("[CPlusPCPService] No Template data found in .pcp");
             return;
         }
 
@@ -129,7 +155,7 @@ public class PcpService : IRequiredService
         }
         catch (Exception ex)
         {
-            _log.Debug($"[CPlusPCPService] Failed to deserialize template: {ex.Message}");
+            _logger.Debug($"[CPlusPCPService] Failed to deserialize template: {ex.Message}");
             return;
         }
 
@@ -157,6 +183,6 @@ public class PcpService : IRequiredService
         _templateManager.SetSource(newTemplate, DataSource.PCPImport);
         _profileManager.SetSource(profile, DataSource.PCPImport);
 
-        _log.Debug($"[CPlusPCPService] Loaded CustomizePlus template '{newTemplate.Name}' with {newTemplate.Bones.Count} bones.");
+        _logger.Debug($"[CPlusPCPService] Loaded CustomizePlus template '{newTemplate.Name}' with {newTemplate.Bones.Count} bones.");
     }
 }

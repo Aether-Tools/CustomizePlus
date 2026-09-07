@@ -28,17 +28,17 @@ public partial class ProfileManager : IDisposable
 
         Profiles.Clear();
         List<(Profile, string)> invalidNames = new();
-        foreach (var file in _saveService.FileNames.Profiles())
+        foreach (var filename in _saveService.FileNames.Profiles()) //todo: 26/09/08 this is not in line with glamourer implementation, see DesignManager in glamourer.
         {
-            _logger.Debug($"Reading profile {file.FullName}");
+            _logger.Debug($"Reading profile {filename}");
 
             try
             {
-                var text = File.ReadAllText(file.FullName);
+                var text = File.ReadAllText(filename);
                 var data = JObject.Parse(text);
                 var profile = LoadIndividualProfile(data);
-                if (profile.UniqueId.ToString() != Path.GetFileNameWithoutExtension(file.Name))
-                    invalidNames.Add((profile, file.FullName));
+                if (profile.UniqueId.ToString() != Path.GetFileNameWithoutExtension(filename))
+                    invalidNames.Add((profile, filename));
                 if (Profiles.Any(f => f.UniqueId == profile.UniqueId))
                     throw new Exception($"ID {profile.UniqueId} was not unique.");
 

@@ -68,7 +68,7 @@ public sealed class TemplateFileSystemDrawer : FileSystemDrawer<TemplateFileSyst
     public override Vector4 CollapsedFolderColor
         => ColorId.FolderCollapsed.Value().ToVector();
 
-    public override Vector4 FolderLineColor
+    public override Rgba32 FolderLineColor
         => ColorId.FolderLine.Value().ToVector();
 
     public override IEnumerable<ISortMode> ValidSortModes

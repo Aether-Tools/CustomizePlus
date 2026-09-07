@@ -30,32 +30,26 @@ public class FilenameService(IDalamudPluginInterface pi) : BaseFilePathProvider(
         Path.Combine(pi.ConfigDirectory.FullName, "profile_filesystem", "empty_folders.json");
     public readonly string MigrationProfileFileSystem = Path.Combine(pi.ConfigDirectory.FullName, "profile_sort_order.json");
 
-    public override List<FileInfo> GetBackupFiles()
+    public override List<IBackupFile> GetBackupFiles()
     {
-        var list = new List<FileInfo>()
+        var list = new List<IBackupFile>()
         {
-            new(ConfigurationFile),
-            new(TemplateLockedNodes),
-            new(ProfileLockedNodes),
-            new(UiConfigurationFile),
-            new(MigrationTemplateFileSystemEmptyFolders),
-            new(MigrationProfileFileSystemEmptyFolders)
+            new DefaultBackupFile(ConfigurationFile),
+            new DefaultBackupFile(TemplateLockedNodes),
+            new DefaultBackupFile(ProfileLockedNodes),
+            new DefaultBackupFile(UiConfigurationFile),
+            new DefaultBackupFile(MigrationTemplateFileSystemEmptyFolders),
+            new DefaultBackupFile(MigrationProfileFileSystemEmptyFolders)
         };
 
-        list.AddRange(Templates());
-        list.AddRange(Profiles());
+        list.AddRange(Templates().Select(f => new DefaultBackupFile(f)));
+        list.AddRange(Profiles().Select(f => new DefaultBackupFile(f)));
 
         return list;
     }
 
-    public IEnumerable<FileInfo> Templates()
-    {
-        if (!Directory.Exists(TemplateDirectory))
-            yield break;
-
-        foreach (var file in Directory.EnumerateFiles(TemplateDirectory, "*.json", SearchOption.TopDirectoryOnly))
-            yield return new FileInfo(file);
-    }
+    public IEnumerable<string> Templates()
+        => !Directory.Exists(TemplateDirectory) ? [] : Directory.EnumerateFiles(TemplateDirectory, "*.json", SearchOption.TopDirectoryOnly);
 
     public string TemplateFile(Guid id)
         => Path.Combine(TemplateDirectory, $"{id}.json");
@@ -63,14 +57,8 @@ public class FilenameService(IDalamudPluginInterface pi) : BaseFilePathProvider(
     public string TemplateFile(Templates.Data.Template template)
         => TemplateFile(template.UniqueId);
 
-    public IEnumerable<FileInfo> Profiles()
-    {
-        if (!Directory.Exists(ProfileDirectory))
-            yield break;
-
-        foreach (var file in Directory.EnumerateFiles(ProfileDirectory, "*.json", SearchOption.TopDirectoryOnly))
-            yield return new FileInfo(file);
-    }
+    public IEnumerable<string> Profiles()
+        => !Directory.Exists(ProfileDirectory) ? [] : Directory.EnumerateFiles(ProfileDirectory, "*.json", SearchOption.TopDirectoryOnly);
 
     public string ProfileFile(Guid id)
         => Path.Combine(ProfileDirectory, $"{id}.json");

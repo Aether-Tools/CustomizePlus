@@ -58,8 +58,8 @@ public abstract class CPlusFileSystemSelector<T, TState> : FileSystemDrawer<CPlu
     public override Vector4 CollapsedFolderColor
         => ((Rgba32)CollapsedFolderColorValue).ToVector();
 
-    public override Vector4 FolderLineColor
-        => ((Rgba32)ColorId.FolderLine.Value()).ToVector();
+    public override Rgba32 FolderLineColor
+        => ColorId.FolderLine.Value();
 
     public virtual void Dispose()
     {

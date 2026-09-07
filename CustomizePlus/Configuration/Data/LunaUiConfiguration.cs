@@ -1,6 +1,5 @@
 ﻿using CustomizePlus.Core.Services;
 using Luna.Generators;
-using Newtonsoft.Json.Linq;
 using Penumbra.GameData.Actors;
 using System.Text.Json;
 
@@ -18,7 +17,7 @@ public sealed partial class LunaUiConfiguration : ConfigurationFile<FilenameServ
     private TwoPanelWidth _templatesTabScale = new(250, ScalingMode.Absolute);
 
     [ConfigProperty]
-    private TwoPanelWidth _profilesTabScale = new(250, ScalingMode.Absolute);
+    private TwoPanelWidth _profilesTabScale = new TwoPanelWidth(0.3f, ScalingMode.Percentage);
 
     public override int CurrentVersion
         => 1;
@@ -29,10 +28,10 @@ public sealed partial class LunaUiConfiguration : ConfigurationFile<FilenameServ
         ProfilesTabScale.WriteJson(j, "ProfilesTab"u8);
     }
 
-    protected override void LoadData(JObject j)
+    protected override void LoadData(in JsonElement j)
     {
-        _templatesTabScale = TwoPanelWidth.ReadJson(j, "TemplatesTab", new TwoPanelWidth(250, ScalingMode.Absolute));
-        _profilesTabScale = TwoPanelWidth.ReadJson(j, "ProfilesTab", new TwoPanelWidth(0.3f, ScalingMode.Percentage));
+        _templatesTabScale = TwoPanelWidth.ReadJson(j, "TemplatesTab"u8, _templatesTabScale);
+        _profilesTabScale = TwoPanelWidth.ReadJson(j, "ProfilesTab"u8, _profilesTabScale);
     }
 
     public override string ToFilePath(FilenameService fileNames)

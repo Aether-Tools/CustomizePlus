@@ -1,6 +1,5 @@
 ﻿using Dalamud.Plugin;
 using Newtonsoft.Json.Linq;
-using Penumbra.Api.Helpers;
 using Penumbra.Api.IpcSubscribers;
 
 namespace CustomizePlus.Interop.Ipc;

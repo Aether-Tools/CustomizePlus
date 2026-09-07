@@ -113,7 +113,10 @@
         }
       },
       "penumbra.api": {
-        "type": "Project"
+        "type": "Project",
+        "dependencies": {
+          "Luna": "[1.0.0, )"
+        }
       },
       "penumbra.gamedata": {
         "type": "Project",
@@ -121,7 +124,7 @@
           "FlatSharp.Compiler": "[7.9.0, )",
           "FlatSharp.Runtime": "[7.9.0, )",
           "Luna": "[1.0.0, )",
-          "Penumbra.Api": "[5.15.1, )",
+          "Penumbra.Api": "[5.17.0, )",
           "Penumbra.String": "[1.0.8, )"
         }
       },

@@ -15,7 +15,7 @@ jobs:
       - name: Prepare Environment
         uses: Aether-Tools/Deployment/.github/actions/prepare-environment@master
         with:
-          dalamud-distrib: stg/
+#          dalamud-distrib: stg/
           project: CustomizePlus
       - name: Build and Upload Artifact
         uses: Aether-Tools/Deployment/.github/actions/build-with-artifact@master

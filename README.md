@@ -1,7 +1,7 @@
 # Customize+
 Customize+ is a Dalamud plugin designed to give you better control over your Final Fantasy XIV character appearance. Namely it allows you to apply character bone manipulations during gameplay.
 
-### <center>[FAQ](https://github.com/Aether-Tools/CustomizePlus/blob/main/docs/FAQ.md) | [Contributing](https://github.com/Aether-Tools/CustomizePlus/blob/main/docs/CONTRIBUTING.md) | [Support Discord](https://discord.gg/KvGJCCnG8t)</center>
+### <center>[FAQ](https://github.com/Aether-Tools/CustomizePlus/blob/main/docs/FAQ.md) | [Support Discord](https://discord.gg/KvGJCCnG8t) | [Contributing](https://github.com/Aether-Tools/CustomizePlus/blob/main/docs/CONTRIBUTING.md) | [Changelog for external tool developers](https://github.com/Aether-Tools/CustomizePlus/blob/main/docs/DEVELOPER_CHANGELOG.md)</center>
 
 ## I need help with using Customize+!
 Please check FAQ and, if needed, ask your question in support discord server run by our community: [Aetherworks](https://discord.gg/KvGJCCnG8t).

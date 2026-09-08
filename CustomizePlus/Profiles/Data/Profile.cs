@@ -159,7 +159,8 @@ public sealed class Profile : ISavable, IFileSystemValue<Profile>
         if (IsTemporary)
             return;
 
-        using var writer = new StreamWriter(stream);
+        //todo: replace with Utf8JsonWriter
+        using var writer = new StreamWriter(stream, null, -1, true); //stream should be left open as per luna docs
         using var j = new JsonTextWriter(writer)
         {
             Formatting = Formatting.Indented,

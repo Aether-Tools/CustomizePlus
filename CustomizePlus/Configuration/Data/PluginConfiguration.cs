@@ -180,7 +180,8 @@ public class PluginConfiguration : IPluginConfiguration, ISavable
 
     public void Save(Stream stream)
     {
-        using var writer = new StreamWriter(stream);
+        //todo: replace with Utf8JsonWriter
+        using var writer = new StreamWriter(stream, null, -1, true); //stream should be left open as per luna docs
         using var jWriter = new JsonTextWriter(writer);
         jWriter.Formatting = Formatting.Indented;
         var serializer = new JsonSerializer { Formatting = Formatting.Indented };

@@ -3,7 +3,7 @@ This document contains changelog for technical changes to Customize+ which might
 
 **If you are regular user this is not relevant to you, refer to changelog in the plugin.**
 
-### 2.3.0.0
+### 2.2.1.0
 
 * Profile file version has been bumped to 6
 	* "Source" field has been added. This field is mapped to DataSource enum.

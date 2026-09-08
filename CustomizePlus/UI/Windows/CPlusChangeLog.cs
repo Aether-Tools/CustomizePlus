@@ -44,6 +44,7 @@ public class CPlusChangeLog
         Add2_1_1_0(Changelog);
         Add2_2_0_0(Changelog);
         Add2_2_0_1(Changelog);
+        Add2_2_1_0(Changelog);
     }
 
     private (int, ChangeLogDisplayType) ConfigData()
@@ -56,6 +57,16 @@ public class CPlusChangeLog
         _configuration.Save();
     }
 
+    private static void Add2_2_1_0(Changelog log)
+        => log.NextVersion("Version 2.2.1.0"u8)
+        .RegisterHighlight("Undo/Redo functionality in template editor has been rewriten and should function properly now. (by Risa)"u8)
+        .RegisterHighlight("PCP functionality changes (by Risa)"u8)
+        .RegisterEntry("PCP templates and profiles are now placed into a separate \"PCP\" folders."u8, 1)
+        .RegisterEntry("All imported PCP data is now write-protected by default."u8, 1)
+        .RegisterEntry("All imported PCP data can now be deleted using Settings -> Integrations -> Delete all imported PCP data button."u8, 1)
+        .RegisterImportant("Making any changes to profile or template imported via PCP (like changing write protection setting or editing) permanently prevents them from being deleted using that button."u8, 2)
+        .RegisterEntry("Customize+ PCP integration settings are also available via Penumbra settings now."u8, 1)
+        .RegisterImportant("If you are a tool developer please refer to \"Changelog for external tool developers\" section on GitHub for information about changes in this release which may affect your tools."u8);
 
     private static void Add2_2_0_1(Changelog log)
         => log.NextVersion("Version 2.2.0.1"u8)

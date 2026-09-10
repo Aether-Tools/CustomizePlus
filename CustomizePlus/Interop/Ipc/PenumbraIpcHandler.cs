@@ -1,4 +1,5 @@
 ﻿using Dalamud.Plugin;
+using Dalamud.Plugin.Ipc.Exceptions;
 using Newtonsoft.Json.Linq;
 using Penumbra.Api.IpcSubscribers;
 
@@ -109,7 +110,18 @@ public sealed class PenumbraIpcHandler : IIpcSubscriber
         _pcpCreated.Disable();
         _pcpParsed.Disable();
 
-        _unregisterSettingsSection?.Invoke(DrawSettings);
+        try
+        {
+            _unregisterSettingsSection?.Invoke(DrawSettings);
+        }
+        catch (IpcNotReadyError ex)
+        {
+            //it's fine if this isn't available, this might be called AFTER penumbra has been unloaded.
+        }
+        catch (Exception ex)
+        {
+            throw;
+        }
 
         _registerSettingsSection = null;
         _unregisterSettingsSection = null;

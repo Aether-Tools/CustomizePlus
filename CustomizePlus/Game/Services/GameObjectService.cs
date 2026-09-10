@@ -1,5 +1,4 @@
 ﻿using CustomizePlus.Configuration.Data;
-using CustomizePlus.Core.Data;
 using CustomizePlus.GameData.Extensions;
 using Dalamud.Plugin.Services;
 using Penumbra.GameData.Actors;
@@ -48,9 +47,7 @@ public class GameObjectService
         if (!actor.Identifier(_actorManager, out var identifier))
             return false;
 
-        return !Constants.IsInObjectTableBusyNPCRange(actor.Index.Index)
-            && (identifier.IsAllowedForProfiles()
-                || actor == _objectTable.GetObjectAddress(0));
+        return identifier.IsAllowedForProfiles() || actor == _objectTable.GetObjectAddress(0);
     }
 
     /// <summary>

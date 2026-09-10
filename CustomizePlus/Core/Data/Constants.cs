@@ -37,12 +37,6 @@ internal static class Constants
     public const int MaxVectorValueLimit = 512;
 
     /// <summary>
-    /// Predicate function for determining if the given object table index represents an
-    /// NPC in a busy area (i.e. there are ~245 other objects already).
-    /// </summary>
-    public static bool IsInObjectTableBusyNPCRange(int index) => index > 245;
-
-    /// <summary>
     /// A "null" havok vector. Since the type isn't inherently nullable, and the default value (0, 0, 0, 0)
     /// is valid input in a lot of cases, we can use this instead.
     /// </summary>

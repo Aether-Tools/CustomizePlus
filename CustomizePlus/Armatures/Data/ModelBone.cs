@@ -1,7 +1,11 @@
 ﻿using CustomizePlus.Core.Data;
 using CustomizePlus.Core.Extensions;
 using CustomizePlus.Templates.Data;
+using Dalamud.Utility;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Render;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
+using FFXIVClientStructs.Havok.Animation.Rig;
+using FFXIVClientStructs.Havok.Common.Base.Container.Array;
 using FFXIVClientStructs.Havok.Common.Base.Math.QsTransform;
 using static FFXIVClientStructs.Havok.Animation.Rig.hkaPose;
 
@@ -345,6 +349,106 @@ public unsafe class ModelBone
             childScaleToUse);
     }
 
+    public unsafe static void PropagateTransforms(hkQsTransformf* access, Vector3 sourcePos, Vector3 deltaPos, Quaternion deltaRot, Vector3 deltaScale, bool propagateScale, bool propagateRotation)
+    {
+        var offset = access->Translation.ToVector3() - sourcePos;
+
+        var matrix = InteropAlloc.GetMatrix(access);
+        if (propagateScale)
+        {
+            var scaleMatrix = Matrix4x4.CreateScale(deltaScale, Vector3.Zero);
+            matrix *= scaleMatrix;
+            offset = Vector3.Transform(offset, scaleMatrix);
+        }
+        if (propagateRotation)
+        {
+            matrix *= Matrix4x4.CreateFromQuaternion(deltaRot);
+            offset = Vector3.Transform(offset, deltaRot);
+        }
+        matrix.Translation = deltaPos + sourcePos + offset;
+        InteropAlloc.SetMatrix(access, matrix);
+    }
+
+    /// <summary>
+    /// Partial-Skeleton-Propagate-function adapted from Ktisis.
+    /// Propagates transformation through all Partial-Skeletons which are children.
+    /// </summary>
+    public unsafe static void PropagatePartials(Skeleton* skele, Vector3 sourcePos, Vector3 deltaPos, Quaternion deltaRot, Vector3 deltaScale, bool propagateScale, bool propagateRotation, int partialIx, int boneIx)
+    {
+        var partial = skele->PartialSkeletons[partialIx];
+        var pose = partial.GetHavokPose(Constants.TruePoseIndex);
+        if (pose == null || pose->Skeleton == null) return;
+
+        // bail out if partialIx is non-zero (indicating we're trying Propagate on a partial, which can't have its own partials)
+        if (partialIx != 0) return;
+
+        // Iterate and propagate to connected partial skeletons
+
+        var hkaSkele = pose->Skeleton;
+        // start at 1 to ignore root skeleton
+        for (var p = 1; p < skele->PartialSkeletonCount; p++)
+        {
+            var subPartial = skele->PartialSkeletons[p];
+            if (subPartial.HavokPoses.IsEmpty) continue;
+
+            var subPose = subPartial.GetHavokPose(Constants.TruePoseIndex);
+            if (subPose == null || subPose->Skeleton == null || subPose->ModelInSync == 0) continue;
+
+            var subSkele = subPose->Skeleton;
+            if (!IsMultiRootSkeleton(subSkele->ParentIndices))
+            {
+                // propagate normally if this is a single-binding partial (i.e. hair, face to j_kao)
+                var rootBoneIdx = subPartial.ConnectedBoneIndex;
+                var parentBoneIdx = subPartial.ConnectedParentBoneIndex;
+
+                // bail out if the bone being manipulated isn't an ancestor of this skeleton's parent bone
+                // ex: break on Hair skele if we're manipulating Left Hand; propagate if we're manipulating Head or Neck
+                // The parent itself is also excluded because it is already handled by C+'s by name bone handling.
+                // If C+'s by name bone matching ever changes the parent include needs to be put back here.
+                if (!IsBoneDescendantOf(hkaSkele->ParentIndices, parentBoneIdx, boneIx)) continue;
+
+                if (rootBoneIdx == -1)
+                {
+                    CustomizePlus.Logger.Debug($"Calling -1 Propagate for skeleton {p}\nManipulated BoneIx: {boneIx} / Name: {hkaSkele->Bones[boneIx].Name.String}");
+                    continue;
+                }
+                PropagatePartialChildren(subPose, rootBoneIdx, sourcePos, deltaPos, deltaRot, deltaScale, propagateScale, propagateRotation);
+            }
+            else
+            {
+                // propagate against each root in a multi-root partial (i.e. j_ex_top_a_l to left arm && j_ex_top_a_r to right arm)
+                var multiRoots = GetMultiRoots(subSkele->ParentIndices);
+                foreach (var rootIdx in multiRoots)
+                {
+                    // for each root on the multiroot Partial, try to find its counterpart index in the parent Partial by matching names
+                    var parentRootIdx = TryGetBoneNameIndex(pose, subSkele->Bones[rootIdx].Name.String);
+
+                    // Propagate if boneIx being posed is the parent of a rootIdx within the parent skeleton (ex: left clavicle on parent Partial)
+                    // Multiroots are explicitly excluded because they are already handled by C+'s by name bone handling
+                    // If C+'s by name bone matching ever changes the Multiroots include needs to be put back here.
+                    var boneIsParent = parentRootIdx != -1 && IsBoneDescendantOf(hkaSkele->ParentIndices, parentRootIdx, boneIx);
+                    if (boneIsParent)
+                    {
+                        if (rootIdx == -1)
+                            CustomizePlus.Logger.Debug($"Calling -1 Multi-Root Propagate for skeleton {p}\nManipulated BoneIx: {boneIx} / Name: {hkaSkele->Bones[boneIx].Name.String}");
+                        PropagatePartialChildren(subPose, rootIdx, sourcePos, deltaPos, deltaRot, deltaScale, propagateScale, propagateRotation);
+                    }
+                }
+            }
+        }
+    }
+
+    public static void PropagatePartialChildren(hkaPose* pose, int boneIdx, Vector3 sourcePos, Vector3 deltaPos, Quaternion deltaRot, Vector3 deltaScale, bool propagateScale, bool propagateRotation)
+    {
+        var skeleton = pose->Skeleton;
+        for (var i = boneIdx; i < skeleton->Bones.Length; i++)
+        {
+            if (i != boneIdx && !IsBoneDescendantOf(skeleton->ParentIndices, i, boneIdx)) continue;
+            var access = pose->AccessBoneModelSpace(i, PropagateOrNot.DontPropagate);
+            if (access == null) continue;
+            PropagateTransforms(access, sourcePos, deltaPos, deltaRot, deltaScale, propagateScale, propagateRotation);
+        }
+    }
 
     public unsafe void PropagateChildren(CharacterBase* cBase, hkQsTransformf* transform, Vector3 initialPos, Quaternion initialRot, Vector3 initialScale, bool propagateTranslation, bool propagateRotation, bool propagateScale, Vector3 childScale, bool includePartials = true)
     {
@@ -358,30 +462,18 @@ public unsafe class ModelBone
         var deltaPos = sourcePos - initialPos;
         var deltaScale = childScale / initialScale;
 
+        var skeleton = cBase->Skeleton;
+
         foreach (var child in GetDescendants())
         {
             // Plugin.Logger.Debug($"Propagating to {child.BoneName}...");
             var access = child.GetGameTransformAccess(cBase, PoseType.Model);
             if (access != null)
-            {
-
-                var offset = access->Translation.ToVector3() - sourcePos;
-
-                var matrix = InteropAlloc.GetMatrix(access);
-                if (propagateScale)
-                {
-                    var scaleMatrix = Matrix4x4.CreateScale(deltaScale, Vector3.Zero);
-                    matrix *= scaleMatrix;
-                    offset = Vector3.Transform(offset, scaleMatrix);
-                }
-                if (propagateRotation)
-                {
-                    matrix *= Matrix4x4.CreateFromQuaternion(deltaRot);
-                    offset = Vector3.Transform(offset, deltaRot);
-                }
-                matrix.Translation = deltaPos + sourcePos + offset;
-                InteropAlloc.SetMatrix(access, matrix);
-            }
+                PropagateTransforms(access, sourcePos, deltaPos, deltaRot, deltaScale, propagateScale, propagateRotation);
+        }
+        if (includePartials && skeleton != null && skeleton->PartialSkeletons != null)
+        {
+            PropagatePartials(skeleton, sourcePos, deltaPos, deltaRot, deltaScale, propagateScale, propagateRotation, PartialSkeletonIndex, BoneIndex);
         }
     }
 
@@ -423,4 +515,53 @@ public unsafe class ModelBone
                CustomizedTransform.Scaling.Y != 0 && CustomizedTransform.Scaling.Y != 1 ||
                CustomizedTransform.Scaling.Z != 0 && CustomizedTransform.Scaling.Z != 1;
     }
+
+    // Helpers for Partial Propagation from Ktisis.
+
+    // Lookup
+    public unsafe static short TryGetBoneNameIndex(hkaPose* pose, string? name)
+    {
+        if (pose == null || pose->Skeleton == null || name.IsNullOrEmpty())
+            return -1;
+
+        var bones = pose->Skeleton->Bones;
+        for (short i = 0; i < bones.Length; i++)
+        {
+            if (bones[i].Name.String == name)
+                return i;
+        }
+
+        return -1;
+    }
+
+    // Bone descendants
+    public static bool IsBoneDescendantOf(hkArray<short> indices, int bone, int parent)
+    {
+        // only shortcut out of descendant evaluation if this is a single-root skeleton,
+        // and parent is the 0 index
+        if (!IsMultiRootSkeleton(indices) && parent < 1) return true;
+
+        var p = indices[bone];
+        while (p != -1)
+        {
+            if (p == parent)
+                return true;
+            p = indices[p];
+        }
+        return false;
+    }
+
+    // Helpers for multi-binding partials
+    // these expect a hkArray<short> ParentIndices from an hkaSkeleton, and evaluate based on whether values in the sklb's bone->parent mapping match -1 to indicate multiple roots
+    private static List<int> GetMultiRoots(hkArray<short> indices)
+    {
+        List<int> parentIndices = [];
+        for (var p = 0; p < indices.Length; p++)
+        {
+            if (indices[p] == -1) parentIndices.Add(p);
+        }
+        return parentIndices;
+    }
+
+    private static bool IsMultiRootSkeleton(hkArray<short> indices) => GetMultiRoots(indices).Count > 1;
 }

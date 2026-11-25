@@ -294,7 +294,7 @@ public unsafe class ModelBone
             var gameTransform = GetGameTransform(cBase, PoseType.Model);
             if (!gameTransform.Equals(Constants.NullTransform))
             {
-                var modify_Transform = CustomizedTransform.ModifyExistingTransform(gameTransform);
+                var modify_Transform = CustomizedTransform.ModifyExistingTransform(gameTransform, OffsetRotation(cBase));
                 if (!modify_Transform.Equals(Constants.NullTransform))
                 {
                     SetGameTransform(cBase, modify_Transform, PoseType.Model);
@@ -312,7 +312,7 @@ public unsafe class ModelBone
         var initialRot = gameTransformAccess->Rotation.ToQuaternion();
         var initialScale = gameTransformAccess->Scale.ToVector3();
 
-        var modTransform = CustomizedTransform.ModifyExistingTransform(*gameTransformAccess);
+        var modTransform = CustomizedTransform.ModifyExistingTransform(*gameTransformAccess, OffsetRotation(cBase));
         SetGameTransform(cBase, modTransform, PoseType.Model);
 
         var pose = cBase->Skeleton->PartialSkeletons[PartialSkeletonIndex].GetHavokPose(Constants.TruePoseIndex);
@@ -385,9 +385,22 @@ public unsafe class ModelBone
         }
     }
 
+    // Uses the parent's rotation and the bone's rest rotation instead of the bone's current rotation,
+    // so rotating the bone doesn't offset it.
+    private Quaternion? OffsetRotation(CharacterBase* cBase)
+    {
+        var pose = cBase->Skeleton->PartialSkeletons[PartialSkeletonIndex].GetHavokPose(Constants.TruePoseIndex);
+        var parent = pose->Skeleton->ParentIndices[BoneIndex];
+        if (parent < 0)
+            return null;
+        return pose->AccessBoneModelSpace(parent, PropagateOrNot.DontPropagate)->Rotation.ToQuaternion()
+            * pose->Skeleton->ReferencePose[BoneIndex].Rotation.ToQuaternion()
+            * CustomizedTransform!.Rotation.ToQuaternion();
+    }
+
     public void ApplyModelScale(CharacterBase* cBase) => ApplyTransFunc(cBase, CustomizedTransform.ModifyExistingScale);
     public void ApplyModelRotation(CharacterBase* cBase) => ApplyTransFunc(cBase, CustomizedTransform.ModifyExistingRotation);
-    public void ApplyModelFullTranslation(CharacterBase* cBase) => ApplyTransFunc(cBase, CustomizedTransform.ModifyExistingTranslationWithRotation);
+    public void ApplyModelFullTranslation(CharacterBase* cBase) => ApplyTransFunc(cBase, tr => CustomizedTransform.ModifyExistingTranslationWithRotation(tr));
     public void ApplyStraightModelTranslation(CharacterBase* cBase) => ApplyTransFunc(cBase, CustomizedTransform.ModifyExistingTranslation);
 
     private void ApplyTransFunc(CharacterBase* cBase, Func<hkQsTransformf, hkQsTransformf> modTrans)

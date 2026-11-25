@@ -236,9 +236,9 @@ public class BoneTransform
         return rotVec;
     }
 
-    public hkQsTransformf ModifyExistingTransform(hkQsTransformf tr)
+    public hkQsTransformf ModifyExistingTransform(hkQsTransformf tr, Quaternion? offsetRotation = null)
     {
-        return ModifyExistingTranslationWithRotation(ModifyExistingRotation(ModifyExistingScale(tr)));
+        return ModifyExistingTranslationWithRotation(ModifyExistingRotation(ModifyExistingScale(tr)), offsetRotation);
     }
 
     public hkQsTransformf ModifyExistingScale(hkQsTransformf tr)
@@ -265,11 +265,11 @@ public class BoneTransform
         return tr;
     }
 
-    public hkQsTransformf ModifyExistingTranslationWithRotation(hkQsTransformf tr)
+    public hkQsTransformf ModifyExistingTranslationWithRotation(hkQsTransformf tr, Quaternion? offsetRotation = null)
     {
         if (PosingModeDetectService.IsAnamnesisPositionFrozen) return tr;
 
-        var adjustedTranslation = Vector4.Transform(Translation, tr.Rotation.ToQuaternion());
+        var adjustedTranslation = Vector4.Transform(Translation, offsetRotation ?? tr.Rotation.ToQuaternion());
         tr.Translation.X += adjustedTranslation.X;
         tr.Translation.Y += adjustedTranslation.Y;
         tr.Translation.Z += adjustedTranslation.Z;
